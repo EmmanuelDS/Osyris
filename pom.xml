@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
+	
+	<parent>
+		<groupId>be.gim.curator</groupId>
+		<artifactId>curator</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</parent>
+	
+	<groupId>be.gim.tov</groupId>
+	<artifactId>osyris</artifactId>
+	<version>1.0.0-SNAPSHOT</version>
+	<packaging>pom</packaging>
+
+	<properties>
+		<specto.version>2.0.0-SNAPSHOT</specto.version>
+	</properties>
+
+	<dependencies>
+		<dependency>
+			<groupId>javax.servlet</groupId>
+			<artifactId>servlet-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.servlet.jsp</groupId>
+			<artifactId>jsp-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>javax.el</groupId>
+			<artifactId>el-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>org.jboss.weld</groupId>
+			<artifactId>weld-api</artifactId>
+			<scope>provided</scope>
+		</dependency>
+	</dependencies>
+
+	<modules>
+		<module>osyris-ui</module>
+		<module>osyris-model</module>
+		<module>osyris-theme</module>
+		<module>osyris-web</module>
+	</modules>
+	
+	<distributionManagement>
+		<site>
+			<id>osyris site</id>
+			<url>${site.distribution}osyris</url>
+		</site>
+	</distributionManagement>
+
+	<inceptionYear>2013</inceptionYear>
+	<developers>
+		<developer>
+			<id>babs</id>
+			<name>Babs Dumont</name>
+			<email>babs.dumont@gim.be</email>
+			<organization>GIM</organization>
+			<organizationUrl>http://www.gim.be</organizationUrl>
+			<roles>
+				<role>manager</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>stefaan</id>
+			<name>Stefaan Desender</name>
+			<email>stefaan.desender@gim.be</email>
+			<organization>GIM</organization>
+			<organizationUrl>http://www.gim.be</organizationUrl>
+			<roles>
+				<role>architect</role>
+				<role>developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>kristof</id>
+			<name>Kristof Spiessens</name>
+			<email>kristof.spiessens@gim.be</email>
+			<organization>GIM</organization>
+			<organizationUrl>http://www.gim.be</organizationUrl>
+			<roles>
+				<role>developer</role>
+				<role>maintainer</role>
+			</roles>
+		</developer>
+	</developers>
+</project>
