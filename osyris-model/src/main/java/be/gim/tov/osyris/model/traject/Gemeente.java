@@ -1,6 +1,5 @@
 package be.gim.tov.osyris.model.traject;
 
-import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
@@ -12,7 +11,7 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class Gemeente extends AbstractModelObject implements StorableObject {
+public class Gemeente extends AbstractModelObject {
 
 	// VARIABLES
 	private String naam;

@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.controle;
 
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SrsName;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -16,6 +17,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AnderProbleem extends Probleem {
 
 	// VARIABLES
+	@NotSearchable
 	@SrsName("EPSG:31370")
 	private Geometry geom;
 

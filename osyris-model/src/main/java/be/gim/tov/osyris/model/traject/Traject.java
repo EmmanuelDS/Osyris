@@ -4,6 +4,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -23,6 +24,7 @@ public abstract class Traject extends AbstractModelObject implements StorableObj
 	// VARIABLES
 	private String naam;
 	private float lengte;
+	@NotSearchable
 	@SrsName("EPSG:31370")
 	private Geometry geom;
 	@ModelClassName("Regio")

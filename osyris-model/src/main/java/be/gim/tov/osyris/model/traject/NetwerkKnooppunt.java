@@ -3,6 +3,7 @@ package be.gim.tov.osyris.model.traject;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -22,6 +23,7 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements St
 	private String naam;
 	private double x;
 	private double y;
+	@NotSearchable
 	@SrsName("EPSG:31370")
 	private Geometry geom;
 
