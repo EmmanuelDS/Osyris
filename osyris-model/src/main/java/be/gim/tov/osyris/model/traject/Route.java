@@ -1,5 +1,7 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -16,6 +18,8 @@ import be.gim.commons.resource.ResourceIdentifier;
 public abstract class Route extends Traject {
 
 	// VARIABLES
+	@Label("Gemeente")
+	@Description("Gemeente")
 	@ModelClassName("Gemeente")
 	private ResourceIdentifier gemeente;
 

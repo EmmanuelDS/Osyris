@@ -1,11 +1,16 @@
 package be.gim.tov.osyris.model.traject;
 
+import static org.conscientia.api.model.SubClassPersistence.UNION;
+
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SrsName;
+import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -19,27 +24,70 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public abstract class Bord extends AbstractModelObject implements StorableObject {
+@SubClassPersistence(UNION)
+public abstract class Bord extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Naam")
+	@Description("Naam")
 	private String naam;
+
+	@Label("Straatnaam")
+	@Description("Straatnaam")
 	private String straatnaam;
+
+	@Label("Wegbevoegd")
+	@Description("Wegbevoegd")
 	private String wegBevoegd;
+
+	@Label("Paalconstructie")
+	@Description("Paalconstructie")
 	private String paalConst;
+
+	@Label("Paaldiameter")
+	@Description("Paaldiameter")
 	private int paalDia;
+
+	@Label("Paalbeugel")
+	@Description("Paalbeugel")
 	private String paalBeugel;
+
+	@Label("Paalgrond")
+	@Description("Paalgrond")
 	private String paalGrond;
+
+	@Label("Bordconstructie")
+	@Description("Bordconstructie")
 	private String bordConst;
-	private String bordBase;
+
+	@Label("Foto")
+	@Description("Foto")
 	private String foto;
+
+	@Label("Fiche")
+	@Description("Fiche")
 	private String fiche;
+
+	@Label("X")
+	@Description("X")
 	private double x;
+
+	@Label("Y")
+	@Description("Y")
 	private double y;
+
 	@NotSearchable
 	@SrsName("EPSG:31370")
 	private Geometry geom;
+
+	@Label("Regio")
+	@Description("Regio")
 	@ModelClassName("Regio")
 	private ResourceIdentifier regio;
+
+	@Label("Gemeente")
+	@Description("Gemeente")
 	@ModelClassName("Gemeente")
 	private ResourceIdentifier gemeente;
 
@@ -106,14 +154,6 @@ public abstract class Bord extends AbstractModelObject implements StorableObject
 
 	public void setBordConst(String bordConst) {
 		this.bordConst = bordConst;
-	}
-
-	public String getBordBase() {
-		return bordBase;
-	}
-
-	public void setBordBase(String bordBase) {
-		this.bordBase = bordBase;
 	}
 
 	public String getFoto() {

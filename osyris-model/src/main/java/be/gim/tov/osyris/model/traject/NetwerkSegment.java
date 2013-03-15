@@ -1,5 +1,7 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -16,11 +18,17 @@ import be.gim.commons.resource.ResourceIdentifier;
 public abstract class NetwerkSegment extends Traject {
 
 	// VARIABLES
+	@Label("Enkele richting")
+	@Description("Enkele richting")
 	private boolean enkelRichting;
-	@ModelClassName("NetwerkBord")
-	private ResourceIdentifier segment;
+
+	@Label("Van knooppunt")
+	@Description("van knooppunt")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier vanKnooppunt;
+
+	@Label("Naar knooppunt")
+	@Description("Naar knooppunt")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier naarKnooppunt;
 
@@ -31,14 +39,6 @@ public abstract class NetwerkSegment extends Traject {
 
 	public void setEnkelRichting(boolean enkelRichting) {
 		this.enkelRichting = enkelRichting;
-	}
-
-	public ResourceIdentifier getSegment() {
-		return segment;
-	}
-
-	public void setSegment(ResourceIdentifier segment) {
-		this.segment = segment;
 	}
 
 	public ResourceIdentifier getVanKnooppunt() {

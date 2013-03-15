@@ -1,8 +1,11 @@
 package be.gim.tov.osyris.model.controle;
 
+import static org.conscientia.api.model.SubClassPersistence.UNION;
+
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.core.model.AbstractModelObject;
 
 /**
@@ -12,7 +15,9 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public abstract class Probleem extends AbstractModelObject implements StorableObject {
+@SubClassPersistence(UNION)
+public abstract class Probleem extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
 	private String type;

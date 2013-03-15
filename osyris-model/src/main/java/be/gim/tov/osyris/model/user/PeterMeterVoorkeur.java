@@ -1,6 +1,8 @@
 package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -15,15 +17,33 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class PeterMeterVoorkeur extends AbstractModelObject implements StorableObject {
+public class PeterMeterVoorkeur extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Trajectnaam")
+	@Description("Trajectnaam")
 	private String trajectNaam;
+
+	@Label("Trajecttype")
+	@Description("Trajecttype")
 	private String trajectType;
+
+	@Label("Maximale afstand")
+	@Description("Maximale afstand")
 	private float maxAfstand;
+
+	@Label("Periode")
+	@Description("Periode")
 	private short periode;
+
+	@Label("Gemeente")
+	@Description("Gemeente")
 	@ModelClassName("Gemeente")
 	private ResourceIdentifier gemeente;
+
+	@Label("Regio")
+	@Description("Regio")
 	@ModelClassName("Regio")
 	private ResourceIdentifier regio;
 

@@ -13,23 +13,11 @@
 		<finalName>geocms</finalName>
 		<plugins>
 			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-war-plugin</artifactId>
-				<configuration>
-					<overlays>
-						<overlay>
-							<groupId>be.gim.specto</groupId>
-							<artifactId>specto-web-all</artifactId>
-						</overlay>
-					</overlays>
-				</configuration>
-			</plugin>
-			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>tomcat-maven-plugin</artifactId>
 				<configuration>
-					<url>http://agiv.gim.be/manager</url>
-					<server>agiv.gim.be</server>
+					<url>http://tov-osyris.gim.be/manager</url>
+					<server>tov-osyris.gim.be</server>
 				</configuration>
 			</plugin>
 		</plugins>
@@ -37,10 +25,129 @@
 
 	<dependencies>
 		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-common</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-repository-default</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-cache-ehcache</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-store-hibernate</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-search-lucene</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-model-base</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-model-user</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-model-content</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-model-ui</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-ui-web</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-ui-admin</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-service-base</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-service-model</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-service-resource</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>be.gim.specto</groupId>
-			<artifactId>specto-web-all</artifactId>
+			<artifactId>specto-common</artifactId>
 			<version>${specto.version}</version>
-			<type>war</type>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-model-map</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-layer-wms</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-layer-wfs</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-layer-model</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-store-hibernate</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-search-lucene</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-dispatch</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-ui-map</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-ui-model</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-service-ogc</artifactId>
+			<version>${specto.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>be.gim.tov</groupId>

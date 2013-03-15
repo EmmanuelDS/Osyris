@@ -1,5 +1,7 @@
 package be.gim.tov.osyris.model.controle;
 
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -16,6 +18,8 @@ import be.gim.commons.resource.ResourceIdentifier;
 public abstract class BordProbleem extends Probleem {
 
 	// VARIABLES
+	@Label("Bord")
+	@Description("Bord")
 	@ModelClassName("Bord")
 	private ResourceIdentifier bord;
 

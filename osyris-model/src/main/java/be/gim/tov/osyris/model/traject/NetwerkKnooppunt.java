@@ -1,6 +1,8 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
@@ -16,13 +18,26 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public abstract class NetwerkKnooppunt extends AbstractModelObject implements StorableObject {
+public abstract class NetwerkKnooppunt extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Nummer")
+	@Description("Nummer")
 	private int nummer;
+
+	@Label("Naam")
+	@Description("Naam")
 	private String naam;
+
+	@Label("X")
+	@Description("X")
 	private double x;
+
+	@Label("Y")
+	@Description("Y")
 	private double y;
+
 	@NotSearchable
 	@SrsName("EPSG:31370")
 	private Geometry geom;

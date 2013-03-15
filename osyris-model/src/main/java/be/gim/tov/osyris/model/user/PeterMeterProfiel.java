@@ -4,6 +4,8 @@ import java.util.Date;
 import java.util.List;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
@@ -15,12 +17,24 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class PeterMeterProfiel extends AbstractModelObject implements StorableObject {
+public class PeterMeterProfiel extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Status")
+	@Description("Status")
 	private String status;
+
+	@Label("Actief sinds")
+	@Description("Actief sinds")
 	private Date actiefSinds;
+
+	@Label("Actief tot")
+	@Description("Actief tot")
 	private Date actiefTot;
+
+	@Label("Voorkeuren")
+	@Description("Voorkeuren")
 	private List<PeterMeterVoorkeur> voorkeuren;
 
 	// GETTERS AND SETTERS

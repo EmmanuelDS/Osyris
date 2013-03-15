@@ -15,6 +15,7 @@
 
 	<properties>
 		<specto.version>2.0.0-SNAPSHOT</specto.version>
+		<conscientia.version>2.0.0-SNAPSHOT</conscientia.version>
 	</properties>
 
 	<dependencies>
@@ -47,9 +48,14 @@
 		<module>osyris-web</module>
 	</modules>
 	
+	<ciManagement>
+		<system>jenkins</system>
+		<url>http://build.gim.be/jenkins</url>
+	</ciManagement>
+	
 	<distributionManagement>
 		<site>
-			<id>osyris site</id>
+			<id>report site</id>
 			<url>${site.distribution}osyris</url>
 		</site>
 	</distributionManagement>

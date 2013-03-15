@@ -1,5 +1,7 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
@@ -14,9 +16,20 @@ import org.conscientia.core.model.AbstractModelObject;
 public class Gemeente extends AbstractModelObject {
 
 	// VARIABLES
+	@Label("Naam")
+	@Description("Naam")
 	private String naam;
+
+	@Label("NIS code")
+	@Description("NIS code")
 	private String niscode;
+
+	@Label("EU code")
+	@Description("EU code")
 	private String eucode;
+
+	@Label("Perimeter")
+	@Description("Perimeter")
 	private float perimeter;
 
 	// GETTERS AND SETTERS

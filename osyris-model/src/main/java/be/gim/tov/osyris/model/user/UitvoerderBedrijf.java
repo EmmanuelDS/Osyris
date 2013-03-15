@@ -1,6 +1,8 @@
 package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
@@ -12,16 +14,40 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class UitvoerderBedrijf extends AbstractModelObject implements StorableObject {
+public class UitvoerderBedrijf extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Adres")
+	@Description("Adres")
 	private String adres;
+
+	@Label("Contactpersoon")
+	@Description("Contactpersoon")
 	private String contactPersoon;
+
+	@Label("Email")
+	@Description("Email")
 	private String email;
+
+	@Label("Fax")
+	@Description("Fax")
 	private String fax;
+
+	@Label("Gemeente")
+	@Description("Gemeente")
 	private String gemeente;
+
+	@Label("Naam")
+	@Description("Naam")
 	private String naam;
+
+	@Label("Postcode")
+	@Description("Postcode")
 	private String postcode;
+
+	@Label("Telefoon")
+	@Description("Telefoon")
 	private String telefoon;
 
 	// GETTERS AND SETTERS

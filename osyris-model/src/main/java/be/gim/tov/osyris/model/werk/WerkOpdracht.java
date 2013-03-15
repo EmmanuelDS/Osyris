@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -24,30 +26,83 @@ import be.gim.tov.osyris.model.controle.Probleem;
 public class WerkOpdracht extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
+	@Label("Type")
+	@Description("Type")
 	private String type;
+
+	@Label("Status")
+	@Description("Status")
 	private String status;
+
+	@Label("Beoordeling")
+	@Description("Beoordeling")
 	private String beoordeling;
+
+	@Label("Omschrijving opdracht")
+	@Description("Omschrijving opdracht")
 	private String omschrijvingOpdracht;
+
+	@Label("Commentaar medewerker")
+	@Description("Commentaar medewerker")
 	private String commentaarMedewerker;
+
+	@Label("Omschrijving uitvoering")
+	@Description("Omschrijving uitvoering")
 	private String omschrijvingUitvoering;
+
+	@Label("Commentaar uitvoerder")
+	@Description("Commentaar uitvoerder")
 	private String commentaarUitvoerder;
+
+	@Label("Foto")
+	@Description("Foto")
 	private String foto;
+
+	@Label("Datum geannuleerd")
+	@Description("Datum geannuleerd")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGeannuleerd;
+
+	@Label("Datum gerapporteerd")
+	@Description("Datum gerapporteerd")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGerapporteerd;
+
+	@Label("Datum gevalideerd")
+	@Description("Datum gevalideerd")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGevalideerd;
+
+	@Label("Datum te controleren")
+	@Description("Datum te controleren")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumTeControleren;
+
+	@Label("Datum uit te voeren")
+	@Description("Datum uit te voeren")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumUitTeVoeren;
+
+	@Label("Medewerker")
+	@Description("Medewerker")
 	@ModelClassName("User")
 	private ResourceIdentifier medewerker;
+
+	@Label("Uitvoerder")
+	@Description("Uitvoerder")
 	@ModelClassName("User")
 	private ResourceIdentifier uitvoerder;
+
+	@Label("Probleem")
+	@Description("Probleem")
 	private Probleem probleem;
+
+	@Label("Gebruikt materiaal")
+	@Description("Gebruikt materiaal")
 	private GebruiktMateriaal gebruiktMateriaal;
+
+	@Label("Handelingen")
+	@Description("Handelingen")
 	private List<WerkHandeling> handelingen;
 
 	// GETTERS AND SETTERS

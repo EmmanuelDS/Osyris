@@ -4,6 +4,8 @@ import java.util.Date;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -22,20 +24,52 @@ import be.gim.commons.resource.ResourceIdentifier;
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
+	@Label("Status")
+	@Description("Status")
 	private String status;
+
+	@Label("Voornaam")
+	@Description("Voornaam")
 	private String voornaam;
+
+	@Label("Naam")
+	@Description("Naam")
 	private String naam;
+
+	@Label("Email")
+	@Description("Email")
 	private String email;
+
+	@Label("Telefoon")
+	@Description("Telefoon")
 	private String telefoon;
+
+	@Label("Datum vaststelling")
+	@Description("Datum vaststelling")
 	private Date datumVaststelling;
+
+	@Label("Datum gemeld")
+	@Description("Datum gemeld")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGemeld;
+
+	@Label("Datum gevalideerd")
+	@Description("Peter/Meter")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGevalideerd;
+
+	@Label("Traject")
+	@Description("Traject")
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
+
+	@Label("Medewerker")
+	@Description("Medewerker")
 	@ModelClassName("User")
 	private ResourceIdentifier medewerker;
+
+	@Label("Probleem")
+	@Description("Probleem")
 	private Probleem probleem;
 
 	// GETTERS AND SETTERS

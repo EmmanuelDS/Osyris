@@ -1,6 +1,8 @@
 package be.gim.tov.osyris.model.werk;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
@@ -12,10 +14,16 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class GebruiktMateriaal extends AbstractModelObject implements StorableObject {
+public class GebruiktMateriaal extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Aantal")
+	@Description("Aantal")
 	private int aantal;
+
+	@Label("Stockmateriaal")
+	@Description("Stockmateriaal")
 	private StockMateriaal stockMateriaal;
 
 	// GETTERS AND SETTERS

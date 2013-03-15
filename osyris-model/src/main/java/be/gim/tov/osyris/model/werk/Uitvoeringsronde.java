@@ -5,6 +5,8 @@ import java.util.List;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -20,12 +22,21 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class Uitvoeringsronde extends AbstractModelObject implements StorableObject {
+public class Uitvoeringsronde extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Status")
+	@Description("Status")
 	private String status;
+
+	@Label("Datum uitvoering")
+	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumUitvoering;
+
+	@Label("Werkopdrachten")
+	@Description("Werkopdrachten")
 	@ModelClassName("WerkOpdracht")
 	private List<ResourceIdentifier> opdrachten;
 

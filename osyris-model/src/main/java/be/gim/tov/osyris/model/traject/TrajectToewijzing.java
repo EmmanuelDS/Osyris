@@ -1,6 +1,8 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -15,16 +17,31 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class TrajectToewijzing extends AbstractModelObject implements StorableObject {
+public class TrajectToewijzing extends AbstractModelObject implements
+		StorableObject {
 
 	// VARIABLES
+	@Label("Jaar")
+	@Description("Jaar")
 	private short jaar;
+
+	@Label("Traject")
+	@Description("Traject")
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
+
+	@Label("Peter/Meter 1")
+	@Description("Peter/Meter 1")
 	@ModelClassName("User")
 	private ResourceIdentifier peterMeter1;
+
+	@Label("Peter/Meter 2")
+	@Description("Peter/Meter 2")
 	@ModelClassName("User")
 	private ResourceIdentifier peterMeter2;
+
+	@Label("Peter/Meter 3")
+	@Description("Peter/Meter 3")
 	@ModelClassName("User")
 	private ResourceIdentifier peterMeter3;
 
