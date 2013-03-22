@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ehcache xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:noNamespaceSchemaLocation="ehcache.xsd">
+	<diskStore path="java.io.tmpdir" />
+	<defaultCache maxElementsInMemory="1000" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		diskPersistent="false" maxElementsOnDisk="10000"
+		diskExpiryThreadIntervalSeconds="120" memoryStoreEvictionPolicy="LRU" />
+	<cache name="pageCache" maxElementsInMemory="50" eternal="false"
+		overflowToDisk="true" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="hibernateObjectCache" maxElementsInMemory="1000"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="hibernateUpdateTimestampsCache" maxElementsInMemory="200"
+		eternal="false" overflowToDisk="true" timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="hibernateStandardQueryCache" maxElementsInMemory="75"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="documentMetaCache" maxElementsInMemory="1000"
+		eternal="false" overflowToDisk="true" timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="permissionCache" maxElementsInMemory="100"
+		eternal="false" overflowToDisk="true" timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="ruleCache" maxElementsInMemory="100"
+		eternal="false" overflowToDisk="true" timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="responseCache" maxElementsInMemory="200" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="wmsServerCache" maxElementsInMemory="75" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="wmsMapCache" maxElementsInMemory="100" eternal="false"
+		overflowToDisk="true" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="wfsDataStoreCache" maxElementsInMemory="75"
+		eternal="false" overflowToDisk="false" timeToIdleSeconds="14400"
+		timeToLiveSeconds="14400" memoryStoreEvictionPolicy="LRU" />
+	<cache name="wfsFeatureCache" maxElementsInMemory="100" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="featureFileSchemaCache" maxElementsInMemory="50" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="wcsServerCache" maxElementsInMemory="75" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="coverageFileCache" maxElementsInMemory="50" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="sosServerCache" maxElementsInMemory="75" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="sosObservationCache" maxElementsInMemory="100" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache name="wpsServerCache" maxElementsInMemory="75" eternal="false"
+		overflowToDisk="false" timeToIdleSeconds="7200" timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+</ehcache>

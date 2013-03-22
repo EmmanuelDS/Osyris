@@ -13,6 +13,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -33,7 +34,7 @@ import be.gim.commons.resource.ResourceIdentifier;
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
 		@Permission(profile = "group:PeterMeter", action = "view", allow = false),
 		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "edit", allow = false), })
+		@Permission(profile = "group:PeterMeter", action = "edit", allow = false) })
 public class StockMateriaal extends AbstractModelObject implements
 		StorableObject {
 
@@ -75,21 +76,27 @@ public class StockMateriaal extends AbstractModelObject implements
 
 	@Label("Besteld")
 	@Description("Besteld")
-	private boolean besteld;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisBean.stockMateriaalStates}")
+	private String besteld;
 
 	@Label("Traject")
+	@Description("Traject")
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
 
 	@Label("Regio")
+	@Description("Regio")
 	@ModelClassName("Regio")
 	private ResourceIdentifier regio;
 
 	@Label("Datum besteld")
+	@Description("Datum besteld")
 	@Type(ModelPropertyType.DATE)
 	private Date datumBesteld;
 
 	@Label("Datum geleverd")
+	@Description("Datum geleverd")
 	@Type(ModelPropertyType.DATE)
 	private Date datumGeleverd;
 
@@ -158,11 +165,11 @@ public class StockMateriaal extends AbstractModelObject implements
 		this.teBestellen = teBestellen;
 	}
 
-	public boolean isBesteld() {
+	public String getBesteld() {
 		return besteld;
 	}
 
-	public void setBesteld(boolean besteld) {
+	public void setBesteld(String besteld) {
 		this.besteld = besteld;
 	}
 

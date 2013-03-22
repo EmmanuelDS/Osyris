@@ -3,12 +3,16 @@ package be.gim.tov.osyris.model.user;
 import java.util.Date;
 import java.util.List;
 
+import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
+
+import be.gim.commons.resource.ResourceIdentifier;
 
 /**
  * 
@@ -17,10 +21,15 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@For("User")
 public class PeterMeterProfiel extends AbstractModelObject implements
-		StorableObject {
+		StorableObject, ModelAspect {
 
 	// VARIABLES
+	@Label("Peter/Meter")
+	@Description("Peter/Meter")
+	private ResourceIdentifier _for;
+
 	@Label("Status")
 	@Description("Status")
 	private String status;
@@ -38,6 +47,16 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	private List<PeterMeterVoorkeur> voorkeuren;
 
 	// GETTERS AND SETTERS
+	@Override
+	public ResourceIdentifier getFor() {
+		return _for;
+	}
+
+	@Override
+	public void setFor(ResourceIdentifier _for) {
+		this._for = _for;
+	}
+
 	public String getStatus() {
 		return status;
 	}

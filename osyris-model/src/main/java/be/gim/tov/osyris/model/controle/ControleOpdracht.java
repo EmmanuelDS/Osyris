@@ -31,7 +31,6 @@ import be.gim.tov.osyris.model.annotation.EditInStatus;
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
 @Edit(type = "controleOpdracht")
-// TODO: Permissies
 public abstract class ControleOpdracht extends AbstractModelObject implements
 		StorableObject {
 

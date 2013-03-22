@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE log4j:configuration SYSTEM "log4j.dtd">
+<log4j:configuration xmlns:log4j="http://jakarta.apache.org/log4j/"
+	debug="false">
+	<appender name="console" class="org.apache.log4j.ConsoleAppender">
+		<param name="Target" value="System.out" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %-5p [%c %L] %m%n" />
+		</layout>
+	</appender>
+	<!--
+	<appender name="file" class="org.apache.log4j.RollingFileAppender">
+		<param name="File" value="conscientia.log" />
+		<param name="MaxBackupIndex" value="1" />
+		<param name="MaxFileSize" value="1024KB" />
+		<layout class="org.apache.log4j.PatternLayout">
+			<param name="ConversionPattern" value="%d{ISO8601} %-5p [%c %L] %m%n" />
+		</layout>
+	</appender>
+	-->
+	<category name="javax.servlet">
+		<level value="error" />
+	</category>
+	<category name="org.ajax4jsf" >
+		<level value="error" />
+	</category>
+	<category name="org.richfaces">
+		<level value="error" />
+	</category>
+	<category name="org.jboss.seam">
+		<level value="error" />
+	</category>
+	<category name="org.jboss.portletbridge">
+		<level value="error" />
+	</category>
+	<category name="org.jbpm">
+		<level value="error" />
+	</category>
+	<category name="org.hibernate">
+		<level value="error" />
+	</category>
+	<category name="org.hibernatespatial">
+		<level value="error" />
+	</category>
+	<category name="net.sf.ehcache">
+		<level value="error" />
+	</category>
+	<category name="org.geotools">
+		<level value="error" />
+	</category>
+	<category name="org.geotools.data.wps">
+		<level value="error" />
+	</category>
+	<category name="be.gim.commons">
+		<level value="debug" />
+	</category>
+	<category name="be.gim.commons.seam">
+		<level value="info" />
+	</category>
+	<category name="be.gim.specto">
+		<level value="debug" />
+	</category>
+	<category name="org.conscientia">
+		<level value="debug" />
+	</category>
+	<root>
+		<priority value="error" />
+		<appender-ref ref="console" />
+	</root>
+</log4j:configuration>
