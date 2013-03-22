@@ -30,8 +30,8 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@Description("Peter/Meter")
 	private ResourceIdentifier _for;
 
-	@Label("Status")
-	@Description("Status")
+	@Label("Status beschikbaarheid")
+	@Description("Status beschikbaarheid")
 	private String status;
 
 	@Label("Actief sinds")

@@ -84,7 +84,8 @@
 				<j:commandButton rendered="#{listForm.canCreate}"
 					value="#{messages['page.create.create.button']}"
 					image="#{resource['core/images/actions/12x12/create.png']}"
-					type="button">
+					type="button"
+					action="#{listForm.createObject()}">
 					<j:renderListener target="createPanel" 
 						rendered="true"
 						execute="@this" />
