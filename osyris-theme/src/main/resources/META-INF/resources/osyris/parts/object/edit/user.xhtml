@@ -1,0 +1,79 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="org.conscientia.ui.ModelObject" />
+	<cc:implementation>
+		<r:tabPanel switchType="ajax"
+			styleClass="model-propertyGroups"
+			contentClass="model-propertyGroup">
+			<r:tab header="#{messages['page.user.profile']}">
+				<a:outputPanel>
+					<d:aspect id="profile"
+						value="#{cc.attrs.value.getAspect('UserProfile', modelRepository, true)}"
+						mode="#{cc.attrs.mode}"
+						level="#{cc.attrs.level}"/>
+				</a:outputPanel>
+			</r:tab>
+			<r:tab header="#{messages['page.user.password']}">
+				<a:outputPanel>
+					<d:fields>
+						<d:field for="password"
+							label="Password">
+							<h:inputSecret id="password"
+								value="#{cc.attrs.value.newPassword}"
+								required="false">
+								<f:validateLength minimum="4"
+									maximum="64" />
+							</h:inputSecret>
+						</d:field>
+						<d:field for="confirm"
+							label="Confirmation">
+							<h:inputSecret id="confirm"
+								required="false">
+								<f:validateLength minimum="4"
+									maximum="64" />
+							</h:inputSecret>
+						</d:field>
+					</d:fields>
+				</a:outputPanel>
+			</r:tab>
+			<r:tab header="Administration"
+				rendered="#{identity.inGroup('admin', 'CUSTOM')}">
+				<a:outputPanel>
+					<d:fields>
+						<d:checkboxField id="active"
+							value="#{cc.attrs.value.active}"
+							label="#{cc.attrs.modelClass.getProperty('active').label}"
+							description="#{cc.attrs.modelClass.getProperty('active').description}" />
+					</d:fields>
+				</a:outputPanel>
+			</r:tab>
+			
+			<r:tab header="Voorkeuren"
+				rendered="#{identity.inGroup('PeterMeter', 'CUSTOM')}">
+				<a:outputPanel>
+					<d:aspect id="peterMeterProfile"
+						value="#{cc.attrs.value.getAspect('PeterMeterProfiel', modelRepository, true)}"
+						mode="#{cc.attrs.mode}"
+						level="#{cc.attrs.level}"/>
+				</a:outputPanel>
+			
+			</r:tab>
+			<r:tab header="UitvoerderBedrijf"
+				rendered="#{identity.inGroup('Uitvoerder', 'CUSTOM')}">
+				<a:outputPanel>
+					<d:aspect id="uitvoerderProfile"
+						value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, true)}"
+						mode="#{cc.attrs.mode}"
+						level="#{cc.attrs.level}"/>
+				</a:outputPanel>
+			</r:tab>
+		</r:tabPanel>
+	</cc:implementation>
+</div>

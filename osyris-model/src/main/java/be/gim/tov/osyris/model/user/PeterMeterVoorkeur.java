@@ -6,6 +6,8 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Permission;
+import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -17,6 +19,11 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Voorkeur")
+@Description("Voorkeur")
+@Permissions({
+		@Permission(profile = "group:PeterMeter", action = "search", allow = true),
+		@Permission(profile = "group:PeterMeter", action = "view", allow = true) })
 public class PeterMeterVoorkeur extends AbstractModelObject implements
 		StorableObject {
 

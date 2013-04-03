@@ -9,12 +9,12 @@
 			<c:forEach items="#{cc.attrs.modelClass.properties}"
 				var="property">
 				<c:choose>
-					<c:when test="#{property.isVisible(cc.attrs.mode, cc.attrs.level, cc.attrs.simple)}">
+					<c:when test="#{propertyEditBean.isEditableProperty(cc.attrs.value, property)}">
 						<d:propertyField id="field_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"
-							modelObject="#{cc.attrs.modelObject}"
+							modelObject="#{cc.attrs.value}"
 							mode="#{cc.attrs.mode}"
 							level="#{cc.attrs.level}"
 							simple="#{cc.attrs.simple}"/>
@@ -24,7 +24,7 @@
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"
-							modelObject="#{cc.attrs.modelObject}"
+							modelObject="#{cc.attrs.value}"
 							mode="VIEW"
 							level="#{cc.attrs.level}"
 							simple="#{cc.attrs.simple}" />

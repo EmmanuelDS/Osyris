@@ -13,7 +13,7 @@
 		value="List" />
 
 	<center>
-		<r:panel id="query"
+		<r:panel id="query" rendered="#{listForm.hasPermission}"
 			style="max-width: 600px; text-align: left; margin: 10px;">
 			<q:query value="#{listForm.query}"
 				modelClassName="#{listForm.modelClass.name}">
@@ -45,7 +45,8 @@
 						<j:commandButton
 							image="#{resource['core/images/actions/16x16/view.png']}"
 							type="image" 
-							title="#{messages['page.actions.view.label']}">
+							title="#{messages['page.actions.view.label']}"
+							rendered="#{listForm.isCanView(object)}">
 							<j:renderListener target="#{r:clientId('viewPanel')}" 
 								rendered="true"
 								execute="@this" />
@@ -121,7 +122,8 @@
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						submit="false">
+						submit="false"
+						immediate="true">
 						<j:renderControl event="click" 
 							rendered="false" />
 					</j:commandButton>
@@ -174,8 +176,9 @@
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						submit="false">
-						<j:renderControl event="click" 
+						submit="false"
+						immediate="true">
+						<j:renderControl event="click"
 							rendered="false" />
 					</j:commandButton>
 				</d:buttons>

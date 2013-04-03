@@ -23,4 +23,15 @@ public class OsyrisBean {
 		return stockMateriaalStates;
 	}
 
+	public List<Object[]> getPeterMeterProfileStates() {
+		List<Object[]> profileStates = new ArrayList<Object[]>();
+		Object[] statusActief = { "Actief", "Actief" };
+		Object[] statusPassief = { "Passief", "Passief" };
+		Object[] statusKandidaat = { "Kandidaat", "Kandidaat" };
+
+		profileStates.add(statusActief);
+		profileStates.add(statusPassief);
+		profileStates.add(statusKandidaat);
+		return profileStates;
+	}
 }

@@ -4,12 +4,18 @@ import java.util.Date;
 import java.util.List;
 
 import org.conscientia.api.model.ModelAspect;
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.Permission;
+import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -22,16 +28,29 @@ import be.gim.commons.resource.ResourceIdentifier;
 @Model
 @ModelStore("OsyrisDataStore")
 @For("User")
+@Permissions({
+		@Permission(profile = "group:Routedokter", action = "search", allow = true),
+		@Permission(profile = "group:Routedokter", action = "view", allow = true),
+		@Permission(profile = "group:Routedokter", action = "create", allow = true),
+		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+
+		@Permission(profile = "group:PeterMeter", action = "search", allow = false),
+		@Permission(profile = "group:PeterMeter", action = "view", allow = true),
+		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
+		@Permission(profile = "group:PeterMeter", action = "edit", allow = true) })
 public class PeterMeterProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
 
 	// VARIABLES
+	@NotEditable
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	private ResourceIdentifier _for;
 
 	@Label("Status beschikbaarheid")
 	@Description("Status beschikbaarheid")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisBean.peterMeterProfileStates}")
 	private String status;
 
 	@Label("Actief sinds")

@@ -26,15 +26,22 @@ import be.gim.commons.resource.ResourceIdentifier;
 @Model
 @ModelStore("OsyrisDataStore")
 @Permissions({
+		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
 		@Permission(profile = "group:Medewerker", action = "create", allow = false),
 		@Permission(profile = "group:Medewerker", action = "edit", allow = false),
+		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "create", allow = false),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+		@Permission(profile = "group:PeterMeter", action = "search", allow = false),
 		@Permission(profile = "group:PeterMeter", action = "view", allow = false),
 		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "edit", allow = false) })
+		@Permission(profile = "group:PeterMeter", action = "edit", allow = false),
+		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
+		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
+		@Permission(profile = "group:Uitvoerder", action = "create", allow = false),
+		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
 public class StockMateriaal extends AbstractModelObject implements
 		StorableObject {
 

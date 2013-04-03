@@ -7,14 +7,12 @@ import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Handler;
 import org.conscientia.api.permission.Permission;
-import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.permission.DefaultPermissionHandler;
 import org.picketlink.idm.api.Group;
 
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
-import be.gim.tov.osyris.model.controle.ControleOpdrachtStatus;
+import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 @Handler(type = "permission")
 @For("ControleOpdracht")
@@ -24,41 +22,41 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 	public Boolean hasPermission(String action, ResourceIdentifier identifier,
 			ModelClass modelClass, boolean isOwner) throws IOException {
 
-		// Ophalen controleOpdracht object via identifier
-		// Object accessen via modelRepository
-		// Status eruit halen en via identity groep achterhalen
-
-		// Object nog meegegeven in ListForm klasse aan canEdit en canDelete en
-		// aanpassen list.xhtml
-
+		// Load ControleOpdracht
 		if (identifier != null) {
 			ControleOpdracht controleOpdracht = (ControleOpdracht) modelRepository
 					.loadObject(identifier);
 
+			// Get status
 			if (controleOpdracht != null) {
-				ControleOpdrachtStatus status = (ControleOpdrachtStatus) controleOpdracht
-						.get("status");
+				ControleOpdrachtStatus status = controleOpdracht.getStatus();
 
-				// Groepen ophalen
+				// Get groups
 				Set<Group> groups = identity.getGroups();
-
 				for (Group group : groups) {
 
-					if (group.getName().equals("PeterMeter")) {
-						if (status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
+					// PETER EN METER
+					if (group.getName().equals("PeterMeter")
+							&& status
+									.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
 
-							Permission permission = new DefaultPermission(
-									new ResourceName("group:PeterMeter"),
-									"edit", true);
-							return permission.isAllow();
+						// Override permissions on action
+						if (action.equals(Permission.EDIT_ACTION)
+								|| action.equals(Permission.VIEW_ACTION)) {
+							return true;
 						}
 					}
 
-					if (group.getName().equals("Routedokter")) {
-						Permission permission = new DefaultPermission(
-								new ResourceName("group:Routedokter"),
-								"create", true);
-						return permission.isAllow();
+					// MEDEWEKER
+					if (group.getName().equals("Medewerker")
+							&& (status
+									.equals(ControleOpdrachtStatus.TE_CONTROLEREN) || status
+									.equals(ControleOpdrachtStatus.GEANNULEERD))) {
+
+						if (action.equals(Permission.EDIT_ACTION)
+								|| action.equals(Permission.VIEW_ACTION)) {
+							return true;
+						}
 					}
 				}
 			}

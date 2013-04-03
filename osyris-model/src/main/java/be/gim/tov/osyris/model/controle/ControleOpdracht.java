@@ -15,12 +15,15 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Permission;
+import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditInStatus;
+import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
  * 
@@ -31,6 +34,27 @@ import be.gim.tov.osyris.model.annotation.EditInStatus;
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
 @Edit(type = "controleOpdracht")
+@Permissions({
+		@Permission(profile = "group:Medewerker", action = "search", allow = true),
+		@Permission(profile = "group:Medewerker", action = "view", allow = false),
+		@Permission(profile = "group:Medewerker", action = "create", allow = false),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = false),
+
+		@Permission(profile = "group:Routedokter", action = "search", allow = true),
+		@Permission(profile = "group:Routedokter", action = "view", allow = true),
+		@Permission(profile = "group:Routedokter", action = "create", allow = true),
+		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
+
+		@Permission(profile = "group:PeterMeter", action = "search", allow = true),
+		@Permission(profile = "group:PeterMeter", action = "view", allow = false),
+		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
+		@Permission(profile = "group:PeterMeter", action = "edit", allow = false),
+
+		@Permission(profile = "group:Uitvoerder", action = "search", allow = false),
+		@Permission(profile = "group:Uitvoerder", action = "view", allow = false),
+		@Permission(profile = "group:Uitvoerder", action = "create", allow = false),
+		@Permission(profile = "group:Uitvoerder", action = "edit", allow = false) })
 public abstract class ControleOpdracht extends AbstractModelObject implements
 		StorableObject {
 
@@ -47,32 +71,33 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Description("Commentaar")
 	@NotSearchable
 	@EditInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
 	@Label("Datum gerapporteerd")
 	@Description("Datum gerapporteerd")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumGerapporteerd;
 
 	@Label("Datum gevalideerd")
 	@Description("Datum gevalideerd")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumGevalideerd;
 
 	@Label("Datum te controleren")
 	@Description("Datum te controleren")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumTeControleren;
 
 	@Label("Datum uitgesteld")
 	@Description("Datum uitgesteld")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumUitgesteld;
 
 	@EditInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
 	@Label("Datum uit te voeren")
 	@Description("Datum uit te voeren")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
 	@EditInStatus({ "TE_CONTROLEREN" })

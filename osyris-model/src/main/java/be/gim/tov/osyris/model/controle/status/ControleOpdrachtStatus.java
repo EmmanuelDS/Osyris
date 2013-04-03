@@ -1,4 +1,4 @@
-package be.gim.tov.osyris.model.controle;
+package be.gim.tov.osyris.model.controle.status;
 
 public enum ControleOpdrachtStatus {
 
