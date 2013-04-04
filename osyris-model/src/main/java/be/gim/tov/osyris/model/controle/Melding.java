@@ -10,6 +10,7 @@ import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Pattern;
 import org.conscientia.api.model.annotation.Permission;
@@ -32,16 +33,10 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 		@Permission(profile = "group:Medewerker", action = "create", allow = false),
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
-		@Permission(profile = "group:Medewerker", action = "edit", allow = false),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
 		@Permission(profile = "group:Medewerker", action = "delete", allow = false),
 
-		@Permission(profile = "group:PeterMeter", action = "create", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "search", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "view", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "edit", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "delete", allow = false),
-
-		@Permission(profile = "group:Routedokter", action = "create", allow = true),
+		@Permission(profile = "group:Routedokter", action = "create", allow = false),
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
@@ -49,6 +44,7 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
+	@NotEditable
 	@Label("Status")
 	@Description("Status")
 	private MeldingStatus status;
@@ -74,17 +70,21 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotSearchable
 	@Label("Telefoon")
 	@Description("Telefoon")
+	@Length(min = 3, max = 30)
+	@Pattern("(\\+?[\\d]+)?")
 	private String telefoon;
 
 	@Label("Datum vaststelling")
 	@Description("Datum vaststelling")
 	private Date datumVaststelling;
 
+	@NotEditable
 	@Label("Datum gemeld")
 	@Description("Datum gemeld")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGemeld;
 
+	@NotEditable
 	@Label("Datum gevalideerd")
 	@Description("Peter/Meter")
 	@Type(ModelPropertyType.TIMESTAMP)
@@ -95,6 +95,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
 
+	@NotEditable
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")

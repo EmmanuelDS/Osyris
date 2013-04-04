@@ -1,0 +1,9 @@
+<#assign subject>
+[${preferences.title?string}] Bevestiging verzenden melding
+</#assign>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<body>
+		<div>Uw melding is succesvol verzonden via ${preferences.title?string}.</div>
+		<div>${melding}</div>
+	</body>
+</html>

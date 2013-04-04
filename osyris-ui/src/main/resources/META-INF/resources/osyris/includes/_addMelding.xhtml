@@ -1,0 +1,37 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf">
+	
+	<div><h2>Routedokter - Melding problemen ivm route infrastructuur</h2></div>
+	
+	<table width="100%">
+	<tr>
+	<td width="50%">
+	<r:panel>
+		<d:object mode="EDIT" 
+				modelClass="#{modelRepository.getModelClass('Melding')}"
+				value="#{form.melding}">
+		</d:object>
+		<d:buttons>
+			<j:commandButton value="Verzenden"
+				image="#{resource['core/images/actions/12x12/apply.png']}"
+				type="button"
+				action="#{form.saveMelding()}">
+			</j:commandButton>
+		</d:buttons>
+	</r:panel>
+	</td>
+	<td width="50%">
+	<r:panel>
+		<div>Map to be inserted</div>
+	</r:panel>
+	</td>
+	</tr>
+	</table>
+</u:composition>

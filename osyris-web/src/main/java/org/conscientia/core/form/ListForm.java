@@ -189,6 +189,10 @@ public class ListForm extends AbstractForm implements Serializable {
 				&& getModelClass().getHandler(DataHandler.class) != null;
 	}
 
+	public boolean isCanDownload() {
+		return identity.hasPermission(getModelClass(), "search");
+	}
+
 	public void searchObjects() throws IOException {
 		this.results = null;
 	}

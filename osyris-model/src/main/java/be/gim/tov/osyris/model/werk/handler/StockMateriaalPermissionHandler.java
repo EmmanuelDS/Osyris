@@ -8,8 +8,10 @@ import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Handler;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.core.permission.DefaultPermissionHandler;
+import org.conscientia.core.user.UsernameLiteral;
 import org.picketlink.idm.api.Group;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
 
@@ -30,12 +32,14 @@ public class StockMateriaalPermissionHandler extends DefaultPermissionHandler {
 
 				// Get groups
 				Set<Group> groups = identity.getGroups();
-				String user = identity.getUser().getId();
 
 				for (Group group : groups) {
 					if (group.getName().equals("Uitvoerder")
-							&& !stockMateriaal.getMagazijn().toLowerCase()
-									.equals(user)) {
+							&& !stockMateriaal
+									.getMagazijn()
+									.toLowerCase()
+									.equals(Beans.getReference(String.class,
+											UsernameLiteral.INSTANCE))) {
 
 						// Override permissions for action
 						if (action.equals(Permission.EDIT_ACTION)

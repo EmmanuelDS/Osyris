@@ -79,5 +79,10 @@
 			<artifactId>specto-ui-map</artifactId>
 			<version>${specto.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>be.gim.tov</groupId>
+			<artifactId>osyris-model</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 	</dependencies>
 </project>

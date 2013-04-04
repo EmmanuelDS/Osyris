@@ -7,6 +7,7 @@ import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
@@ -16,6 +17,7 @@ import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
+import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -63,6 +65,8 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 
 	@Label("Voorkeuren")
 	@Description("Voorkeuren")
+	@Edit(type = "table")
+	@View(type = "table")
 	private List<PeterMeterVoorkeur> voorkeuren;
 
 	// GETTERS AND SETTERS

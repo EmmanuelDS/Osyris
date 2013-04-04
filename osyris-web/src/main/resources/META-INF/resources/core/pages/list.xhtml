@@ -92,6 +92,7 @@
 						execute="@this" />
 				</j:commandButton>
 				<d:fileDownload id="download" 
+					rendered="#{listForm.isCanDownload()}"
 					fileName="#{listForm.fileName}"
 					type="button"
 					image="#{resource['core/images/actions/12x12/download.png']}"
