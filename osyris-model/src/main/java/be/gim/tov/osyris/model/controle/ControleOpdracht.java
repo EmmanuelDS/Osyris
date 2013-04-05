@@ -36,9 +36,6 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 @Edit(type = "controleOpdracht")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
-		@Permission(profile = "group:Medewerker", action = "view", allow = false),
-		@Permission(profile = "group:Medewerker", action = "create", allow = false),
-		@Permission(profile = "group:Medewerker", action = "edit", allow = false),
 
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
@@ -46,15 +43,7 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
 		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
 
-		@Permission(profile = "group:PeterMeter", action = "search", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "view", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "edit", allow = false),
-
-		@Permission(profile = "group:Uitvoerder", action = "search", allow = false),
-		@Permission(profile = "group:Uitvoerder", action = "view", allow = false),
-		@Permission(profile = "group:Uitvoerder", action = "create", allow = false),
-		@Permission(profile = "group:Uitvoerder", action = "edit", allow = false) })
+		@Permission(profile = "group:PeterMeter", action = "search", allow = true) })
 public abstract class ControleOpdracht extends AbstractModelObject implements
 		StorableObject {
 
@@ -104,17 +93,20 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
 	@EditInStatus({ "TE_CONTROLEREN" })
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter;
 
 	@EditInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })

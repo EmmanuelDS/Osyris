@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.traject;
 
 import static org.conscientia.api.model.SubClassPersistence.UNION;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
@@ -12,6 +13,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
+import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -46,6 +48,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier regio;
 
 	// GETTERS AND SETTERS

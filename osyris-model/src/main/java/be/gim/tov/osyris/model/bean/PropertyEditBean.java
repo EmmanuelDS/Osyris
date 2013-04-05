@@ -35,6 +35,9 @@ public class PropertyEditBean {
 
 	public boolean isEditableProperty(ModelObject object, ModelProperty property) {
 
+		Object status = null;
+		Field[] fields = null;
+
 		// Routedokter and admin can edit all properties
 		if (identity.inGroup("Routedokter", "CUSTOM")
 				|| identity.inGroup("admin", "CUSTOM")) {
@@ -42,10 +45,11 @@ public class PropertyEditBean {
 		}
 
 		// Get status of the object
-		ControleOpdrachtStatus status = (ControleOpdrachtStatus) object
-				.get("status");
+		if (object.get("status") instanceof ControleOpdrachtStatus) {
+			status = object.get("status");
+			fields = object.getClass().getSuperclass().getDeclaredFields();
+		}
 
-		Field[] fields = object.getClass().getSuperclass().getDeclaredFields();
 		for (Field field : fields) {
 
 			// Get EditinStatus annotation if available for current property
@@ -57,6 +61,7 @@ public class PropertyEditBean {
 					String[] values = editInStatusAnnotation.value();
 					List<String> list = Arrays.asList(values);
 					if (list.contains(status.toString())) {
+						property.setEditable(true);
 						return true;
 					}
 				}

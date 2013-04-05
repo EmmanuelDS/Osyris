@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.ModelAspect;
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.For;
@@ -8,6 +9,7 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -26,11 +28,13 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 	// VARIABLES
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier _for;
 
 	@Label("Bedrijf")
 	@Description("Bedrijf")
 	@ModelClassName("UitvoerderBedrijf")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier bedrijf;
 
 	// GETTERS AND SETTERS

@@ -1,10 +1,12 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Type;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -29,6 +31,7 @@ public class RouteBord extends Bord {
 	@Label("Route")
 	@Description("Route")
 	@ModelClassName("Route")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS

@@ -2,11 +2,13 @@ package be.gim.tov.osyris.model.traject;
 
 import java.util.List;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Type;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -47,26 +49,31 @@ public abstract class NetwerkBord extends Bord {
 	@Label("Netwerkknooppunt 0")
 	@Description("Netwerkknooppunt 0")
 	@ModelClassName("NetwerkKnooppunt")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier kpid0;
 
 	@Label("Netwerkknooppunt 1")
 	@Description("Netwerkknooppunt 1")
 	@ModelClassName("NetwerkKnooppunt")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier kpid1;
 
 	@Label("Netwerkknooppunt 2")
 	@Description("Netwerkknooppunt 2")
 	@ModelClassName("NetwerkKnooppunt")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier kpid2;
 
 	@Label("Netwerkknooppunt 3")
 	@Description("Netwerkknooppunt 3")
 	@ModelClassName("NetwerkKnooppunt")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier kpid3;
 
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
 	@ModelClassName("NetwerkSegment")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private List<ResourceIdentifier> segmenten;
 
 	@Label("Afbeeldingscode knooppunt 1")

@@ -3,7 +3,6 @@ package be.gim.tov.osyris.form;
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -14,11 +13,10 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
+import org.jboss.seam.international.status.Messages;
 
-import be.gim.commons.localization.bundle.Messages;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.Melding;
-import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
 /**
  * 
@@ -78,23 +76,21 @@ public class MeldingFormBase implements Serializable {
 	public void saveMelding() {
 
 		try {
-			Melding melding = getMelding();
-			melding.set("status", MeldingStatus.GEMELD);
-			melding.set("datumGemeld", new Date());
-
-			// TODO: Automatisch toewijzen aan Medewerker TOV
-
 			// Save Melding
-			modelRepository.saveObject(melding);
+			modelRepository.saveObject(getMelding());
+			messages.info("Melding sucessvol verzonden.");
 
 			// Email bevestiging sturen naar gebruiker
 			sendConfirmationMail(melding);
-			log.info("Email sent to: " + melding.getEmail());
+			messages.info("Er is een bevestigingsmail gestuurd naar "
+					+ melding.getEmail() + ".");
 
 		} catch (IOException e) {
 			log.error("Can not save model object.", e);
+			messages.error("Melding niet verzonden");
 		} catch (Exception e) {
 			log.error("Can not send mail.", e);
+			messages.error("Bevestigingsmail niet verstuurd.");
 			throw new RuntimeException(e);
 		}
 	}

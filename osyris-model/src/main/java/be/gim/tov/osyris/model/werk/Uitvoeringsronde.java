@@ -32,12 +32,13 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 
 	@Label("Datum uitvoering")
 	@Description("Datum uitvoering")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumUitvoering;
 
 	@Label("Werkopdrachten")
 	@Description("Werkopdrachten")
 	@ModelClassName("WerkOpdracht")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private List<ResourceIdentifier> opdrachten;
 
 	// GETTERS AND SETTERS

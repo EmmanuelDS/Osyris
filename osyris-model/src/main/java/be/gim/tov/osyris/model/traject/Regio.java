@@ -1,5 +1,6 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
@@ -9,6 +10,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
+import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -47,6 +49,7 @@ public class Regio extends AbstractModelObject implements StorableObject {
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
 	@ModelClassName("UitvoerderBedrijf")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier uitvoerder;
 
 	// GETTERS AND SETTERS

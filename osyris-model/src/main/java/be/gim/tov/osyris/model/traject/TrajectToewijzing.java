@@ -1,11 +1,13 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -28,21 +30,25 @@ public class TrajectToewijzing extends AbstractModelObject implements
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
 	@Label("Peter/Meter 1")
 	@Description("Peter/Meter 1")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter1;
 
 	@Label("Peter/Meter 2")
 	@Description("Peter/Meter 2")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter2;
 
 	@Label("Peter/Meter 3")
 	@Description("Peter/Meter 3")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS

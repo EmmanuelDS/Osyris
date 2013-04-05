@@ -6,6 +6,7 @@ import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
+import org.conscientia.api.model.annotation.Minimum;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -28,19 +29,14 @@ import be.gim.commons.resource.ResourceIdentifier;
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
-		@Permission(profile = "group:Medewerker", action = "create", allow = false),
-		@Permission(profile = "group:Medewerker", action = "edit", allow = false),
+
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
-		@Permission(profile = "group:Routedokter", action = "create", allow = false),
+		@Permission(profile = "group:Routedokter", action = "create", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "search", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "view", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
-		@Permission(profile = "group:PeterMeter", action = "edit", allow = false),
+
 		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
 		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
-		@Permission(profile = "group:Uitvoerder", action = "create", allow = false),
 		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
 public class StockMateriaal extends AbstractModelObject implements
 		StorableObject {
@@ -70,11 +66,13 @@ public class StockMateriaal extends AbstractModelObject implements
 	@Label("Minimum")
 	@Description("Minimum")
 	@NotSearchable
+	@Minimum(value = 0)
 	private int min;
 
 	@Label("Maximum")
 	@Description("Maximum")
 	@NotSearchable
+	@Minimum(value = 0)
 	private int max;
 
 	@Label("Te bestellen")
@@ -90,11 +88,13 @@ public class StockMateriaal extends AbstractModelObject implements
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier regio;
 
 	@Label("Datum besteld")

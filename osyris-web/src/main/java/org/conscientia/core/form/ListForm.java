@@ -2,9 +2,9 @@ package org.conscientia.core.form;
 
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,6 +56,11 @@ public class ListForm extends AbstractForm implements Serializable {
 	private List<?> results;
 	private ModelObject object;
 
+	@PostConstruct
+	public void init() throws IOException {
+		search();
+	}
+
 	// GETTERS AND SETTERS
 	public Query getQuery() {
 		return query;
@@ -65,41 +70,11 @@ public class ListForm extends AbstractForm implements Serializable {
 		this.query = query;
 	}
 
-	@SuppressWarnings("unchecked")
-	public List<?> getSearchResults() {
-
-		if (results == null) {
-			try {
-				if (query != null) {
-					// List<ModelObject> objects = (List<ModelObject>)
-					// modelRepository
-					// .searchObjects(query, false, false);
-					// query.addFilter(FilterUtils
-					// .id(findViewableObjectIds(objects)));
-					results = modelRepository.searchObjects(query, true, true);
-				} else {
-					// List<ModelObject> objects = (List<ModelObject>)
-					// modelRepository
-					// .searchObjects(new DefaultQuery(name), false, false);
-					Query q = new DefaultQuery(name);
-					// q.addFilter(FilterUtils.id(findViewableObjectIds(objects)));
-					results = modelRepository.searchObjects(q, true, true);
-				}
-			} catch (IOException e) {
-				log.error("Can not get search results.", e);
-			}
-		}
+	public List<?> getResults() {
 		return results;
 	}
 
-	public void setSearchResults(List<?> searchResults) {
-		this.results = searchResults;
-	}
-
 	public ModelObject getObject() {
-		if (object == null) {
-			createObject();
-		}
 		return object;
 	}
 
@@ -109,6 +84,10 @@ public class ListForm extends AbstractForm implements Serializable {
 
 	public String getFileName() {
 		return name + ".csv";
+	}
+
+	public ModelClass getModelClass() {
+		return modelRepository.getModelClass(name);
 	}
 
 	public String getAction() {
@@ -149,10 +128,6 @@ public class ListForm extends AbstractForm implements Serializable {
 		}
 	}
 
-	public ModelClass getModelClass() {
-		return modelRepository.getModelClass(name);
-	}
-
 	public boolean isCanView(ModelObject object) {
 		return identity.hasPermission(object, Permission.VIEW_ACTION);
 	}
@@ -185,19 +160,31 @@ public class ListForm extends AbstractForm implements Serializable {
 
 	public boolean isCanUpload() {
 		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(), "create")
+				&& identity.hasPermission(getModelClass(),
+						Permission.CREATE_ACTION)
 				&& getModelClass().getHandler(DataHandler.class) != null;
 	}
 
 	public boolean isCanDownload() {
-		return identity.hasPermission(getModelClass(), "search");
+		return identity
+				.hasPermission(getModelClass(), Permission.SEARCH_ACTION);
 	}
 
-	public void searchObjects() throws IOException {
-		this.results = null;
+	public void search() throws IOException {
+		try {
+			if (query != null) {
+				results = modelRepository.searchObjects(query, true, true);
+			} else {
+				results = modelRepository.searchObjects(new DefaultQuery(name),
+						true, true);
+			}
+		} catch (IOException e) {
+			log.error("Can not get search results.", e);
+			results = null;
+		}
 	}
 
-	public void createObject() {
+	public void create() {
 		try {
 			object = modelRepository.createObject(getModelClass(), null);
 		} catch (InstantiationException e) {
@@ -207,19 +194,21 @@ public class ListForm extends AbstractForm implements Serializable {
 		}
 	}
 
-	public void saveObject() {
+	public void save() {
 		try {
 			modelRepository.saveObject((StorableObject) object);
 			clear();
+			search();
 		} catch (IOException e) {
 			log.error("Can not save model object.", e);
 		}
 	}
 
-	public void deleteObject() {
+	public void delete() {
 		try {
 			modelRepository.deleteObject((StorableObject) object);
 			clear();
+			search();
 		} catch (IOException e) {
 			log.error("Can not delete model object.", e);
 		}
@@ -227,25 +216,13 @@ public class ListForm extends AbstractForm implements Serializable {
 
 	public void clear() throws IOException {
 		object = null;
-		results = null;
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Content<?> downloadReport() {
-
+	public Content<?> report() {
 		DefaultModelObjectList objectList = new DefaultModelObjectList<ModelObject>(
-				getModelClass(), (List<ModelObject>) getSearchResults());
+				getModelClass(), (List<ModelObject>) getResults());
 		return new EncodableContent<ModelObjectList>(
 				(Encoder) new SCSVModelEncoder(), objectList);
-	}
-
-	private List<String> findViewableObjectIds(List<ModelObject> objects) {
-		List<String> ids = new ArrayList<String>();
-		for (ModelObject object : objects) {
-			if (isCanView(object)) {
-				ids.add(object.get("id").toString());
-			}
-		}
-		return ids;
 	}
 }

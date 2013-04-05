@@ -86,11 +86,13 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier uitvoerder;
 
 	@Label("Probleem")

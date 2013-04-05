@@ -38,7 +38,6 @@ import be.gim.commons.resource.ResourceIdentifier;
 
 		@Permission(profile = "group:PeterMeter", action = "search", allow = false),
 		@Permission(profile = "group:PeterMeter", action = "view", allow = true),
-		@Permission(profile = "group:PeterMeter", action = "create", allow = false),
 		@Permission(profile = "group:PeterMeter", action = "edit", allow = true) })
 public class PeterMeterProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
@@ -47,6 +46,7 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@NotEditable
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier _for;
 
 	@Label("Status beschikbaarheid")

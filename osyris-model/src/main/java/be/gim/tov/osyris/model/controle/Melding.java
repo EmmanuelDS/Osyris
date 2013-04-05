@@ -30,17 +30,13 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 @Model
 @ModelStore("OsyrisDataStore")
 @Permissions({
-		@Permission(profile = "group:Medewerker", action = "create", allow = false),
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
 		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
-		@Permission(profile = "group:Medewerker", action = "delete", allow = false),
 
-		@Permission(profile = "group:Routedokter", action = "create", allow = false),
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
-		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
-		@Permission(profile = "group:Routedokter", action = "delete", allow = false) })
+		@Permission(profile = "group:Routedokter", action = "edit", allow = true) })
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
@@ -76,6 +72,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	@Label("Datum vaststelling")
 	@Description("Datum vaststelling")
+	@Type(ModelPropertyType.DATE)
 	private Date datumVaststelling;
 
 	@NotEditable
@@ -93,12 +90,14 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
 	@NotEditable
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
 	@NotSearchable
