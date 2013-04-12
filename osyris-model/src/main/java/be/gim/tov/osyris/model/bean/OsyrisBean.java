@@ -34,4 +34,14 @@ public class OsyrisBean {
 		profileStates.add(statusKandidaat);
 		return profileStates;
 	}
+
+	public List<Object[]> getEnkeleRichting() {
+		List<Object[]> enkeleRichting = new ArrayList<Object[]>();
+		Object[] enkeleRichtingFalse = { "0", "Nee" };
+		Object[] enkeleRichtingTrue = { "1", "Ja" };
+
+		enkeleRichting.add(enkeleRichtingFalse);
+		enkeleRichting.add(enkeleRichtingTrue);
+		return enkeleRichting;
+	}
 }

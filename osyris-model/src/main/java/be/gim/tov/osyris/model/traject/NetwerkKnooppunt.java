@@ -1,14 +1,19 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
+import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
+import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
+
+import be.gim.commons.resource.ResourceIdentifier;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -30,6 +35,12 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	@Label("Naam")
 	@Description("Naam")
 	private String naam;
+
+	@Label("Regio")
+	@Description("Regio")
+	@ModelClassName("Regio")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	private ResourceIdentifier regio;
 
 	@Label("X")
 	@Description("X")
@@ -59,6 +70,14 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 
 	public void setNaam(String naam) {
 		this.naam = naam;
+	}
+
+	public ResourceIdentifier getRegio() {
+		return regio;
+	}
+
+	public void setRegio(ResourceIdentifier regio) {
+		this.regio = regio;
 	}
 
 	public double getX() {

@@ -57,7 +57,10 @@
 			</r:tab>
 			
 			<r:tab header="Voorkeuren"
-				rendered="#{identity.inGroup('PeterMeter', 'CUSTOM')}">
+				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or
+							 identity.inGroup('Medewerker','CUSTOM') or 
+							 identity.inGroup('PeterMeter','CUSTOM') or
+							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter')}">
 				<a:outputPanel>
 					<d:aspect id="peterMeterProfile"
 						value="#{cc.attrs.value.getAspect('PeterMeterProfiel', modelRepository, true)}"
@@ -66,8 +69,10 @@
 				</a:outputPanel>
 			</r:tab>
 			
-			<r:tab header="UitvoerderBedrijf"
-				rendered="#{identity.inGroup('Uitvoerder', 'CUSTOM')}">
+			<r:tab header="Bedrijf"
+				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or 
+							 identity.inGroup('Uitvoerder','CUSTOM') or 
+							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder')}">
 				<a:outputPanel>
 					<d:aspect id="uitvoerderProfile"
 						value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, true)}"
@@ -75,6 +80,19 @@
 						level="#{cc.attrs.level}"/>
 				</a:outputPanel>
 			</r:tab>
+			
+			<r:tab header="Trajecttype"
+				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or 
+							 identity.inGroup('Medewerker','CUSTOM') or 
+							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker')}">
+				<a:outputPanel>
+					<d:aspect id="medewerkerProfile"
+						value="#{cc.attrs.value.getAspect('MedewerkerProfiel', modelRepository, true)}"
+						mode="#{cc.attrs.mode}"
+						level="#{cc.attrs.level}"/>
+				</a:outputPanel>
+			</r:tab>
+			
 		</r:tabPanel>			
 	</cc:implementation>
 </div>

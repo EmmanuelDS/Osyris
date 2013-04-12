@@ -3,6 +3,7 @@ package be.gim.tov.osyris.model.bean;
 import java.lang.reflect.Field;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -13,8 +14,10 @@ import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
 import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.security.Identity;
+import org.picketlink.idm.api.Group;
 
-import be.gim.tov.osyris.model.annotation.EditInStatus;
+import be.gim.tov.osyris.model.annotation.EditableInGroup;
+import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
@@ -23,9 +26,10 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
  * 
  */
 @Named
-public class PropertyEditBean {
+public class PropertyEditableBean {
 
-	private static final Log log = LogFactory.getLog(PropertyEditBean.class);
+	private static final Log log = LogFactory
+			.getLog(PropertyEditableBean.class);
 
 	@Inject
 	private ModelRepository modelRepository;
@@ -33,8 +37,7 @@ public class PropertyEditBean {
 	@Inject
 	private Identity identity;
 
-	public boolean isEditableProperty(ModelObject object, ModelProperty property) {
-
+	public boolean isEditableInStatus(ModelObject object, ModelProperty property) {
 		Object status = null;
 		Field[] fields = null;
 
@@ -54,8 +57,8 @@ public class PropertyEditBean {
 
 			// Get EditinStatus annotation if available for current property
 			if (field.getName().equals(property.getName())) {
-				EditInStatus editInStatusAnnotation = field
-						.getAnnotation(EditInStatus.class);
+				EditableInStatus editInStatusAnnotation = field
+						.getAnnotation(EditableInStatus.class);
 
 				if (editInStatusAnnotation != null) {
 					String[] values = editInStatusAnnotation.value();
@@ -63,6 +66,31 @@ public class PropertyEditBean {
 					if (list.contains(status.toString())) {
 						property.setEditable(true);
 						return true;
+					}
+				}
+			}
+		}
+		return false;
+	}
+
+	public boolean isEditableInGroup(ModelObject object, ModelProperty property) {
+		Field[] fields = object.getClass().getDeclaredFields();
+		Set<Group> groups = identity.getGroups();
+
+		for (Field field : fields) {
+			if (field.getName().equals(property.getName())) {
+				EditableInGroup editInGroupAnnotation = field
+						.getAnnotation(EditableInGroup.class);
+
+				if (editInGroupAnnotation != null) {
+					String[] values = editInGroupAnnotation.value();
+					List<String> list = Arrays.asList(values);
+
+					for (Group group : groups) {
+						if (list.contains(group.getName())) {
+							property.setEditable(true);
+							return true;
+						}
 					}
 				}
 			}

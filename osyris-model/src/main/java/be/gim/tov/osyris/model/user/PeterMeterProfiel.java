@@ -1,8 +1,11 @@
 package be.gim.tov.osyris.model.user;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
@@ -13,14 +16,17 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Transient;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.tov.osyris.model.annotation.EditableInGroup;
 
 /**
  * 
@@ -30,39 +36,50 @@ import be.gim.commons.resource.ResourceIdentifier;
 @Model
 @ModelStore("OsyrisDataStore")
 @For("User")
+@Edit(type = "peterMeterProfiel")
 @Permissions({
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "create", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
 
-		@Permission(profile = "group:PeterMeter", action = "search", allow = false),
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+
 		@Permission(profile = "group:PeterMeter", action = "view", allow = true),
 		@Permission(profile = "group:PeterMeter", action = "edit", allow = true) })
 public class PeterMeterProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
 
+	private static final Log log = LogFactory.getLog(PeterMeterProfiel.class);
+
 	// VARIABLES
+	@NotViewable
 	@NotEditable
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier _for;
 
+	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	@Label("Status beschikbaarheid")
 	@Description("Status beschikbaarheid")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisBean.peterMeterProfileStates}")
 	private String status;
 
+	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	@Label("Actief sinds")
 	@Description("Actief sinds")
 	private Date actiefSinds;
 
+	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	@Label("Actief tot")
 	@Description("Actief tot")
 	private Date actiefTot;
 
+	@EditableInGroup({ "Medewerker", "Routedokter", "admin", "PeterMeter" })
 	@Label("Voorkeuren")
 	@Description("Voorkeuren")
 	@Edit(type = "table")
@@ -110,5 +127,20 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 
 	public void setVoorkeuren(List<PeterMeterVoorkeur> voorkeuren) {
 		this.voorkeuren = voorkeuren;
+	}
+
+	@Transient
+	@Label("Toegewezen trajecten")
+	public List<String> getToegewezenTrajecten() {
+
+		// TODO: Query maken die de trajecten voor een bepaalde peterMeter
+		// ophaalt
+		List<String> test = new ArrayList<String>();
+
+		if (test.isEmpty()) {
+			test.add("Nog niet toegewezen aan trajecten.");
+		}
+
+		return test;
 	}
 }

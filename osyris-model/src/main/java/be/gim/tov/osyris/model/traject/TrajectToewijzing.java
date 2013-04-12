@@ -19,6 +19,7 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Toewijzing")
 public class TrajectToewijzing extends AbstractModelObject implements
 		StorableObject {
 
@@ -26,12 +27,6 @@ public class TrajectToewijzing extends AbstractModelObject implements
 	@Label("Jaar")
 	@Description("Jaar")
 	private short jaar;
-
-	@Label("Traject")
-	@Description("Traject")
-	@ModelClassName("Traject")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier traject;
 
 	@Label("Peter/Meter 1")
 	@Description("Peter/Meter 1")
@@ -58,14 +53,6 @@ public class TrajectToewijzing extends AbstractModelObject implements
 
 	public void setJaar(short jaar) {
 		this.jaar = jaar;
-	}
-
-	public ResourceIdentifier getTraject() {
-		return traject;
-	}
-
-	public void setTraject(ResourceIdentifier traject) {
-		this.traject = traject;
 	}
 
 	public ResourceIdentifier getPeterMeter1() {

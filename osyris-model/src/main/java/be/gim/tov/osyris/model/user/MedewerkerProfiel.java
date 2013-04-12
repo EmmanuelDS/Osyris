@@ -7,8 +7,8 @@ import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
-import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
@@ -31,22 +31,21 @@ import be.gim.commons.resource.ResourceIdentifier;
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
 		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
 
-		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
-		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
-public class UitvoerderProfiel extends AbstractModelObject implements
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true) })
+public class MedewerkerProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
 
 	// VARIABLES
-	@Label("Uitvoerder")
-	@Description("Uitvoerder")
+	@NotEditable
+	@Label("Medewerker")
+	@Description("Medewerker")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier _for;
 
-	@Label("Bedrijf")
-	@Description("Bedrijf")
-	@ModelClassName("UitvoerderBedrijf")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier bedrijf;
+	@Label("Trajecttype")
+	@Description("Trajecttype")
+	private String trajectType;
 
 	// GETTERS AND SETTERS
 	@Override
@@ -59,11 +58,11 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 		this._for = _for;
 	}
 
-	public ResourceIdentifier getBedrijf() {
-		return bedrijf;
+	public String getTrajectType() {
+		return trajectType;
 	}
 
-	public void setBedrijf(ResourceIdentifier bedrijf) {
-		this.bedrijf = bedrijf;
+	public void setTrajectType(String trajectType) {
+		this.trajectType = trajectType;
 	}
 }

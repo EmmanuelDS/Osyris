@@ -39,15 +39,34 @@
 					level="#{cc.attrs.level}"
 					simple="#{cc.attrs.simple}"
 					rendered="#{identity.hasPermission(cc.attrs.value, 'admin')}" />
+				<d:propertyField id="Geboortedatum"
+					value="#{cc.attrs.value.getAspect('UserProfile', modelRepository, false).birthDate}"
+					mode="#{cc.attrs.mode}"
+					level="#{cc.attrs.level}"
+					simple="#{cc.attrs.simple}"
+					rendered="#{identity.isLoggedIn()}" />
 			</d:fields>
+			
 			<d:aspect id="profile"
 				value="#{cc.attrs.value.getAspect('UserProfile', modelRepository, false)}"
 				mode="#{cc.attrs.mode}"
 				level="#{cc.attrs.level}"
 				simple="#{cc.attrs.simple}" />
 				
-			<d:aspect id="PeterMeterProfile"
+			<d:aspect id="peterMeterProfile"
 				value="#{cc.attrs.value.getAspect('PeterMeterProfiel', modelRepository, false)}"
+				mode="#{cc.attrs.mode}"
+				level="#{cc.attrs.level}"
+				simple="#{cc.attrs.simple}" />	
+			
+			<d:aspect id="uitvoerderProfile"
+				value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, false)}"
+				mode="#{cc.attrs.mode}"
+				level="#{cc.attrs.level}"
+				simple="#{cc.attrs.simple}" />	
+				
+			<d:aspect id="medewerkerProfile"
+				value="#{cc.attrs.value.getAspect('MedewerkerProfiel', modelRepository, false)}"
 				mode="#{cc.attrs.mode}"
 				level="#{cc.attrs.level}"
 				simple="#{cc.attrs.simple}" />								

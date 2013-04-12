@@ -3,8 +3,10 @@ package be.gim.tov.osyris.model.user;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
+import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Pattern;
 import org.conscientia.core.model.AbstractModelObject;
 
 /**
@@ -28,10 +30,14 @@ public class UitvoerderBedrijf extends AbstractModelObject implements
 
 	@Label("Email")
 	@Description("Email")
+	@Length(min = 3, max = 128)
+	@Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
 	private String email;
 
 	@Label("Fax")
 	@Description("Fax")
+	@Length(min = 3, max = 30)
+	@Pattern("(\\+?[\\d]+)?")
 	private String fax;
 
 	@Label("Gemeente")
@@ -48,6 +54,8 @@ public class UitvoerderBedrijf extends AbstractModelObject implements
 
 	@Label("Telefoon")
 	@Description("Telefoon")
+	@Length(min = 3, max = 30)
+	@Pattern("(\\+?[\\d]+)?")
 	private String telefoon;
 
 	// GETTERS AND SETTERS

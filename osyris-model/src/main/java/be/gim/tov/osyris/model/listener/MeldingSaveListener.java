@@ -25,12 +25,16 @@ public class MeldingSaveListener {
 		if (melding.getStatus() == null) {
 			melding.setStatus(MeldingStatus.GEMELD);
 			melding.set("datumGemeld", new Date());
-			// TODO: Automatisch toewijzen aan Medewerker TOV
+			// TODO: Automatisch toewijzen aan Medewerker TOV via
+			// MedewerkerProfiel trajecttype property
 		}
 
 		else if (melding.getStatus().equals(MeldingStatus.GEMELD)) {
 			melding.setStatus(MeldingStatus.GEVALIDEERD);
 			melding.setDatumGevalideerd(new Date());
+			// TODO: nieuwe WerkOpdracht maken met te herstellen bording,
+			// uitvoerder,
+			// toezichthoudend medewerker, status te controleren, datum creatie
 		}
 	}
 }

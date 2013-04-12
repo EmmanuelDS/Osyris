@@ -13,7 +13,6 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
-import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
@@ -22,7 +21,7 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.tov.osyris.model.annotation.EditInStatus;
+import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
@@ -59,7 +58,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Commentaar")
 	@Description("Commentaar")
 	@NotSearchable
-	@EditInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
@@ -83,13 +82,13 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitgesteld;
 
-	@EditInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
 	@Label("Datum uit te voeren")
 	@Description("Datum uit te voeren")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
-	@EditInStatus({ "TE_CONTROLEREN" })
+	@EditableInStatus({ "TE_CONTROLEREN" })
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
@@ -102,18 +101,18 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
-	@EditInStatus({ "TE_CONTROLEREN" })
+	@EditableInStatus({ "TE_CONTROLEREN" })
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter;
 
-	@EditInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
 	@Label("Problemen")
 	@Description("Problemen")
 	@NotSearchable
-	@NotEditable
+	// @NotEditable
 	private List<Probleem> problemen;
 
 	// GETTERS AND SETTERS

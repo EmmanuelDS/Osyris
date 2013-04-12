@@ -10,11 +10,15 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Permission;
+import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
 /**
  * 
@@ -23,37 +27,57 @@ import be.gim.tov.osyris.model.controle.Probleem;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Werkopdracht")
+@Permissions({
+		@Permission(profile = "group:Routedokter", action = "search", allow = true),
+		@Permission(profile = "group:Routedokter", action = "view", allow = true),
+		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
+
+		@Permission(profile = "group:Medewerker", action = "search", allow = true),
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+
+		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
+		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
+		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
 public class WerkOpdracht extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@Label("Type")
-	@Description("Type")
+	@Label("Type werkopdracht")
+	@Description("Type werkopdracht")
 	private String type;
 
 	@Label("Status")
 	@Description("Status")
-	private String status;
+	private WerkopdrachtStatus status;
 
+	@NotSearchable
 	@Label("Beoordeling")
 	@Description("Beoordeling")
 	private String beoordeling;
 
+	@NotSearchable
 	@Label("Omschrijving opdracht")
 	@Description("Omschrijving opdracht")
 	private String omschrijvingOpdracht;
 
+	@NotSearchable
 	@Label("Commentaar medewerker")
 	@Description("Commentaar medewerker")
 	private String commentaarMedewerker;
 
+	@NotSearchable
 	@Label("Omschrijving uitvoering")
 	@Description("Omschrijving uitvoering")
 	private String omschrijvingUitvoering;
 
+	@NotSearchable
 	@Label("Commentaar uitvoerder")
 	@Description("Commentaar uitvoerder")
 	private String commentaarUitvoerder;
 
+	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
 	private String foto;
@@ -95,14 +119,17 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier uitvoerder;
 
+	@NotSearchable
 	@Label("Probleem")
 	@Description("Probleem")
 	private Probleem probleem;
 
+	@NotSearchable
 	@Label("Gebruikt materiaal")
 	@Description("Gebruikt materiaal")
 	private GebruiktMateriaal gebruiktMateriaal;
 
+	@NotSearchable
 	@Label("Handelingen")
 	@Description("Handelingen")
 	private List<WerkHandeling> handelingen;
@@ -116,11 +143,11 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.type = type;
 	}
 
-	public String getStatus() {
+	public WerkopdrachtStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(WerkopdrachtStatus status) {
 		this.status = status;
 	}
 

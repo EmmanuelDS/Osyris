@@ -1,10 +1,13 @@
 package be.gim.tov.osyris.model.traject;
 
+import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -20,7 +23,9 @@ public abstract class NetwerkSegment extends Traject {
 	// VARIABLES
 	@Label("Enkele richting")
 	@Description("Enkele richting")
-	private boolean enkelRichting;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisBean.enkeleRichting}")
+	private String enkelRichting;
 
 	@Label("Van knooppunt")
 	@Description("van knooppunt")
@@ -33,11 +38,11 @@ public abstract class NetwerkSegment extends Traject {
 	private ResourceIdentifier naarKnooppunt;
 
 	// GETTERS AND SETTERS
-	public boolean isEnkelRichting() {
+	public String getEnkelRichting() {
 		return enkelRichting;
 	}
 
-	public void setEnkelRichting(boolean enkelRichting) {
+	public void setEnkelRichting(String enkelRichting) {
 		this.enkelRichting = enkelRichting;
 	}
 

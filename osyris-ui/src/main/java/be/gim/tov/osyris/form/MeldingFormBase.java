@@ -44,7 +44,6 @@ public class MeldingFormBase implements Serializable {
 
 	// GETTERS AND SETTERS
 	public Melding getMelding() {
-
 		if (melding == null) {
 			melding = createMelding();
 		}
@@ -74,7 +73,6 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	public void saveMelding() {
-
 		try {
 			// Save Melding
 			modelRepository.saveObject(getMelding());
@@ -96,7 +94,6 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	private void sendConfirmationMail(Melding melding) throws Exception {
-
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
 
@@ -107,6 +104,5 @@ public class MeldingFormBase implements Serializable {
 				Collections.singleton(melding.getEmail()),
 				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
 	}
-
 	// TODO: Uploaden foto bij een probleem
 }

@@ -51,6 +51,10 @@ public abstract class Traject extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier regio;
 
+	@Label("Traject toewijzing")
+	@Description("Traject toewijzing")
+	private TrajectToewijzing trajectToewijzing;
+
 	// GETTERS AND SETTERS
 	public String getNaam() {
 		return naam;
@@ -82,5 +86,13 @@ public abstract class Traject extends AbstractModelObject implements
 
 	public void setRegio(ResourceIdentifier regio) {
 		this.regio = regio;
+	}
+
+	public TrajectToewijzing getTrajectToewijzing() {
+		return trajectToewijzing;
+	}
+
+	public void setTrajectToewijzing(TrajectToewijzing trajectToewijzing) {
+		this.trajectToewijzing = trajectToewijzing;
 	}
 }
