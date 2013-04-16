@@ -16,17 +16,18 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Transient;
 import org.conscientia.api.model.annotation.Type;
-import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditableInGroup;
+import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
 /**
  * 
@@ -65,9 +66,7 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	@Label("Status beschikbaarheid")
 	@Description("Status beschikbaarheid")
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisBean.peterMeterProfileStates}")
-	private String status;
+	private PeterMeterStatus status;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	@Label("Actief sinds")
@@ -97,11 +96,11 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 		this._for = _for;
 	}
 
-	public String getStatus() {
+	public PeterMeterStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(PeterMeterStatus status) {
 		this.status = status;
 	}
 
@@ -131,6 +130,7 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 
 	@Transient
 	@Label("Toegewezen trajecten")
+	@NotSearchable
 	public List<String> getToegewezenTrajecten() {
 
 		// TODO: Query maken die de trajecten voor een bepaalde peterMeter

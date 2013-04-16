@@ -9,6 +9,7 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -24,10 +25,14 @@ public abstract class NetwerkBord extends Bord {
 	// VARIABLES
 	@Label("Bordtype")
 	@Description("bordtype")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordTypeCode')}")
 	private String bordType;
 
 	@Label("Bordbase")
 	@Description("Bordbase")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordBaseCode')}")
 	private String bordBase;
 
 	@Label("Knooppuntnummer 0")
@@ -78,15 +83,21 @@ public abstract class NetwerkBord extends Bord {
 
 	@Label("Afbeeldingscode knooppunt 1")
 	@Description("Afbeeldingscode knooppunt 1")
-	private short kp1ImageCode;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
+	private String kp1ImageCode;
 
 	@Label("Afbeeldingscode knooppunt 2")
 	@Description("Afbeeldingscode knooppunt 2")
-	private short kp2ImageCode;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
+	private String kp2ImageCode;
 
 	@Label("Afbeeldingscode knooppunt 3")
 	@Description("Afbeeldingscode knooppunt 3")
-	private short kp3ImageCode;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
+	private String kp3ImageCode;
 
 	// GETTERS AND SETTERS
 	public String getBordType() {
@@ -177,27 +188,27 @@ public abstract class NetwerkBord extends Bord {
 		this.segmenten = segmenten;
 	}
 
-	public short getKp1ImageCode() {
+	public String getKp1ImageCode() {
 		return kp1ImageCode;
 	}
 
-	public void setKp1ImageCode(short kp1ImageCode) {
+	public void setKp1ImageCode(String kp1ImageCode) {
 		this.kp1ImageCode = kp1ImageCode;
 	}
 
-	public short getKp2ImageCode() {
+	public String getKp2ImageCode() {
 		return kp2ImageCode;
 	}
 
-	public void setKp2ImageCode(short kp2ImageCode) {
+	public void setKp2ImageCode(String kp2ImageCode) {
 		this.kp2ImageCode = kp2ImageCode;
 	}
 
-	public short getKp3ImageCode() {
+	public String getKp3ImageCode() {
 		return kp3ImageCode;
 	}
 
-	public void setKp3ImageCode(short kp3ImageCode) {
+	public void setKp3ImageCode(String kp3ImageCode) {
 		this.kp3ImageCode = kp3ImageCode;
 	}
 }

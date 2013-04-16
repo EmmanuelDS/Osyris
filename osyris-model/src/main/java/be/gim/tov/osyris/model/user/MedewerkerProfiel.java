@@ -12,6 +12,7 @@ import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -45,6 +46,8 @@ public class MedewerkerProfiel extends AbstractModelObject implements
 
 	@Label("Trajecttype")
 	@Description("Trajecttype")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.trajectTypes}")
 	private String trajectType;
 
 	// GETTERS AND SETTERS

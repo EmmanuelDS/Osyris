@@ -14,6 +14,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -42,26 +43,38 @@ public abstract class Bord extends AbstractModelObject implements
 
 	@Label("Wegbevoegd")
 	@Description("Wegbevoegd")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('WegbevoegdCode')}")
 	private String wegBevoegd;
 
 	@Label("Paalconstructie")
 	@Description("Paalconstructie")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalConstructieCode')}")
 	private String paalConst;
 
 	@Label("Paaldiameter")
 	@Description("Paaldiameter")
-	private int paalDia;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalDiameterCode')}")
+	private String paalDia;
 
 	@Label("Paalbeugel")
 	@Description("Paalbeugel")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalBeugelCode')}")
 	private String paalBeugel;
 
 	@Label("Paalgrond")
 	@Description("Paalgrond")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalGrondCode')}")
 	private String paalGrond;
 
 	@Label("Bordconstructie")
 	@Description("Bordconstructie")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordConstructieCode')}")
 	private String bordConst;
 
 	@Label("Foto")
@@ -130,11 +143,11 @@ public abstract class Bord extends AbstractModelObject implements
 		this.paalConst = paalConst;
 	}
 
-	public int getPaalDia() {
+	public String getPaalDia() {
 		return paalDia;
 	}
 
-	public void setPaalDia(int paalDia) {
+	public void setPaalDia(String paalDia) {
 		this.paalDia = paalDia;
 	}
 

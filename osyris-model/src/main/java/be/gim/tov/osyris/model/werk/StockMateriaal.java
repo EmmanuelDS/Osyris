@@ -44,10 +44,14 @@ public class StockMateriaal extends AbstractModelObject implements
 	// VARIABLES
 	@Label("Magazijn")
 	@Description("Magazijn")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('MagazijnCode')}")
 	private String magazijn;
 
 	@Label("Categorie")
 	@Description("Categorie")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('StockCategorieCode')}")
 	private String categorie;
 
 	@Label("Type")
@@ -75,6 +79,7 @@ public class StockMateriaal extends AbstractModelObject implements
 	@Minimum(value = 0)
 	private int max;
 
+	@NotSearchable
 	@Label("Te bestellen")
 	@Description("Te bestellen")
 	private int teBestellen;
@@ -82,7 +87,7 @@ public class StockMateriaal extends AbstractModelObject implements
 	@Label("Besteld")
 	@Description("Besteld")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisBean.stockMateriaalStates}")
+	@ValuesExpression("#{osyrisModelFunctions.stockMateriaalStates}")
 	private String besteld;
 
 	@Label("Traject")

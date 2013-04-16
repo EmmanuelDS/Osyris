@@ -14,6 +14,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -34,6 +35,8 @@ public abstract class Traject extends AbstractModelObject implements
 	// VARIABLES
 	@Label("Naam")
 	@Description("Naam")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
 	private String naam;
 
 	@Label("Lengte")
@@ -51,6 +54,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier regio;
 
+	@NotSearchable
 	@Label("Traject toewijzing")
 	@Description("Traject toewijzing")
 	private TrajectToewijzing trajectToewijzing;

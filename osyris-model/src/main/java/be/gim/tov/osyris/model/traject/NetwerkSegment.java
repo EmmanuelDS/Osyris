@@ -24,8 +24,8 @@ public abstract class NetwerkSegment extends Traject {
 	@Label("Enkele richting")
 	@Description("Enkele richting")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisBean.enkeleRichting}")
-	private String enkelRichting;
+	@ValuesExpression("#{osyrisModelFunctions.enkeleRichting}")
+	private String enkeleRichting;
 
 	@Label("Van knooppunt")
 	@Description("van knooppunt")
@@ -38,12 +38,12 @@ public abstract class NetwerkSegment extends Traject {
 	private ResourceIdentifier naarKnooppunt;
 
 	// GETTERS AND SETTERS
-	public String getEnkelRichting() {
-		return enkelRichting;
+	public String getEnkeleRichting() {
+		return enkeleRichting;
 	}
 
-	public void setEnkelRichting(String enkelRichting) {
-		this.enkelRichting = enkelRichting;
+	public void setEnkeleRichting(String enkeleRichting) {
+		this.enkeleRichting = enkeleRichting;
 	}
 
 	public ResourceIdentifier getVanKnooppunt() {

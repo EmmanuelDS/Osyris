@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
@@ -23,7 +22,7 @@ import be.gim.tov.osyris.model.controle.Melding;
  * @author kristof
  * 
  */
-public class MeldingFormBase implements Serializable {
+public class MeldingFormBase {
 
 	private static final Log log = LogFactory.getLog(MeldingFormBase.class);
 
