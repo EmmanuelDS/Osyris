@@ -56,6 +56,7 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	private static final Log log = LogFactory.getLog(PeterMeterProfiel.class);
 
 	// VARIABLES
+	@NotSearchable
 	@NotViewable
 	@NotEditable
 	@Label("Peter/Meter")

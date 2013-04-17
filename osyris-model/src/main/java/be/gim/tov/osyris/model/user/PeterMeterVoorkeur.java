@@ -10,6 +10,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -44,7 +45,9 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 
 	@Label("Periode")
 	@Description("Periode")
-	private short periode;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.periodeCodes}")
+	private String periode;
 
 	@Label("Gemeente")
 	@Description("Gemeente")
@@ -83,11 +86,11 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 		this.maxAfstand = maxAfstand;
 	}
 
-	public short getPeriode() {
+	public String getPeriode() {
 		return periode;
 	}
 
-	public void setPeriode(short periode) {
+	public void setPeriode(String periode) {
 		this.periode = periode;
 	}
 

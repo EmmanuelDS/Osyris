@@ -29,8 +29,7 @@ public class MeldingSaveListener {
 			// MedewerkerProfiel trajecttype property
 		}
 
-		else if (melding.getStatus().equals(MeldingStatus.GEMELD)) {
-			melding.setStatus(MeldingStatus.GEVALIDEERD);
+		else {
 			melding.setDatumGevalideerd(new Date());
 			// TODO: nieuwe WerkOpdracht maken met te herstellen bording,
 			// uitvoerder,

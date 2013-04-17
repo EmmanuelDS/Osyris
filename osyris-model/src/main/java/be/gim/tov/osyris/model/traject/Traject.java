@@ -9,6 +9,7 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
@@ -45,6 +46,7 @@ public abstract class Traject extends AbstractModelObject implements
 
 	@NotViewable
 	@NotSearchable
+	@NotEditable
 	@SrsName("EPSG:31370")
 	private Geometry geom;
 

@@ -19,6 +19,7 @@ import org.picketlink.idm.api.Group;
 import be.gim.tov.osyris.model.annotation.EditableInGroup;
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
+import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
 /**
  * 
@@ -51,6 +52,11 @@ public class PropertyEditableBean {
 		if (object.get("status") instanceof ControleOpdrachtStatus) {
 			status = object.get("status");
 			fields = object.getClass().getSuperclass().getDeclaredFields();
+		}
+
+		if (object.get("status") instanceof MeldingStatus) {
+			status = object.get("status");
+			fields = object.getClass().getDeclaredFields();
 		}
 
 		for (Field field : fields) {

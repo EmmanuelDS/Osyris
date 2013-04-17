@@ -61,6 +61,18 @@ public class OsyrisModelFunctions {
 		return imageCodes;
 	}
 
+	public List<Object[]> getPeriodeCodes() {
+		List<Object[]> periodeCodes = new ArrayList<Object[]>();
+		Object[] periode1 = { "1", "1" };
+		Object[] periode2 = { "2", "2" };
+		Object[] periode3 = { "3", "3" };
+
+		periodeCodes.add(periode1);
+		periodeCodes.add(periode2);
+		periodeCodes.add(periode3);
+		return periodeCodes;
+	}
+
 	public List<Object[]> getTrajectTypes() {
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();

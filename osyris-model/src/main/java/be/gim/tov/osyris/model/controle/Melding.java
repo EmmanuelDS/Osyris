@@ -20,6 +20,8 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.tov.osyris.model.annotation.EditableInGroup;
+import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
 /**
@@ -40,7 +42,8 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@NotEditable
+	@EditableInStatus("GEMELD")
+	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	@Label("Status")
 	@Description("Status")
 	private MeldingStatus status;
