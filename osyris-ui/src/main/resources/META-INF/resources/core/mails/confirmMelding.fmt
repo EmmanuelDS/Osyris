@@ -4,6 +4,19 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<body>
 		<div>Uw melding is succesvol verzonden via ${preferences.title?string}.</div>
-		<div>${melding}</div>
+		<dl>
+			<dt>Voornaam:</dt>
+			<dd>${firstname}</dd>
+			<dt>Naam:</dt>
+			<dd>${lastname}</dd>
+			<dt>Telefoon:</dt>
+			<dd>${phone}</dd>
+			<dt>Status melding:</dt>
+			<dd>${status}</dd>
+			<dt>Type probleem:</dt>
+			<dd>${problemType}</dd>
+			<dt>Commentaar:</dt>
+			<dd>${comment}</dd>
+		</dl>
 	</body>
 </html>

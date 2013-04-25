@@ -28,20 +28,20 @@ public class TrajectToewijzing extends AbstractModelObject implements
 	@Description("Jaar")
 	private short jaar;
 
-	@Label("Peter/Meter 1")
-	@Description("Peter/Meter 1")
+	@Label("Peter/Meter Lente")
+	@Description("Peter/Meter Lente")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter1;
 
-	@Label("Peter/Meter 2")
-	@Description("Peter/Meter 2")
+	@Label("Peter/Meter Zomer")
+	@Description("Peter/Meter Zomer")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter2;
 
-	@Label("Peter/Meter 3")
-	@Description("Peter/Meter 3")
+	@Label("Peter/Meter Herfst")
+	@Description("Peter/Meter Herfst")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter3;

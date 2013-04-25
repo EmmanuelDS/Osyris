@@ -1,6 +1,5 @@
 package be.gim.tov.osyris.model.user;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -20,7 +19,6 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
-import org.conscientia.api.model.annotation.Transient;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
@@ -129,19 +127,19 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 		this.voorkeuren = voorkeuren;
 	}
 
-	@Transient
-	@Label("Toegewezen trajecten")
-	@NotSearchable
-	public List<String> getToegewezenTrajecten() {
-
-		// TODO: Query maken die de trajecten voor een bepaalde peterMeter
-		// ophaalt
-		List<String> test = new ArrayList<String>();
-
-		if (test.isEmpty()) {
-			test.add("Nog niet toegewezen aan trajecten.");
-		}
-
-		return test;
-	}
+	// @Transient
+	// @Label("Toegewezen trajecten")
+	// @NotSearchable
+	// public List<String> getToegewezenTrajecten() {
+	//
+	// // TODO: Query maken die de trajecten voor een bepaalde peterMeter
+	// // ophaalt
+	// List<String> test = new ArrayList<String>();
+	//
+	// if (test.isEmpty()) {
+	// test.add("Nog niet toegewezen aan trajecten.");
+	// }
+	//
+	// return test;
+	// }
 }

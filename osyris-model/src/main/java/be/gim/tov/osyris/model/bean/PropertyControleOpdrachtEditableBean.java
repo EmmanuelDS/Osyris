@@ -19,7 +19,6 @@ import org.picketlink.idm.api.Group;
 import be.gim.tov.osyris.model.annotation.EditableInGroup;
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
-import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
 /**
  * 
@@ -27,10 +26,10 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
  * 
  */
 @Named
-public class PropertyEditableBean {
+public class PropertyControleOpdrachtEditableBean {
 
 	private static final Log log = LogFactory
-			.getLog(PropertyEditableBean.class);
+			.getLog(PropertyControleOpdrachtEditableBean.class);
 
 	@Inject
 	private ModelRepository modelRepository;
@@ -54,17 +53,16 @@ public class PropertyEditableBean {
 			fields = object.getClass().getSuperclass().getDeclaredFields();
 		}
 
-		if (object.get("status") instanceof MeldingStatus) {
-			status = object.get("status");
-			fields = object.getClass().getDeclaredFields();
-		}
-
 		for (Field field : fields) {
 
 			// Get EditinStatus annotation if available for current property
 			if (field.getName().equals(property.getName())) {
 				EditableInStatus editInStatusAnnotation = field
 						.getAnnotation(EditableInStatus.class);
+
+				if (editInStatusAnnotation == null) {
+					return property.isEditable();
+				}
 
 				if (editInStatusAnnotation != null) {
 					String[] values = editInStatusAnnotation.value();
@@ -87,6 +85,10 @@ public class PropertyEditableBean {
 			if (field.getName().equals(property.getName())) {
 				EditableInGroup editInGroupAnnotation = field
 						.getAnnotation(EditableInGroup.class);
+
+				if (editInGroupAnnotation == null) {
+					return property.isEditable();
+				}
 
 				if (editInGroupAnnotation != null) {
 					String[] values = editInGroupAnnotation.value();

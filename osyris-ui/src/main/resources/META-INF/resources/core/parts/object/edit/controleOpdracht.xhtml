@@ -9,7 +9,7 @@
 			<c:forEach items="#{cc.attrs.modelClass.properties}"
 				var="property">
 				<c:choose>
-					<c:when test="#{propertyEditableBean.isEditableInStatus(cc.attrs.value, property)}">
+					<c:when test="#{propertyControleOpdrachtEditableBean.isEditableInStatus(cc.attrs.value, property)}">
 						<d:propertyField id="field_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 

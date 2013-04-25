@@ -1,10 +1,12 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.apache.commons.logging.Log;
@@ -22,7 +24,7 @@ import be.gim.tov.osyris.model.controle.Melding;
  * @author kristof
  * 
  */
-public class MeldingFormBase {
+public class MeldingFormBase implements Serializable {
 
 	private static final Log log = LogFactory.getLog(MeldingFormBase.class);
 
@@ -41,11 +43,13 @@ public class MeldingFormBase {
 
 	private Melding melding;
 
+	@PostConstruct
+	public void init() throws IOException {
+		createMelding();
+	}
+
 	// GETTERS AND SETTERS
 	public Melding getMelding() {
-		if (melding == null) {
-			melding = createMelding();
-		}
 		return melding;
 	}
 
@@ -81,7 +85,7 @@ public class MeldingFormBase {
 			sendConfirmationMail(melding);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ melding.getEmail() + ".");
-
+			createMelding();
 		} catch (IOException e) {
 			log.error("Can not save model object.", e);
 			messages.error("Melding niet verzonden");
@@ -96,8 +100,13 @@ public class MeldingFormBase {
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
 
-		// TODO: Melding properties toevoegen
-		variables.put("melding", melding);
+		// TODO: Extra melding properties toevoegen?
+		variables.put("firstname", melding.getVoornaam());
+		variables.put("lastname", melding.getNaam());
+		variables.put("phone", melding.getTelefoon());
+		variables.put("status", melding.getStatus());
+		variables.put("problemType", melding.getProbleem().getType());
+		variables.put("comment", melding.getProbleem().getCommentaar());
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
 				Collections.singleton(melding.getEmail()),

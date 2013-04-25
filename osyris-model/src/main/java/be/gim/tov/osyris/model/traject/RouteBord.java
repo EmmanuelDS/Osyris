@@ -7,6 +7,7 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -26,7 +27,9 @@ public class RouteBord extends Bord {
 
 	@Label("Afbeeldingscode")
 	@Description("Afbeeldingscode")
-	private short imageCode;
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
+	private String imageCode;
 
 	@Label("Route")
 	@Description("Route")
@@ -43,11 +46,11 @@ public class RouteBord extends Bord {
 		this.volg = volg;
 	}
 
-	public short getImageCode() {
+	public String getImageCode() {
 		return imageCode;
 	}
 
-	public void setImageCode(short imageCode) {
+	public void setImageCode(String imageCode) {
 		this.imageCode = imageCode;
 	}
 

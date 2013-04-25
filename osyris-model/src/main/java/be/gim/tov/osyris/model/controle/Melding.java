@@ -5,6 +5,7 @@ import java.util.Date;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.Model;
@@ -20,7 +21,6 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.tov.osyris.model.annotation.EditableInGroup;
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
@@ -31,6 +31,7 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Edit(type = "melding")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
@@ -42,8 +43,8 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@EditableInStatus("GEMELD")
-	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
+	@NotEditable
+	// @EditableInStatus({ "GEMELD" })
 	@Label("Status")
 	@Description("Status")
 	private MeldingStatus status;
@@ -103,10 +104,20 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
+	@Required
 	@NotSearchable
 	@Label("Probleem")
 	@Description("Probleem")
 	private Probleem probleem;
+
+	@EditableInStatus({ "GEMELD", "GEVALIDEERD_WERKOPDRACHT",
+			"GEVALIDEERD_GEEN_WERKOPDRACHT", "GEVALIDEERD_REEDS_GEMELD",
+			"GEVALIDEERD_IN_BEHANDELING" })
+	@NotSearchable
+	@Label("Commentaar TOV")
+	@Description("Commentaar TOV")
+	@Type(value = ModelPropertyType.TEXT)
+	private String commentaar;
 
 	// GETTERS AND SETTERS
 	public MeldingStatus getStatus() {
@@ -195,5 +206,13 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	public void setProbleem(Probleem probleem) {
 		this.probleem = probleem;
+	}
+
+	public String getCommentaar() {
+		return commentaar;
+	}
+
+	public void setCommentaar(String commentaar) {
+		this.commentaar = commentaar;
 	}
 }

@@ -1,0 +1,62 @@
+<u:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:j="http://conscientia.org/jsf">
+	<j:layout
+		id="layout"
+		content="true"
+		style="height: 400px; #{cc.attrs.style}">
+		<j:layoutPane styleClass="ribbon"
+			region="north"
+			slidable="true">
+			<m:ribbon/>
+		</j:layoutPane>
+		<j:layoutPane>
+			<m:map id="map" />
+		</j:layoutPane>
+		<j:layoutPane
+			region="east"
+			size="350"
+			minSize="200"
+			resizable="true"
+			slidable="true">
+			<j:layoutPane styleClass="component-map-tasks">
+				<r:tabPanel id="tasks">
+					<r:tab
+						id="layerTab"
+						header="#{messages['model.entry.mapContext.tabpanel.tab.layers']}">
+						<m:layerManager />
+					</r:tab>
+					<r:tab
+						id="searchTab"
+						header="#{messages['model.entry.mapContext.tabpanel.tab.search']}">
+						<m:featureSearch />
+					</r:tab>
+					<r:tab
+						id="resultTab"
+						header="#{messages['model.entry.mapContext.tabpanel.tab.result']}">
+						<m:featureResult />
+					</r:tab>
+				</r:tabPanel>
+			</j:layoutPane>
+			<j:layoutPane
+				region="south"
+				size="170"
+				resizable="false"
+				slidable="false">
+				<m:overviewMap for="map" />
+			</j:layoutPane>
+		</j:layoutPane>
+		<j:layoutPane
+			region="south"
+			closable="false">
+			<m:statusBar for="map" />
+		</j:layoutPane>
+	</j:layout>
+</u:composition>

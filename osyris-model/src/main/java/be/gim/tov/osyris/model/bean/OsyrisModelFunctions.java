@@ -63,9 +63,9 @@ public class OsyrisModelFunctions {
 
 	public List<Object[]> getPeriodeCodes() {
 		List<Object[]> periodeCodes = new ArrayList<Object[]>();
-		Object[] periode1 = { "1", "1" };
-		Object[] periode2 = { "2", "2" };
-		Object[] periode3 = { "3", "3" };
+		Object[] periode1 = { "1", "Lente" };
+		Object[] periode2 = { "2", "Zomer" };
+		Object[] periode3 = { "3", "Herfst" };
 
 		periodeCodes.add(periode1);
 		periodeCodes.add(periode2);

@@ -1,0 +1,373 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="be.gim.specto.ui.MapComponent" />
+	<cc:implementation>
+		<j:contextual var="viewer"
+			value="#{cc.viewer}" />
+		<c:set var="editLayer"
+			value="#{viewer.context.getLayer(viewer.editLayerId)}" />
+		<j:subscribe name="updatedEditLayer"
+			render="editTab" />
+		<r:tabPanel styleClass="component-map-ribbon">
+			<r:tab header="Navigate &amp; Features">
+				<j:sectionPanel>
+					<j:sectionPanel label="Zoom &amp; pan">
+						<j:commandButton image="#{resource['core/images/actions/24x24/zoomIn.png']}"
+							styleClass="component-toolbar-button"
+							value="Zoom in"
+							title="#{messages['model.entry.mapContext.tools.zoomIn.label']}"
+							rendered="#{viewer.context.hasTool('zoomIn')}"
+							submit="false">
+							<j:activateControl event="click"
+								control="zoomIn" />
+						</j:commandButton>
+				   		<j:commandButton image="#{resource['core/images/actions/24x24/zoomOut.png']}"
+							styleClass="component-toolbar-button"
+							value="Zoom out"
+							title="#{messages['model.entry.mapContext.tools.zoomOut.label']}"
+							rendered="#{viewer.context.hasTool('zoomOut')}"
+							submit="false">
+							<j:activateControl event="click"
+								control="zoomOut" />
+						</j:commandButton>
+				   		<j:commandButton image="#{resource['core/images/actions/24x24/pan.png']}"
+							styleClass="component-toolbar-button"
+							value="Pan"
+							title="#{messages['model.entry.mapContext.tools.pan.label']}"
+							rendered="#{viewer.context.hasTool('pan')}"
+							submit="false">
+							<j:activateControl event="click"
+								control="pan" />
+						</j:commandButton>
+						<m:zoomPoint rendered="#{viewer.context.hasTool('zoomPoint')}"/>
+						<j:sectionPanel rows="2">
+							<j:commandButton onclick="#{j:controller()}.zoomToPreviousExtent();"
+								image="#{resource['core/images/actions/12x12/undo.png']}"
+								styleClass="component-toolbar-button"
+								value="Previous"
+								title="#{messages['model.entry.mapContext.tools.zoomToPrevious.label']}"
+								rendered="#{viewer.context.hasTool('zoomToPrevious')}"
+								submit="false"/>
+					   		<j:commandButton onclick="#{j:controller()}.zoomToNextExtent();"
+								image="#{resource['core/images/actions/12x12/redo.png']}"
+								styleClass="component-toolbar-button"
+								value="Next"
+								title="#{messages['model.entry.mapContext.tools.zoomToNext.label']}"
+								rendered="#{viewer.context.hasTool('zoomToNext')}"
+								submit="false"/>
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Extent"
+						rendered="#{viewer.context.hasAnyTool('zoomToMax', 'zoomToContent', 'zoomToSelection')}">
+						<j:sectionPanel rows="2">
+							<j:commandButton image="#{resource['core/images/actions/12x12/zoomToMax.png']}"
+								value="Maximum"
+								title="#{messages['model.entry.mapContext.tools.zoomToMax.label']}"
+								rendered="#{viewer.context.hasTool('zoomToMax')}"
+								onclick="#{j:controller()}.zoomToMaxExtent();"
+								styleClass="component-toolbar-button" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/zoomToContent.png']}"
+								value="Content"
+								title="#{messages['model.entry.mapContext.tools.zoomToContent.label']}"
+								rendered="#{viewer.context.hasTool('zoomToContent')}"
+								onclick="#{j:controller()}.zoomToContentExtent();"
+								styleClass="component-toolbar-button" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/zoomToSelection.png']}"
+								value="Selection"
+								title="#{messages['model.entry.mapContext.tools.zoomToSelection.label']}"
+								rendered="#{viewer.context.hasTool('zoomToSelection')}"
+								onclick="#{j:controller()}.zoomToSelectionExtent();"
+								styleClass="component-toolbar-button" />
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Search"
+						rendered="#{false}">
+						<j:sectionPanel rows="2">
+							<h:outputText value="Search location" />
+							<h:inputText style="width: 400px" />
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Animation"
+						rendered="#{viewer.context.hasTool('animation')}">
+						<j:commandButton id="animation"
+							onclick="#{j:controller()}.getTimeSeries(function (timeSeries){ #{j:controller()}.animation.timeSeries = timeSeries; #{j:controller()}.animation.waitTime = #{viewer.context.timeRefreshPeriod}; #{j:controller()}.animation.timeIndex = 0; #{j:controller()}.animation.start(); });"
+							submit="false"
+							image="#{resource['core/images/actions/24x24/play.png']}"
+							styleClass="component-toolbar-button"
+							value="Start"
+							title="#{messages['component.map.statusBar.animation.start.label']}" />
+						<j:commandButton onclick="#{j:controller()}.animation.stop();"
+							submit="false"
+							image="#{resource['core/images/actions/24x24/stop.png']}"
+							styleClass="component-toolbar-button"
+							value="Stop"
+							title="#{messages['component.map.statusBar.animation.stop.label']}" />
+					</j:sectionPanel>
+					<j:sectionPanel label="Selection"
+						rendered="#{viewer.context.hasAnyTool('selectFeatures','clearSelection','selectOverlapping','selectionBuffer')}">
+						<j:commandButton id="selectFeatures"
+							image="#{resource['core/images/actions/24x24/select.png']}"
+							styleClass="component-toolbar-button"
+							value="Select"
+							title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+							rendered="#{viewer.context.hasTool('selectFeatures')}"
+							submit="false">
+							<j:activateControl event="click"
+								control="selectBox">
+								<f:param name="layerId"
+									value="#{null}" />
+								<f:param name="afterHandle"
+									value="#{null}" />
+							</j:activateControl>
+						</j:commandButton>
+						<j:commandButton id="clearSelection"
+							onclick="#{j:controller()}.clearSelection()"
+							image="#{resource['core/images/actions/24x24/clearSelection.png']}"
+							styleClass="component-toolbar-button"
+							value="Clear"
+							title="#{messages['model.entry.mapContext.tools.clearSelection.label']}"
+							rendered="#{viewer.context.hasTool('clearSelection')}"
+							submit="false" />
+						<j:sectionPanel rows="2">
+							<m:selectOverlapping rendered="#{viewer.context.hasTool('selectOverlapping')}" />
+							<m:selectBuffer rendered="#{viewer.context.hasTool('selectionBuffer')}" />
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Info"
+						rendered="#{viewer.context.hasTool('featureInfo')}">
+				  		<j:commandButton image="#{resource['core/images/actions/24x24/featureInfo.png']}"
+							styleClass="component-toolbar-button"
+							rendered="#{viewer.context.hasTool('featureInfo')}"
+							value="Attributes"
+							title="#{messages['model.entry.mapContext.tools.featureInfo.label']}"
+							submit="false">
+							<j:activateControl event="click"
+								control="featureInfoBox">
+								<f:param name="layerId"
+									value="#{null}" />
+							</j:activateControl>
+						</j:commandButton>
+					</j:sectionPanel>
+					<j:sectionPanel label="Measure"
+						rendered="#{viewer.context.hasAnyTool('measureLine','measureArea')}">
+						<j:sectionPanel rows="2">
+							<j:commandButton image="#{resource['core/images/actions/12x12/measureLine.png']}"
+								styleClass="component-toolbar-button"
+								value="Distance"
+								title="#{messages['model.entry.mapContext.tools.measureLine.label']}"
+								rendered="#{viewer.context.hasTool('measureLine')}"
+								submit="false">
+								<j:activateControl event="click"
+									control="measureLine" />
+							</j:commandButton>
+							<j:commandButton image="#{resource['core/images/actions/12x12/measureArea.png']}"
+								styleClass="component-toolbar-button"
+								value="Area"
+								title="#{messages['model.entry.mapContext.tools.measureArea.label']}"
+								rendered="#{viewer.context.hasTool('measureArea')}"
+								submit="false">
+								<j:activateControl event="click"
+									control="measureArea" />
+							</j:commandButton>
+						</j:sectionPanel>
+					</j:sectionPanel>
+				</j:sectionPanel>
+			</r:tab>
+			<r:tab id="editTab"
+				header="Edit"
+				rendered="#{editLayer != null}">
+				<j:sectionPanel>
+					<j:sectionPanel label="Layer"
+						rendered="#{viewer.editLayerCount gt 1}">
+						<j:sectionPanel rows="2">
+							<h:outputText value="Select edit layer" />
+							<h:selectOneMenu value="#{viewer.editLayerId}"
+								style="width: 160px">
+								<f:selectItems value="#{viewer.editLayerOptions}" />
+								<f:ajax event="change"
+									execute="@this" />
+							</h:selectOneMenu>
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Session"
+						rendered="#{editLayer.inEditSession}">
+						<j:commandButton action="#{viewer.commitEditSession(editLayer)}"
+							image="#{resource['core/images/actions/24x24/save.png']}"
+							styleClass="component-toolbar-button"
+							value="Save edited features" />
+						<j:commandButton action="#{viewer.cancelEditSession(editLayer)}"
+							image="#{resource['core/images/actions/24x24/cancel.png']}"
+							styleClass="component-toolbar-button"
+							value="Cancel edited features" />
+					</j:sectionPanel>
+					<j:sectionPanel label="Selection"
+						rendered="#{editLayer.editMode != 'single'}">
+						<j:commandButton id="selectEditFeatures"
+							image="#{resource['core/images/actions/24x24/select.png']}"
+							styleClass="component-toolbar-button"
+							value="Select"
+							title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+							submit="false">
+							<j:activateControl event="click"
+								control="selectBox">
+								<f:param name="layerId"
+									value="#{viewer.editLayerId}" />
+								<f:param name="afterHandle"
+									value="#{null}" />
+							</j:activateControl>
+						</j:commandButton>
+						<j:commandButton id="clearEditSelection"
+							onclick="#{j:controller()}.clearLayerSelection('#{viewer.getEditLayerId()}')"
+							image="#{resource['core/images/actions/24x24/clearSelection.png']}"
+							styleClass="component-toolbar-button"
+							value="Clear"
+							title="#{messages['model.entry.mapContext.tools.clearSelection.label']}"
+							submit="false" />
+					</j:sectionPanel>
+					<j:sectionPanel label="Edit mode"
+						rendered="#{editLayer.hasAnyTool('combineReplace','toggleSnapping')}">
+						<j:sectionPanel rows="2">
+							<h:selectOneMenu style="width: 120px"
+								onchange="#{j:controller()}.setEditCombinationMode(this.value)"
+								rendered="#{editLayer.hasTool('combineReplace')}">
+								<f:selectItems value="#{mapContextSupport.combinationModeOptions}" />
+							</h:selectOneMenu>
+							<h:selectOneMenu style="width: 120px"
+								onchange="#{j:controller()}.setSnapping(this.value != 'none')"
+								rendered="#{editLayer.hasTool('toggleSnapping')}">
+								<f:selectItem itemValue="none"
+									itemLabel="No snapping" />
+								<f:selectItem itemValue="point"
+									itemLabel="Snap point" />
+							</h:selectOneMenu>
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Draw"
+						rendered="#{editLayer.hasAnyTool('drawPoint','drawLinestring','drawPolygon','drawRectangle','drawCircle')}">
+						<j:sectionPanel rows="2">
+							<j:commandButton image="#{resource['core/images/actions/12x12/drawPoint.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.drawPoint.label']}" 
+								rendered="#{editLayer.hasTool('drawPoint') and viewer.supportsGeometryType(editLayer, 'MULTIPOINT')}">
+								<j:activateControl event="click"
+									control="drawPoint" />
+							</j:commandButton>
+							<j:commandButton image="#{resource['core/images/actions/12x12/drawLineString.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.drawLinestring.label']}" 
+								rendered="#{editLayer.hasTool('drawLinestring') and viewer.supportsGeometryType(editLayer, 'MULTILINESTRING')}">
+								<j:activateControl event="click"
+									control="drawLineString" />
+							</j:commandButton>
+							<j:commandButton image="#{resource['core/images/actions/12x12/drawPolygon.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.drawPolygon.label']}" 
+								rendered="#{editLayer.hasTool('drawPolygon') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}"
+								onclick="#{j:controller()}.activateControl('drawPolygon')">
+								<j:activateControl event="click"
+									control="drawPolygon" />
+							</j:commandButton>
+							<j:commandButton image="#{resource['core/images/actions/12x12/drawRectangle.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.drawRectangle.label']}" 
+								rendered="#{editLayer.hasTool('drawRectangle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}">
+								<j:activateControl event="click"
+									control="drawRectangle" />
+							</j:commandButton>
+							<j:commandButton image="#{resource['core/images/actions/12x12/drawCircle.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.drawCircle.label']}" 
+								rendered="#{editLayer.hasTool('drawCircle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}">
+								<j:activateControl event="click"
+									control="drawCircle" />
+							</j:commandButton>
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Insert"
+						rendered="#{editLayer.hasAnyTool('insertPoint','insertLinestring','insertPolygon','insertRectangle','insertCircle')}">
+						<j:sectionPanel rows="2">
+							<m:insertPoint rendered="#{editLayer.hasTool('insertPoint') and viewer.supportsGeometryType(editLayer, 'MULTIPOINT')}" />
+							<m:insertLineString rendered="#{editLayer.hasTool('insertLinestring') and viewer.supportsGeometryType(editLayer, 'MULTILINESTRING')}" />
+							<m:insertPolygon rendered="#{editLayer.hasTool('insertPolygon') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+							<m:insertRectangle rendered="#{editLayer.hasTool('insertRectangle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+							<m:insertCircle rendered="#{editLayer.hasTool('insertCircle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Modify"
+						rendered="#{editLayer.hasAnyTool('modifyReshape','modifyRotate','modifyResize','modifyDrag')}">
+						<j:sectionPanel rows="2">
+							<j:commandButton image="#{resource['core/images/actions/12x12/modifyReshape.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.modifyReshape.label']}" 
+								rendered="#{editLayer.hasTool('modifyReshape')}"
+								onclick="#{j:controller()}.activateControl('modify', { mode: OpenLayers.Control.ModifyFeature.RESHAPE });" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/modifyRotate.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.modifyRotate.label']}" 
+								rendered="#{editLayer.hasTool('modifyRotate')}"
+								onclick="#{j:controller()}.activateControl('modify', { mode: OpenLayers.Control.ModifyFeature.ROTATE });" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/modifyResize.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.modifyResize.label']}" 
+								rendered="#{editLayer.hasTool('modifyResize')}"
+								onclick="#{j:controller()}.activateControl('modify', { mode: OpenLayers.Control.ModifyFeature.RESIZE });" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/modifyDrag.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.modifyDrag.label']}" 
+								rendered="#{editLayer.hasTool('modifyDrag')}"
+								onclick="#{j:controller()}.activateControl('modify', { mode: OpenLayers.Control.ModifyFeature.DRAG });" />
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Other"
+						rendered="#{editLayer.hasAnyTool('cloneGeometry','mergeGeometry','splitGeometry','explodeGeometry','createBuffer','editWKT')}">
+						<j:sectionPanel rows="2">
+							<j:commandButton image="#{resource['core/images/actions/12x12/cloneGeometry.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.cloneGeometry.label']}" 
+								rendered="#{editLayer.hasTool('cloneGeometry')}"
+								onclick="#{id}_checkSelectControl(function() { #{j:controller()}.cloneSelectedFeatures(); });" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/mergeGeometry.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.mergeGeometry.label']}" 
+								rendered="#{editLayer.hasTool('mergeGeometry')}"
+								onclick="#{id}_checkSelectControl(function() { #{j:controller()}.mergeSelectedFeatures(); });" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/splitGeometry.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.splitGeometry.label']}" 
+								rendered="#{editLayer.hasTool('splitGeometry')}"
+								onclick="#{id}_checkEditControl(function() { #{j:controller()}.activateControl('split'); });" />
+							<j:commandButton image="#{resource['core/images/actions/12x12/explodeGeometry.png']}"
+								styleClass="component-toolbar-button"
+								value="#{messages['model.entry.mapLayer.tools.explodeGeometry.label']}" 
+								rendered="#{editLayer.hasTool('explodeGeometry')}"
+								onclick="#{id}_checkEditControl(function() { #{j:controller()}.explodeSelectedFeatures(); });" />
+							<m:createBuffer rendered="#{editLayer.hasTool('createBuffer') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+							<m:editWKT rendered="#{editLayer.hasTool('editWKT')}" />
+						</j:sectionPanel>
+					</j:sectionPanel>
+					<j:sectionPanel label="Attributes"
+						rendered="#{editLayer.hasAnyTool('editAttributes','batchUpdateAttributes')}">
+						<m:editAttributes rendered="#{editLayer.hasTool('editAttributes')}" />
+						<j:commandButton image="#{resource['core/images/actions/24x24/editAttributes.png']}"
+							styleClass="component-toolbar-button"
+							value="#{messages['model.entry.mapLayer.tools.batchUpdateAttributes.label']}"
+							rendered="#{editLayer.hasTool('batchUpdateAttributes')}">
+						</j:commandButton>
+					</j:sectionPanel>
+					<j:sectionPanel label="Delete"
+						rendered="#{editLayer.editMode != 'single' and editLayer.hasTool('deleteFeature')}">
+						<m:deleteFeature />
+					</j:sectionPanel>
+				</j:sectionPanel>
+			</r:tab>
+		</r:tabPanel>
+	</cc:implementation>
+</div>

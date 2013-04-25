@@ -48,14 +48,22 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 					}
 
 					// MEDEWEKER
-					if (group.getName().equals("Medewerker")
-							&& (status
-									.equals(ControleOpdrachtStatus.TE_CONTROLEREN) || status
-									.equals(ControleOpdrachtStatus.GEANNULEERD))) {
+					if (group.getName().equals("Medewerker")) {
 
-						if (action.equals(Permission.EDIT_ACTION)
-								|| action.equals(Permission.VIEW_ACTION)) {
+						if (action.equals(Permission.CREATE_ACTION)) {
 							return true;
+						}
+						if (status
+								.equals(ControleOpdrachtStatus.TE_CONTROLEREN)
+								|| status
+										.equals(ControleOpdrachtStatus.GEANNULEERD)) {
+
+							if (action.equals(Permission.EDIT_ACTION)
+									|| action.equals(Permission.VIEW_ACTION)) {
+								return true;
+							}
+						} else {
+							return false;
 						}
 					}
 				}

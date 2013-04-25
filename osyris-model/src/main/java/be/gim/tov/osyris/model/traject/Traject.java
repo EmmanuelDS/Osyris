@@ -56,7 +56,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier regio;
 
-	@NotSearchable
 	@Label("Traject toewijzing")
 	@Description("Traject toewijzing")
 	private TrajectToewijzing trajectToewijzing;

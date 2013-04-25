@@ -4,7 +4,13 @@ import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.core.model.AbstractModelObject;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -31,6 +37,12 @@ public class Gemeente extends AbstractModelObject {
 	@Label("Perimeter")
 	@Description("Perimeter")
 	private float perimeter;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@SrsName("EPSG:31370")
+	private Geometry geom;
 
 	// GETTERS AND SETTERS
 	public String getNaam() {
@@ -63,5 +75,13 @@ public class Gemeente extends AbstractModelObject {
 
 	public void setPerimeter(float perimeter) {
 		this.perimeter = perimeter;
+	}
+
+	public Geometry getGeom() {
+		return geom;
+	}
+
+	public void setGeom(Geometry geom) {
+		this.geom = geom;
 	}
 }

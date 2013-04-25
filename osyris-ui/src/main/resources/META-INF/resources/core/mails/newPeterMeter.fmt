@@ -1,0 +1,18 @@
+<#assign subject>
+[${preferences.title?string}] Registratie nieuwe Peter/Meter
+</#assign>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<body>
+		<div>U bent geregistreerd als peter/meter voor OSYRIS.</div>
+		<div>U kan inloggen met onderstaande gegevens:</div>
+		<dl>
+			<dt>Gebruikersnaam:</dt>
+			<dd>${username}</dd>
+			<dt>Paswoord:</dt>
+			<dd>${password}</dd>
+			<dt>Groep:</dt>
+			<dd>${group}</dd>
+		</dl>
+		<div>U kan uw gegevens, paswoord en voorkeuren wijzigen op uw profielpagina.</div>
+	</body>
+</html>

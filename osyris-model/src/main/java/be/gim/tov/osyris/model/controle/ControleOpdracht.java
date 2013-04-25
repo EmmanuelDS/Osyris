@@ -13,6 +13,7 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
@@ -35,6 +36,9 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 @Edit(type = "controleOpdracht")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
+		@Permission(profile = "group:Medewerker", action = "create", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
 
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
@@ -65,11 +69,13 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Datum gerapporteerd")
 	@Description("Datum gerapporteerd")
 	@Type(ModelPropertyType.DATE)
+	@NotEditable
 	private Date datumGerapporteerd;
 
 	@Label("Datum gevalideerd")
 	@Description("Datum gevalideerd")
 	@Type(ModelPropertyType.DATE)
+	@NotEditable
 	private Date datumGevalideerd;
 
 	@Label("Datum te controleren")
@@ -80,6 +86,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Datum uitgesteld")
 	@Description("Datum uitgesteld")
 	@Type(ModelPropertyType.DATE)
+	@NotEditable
 	private Date datumUitgesteld;
 
 	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
@@ -112,7 +119,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Problemen")
 	@Description("Problemen")
 	@NotSearchable
-	// @NotEditable
 	private List<Probleem> problemen;
 
 	// GETTERS AND SETTERS

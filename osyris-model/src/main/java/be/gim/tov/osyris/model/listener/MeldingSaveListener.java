@@ -22,14 +22,18 @@ public class MeldingSaveListener {
 			InstantiationException, IllegalAccessException {
 		Melding melding = (Melding) event.getModelObject();
 
-		if (melding.getStatus() == null) {
+		if (melding.get("status").equals(null)) {
 			melding.setStatus(MeldingStatus.GEMELD);
 			melding.set("datumGemeld", new Date());
+			String type = melding.getProbleem().getModelClass().getName();
+			melding.getProbleem().setType(type);
+
 			// TODO: Automatisch toewijzen aan Medewerker TOV via
 			// MedewerkerProfiel trajecttype property
 		}
 
-		else {
+		if (melding.get("status")
+				.equals(MeldingStatus.GEVALIDEERD_WERKOPDRACHT)) {
 			melding.setDatumGevalideerd(new Date());
 			// TODO: nieuwe WerkOpdracht maken met te herstellen bording,
 			// uitvoerder,

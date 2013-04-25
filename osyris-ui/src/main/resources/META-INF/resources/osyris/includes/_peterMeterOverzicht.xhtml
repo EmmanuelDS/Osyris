@@ -125,7 +125,7 @@
 								rendered="true"
 								execute="@this" />
 							<f:setPropertyActionListener target="#{form.object}"
-								value="#{object}" />
+								value="#{user}" />
 						</j:commandButton>
 						<j:commandButton
 							image="#{resource['core/images/actions/16x16/edit.png']}"
@@ -136,7 +136,7 @@
 								rendered="true"
 								execute="@this" />
 							<f:setPropertyActionListener target="#{form.object}"
-								value="#{object}" />
+								value="#{user}" />
 						</j:commandButton>
 						<j:commandButton 
 							rendered="true"
@@ -147,7 +147,7 @@
 								rendered="true"
 								execute="@this" />
 							<f:setPropertyActionListener target="#{form.object}"
-								value="#{object}" />
+								value="#{user}" />
 						</j:commandButton>
 					</h:panelGrid>
 				</a:outputPanel>
@@ -165,7 +165,7 @@
 					image="#{resource['core/images/actions/12x12/create.png']}"
 					type="button"
 					action="#{form.create()}">
-					<j:renderListener target="createPanel" 
+					<j:renderListener target="createPeterMeterPanel" 
 						rendered="true"
 						execute="@this" />
 				</j:commandButton>
@@ -188,24 +188,33 @@
 				type="button"/>
 	</r:panel>
 	
+	<u:decorate template="/resources/core/includes/managePanels.xhtml">
+		<u:param name="form"
+			value="#{form}" />
+		<u:param name="render"
+			value="#{r:clientId('result')}" />
+	</u:decorate>
+	
 	<a:outputPanel>
-		<j:renderPanel id="createPanel"
+		<j:renderPanel id="createPeterMeterPanel"
 			rendered="false">
 			<d:popupPanel header="#{messages['page.create.title']}"
 				icon="#{resources['core/images/actions/16x16/create.png']}"
 				show="true" 
 				modal="true"
 				width="600">
-				<d:object mode="EDIT" 
-					modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
+				<u:decorate template="/resources/osyris/includes/_createPeterMeter.xhtml">
+					<u:param name="form"
+						value="#{form}" />
+					<u:param name="render"
+						value="#{r:clientId('result')}" />
+				</u:decorate>
 				<d:buttons>
 					<j:commandButton value="#{messages['page.create.create.button']}"
 						image="#{resource['core/images/actions/12x12/apply.png']}"
 						type="button"
-						action="#{form.save()}"
-						render="objects">
+						action="#{form.saveNewPeterMeter()}"
+						render="result">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
@@ -218,89 +227,5 @@
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-		
-		<j:renderPanel id="viewPanel" 
-			rendered="false">
-			<d:popupPanel header="#{messages['page.view.title']}"
-				icon="#{resources['core/images/actions/16x16/view.png']}"
-				show="true" 
-				modal="true"
-				width="600">
-				<d:object mode="VIEW" 
-					modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
-				<d:buttons>
-					<j:commandButton value="Close"
-						image="#{resource['core/images/actions/12x12/close.png']}"
-						type="button"
-						submit="false">
-						<j:renderControl event="click" 
-							rendered="false" />
-					</j:commandButton>
-				</d:buttons>
-			</d:popupPanel>
-		</j:renderPanel>
-		
-		<j:renderPanel id="editPanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.edit.title']}"
-				icon="#{resources['core/images/actions/16x16/edit.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<d:object mode="EDIT" 
-					modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
-				<d:buttons>
-					<j:commandButton value="Save"
-						image="#{resource['core/images/actions/12x12/save.png']}"
-						type="button" 
-						action="#{form.save()}"
-						render="objects">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-					<j:commandButton value="#{messages['form.general.cancel.button']}"
-						type="button"
-						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						submit="false">
-						<j:renderControl event="click" 
-							rendered="false" />
-					</j:commandButton>
-				</d:buttons>
-			</d:popupPanel>
-		</j:renderPanel>
-		
-		<j:renderPanel id="deletePanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.delete.title']}"
-				icon="#{resources['core/images/actions/16x16/delete.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<h:outputText value="Are you sure you want to delete this object?" />
-				<d:object mode="VIEW" 
-					modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
-				<d:buttons>
-					<j:commandButton value="Delete"
-						image="#{resource['core/images/actions/12x12/delete.png']}"
-						type="button" 
-						action="#{form.delete()}"
-						render="objects">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-					<j:commandButton value="#{messages['form.general.cancel.button']}"
-						type="button"
-						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						submit="false">
-						<j:renderControl event="click" 
-							rendered="false" />
-					</j:commandButton>
-				</d:buttons>
-			</d:popupPanel>
-		</j:renderPanel>	
 	</a:outputPanel>
 </u:composition>

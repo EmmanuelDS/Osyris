@@ -63,10 +63,18 @@
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter')}">
 				<a:outputPanel>
 					<d:aspect id="peterMeterProfile"
-						value="#{cc.attrs.value.getAspect('PeterMeterProfiel', modelRepository, true)}"
+						value="#{cc.attrs.value.getAspect('PeterMeterProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter'))}"
 						mode="#{cc.attrs.mode}"
 						level="#{cc.attrs.level}"/>
 				</a:outputPanel>
+				
+				<a:outputPanel>    
+					<j:dynamicInclude id="include"     
+					src="/resources/osyris/includes/_toegewezenTrajecten.xhtml"     
+					rendered="true">    
+					</j:dynamicInclude>   
+				</a:outputPanel>
+				
 			</r:tab>
 			
 			<r:tab header="Bedrijf"
@@ -75,7 +83,7 @@
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder')}">
 				<a:outputPanel>
 					<d:aspect id="uitvoerderProfile"
-						value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, true)}"
+						value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder'))}"
 						mode="#{cc.attrs.mode}"
 						level="#{cc.attrs.level}"/>
 				</a:outputPanel>
@@ -87,7 +95,7 @@
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker')}">
 				<a:outputPanel>
 					<d:aspect id="medewerkerProfile"
-						value="#{cc.attrs.value.getAspect('MedewerkerProfiel', modelRepository, true)}"
+						value="#{cc.attrs.value.getAspect('MedewerkerProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker'))}"
 						mode="#{cc.attrs.mode}"
 						level="#{cc.attrs.level}"/>
 				</a:outputPanel>
