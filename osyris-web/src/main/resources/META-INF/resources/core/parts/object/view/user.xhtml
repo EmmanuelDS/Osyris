@@ -59,12 +59,10 @@
 				level="#{cc.attrs.level}"
 				simple="#{cc.attrs.simple}" />	
 				
-				<a:outputPanel>    
-					<j:dynamicInclude id="include"     
-					src="/resources/osyris/includes/_toegewezenTrajecten.xhtml"     
-					rendered="true">    
-					</j:dynamicInclude>   
-				</a:outputPanel>
+			<u:decorate template="/resources/osyris/includes/_toegewezenTrajecten.xhtml" >
+				<u:param name="username"
+						value="#{cc.attrs.value.username}" />
+			</u:decorate>
 			
 			<d:aspect id="uitvoerderProfile"
 				value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, false)}"

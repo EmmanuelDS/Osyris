@@ -13,7 +13,7 @@
 	<r:panel>
 	<div><b>U bent momenteel toegewezen aan: </b></div>
 	<br/>
-	<c:forEach items="#{trajectToewijzingBean.getTrajectToewijzingen(identity.getUser().id)}" 
+	<c:forEach items="#{trajectToewijzingBean.getTrajectToewijzingen(username)}" 
 				var="toewijzing">			
 		<div>
 			#{toewijzing}

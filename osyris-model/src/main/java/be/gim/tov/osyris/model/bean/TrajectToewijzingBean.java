@@ -50,22 +50,25 @@ public class TrajectToewijzingBean {
 			trajectToewijzingen = (List<TrajectToewijzing>) modelRepository
 					.searchObjects(q, true, true);
 
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName("Traject");
-			query.addFilter(FilterUtils.in("trajectToewijzing",
-					trajectToewijzingen));
+			if (!trajectToewijzingen.isEmpty()) {
 
-			List<Traject> trajecten = (List<Traject>) modelRepository
-					.searchObjects(query, true, true);
+				DefaultQuery query = new DefaultQuery();
+				query.setModelClassName("Traject");
+				query.addFilter(FilterUtils.in("trajectToewijzing",
+						trajectToewijzingen));
 
-			for (Traject traject : trajecten) {
-				result.add("periode "
-						+ traject.getTrajectToewijzing().getJaar() + ": "
-						+ traject.getClass().getSimpleName() + ", "
-						+ traject.getNaam() + ", " + traject.getLengte()
-						+ " km");
+				List<Traject> trajecten = (List<Traject>) modelRepository
+						.searchObjects(query, true, true);
+
+				for (Traject traject : trajecten) {
+					result.add("periode "
+							+ traject.getTrajectToewijzing().getJaar() + ": "
+							+ traject.getClass().getSimpleName() + ", "
+							+ traject.getNaam() + ", " + traject.getLengte()
+							+ " km");
+				}
+
 			}
-
 			if (!result.isEmpty()) {
 				return result;
 			}
