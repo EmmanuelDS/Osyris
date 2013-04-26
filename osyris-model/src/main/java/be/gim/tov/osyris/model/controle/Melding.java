@@ -44,21 +44,29 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
 	@NotEditable
-	// @EditableInStatus({ "GEMELD" })
+	@EditableInStatus({ "GEMELD", "GEVALIDEERD_WERKOPDRACHT",
+			"GEVALIDEERD_GEEN_WERKOPDRACHT", "GEVALIDEERD_REEDS_GEMELD",
+			"GEVALIDEERD_IN_BEHANDELING" })
 	@Label("Status")
 	@Description("Status")
 	private MeldingStatus status;
 
+	@NotEditable
+	@EditableInStatus("")
 	@NotSearchable
 	@Label("Voornaam")
 	@Description("Voornaam")
 	private String voornaam;
 
+	@NotEditable
+	@EditableInStatus("")
 	@NotSearchable
 	@Label("Naam")
 	@Description("Naam")
 	private String naam;
 
+	@NotEditable
+	@EditableInStatus("")
 	@Required
 	@NotSearchable
 	@Label("Email")
@@ -67,6 +75,8 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
 	private String email;
 
+	@NotEditable
+	@EditableInStatus("")
 	@NotSearchable
 	@Label("Telefoon")
 	@Description("Telefoon")
@@ -74,6 +84,8 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Pattern("(\\+?[\\d]+)?")
 	private String telefoon;
 
+	@NotEditable
+	@EditableInStatus("")
 	@Label("Datum vaststelling")
 	@Description("Datum vaststelling")
 	@Type(ModelPropertyType.DATE)
@@ -91,6 +103,8 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGevalideerd;
 
+	@NotEditable
+	@EditableInStatus("")
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
@@ -104,12 +118,15 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
+	@NotEditable
+	@EditableInStatus("")
 	@Required
 	@NotSearchable
 	@Label("Probleem")
 	@Description("Probleem")
 	private Probleem probleem;
 
+	@NotEditable
 	@EditableInStatus({ "GEMELD", "GEVALIDEERD_WERKOPDRACHT",
 			"GEVALIDEERD_GEEN_WERKOPDRACHT", "GEVALIDEERD_REEDS_GEMELD",
 			"GEVALIDEERD_IN_BEHANDELING" })

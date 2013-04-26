@@ -7,6 +7,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelObject;
@@ -65,6 +66,16 @@ public class PropertyMeldingEditableBean {
 							property.setEditable(true);
 							return true;
 						}
+					}
+
+					// For new melding with status null and editable in empty
+					// status
+					if (object.get("status") == null) {
+						if (list.contains(StringUtils.EMPTY)) {
+							property.setEditable(true);
+							return true;
+						}
+
 					}
 				}
 			}

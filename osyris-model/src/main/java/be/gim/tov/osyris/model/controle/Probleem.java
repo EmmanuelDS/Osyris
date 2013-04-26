@@ -8,6 +8,7 @@ import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
@@ -24,6 +25,7 @@ public abstract class Probleem extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	@NotEditable
 	@Label("Type")
 	@Description("Type")
 	private String type;

@@ -6,7 +6,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.apache.commons.logging.Log;
@@ -43,13 +42,12 @@ public class MeldingFormBase implements Serializable {
 
 	private Melding melding;
 
-	@PostConstruct
-	public void init() throws IOException {
-		createMelding();
-	}
-
 	// GETTERS AND SETTERS
 	public Melding getMelding() {
+
+		if (melding == null) {
+			melding = createMelding();
+		}
 		return melding;
 	}
 
@@ -79,13 +77,13 @@ public class MeldingFormBase implements Serializable {
 		try {
 			// Save Melding
 			modelRepository.saveObject(getMelding());
-			messages.info("Melding sucessvol verzonden.");
+			messages.info("Melding sucessvol verzonden naar TOV.");
 
 			// Email bevestiging sturen naar gebruiker
 			sendConfirmationMail(melding);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ melding.getEmail() + ".");
-			createMelding();
+			melding = createMelding();
 		} catch (IOException e) {
 			log.error("Can not save model object.", e);
 			messages.error("Melding niet verzonden");

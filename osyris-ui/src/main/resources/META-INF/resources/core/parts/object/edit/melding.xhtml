@@ -6,10 +6,10 @@
 	<cc:interface componentType="org.conscientia.ui.ModelObject" />
 	<cc:implementation>
 		<div>
-			<c:forEach items="#{cc.attrs.modelClass.properties}"
+			<c:forEach items="#{modelRepository.getModelClass('Melding').properties}"
 				var="property">
 				<c:choose>
-					<c:when test="#{propertyMeldingEditableBean.isEditableInStatus(cc.attrs.value, property)}">
+					<c:when test="#{propertyMeldingEditableBean.isEditableInStatus(cc.attrs.value, property) }">
 						<d:propertyField id="field_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 

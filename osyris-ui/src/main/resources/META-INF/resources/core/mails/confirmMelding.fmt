@@ -3,7 +3,7 @@
 </#assign>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<body>
-		<div>Uw melding is succesvol verzonden via ${preferences.title?string}.</div>
+		<div>Uw melding is succesvol verzonden naar toerisme Oost-Vlaanderen via ${preferences.title?string} routedokter.</div>
 		<dl>
 			<dt>Voornaam:</dt>
 			<dd>${firstname}</dd>
