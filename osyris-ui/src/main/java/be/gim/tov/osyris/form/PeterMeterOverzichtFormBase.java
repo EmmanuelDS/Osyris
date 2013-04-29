@@ -142,7 +142,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 	public void search() throws IOException {
 		try {
 			if (query != null) {
-				// results = modelRepository.searchObjects(query, true, true);
+				// Filter Peters and meters
 				List<User> users = new ArrayList<User>();
 				List<User> test = new ArrayList<User>();
 				users = (List<User>) modelRepository.searchObjects(query, true,
@@ -156,8 +156,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 				results = test;
 
 			} else {
-				// results = modelRepository.searchObjects(new
-				// DefaultQuery(getModelClass().getName()), true, true);
+				// Filter Peters and meters
 				List<User> users = new ArrayList<User>();
 				List<User> test = new ArrayList<User>();
 				users = (List<User>) modelRepository
@@ -239,9 +238,6 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 			user = (User) object;
 			UserProfile userProfile = (UserProfile) user
 					.getAspect("UserProfile");
-
-			// user.setUsername(userProfile.getFirstName().toLowerCase() + "."
-			// + userProfile.getLastName().toLowerCase());
 
 			if (!checkUsernameExists(user.getUsername())) {
 

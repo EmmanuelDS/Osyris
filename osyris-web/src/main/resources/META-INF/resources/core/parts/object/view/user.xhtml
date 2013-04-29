@@ -58,11 +58,13 @@
 				mode="#{cc.attrs.mode}"
 				level="#{cc.attrs.level}"
 				simple="#{cc.attrs.simple}" />	
-				
-			<u:decorate template="/resources/osyris/includes/_toegewezenTrajecten.xhtml" >
-				<u:param name="username"
-						value="#{cc.attrs.value.username}" />
-			</u:decorate>
+			
+			<a:outputPanel rendered="#{userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter')}">	
+				<u:decorate template="/resources/osyris/includes/_toegewezenTrajecten.xhtml" >
+					<u:param name="username"
+							value="#{cc.attrs.value.username}" />
+				</u:decorate>
+			</a:outputPanel>
 			
 			<d:aspect id="uitvoerderProfile"
 				value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, false)}"

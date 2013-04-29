@@ -93,6 +93,12 @@ public class OsyrisModelFunctions {
 		return trajectTypes;
 	}
 
+	/**
+	 * Gets codes and labels for a given modelClass.
+	 * 
+	 * @param modelClassName
+	 * @return
+	 */
 	@SuppressWarnings({ "unchecked", "deprecation" })
 	public List<?> getCodeList(String modelClassName) {
 		List<?> codeList = Collections.emptyList();

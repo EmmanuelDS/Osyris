@@ -53,6 +53,8 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@Description("Gemeente")
 	@ModelClassName("Gemeente")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	// @Type(value = ModelPropertyType.ENUM)
+	// @ValuesExpression("#{osyrisModelFunctions.gemeentes}")
 	private ResourceIdentifier gemeente;
 
 	@Label("Regio")

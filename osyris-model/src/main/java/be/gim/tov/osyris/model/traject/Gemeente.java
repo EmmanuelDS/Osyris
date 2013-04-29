@@ -19,6 +19,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Gemeente")
 public class Gemeente extends AbstractModelObject {
 
 	// VARIABLES

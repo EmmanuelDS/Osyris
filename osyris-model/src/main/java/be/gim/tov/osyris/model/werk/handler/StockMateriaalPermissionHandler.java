@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.werk.handler;
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.annotation.For;
@@ -9,10 +8,11 @@ import org.conscientia.api.model.annotation.Handler;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.core.permission.DefaultPermissionHandler;
 import org.conscientia.core.user.UsernameLiteral;
-import org.picketlink.idm.api.Group;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
+import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
 
 @Handler(type = "permission")
@@ -23,6 +23,14 @@ public class StockMateriaalPermissionHandler extends DefaultPermissionHandler {
 	public Boolean hasPermission(String action, ResourceIdentifier identifier,
 			ModelClass modelClass, boolean isOwner) throws IOException {
 
+		String username = Beans.getReference(String.class,
+				UsernameLiteral.INSTANCE);
+
+		// Load uitvoerderPofiel
+		UitvoerderProfiel profiel = (UitvoerderProfiel) modelRepository
+				.loadAspect(modelRepository.getModelClass("UitvoerderProfiel"),
+						new ResourceKey("User", "6"));
+
 		// Load StockMateriaal
 		if (identifier != null) {
 			StockMateriaal stockMateriaal = (StockMateriaal) modelRepository
@@ -30,24 +38,19 @@ public class StockMateriaalPermissionHandler extends DefaultPermissionHandler {
 
 			if (stockMateriaal != null) {
 
-				// Get groups
-				Set<Group> groups = identity.getGroups();
+				if (identity.inGroup("Uitvoerder", "CUSTOM")
+						&& !stockMateriaal
+								.getMagazijn()
+								.toLowerCase()
+								.equals(profiel.getBedrijf().getNaam()
+										.toLowerCase())) {
 
-				for (Group group : groups) {
-					if (group.getName().equals("Uitvoerder")
-							&& !stockMateriaal
-									.getMagazijn()
-									.toLowerCase()
-									.equals(Beans.getReference(String.class,
-											UsernameLiteral.INSTANCE))) {
-
-						// Override permissions for action
-						if (action.equals(Permission.EDIT_ACTION)
-								|| action.equals(Permission.VIEW_ACTION)) {
-							return false;
-						}
+					// Override permissions for action
+					if (action.equals(Permission.VIEW_ACTION)) {
+						return false;
 					}
 				}
+
 			}
 		}
 		return super.hasPermission(action, identifier, modelClass, isOwner);

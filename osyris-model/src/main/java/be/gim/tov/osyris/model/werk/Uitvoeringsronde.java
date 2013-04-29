@@ -10,10 +10,14 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Permission;
+import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
 
 /**
  * 
@@ -22,19 +26,33 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Permissions({
+		@Permission(profile = "group:Routedokter", action = "search", allow = true),
+		@Permission(profile = "group:Routedokter", action = "view", allow = true),
+		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
+
+		@Permission(profile = "group:Medewerker", action = "search", allow = true),
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+
+		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
+		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
+		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
 public class Uitvoeringsronde extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
 	@Label("Status")
 	@Description("Status")
-	private String status;
+	private UitvoeringsrondeStatus status;
 
 	@Label("Datum uitvoering")
 	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitvoering;
 
+	@NotSearchable
 	@Label("Werkopdrachten")
 	@Description("Werkopdrachten")
 	@ModelClassName("WerkOpdracht")
@@ -42,11 +60,11 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	private List<ResourceIdentifier> opdrachten;
 
 	// GETTERS AND SETTERS
-	public String getStatus() {
+	public UitvoeringsrondeStatus getStatus() {
 		return status;
 	}
 
-	public void setStatus(String status) {
+	public void setStatus(UitvoeringsrondeStatus status) {
 		this.status = status;
 	}
 

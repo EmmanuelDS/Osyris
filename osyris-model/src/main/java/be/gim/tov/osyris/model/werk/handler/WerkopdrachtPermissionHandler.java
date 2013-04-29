@@ -18,6 +18,9 @@ public class WerkopdrachtPermissionHandler extends DefaultPermissionHandler {
 			ModelClass modelClass, boolean isOwner) throws IOException {
 
 		// TODO: Uitvoerders mogen enkel hun eigen werkopdrachten zien
+		// Medewerkers mogen enkel hun eigen werkoprdrachten editeren, kunnen
+		// alles wel zien
+
 		return super.hasPermission(action, identifier, modelClass, isOwner);
 
 	}

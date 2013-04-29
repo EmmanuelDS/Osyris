@@ -36,8 +36,7 @@ import be.gim.commons.resource.ResourceIdentifier;
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
 
 		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
-		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
-		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
+		@Permission(profile = "group:Uitvoerder", action = "view", allow = true) })
 public class StockMateriaal extends AbstractModelObject implements
 		StorableObject {
 

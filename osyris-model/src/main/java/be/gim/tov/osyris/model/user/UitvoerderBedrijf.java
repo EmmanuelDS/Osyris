@@ -16,6 +16,7 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Bedrijf")
 public class UitvoerderBedrijf extends AbstractModelObject implements
 		StorableObject {
 

@@ -7,8 +7,9 @@ import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
-import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
@@ -37,6 +38,8 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
 
 	// VARIABLES
+	@NotViewable
+	@NotEditable
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
@@ -44,9 +47,7 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 
 	@Label("Bedrijf")
 	@Description("Bedrijf")
-	@ModelClassName("UitvoerderBedrijf")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier bedrijf;
+	private UitvoerderBedrijf bedrijf;
 
 	// GETTERS AND SETTERS
 	@Override
@@ -59,11 +60,11 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 		this._for = _for;
 	}
 
-	public ResourceIdentifier getBedrijf() {
+	public UitvoerderBedrijf getBedrijf() {
 		return bedrijf;
 	}
 
-	public void setBedrijf(ResourceIdentifier bedrijf) {
+	public void setBedrijf(UitvoerderBedrijf bedrijf) {
 		this.bedrijf = bedrijf;
 	}
 }

@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.List;
 
-import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -56,10 +55,10 @@ public class ListForm extends AbstractForm implements Serializable {
 	private List<?> results;
 	private ModelObject object;
 
-	@PostConstruct
-	public void init() throws IOException {
-		search();
-	}
+	// @PostConstruct
+	// public void init() throws IOException {
+	// search();
+	// }
 
 	// GETTERS AND SETTERS
 	public Query getQuery() {

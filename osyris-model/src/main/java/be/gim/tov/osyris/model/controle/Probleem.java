@@ -9,6 +9,7 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
@@ -21,6 +22,7 @@ import org.conscientia.core.model.AbstractModelObject;
 @Model
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
+@Label("Probleem")
 public abstract class Probleem extends AbstractModelObject implements
 		StorableObject {
 
@@ -30,14 +32,17 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Description("Type")
 	private String type;
 
+	@NotSearchable
 	@Label("Fiche")
 	@Description("Fiche")
 	private String fiche;
 
+	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
 	private String foto;
 
+	@NotSearchable
 	@Label("Commentaar")
 	@Description("Commentaar")
 	@Type(value = ModelPropertyType.TEXT)

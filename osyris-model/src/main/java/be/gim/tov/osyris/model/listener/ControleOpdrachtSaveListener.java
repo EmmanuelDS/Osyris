@@ -34,13 +34,7 @@ public class ControleOpdrachtSaveListener {
 		}
 
 		if (controleOpdracht.get("status").equals(
-				ControleOpdrachtStatus.GEVALIDEERD_GEEN_WERKOPDRACHT)
-				|| controleOpdracht.get("status").equals(
-						ControleOpdrachtStatus.GEVALIDEERD_WERKOPDRACHT)
-				|| controleOpdracht.get("status").equals(
-						ControleOpdrachtStatus.GEVALIDEERD_REEDS_GEMELD)
-				|| controleOpdracht.get("status").equals(
-						ControleOpdrachtStatus.GEVALIDEERD_IN_BEHANDELING)) {
+				ControleOpdrachtStatus.GEVALIDEERD)) {
 			controleOpdracht.setDatumGevalideerd(new Date());
 		}
 	}

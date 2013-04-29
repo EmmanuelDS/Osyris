@@ -1,14 +1,12 @@
 package be.gim.tov.osyris.model.controle.handler;
 
 import java.io.IOException;
-import java.util.Set;
 
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Handler;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.core.permission.DefaultPermissionHandler;
-import org.picketlink.idm.api.Group;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
@@ -32,41 +30,37 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 				ControleOpdrachtStatus status = controleOpdracht.getStatus();
 
 				// Get groups
-				Set<Group> groups = identity.getGroups();
-				for (Group group : groups) {
 
-					// PETER EN METER
-					if (group.getName().equals("PeterMeter")
-							&& status
-									.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
+				// PETER EN METER
+				if (identity.inGroup("PeterMeter", "CUSTOM")
+						&& status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
 
-						// Override permissions on action
+					// Override permissions on action
+					if (action.equals(Permission.EDIT_ACTION)
+							|| action.equals(Permission.VIEW_ACTION)) {
+						return true;
+					}
+				}
+
+				// MEDEWEKER
+				if (identity.inGroup("Medewerker", "CUSTOM")) {
+
+					if (action.equals(Permission.CREATE_ACTION)) {
+						return true;
+					}
+					if (status.equals(ControleOpdrachtStatus.TE_CONTROLEREN)
+							|| status
+									.equals(ControleOpdrachtStatus.GEANNULEERD)) {
+
 						if (action.equals(Permission.EDIT_ACTION)
 								|| action.equals(Permission.VIEW_ACTION)) {
 							return true;
 						}
-					}
-
-					// MEDEWEKER
-					if (group.getName().equals("Medewerker")) {
-
-						if (action.equals(Permission.CREATE_ACTION)) {
-							return true;
-						}
-						if (status
-								.equals(ControleOpdrachtStatus.TE_CONTROLEREN)
-								|| status
-										.equals(ControleOpdrachtStatus.GEANNULEERD)) {
-
-							if (action.equals(Permission.EDIT_ACTION)
-									|| action.equals(Permission.VIEW_ACTION)) {
-								return true;
-							}
-						} else {
-							return false;
-						}
+					} else {
+						return false;
 					}
 				}
+
 			}
 		}
 		return super.hasPermission(action, identifier, modelClass, isOwner);

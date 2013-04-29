@@ -119,7 +119,6 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier uitvoerder;
 
-	@NotSearchable
 	@Label("Probleem")
 	@Description("Probleem")
 	private Probleem probleem;
@@ -129,7 +128,6 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Description("Gebruikt materiaal")
 	private GebruiktMateriaal gebruiktMateriaal;
 
-	@NotSearchable
 	@Label("Handelingen")
 	@Description("Handelingen")
 	private List<WerkHandeling> handelingen;
