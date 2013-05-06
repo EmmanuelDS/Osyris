@@ -23,7 +23,7 @@ import org.conscientia.core.functions.ModelFunctions;
 @Named
 public class OsyrisModelFunctions {
 
-	private static final Log log = LogFactory
+	private static final Log LOG = LogFactory
 			.getLog(OsyrisModelFunctions.class);
 
 	@Inject
@@ -61,18 +61,6 @@ public class OsyrisModelFunctions {
 		return imageCodes;
 	}
 
-	public List<Object[]> getPeriodeCodes() {
-		List<Object[]> periodeCodes = new ArrayList<Object[]>();
-		Object[] periode1 = { "1", "Lente" };
-		Object[] periode2 = { "2", "Zomer" };
-		Object[] periode3 = { "3", "Herfst" };
-
-		periodeCodes.add(periode1);
-		periodeCodes.add(periode2);
-		periodeCodes.add(periode3);
-		return periodeCodes;
-	}
-
 	public List<Object[]> getTrajectTypes() {
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
@@ -108,7 +96,7 @@ public class OsyrisModelFunctions {
 					modelClassName, "code", "label", null, null);
 
 		} catch (IOException e) {
-			log.error("Can not get list of codes for class " + modelClassName,
+			LOG.error("Can not get list of codes for class " + modelClassName,
 					e);
 		}
 		return codeList;

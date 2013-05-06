@@ -8,8 +8,6 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
 import org.conscientia.api.repository.ModelRepository;
@@ -25,9 +23,6 @@ import be.gim.tov.osyris.model.annotation.EditableInGroup;
  */
 @Named
 public class PropertyPeterMeterProfielEditableBean {
-
-	private static final Log log = LogFactory
-			.getLog(PropertyPeterMeterProfielEditableBean.class);
 
 	@Inject
 	private ModelRepository modelRepository;

@@ -1,4 +1,4 @@
-package org.conscientia.core.form;
+package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -22,6 +22,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.encoder.SCSVModelEncoder;
 import org.conscientia.core.handler.data.annotation.ContentTypeLiteral;
 import org.conscientia.core.handler.data.annotation.ExtensionLiteral;
@@ -34,14 +35,21 @@ import org.richfaces.model.UploadedFile;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.encoder.api.Encoder;
+import be.gim.commons.filter.FilterUtils;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.peritia.io.content.Content;
 
+/**
+ * 
+ * @author kristof
+ * 
+ */
 @Named
 @ViewScoped
-public class ListForm extends AbstractForm implements Serializable {
-	private static final long serialVersionUID = 3676671150227033873L;
-	private static final Log log = LogFactory.getLog(ListForm.class);
+public class MeldingOverzichtFormBase implements Serializable {
+
+	private static final Log LOG = LogFactory
+			.getLog(MeldingOverzichtFormBase.class);
 	private static final Integer PAGE_SIZE = 20;
 
 	// VARIABLES
@@ -49,6 +57,8 @@ public class ListForm extends AbstractForm implements Serializable {
 	protected ModelRepository modelRepository;
 	@Inject
 	protected Identity identity;
+	@Inject
+	protected UserRepository userRepository;
 
 	@Inject
 	@RequestParam
@@ -60,11 +70,30 @@ public class ListForm extends AbstractForm implements Serializable {
 
 	@PostConstruct
 	public void init() throws IOException {
+		name = "Melding";
 		search();
 	}
 
 	// GETTERS AND SETTERS
 	public Query getQuery() {
+
+		if (query == null) {
+			query = new DefaultQuery(name);
+		}
+
+		if (identity.inGroup("Routedokter", "CUSTOM")) {
+			return query;
+		}
+
+		if (identity.inGroup("Medewerker", "CUSTOM")) {
+			try {
+				query.addFilter(FilterUtils.equal("medewerker", modelRepository
+						.getResourceKey(userRepository.loadUser(identity
+								.getUser().getId()))));
+			} catch (IOException e) {
+				LOG.error("Can not load user.", e);
+			}
+		}
 		return query;
 	}
 
@@ -172,18 +201,11 @@ public class ListForm extends AbstractForm implements Serializable {
 				.hasPermission(getModelClass(), Permission.SEARCH_ACTION);
 	}
 
-	public void search() {
-
+	public void search() throws IOException {
 		try {
-			if (query != null) {
-				results = modelRepository.searchObjects(query, true, true,
-						PAGE_SIZE);
-			} else {
-				results = modelRepository.searchObjects(new DefaultQuery(name),
-						true, true, PAGE_SIZE);
-			}
+			results = modelRepository.searchObjects(getQuery(), true, true);
 		} catch (IOException e) {
-			log.error("Can not get search results.", e);
+			LOG.error("Can not get search results.", e);
 			results = null;
 		}
 	}
@@ -192,9 +214,9 @@ public class ListForm extends AbstractForm implements Serializable {
 		try {
 			object = modelRepository.createObject(getModelClass(), null);
 		} catch (InstantiationException e) {
-			log.error("Can not instantiate model object.", e);
+			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
-			log.error("Illegal access at creation model object.", e);
+			LOG.error("Illegal access at creation model object.", e);
 		}
 	}
 
@@ -204,7 +226,7 @@ public class ListForm extends AbstractForm implements Serializable {
 			clear();
 			search();
 		} catch (IOException e) {
-			log.error("Can not save model object.", e);
+			LOG.error("Can not save model object.", e);
 		}
 	}
 
@@ -214,21 +236,12 @@ public class ListForm extends AbstractForm implements Serializable {
 			clear();
 			search();
 		} catch (IOException e) {
-			log.error("Can not delete model object.", e);
+			LOG.error("Can not delete model object.", e);
 		}
 	}
 
 	public void clear() {
 		object = null;
-	}
-
-	public void cancel() {
-
-		if (object != null) {
-			modelRepository.evictObject((StorableObject) object);
-		}
-		clear();
-		search();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })

@@ -1,111 +1,131 @@
 <u:composition xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:u="http://java.sun.com/jsf/facelets"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:a="http://richfaces.org/a4j"
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:q="http://specto.gim.be/search"
 	template="/resources/core/templates/page.xhtml">
 	<u:param name="title"
 		value="List" />
-
-	<center>
-		<r:panel id="query" rendered="#{listForm.hasPermission}"
-			style="max-width: 600px; text-align: left; margin: 10px;">
-			<q:query value="#{listForm.query}"
-				modelClassName="#{listForm.modelClass.name}">
-				<d:object mode="SEARCH"
-					modelClass="#{listForm.modelClass}" />
-			</q:query>
-			<d:buttons>
-				<j:commandButton rendered="true"
-					value="#{messages['page.general.button.search']}"
-					image="#{resource['core/images/actions/12x12/apply.png']}"
-					type="button"
-					actionListener="#{listForm.search()}"
-					render="objects" />
-			</d:buttons>
-		</r:panel>
-	</center>
-
-	<a:outputPanel id="result"
-		renderend="true">
-		<d:objects id="objects" 
-			value="#{listForm.results}"
-			modelClass="#{listForm.modelClass}" 
-			mode="RESULT" 
-			level="SHORT">
-			<f:facet name="right">
-				<a:outputPanel rendered="true" 
-					styleClass="model-table-actions">
-					<h:panelGrid columns="3">
-						<j:commandButton
-							image="#{resource['core/images/actions/16x16/view.png']}"
-							type="image" 
-							title="#{messages['page.actions.view.label']}"
-							rendered="#{listForm.isCanView(object)}">
-							<j:renderListener target="#{r:clientId('viewPanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{listForm.object}"
-								value="#{object}" />
-						</j:commandButton>
-						<j:commandButton
-							image="#{resource['core/images/actions/16x16/edit.png']}"
-							type="image" 
-							title="#{messages['page.actions.edit.label']}"
-							rendered="#{listForm.isCanEdit(object)}">
-							<j:renderListener target="#{r:clientId('editPanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{listForm.object}"
-								value="#{object}" />
-						</j:commandButton>
-						<j:commandButton rendered="#{listForm.isCanDelete(object)}"
-							image="#{resource['core/images/actions/16x16/delete.png']}"
-							type="image" 
-							title="#{messages['page.actions.delete.label']}">
-							<j:renderListener target="#{r:clientId('deletePanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{listForm.object}"
-								value="#{object}" />
-						</j:commandButton>
-					</h:panelGrid>
+	<j:layout style="height: 600px">
+		<j:layoutPane
+			region="west"
+			size="350"
+			minSize="200"
+			resizable="true"
+			slidable="true">
+			<div class="ui-layout-content" >
+				<q:query value="#{listForm.query}"
+					modelClassName="#{listForm.modelClass.name}">
+					<c:if test="#{listForm.index}">
+						<d:field for="term"
+							label="#{messages['page.search.query.term.title']}">
+							<q:phrase id="termFilter"
+								value="#{searchForm.term}">
+								<h:inputText value="#{searchForm.term}" />
+							</q:phrase>
+						</d:field>
+					</c:if>
+					<d:object mode="SEARCH"
+						modelClass="#{listForm.modelClass}" />
+				</q:query>
+				<d:buttons>
+					<j:commandButton rendered="true"
+						value="#{messages['page.general.button.search']}"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{listForm.search()}"
+						render="objects" />
+				</d:buttons>
+			</div>
+		</j:layoutPane>
+		<j:layoutPane>
+			<div class="ui-layout-content">
+				<a:outputPanel id="result">
+					<d:objects id="objects" 
+						value="#{listForm.results}"
+						modelClass="#{listForm.modelClass}" 
+						mode="RESULT" 
+						level="SHORT">
+						<f:facet name="right">
+							<a:outputPanel rendered="true" 
+								styleClass="model-table-actions">
+								<h:panelGrid columns="3">
+									<j:commandButton rendered="#{listForm.isCanView(object)}"
+										image="#{resource['core/images/actions/16x16/view.png']}" 
+										type="image" 
+										title="#{messages['page.actions.view.label']}">
+										<j:renderListener target="#{r:clientId('viewPanel')}" 
+											rendered="true"
+											execute="@this" />
+										<f:setPropertyActionListener target="#{listForm.object}"
+											value="#{object}" />
+									</j:commandButton>
+									<j:commandButton rendered="#{listForm.isCanEdit(object)}"
+										image="#{resource['core/images/actions/16x16/edit.png']}"
+										type="image" 
+										title="#{messages['page.actions.edit.label']}">
+										<j:renderListener target="#{r:clientId('editPanel')}" 
+											rendered="true"
+											execute="@this" />
+										<f:setPropertyActionListener target="#{listForm.object}"
+											value="#{object}" />
+									</j:commandButton>
+									<j:commandButton rendered="#{listForm.isCanDelete(object)}"
+										image="#{resource['core/images/actions/16x16/delete.png']}"
+										type="image" 
+										title="#{messages['page.actions.delete.label']}">
+										<j:renderListener target="#{r:clientId('deletePanel')}" 
+											rendered="true"
+											execute="@this" />
+										<f:setPropertyActionListener target="#{listForm.object}"
+											value="#{object}" />
+									</j:commandButton>
+								</h:panelGrid>
+							</a:outputPanel>
+						</f:facet>
+					</d:objects>
 				</a:outputPanel>
-			</f:facet>
-		</d:objects>
-
-		<a:outputPanel rendered="#{listForm.canCreate}">
-			<d:buttons>
-				<j:commandButton rendered="#{listForm.canCreate}"
-					value="#{messages['page.create.create.button']}"
-					image="#{resource['core/images/actions/12x12/create.png']}"
-					type="button"
-					action="#{listForm.create()}">
-					<j:renderListener target="createPanel" 
-						rendered="true"
-						execute="@this" />
-				</j:commandButton>
-				<d:fileDownload 
-					rendered="#{listForm.isCanDownload()}"
-					fileName="#{listForm.fileName}"
-					type="button"
-					image="#{resource['core/images/actions/12x12/download.png']}"
-					content="#{listForm.report()}" 
-					value="Rapport" />
-			</d:buttons>
-		</a:outputPanel>
-
-	<u:decorate template="/resources/core/includes/managePanels.xhtml">
-		<u:param name="form"
-			value="#{listForm}" />
-		<u:param name="render"
-			value="#{r:clientId('result')}" />
-	</u:decorate>
-		
-	</a:outputPanel>
+				
+				<a:outputPanel>
+					<d:buttons>
+						<j:commandButton rendered="#{listForm.canCreate}"
+							value="#{messages['page.actions.create.label']}"
+							image="#{resource['core/images/actions/12x12/create.png']}"
+							type="button"
+							action="#{listForm.create()}">
+							<j:renderListener target="createPanel" 
+								rendered="true"
+								execute="@this" />
+						</j:commandButton>
+						<j:commandButton rendered="#{listForm.canUpload}"
+							value="#{messages['page.actions.upload.label']}"
+							image="#{resource['core/images/actions/12x12/upload.png']}"
+							type="button"
+							action="#{listForm.clear()}">
+							<j:renderListener target="uploadPanel" 
+								rendered="true"
+								execute="@this" />
+						</j:commandButton>
+						<d:fileDownload fileName="#{listForm.fileName}"
+							type="button"
+							image="#{resource['core/images/actions/12x12/download.png']}"
+							content="#{listForm.report()}" 
+							value="Report" />
+					</d:buttons>
+				</a:outputPanel>
+				
+				<u:decorate template="/resources/core/includes/managePanels.xhtml">
+					<u:param name="form"
+						value="#{listForm}" />
+					<u:param name="render"
+						value="#{r:clientId('result')}" />
+				</u:decorate>
+			</div>
+		</j:layoutPane>
+	</j:layout>
 </u:composition>

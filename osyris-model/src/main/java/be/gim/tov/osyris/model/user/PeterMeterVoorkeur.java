@@ -46,15 +46,13 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@Label("Periode")
 	@Description("Periode")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.periodeCodes}")
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
 
 	@Label("Gemeente")
 	@Description("Gemeente")
 	@ModelClassName("Gemeente")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	// @Type(value = ModelPropertyType.ENUM)
-	// @ValuesExpression("#{osyrisModelFunctions.gemeentes}")
 	private ResourceIdentifier gemeente;
 
 	@Label("Regio")

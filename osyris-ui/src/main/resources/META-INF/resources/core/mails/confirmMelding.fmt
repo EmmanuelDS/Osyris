@@ -13,10 +13,8 @@
 			<dd>${phone}</dd>
 			<dt>Status melding:</dt>
 			<dd>${status}</dd>
-			<dt>Type probleem:</dt>
-			<dd>${problemType}</dd>
-			<dt>Commentaar:</dt>
-			<dd>${comment}</dd>
+			<dt>Probleem:</dt>
+			<dd>${problem}</dd>
 		</dl>
 	</body>
 </html>

@@ -56,9 +56,23 @@ public abstract class Traject extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier regio;
 
-	@Label("Traject toewijzing")
-	@Description("Traject toewijzing")
-	private TrajectToewijzing trajectToewijzing;
+	@Label("Peter/Meter Lente")
+	@Description("Peter/Meter Lente")
+	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	private ResourceIdentifier peterMeter1;
+
+	@Label("Peter/Meter Zomer")
+	@Description("Peter/Meter Zomer")
+	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	private ResourceIdentifier peterMeter2;
+
+	@Label("Peter/Meter Herfst")
+	@Description("Peter/Meter Herfst")
+	@ModelClassName("User")
+	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
 	public String getNaam() {
@@ -93,11 +107,27 @@ public abstract class Traject extends AbstractModelObject implements
 		this.regio = regio;
 	}
 
-	public TrajectToewijzing getTrajectToewijzing() {
-		return trajectToewijzing;
+	public ResourceIdentifier getPeterMeter1() {
+		return peterMeter1;
 	}
 
-	public void setTrajectToewijzing(TrajectToewijzing trajectToewijzing) {
-		this.trajectToewijzing = trajectToewijzing;
+	public void setPeterMeter1(ResourceIdentifier peterMeter1) {
+		this.peterMeter1 = peterMeter1;
+	}
+
+	public ResourceIdentifier getPeterMeter2() {
+		return peterMeter2;
+	}
+
+	public void setPeterMeter2(ResourceIdentifier peterMeter2) {
+		this.peterMeter2 = peterMeter2;
+	}
+
+	public ResourceIdentifier getPeterMeter3() {
+		return peterMeter3;
+	}
+
+	public void setPeterMeter3(ResourceIdentifier peterMeter3) {
+		this.peterMeter3 = peterMeter3;
 	}
 }

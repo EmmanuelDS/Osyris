@@ -19,9 +19,11 @@ import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.tov.osyris.model.annotation.EditableInGroup;
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
@@ -51,10 +53,15 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	@NotEditable
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Controle periode")
-	@Description("Controle periode")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
 
+	@NotEditable
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Status")
 	@Description("Status")
 	private ControleOpdrachtStatus status;
@@ -78,6 +85,8 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotEditable
 	private Date datumGevalideerd;
 
+	@NotEditable
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Datum te controleren")
 	@Description("Datum te controleren")
 	@Type(ModelPropertyType.DATE)
@@ -89,33 +98,38 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotEditable
 	private Date datumUitgesteld;
 
-	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@NotEditable
+	@EditableInStatus("UIT_TE_VOEREN")
 	@Label("Datum uit te voeren")
 	@Description("Datum uit te voeren")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
-	@EditableInStatus({ "TE_CONTROLEREN" })
+	@NotEditable
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
+	@NotEditable
+	@EditableInGroup("Routedokter")
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
-	@EditableInStatus({ "TE_CONTROLEREN" })
+	@NotEditable
+	@EditableInGroup("Routedokter")
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter;
 
-	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@EditableInStatus({ "UIT_TE_VOEREN" })
 	@Label("Problemen")
 	@Description("Problemen")
 	@NotSearchable

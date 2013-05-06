@@ -1,5 +1,7 @@
 package be.gim.tov.osyris.model.user;
 
+import java.util.List;
+
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
@@ -48,7 +50,7 @@ public class MedewerkerProfiel extends AbstractModelObject implements
 	@Description("Trajecttype")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.trajectTypes}")
-	private String trajectType;
+	private List<String> trajectType;
 
 	// GETTERS AND SETTERS
 	@Override
@@ -61,11 +63,11 @@ public class MedewerkerProfiel extends AbstractModelObject implements
 		this._for = _for;
 	}
 
-	public String getTrajectType() {
+	public List<String> getTrajectType() {
 		return trajectType;
 	}
 
-	public void setTrajectType(String trajectType) {
+	public void setTrajectType(List<String> trajectType) {
 		this.trajectType = trajectType;
 	}
 }

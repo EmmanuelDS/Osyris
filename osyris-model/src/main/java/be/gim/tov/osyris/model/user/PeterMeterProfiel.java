@@ -126,20 +126,4 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	public void setVoorkeuren(List<PeterMeterVoorkeur> voorkeuren) {
 		this.voorkeuren = voorkeuren;
 	}
-
-	// @Transient
-	// @Label("Toegewezen trajecten")
-	// @NotSearchable
-	// public List<String> getToegewezenTrajecten() {
-	//
-	// // TODO: Query maken die de trajecten voor een bepaalde peterMeter
-	// // ophaalt
-	// List<String> test = new ArrayList<String>();
-	//
-	// if (test.isEmpty()) {
-	// test.add("Nog niet toegewezen aan trajecten.");
-	// }
-	//
-	// return test;
-	// }
 }

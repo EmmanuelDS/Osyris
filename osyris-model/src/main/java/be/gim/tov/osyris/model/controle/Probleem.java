@@ -8,7 +8,6 @@ import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
-import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
@@ -27,11 +26,6 @@ public abstract class Probleem extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@NotEditable
-	@Label("Type")
-	@Description("Type")
-	private String type;
-
 	@NotSearchable
 	@Label("Fiche")
 	@Description("Fiche")
@@ -49,14 +43,6 @@ public abstract class Probleem extends AbstractModelObject implements
 	private String commentaar;
 
 	// GETTERS AND SETTERS
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public String getFiche() {
 		return fiche;
 	}

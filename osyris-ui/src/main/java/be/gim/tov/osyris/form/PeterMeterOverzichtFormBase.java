@@ -9,7 +9,9 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.RandomStringUtils;
@@ -25,7 +27,6 @@ import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.permission.Permission;
 import org.conscientia.api.permission.Permissions;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
@@ -42,6 +43,7 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
+import org.jboss.solder.servlet.http.RequestParam;
 import org.richfaces.event.FileUploadEvent;
 import org.richfaces.model.UploadedFile;
 
@@ -58,9 +60,11 @@ import be.gim.peritia.io.content.Content;
  * @author kristof
  * 
  */
+@Named
+@ViewScoped
 public class PeterMeterOverzichtFormBase implements Serializable {
 
-	private static final Log log = LogFactory
+	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
 
 	// VARIABLES
@@ -82,6 +86,10 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 	@Inject
 	private Messages messages;
 
+	@Inject
+	@RequestParam
+	protected String name;
+
 	private Query query;
 	private List<?> results;
 	private ModelObject object;
@@ -89,11 +97,16 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 
 	@PostConstruct
 	public void init() throws IOException {
+		name = "User";
 		search();
 	}
 
 	// GETTERS AND SETTERS
+	@SuppressWarnings("unchecked")
 	public Query getQuery() {
+		if (query == null) {
+			query = new DefaultQuery(name);
+		}
 		return query;
 	}
 
@@ -123,7 +136,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 
 	// METHODS
 	public ModelClass getModelClass() {
-		return modelRepository.getModelClass("User");
+		return modelRepository.getModelClass(name);
 	}
 
 	public String getFileName() {
@@ -131,7 +144,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 	}
 
 	public String getAction() {
-		return Permission.SEARCH_ACTION;
+		return "search";
 	}
 
 	public boolean hasPermission() {
@@ -141,49 +154,31 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 	@SuppressWarnings("unchecked")
 	public void search() throws IOException {
 		try {
-			if (query != null) {
-				// Filter Peters and meters
-				List<User> users = new ArrayList<User>();
-				List<User> test = new ArrayList<User>();
-				users = (List<User>) modelRepository.searchObjects(query, true,
-						true);
-				for (User user : users) {
-					if (userRepository.listGroupnames(user).contains(
-							"PeterMeter")) {
-						test.add(user);
-					}
+			// Filter Peters and meters
+			List<User> users = new ArrayList<User>();
+			List<User> test = new ArrayList<User>();
+			// TODO: possible to do it in a Query Filter?
+			users = (List<User>) modelRepository.searchObjects(getQuery(),
+					true, true);
+			for (User user : users) {
+				if (userRepository.listGroupnames(user).contains("PeterMeter")) {
+					test.add(user);
 				}
-				results = test;
-
-			} else {
-				// Filter Peters and meters
-				List<User> users = new ArrayList<User>();
-				List<User> test = new ArrayList<User>();
-				users = (List<User>) modelRepository
-						.searchObjects(new DefaultQuery(getModelClass()
-								.getName()), true, true);
-				for (User user : users) {
-					if (userRepository.listGroupnames(user).contains(
-							"PeterMeter")) {
-						test.add(user);
-					}
-				}
-				results = test;
 			}
+			results = test;
 		} catch (IOException e) {
-			log.error("Can not get search results.", e);
+			LOG.error("Can not get search results.", e);
 			results = null;
 		}
 	}
 
 	public boolean isCanView(ModelObject object) {
-		return identity.hasPermission(object, Permission.VIEW_ACTION);
+		return identity.hasPermission(object, "view");
 	}
 
 	public boolean isCanCreate() {
 		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(),
-						Permission.CREATE_ACTION);
+				&& identity.hasPermission(getModelClass(), "create");
 	}
 
 	public boolean isCanEdit(ModelObject object) {
@@ -191,33 +186,30 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 		if (object != null) {
 			return (getModelClass().hasInterface(StorableObject.class) || getModelClass()
 					.hasInterface(ManagedObject.class))
-					&& identity.hasPermission(object, Permission.EDIT_ACTION);
+					&& identity.hasPermission(object, "edit");
 		} else {
 			return (getModelClass().hasInterface(StorableObject.class) || getModelClass()
 					.hasInterface(ManagedObject.class))
-					&& identity.hasPermission(getModelClass(),
-							Permission.EDIT_ACTION);
+					&& identity.hasPermission(getModelClass(), "edit");
 		}
 	}
 
 	public boolean isCanDelete(ModelObject object) {
 		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(),
-						Permission.DELETE_ACTION);
+				&& identity.hasPermission(getModelClass(), "delete");
 	}
 
 	public boolean isCanDownload() {
-		return identity
-				.hasPermission(getModelClass(), Permission.SEARCH_ACTION);
+		return identity.hasPermission(getModelClass(), "search");
 	}
 
 	public void create() {
 		try {
 			object = modelRepository.createObject(getModelClass(), null);
 		} catch (InstantiationException e) {
-			log.error("Can not instantiate model object.", e);
+			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
-			log.error("Illegal access at creation model object.", e);
+			LOG.error("Illegal access at creation model object.", e);
 		}
 	}
 
@@ -228,7 +220,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 			clear();
 			search();
 		} catch (IOException e) {
-			log.error("Can not save model object.", e);
+			LOG.error("Can not save model object.", e);
 		}
 	}
 
@@ -292,9 +284,9 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 				messages.error("Gebruikersnaam bestaat al.");
 			}
 		} catch (IOException e) {
-			log.error("Can not save model object.", e);
+			LOG.error("Can not save model object.", e);
 		} catch (Exception e) {
-			log.error("Can not send mail.", e);
+			LOG.error("Can not send mail.", e);
 			throw new RuntimeException(e);
 		}
 	}
@@ -308,16 +300,27 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 					new ResourceName("user", user.getUsername()),
 					FilterUtils.equal("scope", "document"));
 
+			// Delete user from PM group
+			List<Group> groups = (List<Group>) modelRepository.searchObjects(
+					new DefaultQuery("Group"), false, false);
+			for (Group group : groups) {
+				if (group.getGroupname().equals("PeterMeter")) {
+					group.getMembers().remove(
+							modelRepository.getResourceName(user));
+				}
+			}
+
 			// Delete user and document permissions
 			modelRepository.deleteObject((StorableObject) object);
 
 			if (permissions != null) {
 				modelRepository.deleteAspect(permissions);
 			}
+
 			clear();
 			search();
 		} catch (IOException e) {
-			log.error("Can not delete model object.", e);
+			LOG.error("Can not delete model object.", e);
 		}
 	}
 
@@ -387,7 +390,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 				return false;
 			}
 		} catch (IOException e) {
-			log.error("Can not count objects.", e);
+			LOG.error("Can not count objects.", e);
 		}
 		return true;
 
@@ -406,7 +409,7 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 			modelRepository.saveObject(group);
 
 		} catch (IOException e) {
-			log.error("Can not search objects.", e);
+			LOG.error("Can not search objects.", e);
 		}
 	}
 
@@ -434,33 +437,31 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 			modelRepository.saveAspect(permissions);
 
 		} catch (IOException e) {
-			log.error("Can not load aspect.", e);
+			LOG.error("Can not load aspect.", e);
 		} catch (InstantiationException e) {
-			log.error("Can not instantiate aspect.", e);
+			LOG.error("Can not instantiate aspect.", e);
 		} catch (IllegalAccessException e) {
-			log.error("Can not access aspect.", e);
+			LOG.error("Can not access aspect.", e);
 		}
 	}
 
 	private List<DefaultPermission> getAllowedPermissions(ResourceName name) {
 
-		DefaultPermission p1 = new DefaultPermission(name,
-				Permission.VIEW_ACTION, true);
+		DefaultPermission p1 = new DefaultPermission(name, "view", true);
 
-		DefaultPermission p2 = new DefaultPermission(name,
-				Permission.EDIT_ACTION, true);
+		DefaultPermission p2 = new DefaultPermission(name, "edit", true);
 
 		DefaultPermission p3 = new DefaultPermission(new ResourceName("group",
-				"Routedokter"), Permission.VIEW_ACTION, true);
+				"Routedokter"), "view", true);
 
 		DefaultPermission p4 = new DefaultPermission(new ResourceName("group",
-				"Routedokter"), Permission.EDIT_ACTION, true);
+				"Routedokter"), "edit", true);
 
 		DefaultPermission p5 = new DefaultPermission(new ResourceName("group",
-				"Medewerker"), Permission.VIEW_ACTION, true);
+				"Medewerker"), "view", true);
 
 		DefaultPermission p6 = new DefaultPermission(new ResourceName("group",
-				"Medewerker"), Permission.EDIT_ACTION, true);
+				"Medewerker"), "edit", true);
 
 		List<DefaultPermission> permissionList = new ArrayList<DefaultPermission>();
 		permissionList.add(p1);

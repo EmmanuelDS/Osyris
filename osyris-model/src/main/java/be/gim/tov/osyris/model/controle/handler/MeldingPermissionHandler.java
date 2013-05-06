@@ -12,6 +12,11 @@ import org.conscientia.core.permission.DefaultPermissionHandler;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.controle.Melding;
 
+/**
+ * 
+ * @author kristof
+ * 
+ */
 @Handler(type = "permission")
 @For("Melding")
 public class MeldingPermissionHandler extends DefaultPermissionHandler {
@@ -20,9 +25,13 @@ public class MeldingPermissionHandler extends DefaultPermissionHandler {
 	public Boolean hasPermission(String action, ResourceIdentifier identifier,
 			ModelClass modelClass, boolean isOwner) throws IOException {
 
-		// Only give permission to view/edit melding for medewerker group
-		// if melding is assigned to this medewerker
+		// Routedokter has permissions on all records
+		if (identity.inGroup("Routedokter", "CUSTOM")) {
+			return true;
+		}
 
+		// Only give permission to view/edit melding for medewerker
+		// if melding is assigned to this medewerker
 		// Load Melding
 		if (identifier != null) {
 			Melding melding = (Melding) modelRepository.loadObject(identifier);

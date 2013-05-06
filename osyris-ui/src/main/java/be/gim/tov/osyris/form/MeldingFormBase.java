@@ -6,7 +6,9 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
+import javax.inject.Named;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -23,9 +25,11 @@ import be.gim.tov.osyris.model.controle.Melding;
  * @author kristof
  * 
  */
+@Named
+@ViewScoped
 public class MeldingFormBase implements Serializable {
 
-	private static final Log log = LogFactory.getLog(MeldingFormBase.class);
+	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
 
 	// VARIABLES
 	@Inject
@@ -66,9 +70,9 @@ public class MeldingFormBase implements Serializable {
 					(ResourceName) ResourceName.fromString(name));
 
 		} catch (InstantiationException e) {
-			log.error("Can not instantiate model object.", e);
+			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
-			log.error("Illegal access at creation model object.", e);
+			LOG.error("Illegal access at creation model object.", e);
 		}
 		return melding;
 	}
@@ -85,10 +89,10 @@ public class MeldingFormBase implements Serializable {
 					+ melding.getEmail() + ".");
 			melding = createMelding();
 		} catch (IOException e) {
-			log.error("Can not save model object.", e);
+			LOG.error("Can not save model object.", e);
 			messages.error("Melding niet verzonden");
 		} catch (Exception e) {
-			log.error("Can not send mail.", e);
+			LOG.error("Can not send mail.", e);
 			messages.error("Bevestigingsmail niet verstuurd.");
 			throw new RuntimeException(e);
 		}
@@ -103,12 +107,12 @@ public class MeldingFormBase implements Serializable {
 		variables.put("lastname", melding.getNaam());
 		variables.put("phone", melding.getTelefoon());
 		variables.put("status", melding.getStatus());
-		variables.put("problemType", melding.getProbleem().getType());
-		variables.put("comment", melding.getProbleem().getCommentaar());
+		variables.put("problem", melding.getProbleem());
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
 				Collections.singleton(melding.getEmail()),
 				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
 	}
+
 	// TODO: Uploaden foto bij een probleem
 }

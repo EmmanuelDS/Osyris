@@ -1,4 +1,4 @@
-package org.conscientia.core.form;
+package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -13,15 +13,14 @@ import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.handler.data.DataHandler;
-import org.conscientia.api.model.IndexedObject;
 import org.conscientia.api.model.ManagedObject;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.permission.Permission;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.encoder.SCSVModelEncoder;
 import org.conscientia.core.handler.data.annotation.ContentTypeLiteral;
 import org.conscientia.core.handler.data.annotation.ExtensionLiteral;
@@ -34,21 +33,29 @@ import org.richfaces.model.UploadedFile;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.encoder.api.Encoder;
+import be.gim.commons.filter.FilterUtils;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.peritia.io.content.Content;
 
+/**
+ * 
+ * @author kristof
+ * 
+ */
 @Named
 @ViewScoped
-public class ListForm extends AbstractForm implements Serializable {
-	private static final long serialVersionUID = 3676671150227033873L;
-	private static final Log log = LogFactory.getLog(ListForm.class);
-	private static final Integer PAGE_SIZE = 20;
+public class WerkOpdrachtOverzichtFormBase implements Serializable {
+
+	private static final Log LOG = LogFactory
+			.getLog(WerkOpdrachtOverzichtFormBase.class);
 
 	// VARIABLES
 	@Inject
 	protected ModelRepository modelRepository;
 	@Inject
 	protected Identity identity;
+	@Inject
+	protected UserRepository userRepository;
 
 	@Inject
 	@RequestParam
@@ -60,11 +67,27 @@ public class ListForm extends AbstractForm implements Serializable {
 
 	@PostConstruct
 	public void init() throws IOException {
+		name = "WerkOpdracht";
 		search();
 	}
 
 	// GETTERS AND SETTERS
 	public Query getQuery() {
+
+		if (query == null) {
+			query = new DefaultQuery(name);
+		}
+		try {
+			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
+
+				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
+						.getResourceKey(userRepository.loadUser(identity
+								.getUser().getId()))));
+				return query;
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load user.", e);
+		}
 		return query;
 	}
 
@@ -93,7 +116,7 @@ public class ListForm extends AbstractForm implements Serializable {
 	}
 
 	public String getAction() {
-		return Permission.SEARCH_ACTION;
+		return "search";
 	}
 
 	public boolean hasPermission() {
@@ -131,13 +154,12 @@ public class ListForm extends AbstractForm implements Serializable {
 	}
 
 	public boolean isCanView(ModelObject object) {
-		return identity.hasPermission(object, Permission.VIEW_ACTION);
+		return identity.hasPermission(object, "view");
 	}
 
 	public boolean isCanCreate() {
 		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(),
-						Permission.CREATE_ACTION);
+				&& identity.hasPermission(getModelClass(), "create");
 	}
 
 	public boolean isCanEdit(ModelObject object) {
@@ -145,45 +167,34 @@ public class ListForm extends AbstractForm implements Serializable {
 		if (object != null) {
 			return (getModelClass().hasInterface(StorableObject.class) || getModelClass()
 					.hasInterface(ManagedObject.class))
-					&& identity.hasPermission(object, Permission.EDIT_ACTION);
+					&& identity.hasPermission(object, "edit");
 		} else {
 			return (getModelClass().hasInterface(StorableObject.class) || getModelClass()
 					.hasInterface(ManagedObject.class))
-					&& identity.hasPermission(getModelClass(),
-							Permission.EDIT_ACTION);
+					&& identity.hasPermission(getModelClass(), "edit");
 		}
 	}
 
 	public boolean isCanDelete(ModelObject object) {
 		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(),
-						Permission.DELETE_ACTION);
+				&& identity.hasPermission(getModelClass(), "delete");
 	}
 
 	public boolean isCanUpload() {
 		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(),
-						Permission.CREATE_ACTION)
+				&& identity.hasPermission(getModelClass(), "create")
 				&& getModelClass().getHandler(DataHandler.class) != null;
 	}
 
 	public boolean isCanDownload() {
-		return identity
-				.hasPermission(getModelClass(), Permission.SEARCH_ACTION);
+		return identity.hasPermission(getModelClass(), "search");
 	}
 
-	public void search() {
-
+	public void search() throws IOException {
 		try {
-			if (query != null) {
-				results = modelRepository.searchObjects(query, true, true,
-						PAGE_SIZE);
-			} else {
-				results = modelRepository.searchObjects(new DefaultQuery(name),
-						true, true, PAGE_SIZE);
-			}
+			results = modelRepository.searchObjects(getQuery(), true, true);
 		} catch (IOException e) {
-			log.error("Can not get search results.", e);
+			LOG.error("Can not get search results.", e);
 			results = null;
 		}
 	}
@@ -192,9 +203,9 @@ public class ListForm extends AbstractForm implements Serializable {
 		try {
 			object = modelRepository.createObject(getModelClass(), null);
 		} catch (InstantiationException e) {
-			log.error("Can not instantiate model object.", e);
+			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
-			log.error("Illegal access at creation model object.", e);
+			LOG.error("Illegal access at creation model object.", e);
 		}
 	}
 
@@ -204,7 +215,7 @@ public class ListForm extends AbstractForm implements Serializable {
 			clear();
 			search();
 		} catch (IOException e) {
-			log.error("Can not save model object.", e);
+			LOG.error("Can not save model object.", e);
 		}
 	}
 
@@ -214,21 +225,12 @@ public class ListForm extends AbstractForm implements Serializable {
 			clear();
 			search();
 		} catch (IOException e) {
-			log.error("Can not delete model object.", e);
+			LOG.error("Can not delete model object.", e);
 		}
 	}
 
-	public void clear() {
+	public void clear() throws IOException {
 		object = null;
-	}
-
-	public void cancel() {
-
-		if (object != null) {
-			modelRepository.evictObject((StorableObject) object);
-		}
-		clear();
-		search();
 	}
 
 	@SuppressWarnings({ "rawtypes", "unchecked" })
@@ -237,12 +239,5 @@ public class ListForm extends AbstractForm implements Serializable {
 				getModelClass(), (List<ModelObject>) getResults());
 		return new EncodableContent<ModelObjectList>(
 				(Encoder) new SCSVModelEncoder(), objectList);
-	}
-
-	public boolean isIndex() {
-
-		ModelClass modelClass = getModelClass();
-		return modelClass.hasInterface(ManagedObject.class)
-				|| modelClass.hasInterface(IndexedObject.class);
 	}
 }

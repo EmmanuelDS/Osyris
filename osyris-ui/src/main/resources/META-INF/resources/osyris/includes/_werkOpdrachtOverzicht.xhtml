@@ -1,0 +1,101 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:q="http://specto.gim.be/search">
+	<u:param name="title" value="List" />
+	<h2>Overzicht Werkopdrachten</h2>
+	
+	<j:layout style="height: 600px">
+		<j:layoutPane
+			region="west"
+			size="350"
+			minSize="200"
+			resizable="true"
+			slidable="true">
+		<div class="ui-layout-content">
+		<r:panel id="query" rendered="#{werkOpdrachtOverzichtFormBase.hasPermission}"
+			style="max-width: 600px; text-align: left; margin: 10px;">
+			<q:query value="#{werkOpdrachtOverzichtFormBase.query}"
+				modelClassName="#{werkOpdrachtOverzichtFormBase.modelClass.name}">
+				<d:object mode="SEARCH" modelClass="#{werkOpdrachtOverzichtFormBase.modelClass}" />
+			</q:query>
+			<d:buttons>
+				<j:commandButton rendered="true"
+					value="#{messages['page.general.button.search']}"
+					image="#{resource['core/images/actions/12x12/apply.png']}"
+					type="button" actionListener="#{werkOpdrachtOverzichtFormBase.search()}" render="objects" />
+			</d:buttons>
+		</r:panel>
+	</div>
+	</j:layoutPane>
+
+	<j:layoutPane>
+		<div class="ui-layout-content">
+	<a:outputPanel id="result" renderend="true">
+		<d:objects id="objects" value="#{werkOpdrachtOverzichtFormBase.results}"
+			modelClass="#{werkOpdrachtOverzichtFormBase.modelClass}" mode="RESULT" level="SHORT">
+			<f:facet name="right">
+				<a:outputPanel rendered="true" styleClass="model-table-actions">
+					<h:panelGrid columns="3">
+						<j:commandButton
+							image="#{resource['core/images/actions/16x16/view.png']}"
+							type="image" title="#{messages['page.actions.view.label']}"
+							rendered="#{werkOpdrachtOverzichtFormBase.isCanView(object)}">
+							<j:renderListener target="#{r:clientId('viewPanel')}"
+								rendered="true" execute="@this" />
+							<f:setPropertyActionListener target="#{werkOpdrachtOverzichtFormBase.object}"
+								value="#{object}" />
+						</j:commandButton>
+						<j:commandButton
+							image="#{resource['core/images/actions/16x16/edit.png']}"
+							type="image" title="#{messages['page.actions.edit.label']}"
+							rendered="#{werkOpdrachtOverzichtFormBase.isCanEdit(object)}">
+							<j:renderListener target="#{r:clientId('editPanel')}"
+								rendered="true" execute="@this" />
+							<f:setPropertyActionListener target="#{werkOpdrachtOverzichtFormBase.object}"
+								value="#{object}" />
+						</j:commandButton>
+						<j:commandButton rendered="#{werkOpdrachtOverzichtFormBase.isCanDelete(object)}"
+							image="#{resource['core/images/actions/16x16/delete.png']}"
+							type="image" title="#{messages['page.actions.delete.label']}">
+							<j:renderListener target="#{r:clientId('deletePanel')}"
+								rendered="true" execute="@this" />
+							<f:setPropertyActionListener target="#{werkOpdrachtOverzichtFormBase.object}"
+								value="#{object}" />
+						</j:commandButton>
+					</h:panelGrid>
+				</a:outputPanel>
+			</f:facet>
+		</d:objects>
+
+		<a:outputPanel rendered="#{werkOpdrachtOverzichtFormBase.canCreate}">
+			<d:buttons>
+				<j:commandButton rendered="#{werkOpdrachtOverzichtFormBase.canCreate}"
+					value="#{messages['page.create.create.button']}"
+					image="#{resource['core/images/actions/12x12/create.png']}"
+					type="button" action="#{werkOpdrachtOverzichtFormBase.create()}">
+					<j:renderListener target="createPanel" rendered="true"
+						execute="@this" />
+				</j:commandButton>
+				<d:fileDownload rendered="#{werkOpdrachtOverzichtFormBase.isCanDownload()}"
+					fileName="#{werkOpdrachtOverzichtFormBase.fileName}" type="button"
+					image="#{resource['core/images/actions/12x12/download.png']}"
+					content="#{werkOpdrachtOverzichtFormBase.report()}" value="Rapport" />
+			</d:buttons>
+		</a:outputPanel>
+
+		<u:decorate template="/resources/core/includes/managePanels.xhtml">
+			<u:param name="form" value="#{werkOpdrachtOverzichtFormBase}" />
+			<u:param name="render" value="#{r:clientId('result')}" />
+		</u:decorate>
+
+	</a:outputPanel>
+	</div>
+	</j:layoutPane>
+	</j:layout>
+</u:composition>

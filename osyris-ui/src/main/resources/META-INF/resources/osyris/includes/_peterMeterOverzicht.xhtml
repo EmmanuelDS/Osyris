@@ -12,11 +12,18 @@
 	
 	<div><h2>Overzicht Peters en Meters</h2></div>
 	
-	<center>
+	<j:layout style="height: 600px">
+		<j:layoutPane
+			region="west"
+			size="350"
+			minSize="200"
+			resizable="true"
+			slidable="true">
+		<div class="ui-layout-content">
 		<r:panel id="query" rendered="true"
 			style="max-width: 600px; text-align: left; margin: 10px;">
-			<q:query value="#{form.query}"
-				modelClassName="#{form.modelClass.getName()}">
+			<q:query value="#{peterMeterOverzichtFormBase.query}"
+				modelClassName="#{peterMeterOverzichtFormBase.modelClass.getName()}">
 				<d:fields>
 					<d:propertyField id="firstName"
 						modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
@@ -37,17 +44,20 @@
 					value="#{messages['page.general.button.search']}"
 					image="#{resource['core/images/actions/12x12/apply.png']}"
 					type="button"
-					actionListener="#{form.search()}"
+					actionListener="#{peterMeterOverzichtFormBase.search()}"
 					render="objects" />
 			</d:buttons>
 		</r:panel>
-	</center>
+	</div>
+	</j:layoutPane>
 	
+	<j:layoutPane>
+		<div class="ui-layout-content">
 	<a:outputPanel id="result"
 		renderend="true">
 		
 		<r:dataTable id="objects"
-					 value="#{form.results}"  
+					 value="#{peterMeterOverzichtFormBase.results}"  
 					 mode="RESULT" 
 					 var="user" 
 					 style="width: 100%;"
@@ -124,7 +134,7 @@
 							<j:renderListener target="#{r:clientId('viewPanel')}" 
 								rendered="true"
 								execute="@this" />
-							<f:setPropertyActionListener target="#{form.object}"
+							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
 								value="#{user}" />
 						</j:commandButton>
 						<j:commandButton
@@ -135,7 +145,7 @@
 							<j:renderListener target="#{r:clientId('editPanel')}" 
 								rendered="true"
 								execute="@this" />
-							<f:setPropertyActionListener target="#{form.object}"
+							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
 								value="#{user}" />
 						</j:commandButton>
 						<j:commandButton 
@@ -146,7 +156,7 @@
 							<j:renderListener target="#{r:clientId('deletePanel')}" 
 								rendered="true"
 								execute="@this" />
-							<f:setPropertyActionListener target="#{form.object}"
+							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
 								value="#{user}" />
 						</j:commandButton>
 					</h:panelGrid>
@@ -164,17 +174,17 @@
 					value="#{messages['page.create.create.button']}"
 					image="#{resource['core/images/actions/12x12/create.png']}"
 					type="button"
-					action="#{form.create()}">
+					action="#{peterMeterOverzichtFormBase.create()}">
 					<j:renderListener target="createPeterMeterPanel" 
 						rendered="true"
 						execute="@this" />
 				</j:commandButton>
 				<d:fileDownload 
 					rendered="true"
-					fileName="#{form.fileName}"
+					fileName="#{peterMeterOverzichtFormBase.fileName}"
 					type="button"
 					image="#{resource['core/images/actions/12x12/download.png']}"
-					content="#{form.report()}" 
+					content="#{peterMeterOverzichtFormBase.report()}" 
 					value="Rapport" />
 			</d:buttons>
 	</a:outputPanel>
@@ -190,7 +200,7 @@
 	
 	<u:decorate template="/resources/core/includes/managePanels.xhtml">
 		<u:param name="form"
-			value="#{form}" />
+			value="#{peterMeterOverzichtFormBase}" />
 		<u:param name="render"
 			value="#{r:clientId('result')}" />
 	</u:decorate>
@@ -205,7 +215,7 @@
 				width="600">
 				<u:decorate template="/resources/osyris/includes/_createPeterMeter.xhtml">
 					<u:param name="form"
-						value="#{form}" />
+						value="#{peterMeterOverzichtFormBase}" />
 					<u:param name="render"
 						value="#{r:clientId('result')}" />
 				</u:decorate>
@@ -213,7 +223,7 @@
 					<j:commandButton value="#{messages['page.create.create.button']}"
 						image="#{resource['core/images/actions/12x12/apply.png']}"
 						type="button"
-						action="#{form.saveNewPeterMeter()}"
+						action="#{peterMeterOverzichtFormBase.saveNewPeterMeter()}"
 						render="result">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
@@ -228,4 +238,7 @@
 			</d:popupPanel>
 		</j:renderPanel>
 	</a:outputPanel>
+	</div>
+	</j:layoutPane>
+	</j:layout>
 </u:composition>

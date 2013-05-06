@@ -16,12 +16,11 @@ import org.conscientia.core.search.DefaultQuery;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.traject.Traject;
-import be.gim.tov.osyris.model.traject.TrajectToewijzing;
 
 @Named
 public class TrajectToewijzingBean {
 
-	private static final Log log = LogFactory
+	private static final Log LOG = LogFactory
 			.getLog(TrajectToewijzingBean.class);
 	@Inject
 	private ModelRepository modelRepository;
@@ -38,43 +37,45 @@ public class TrajectToewijzingBean {
 			ResourceKey resourceKey = modelRepository
 					.getResourceKey(userRepository.loadUser(username));
 
-			DefaultQuery q = new DefaultQuery();
-			q.setModelClassName("TrajectToewijzing");
-			q.setFilter(FilterUtils.or(
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Traject");
+			query.setFilter(FilterUtils.or(
 					FilterUtils.equal("peterMeter1", resourceKey),
 					FilterUtils.equal("peterMeter2", resourceKey),
 					FilterUtils.equal("peterMeter3", resourceKey)));
 
-			List<TrajectToewijzing> trajectToewijzingen = new ArrayList<TrajectToewijzing>();
+			List<Traject> trajecten = (List<Traject>) modelRepository
+					.searchObjects(query, true, true);
 
-			trajectToewijzingen = (List<TrajectToewijzing>) modelRepository
-					.searchObjects(q, true, true);
-
-			if (!trajectToewijzingen.isEmpty()) {
-
-				DefaultQuery query = new DefaultQuery();
-				query.setModelClassName("Traject");
-				query.addFilter(FilterUtils.in("trajectToewijzing",
-						trajectToewijzingen));
-
-				List<Traject> trajecten = (List<Traject>) modelRepository
-						.searchObjects(query, true, true);
-
-				for (Traject traject : trajecten) {
-					result.add("periode "
-							+ traject.getTrajectToewijzing().getJaar() + ": "
+			for (Traject traject : trajecten) {
+				if (traject.getPeterMeter1() != null
+						&& traject.getPeterMeter1().equals(resourceKey)) {
+					result.add("Periode Lente: "
 							+ traject.getClass().getSimpleName() + ", "
 							+ traject.getNaam() + ", " + traject.getLengte()
 							+ " km");
 				}
-
+				if (traject.getPeterMeter2() != null
+						&& traject.getPeterMeter2().equals(resourceKey)) {
+					result.add("Periode Zomer: "
+							+ traject.getClass().getSimpleName() + ", "
+							+ traject.getNaam() + ", " + traject.getLengte()
+							+ " km");
+				}
+				if (traject.getPeterMeter3() != null
+						&& traject.getPeterMeter3().equals(resourceKey)) {
+					result.add("Periode Herfst: "
+							+ traject.getClass().getSimpleName() + ", "
+							+ traject.getNaam() + ", " + traject.getLengte()
+							+ " km");
+				}
 			}
 			if (!result.isEmpty()) {
 				return result;
 			}
 
 		} catch (IOException e) {
-			log.error("Can not get trajecttoewijzing.", e);
+			LOG.error("Can not get trajecttoewijzing.", e);
 		}
 
 		result.add("Nog geen trajecten toegewezen");

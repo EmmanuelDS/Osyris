@@ -12,6 +12,11 @@ import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
+/**
+ * 
+ * @author kristof
+ * 
+ */
 @Handler(type = "permission")
 @For("ControleOpdracht")
 public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler {
@@ -19,6 +24,11 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 	@Override
 	public Boolean hasPermission(String action, ResourceIdentifier identifier,
 			ModelClass modelClass, boolean isOwner) throws IOException {
+
+		// Routedokter has permissions on all records
+		if (identity.inGroup("Routedokter", "CUSTOM")) {
+			return true;
+		}
 
 		// Load ControleOpdracht
 		if (identifier != null) {
@@ -50,7 +60,9 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 					}
 					if (status.equals(ControleOpdrachtStatus.TE_CONTROLEREN)
 							|| status
-									.equals(ControleOpdrachtStatus.GEANNULEERD)) {
+									.equals(ControleOpdrachtStatus.GEANNULEERD)
+							|| status
+									.equals(ControleOpdrachtStatus.GERAPPORTEERD)) {
 
 						if (action.equals(Permission.EDIT_ACTION)
 								|| action.equals(Permission.VIEW_ACTION)) {

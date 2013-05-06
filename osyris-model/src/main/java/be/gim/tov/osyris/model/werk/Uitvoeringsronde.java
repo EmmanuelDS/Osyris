@@ -36,6 +36,8 @@ import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
 		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
 
+		@Permission(profile = "group:PeterMeter", action = "search", allow = false),
+
 		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
 		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
 		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
