@@ -39,8 +39,6 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 			if (controleOpdracht != null) {
 				ControleOpdrachtStatus status = controleOpdracht.getStatus();
 
-				// Get groups
-
 				// PETER EN METER
 				if (identity.inGroup("PeterMeter", "CUSTOM")
 						&& status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
@@ -69,10 +67,11 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 							return true;
 						}
 					} else {
-						return false;
+						if (!action.equals(Permission.VIEW_ACTION)) {
+							return false;
+						}
 					}
 				}
-
 			}
 		}
 		return super.hasPermission(action, identifier, modelClass, isOwner);

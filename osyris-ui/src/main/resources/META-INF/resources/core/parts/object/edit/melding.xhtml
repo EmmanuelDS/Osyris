@@ -10,7 +10,7 @@
 				var="property">
 				<c:choose>
 					<c:when test="#{propertyMeldingEditableBean.isEditableInStatus(cc.attrs.value, property) }">
-						<d:propertyField id="field_#{property.name}"
+						<d:propertyField id="field1_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"

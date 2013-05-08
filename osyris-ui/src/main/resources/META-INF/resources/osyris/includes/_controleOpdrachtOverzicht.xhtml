@@ -77,12 +77,19 @@
 		<a:outputPanel rendered="#{controleOpdrachtOverzichtFormBase.canCreate}">
 			<d:buttons>
 				<j:commandButton rendered="#{controleOpdrachtOverzichtFormBase.canCreate}"
-					value="#{messages['page.create.create.button']}"
+					value="#{messages['page.create.create.button']} Controleopdracht route"
 					image="#{resource['core/images/actions/12x12/create.png']}"
-					type="button" action="#{controleOpdrachtOverzichtFormBase.create()}">
+					type="button" action="#{controleOpdrachtOverzichtFormBase.create('RouteControleOpdracht')}">
 					<j:renderListener target="createPanel" rendered="true"
 						execute="@this" />
 				</j:commandButton>
+<!-- 				<j:commandButton rendered="#{controleOpdrachtOverzichtFormBase.canCreate}" -->
+<!-- 					value="#{messages['page.create.create.button']} Controleopdracht netwerk" -->
+<!-- 					image="#{resource['core/images/actions/12x12/create.png']}" -->
+<!-- 					type="button" action="#{controleOpdrachtOverzichtFormBase.create('NetwerkControleOpdracht')}"> -->
+<!-- 					<j:renderListener target="createPanel" rendered="true" -->
+<!-- 						execute="@this" /> -->
+<!-- 				</j:commandButton> -->
 				<d:fileDownload rendered="#{controleOpdrachtOverzichtFormBase.isCanDownload()}"
 					fileName="#{controleOpdrachtOverzichtFormBase.fileName}" type="button"
 					image="#{resource['core/images/actions/12x12/download.png']}"

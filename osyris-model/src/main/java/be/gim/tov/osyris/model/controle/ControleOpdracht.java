@@ -92,16 +92,16 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumTeControleren;
 
+	@NotEditable
 	@Label("Datum uitgesteld")
 	@Description("Datum uitgesteld")
 	@Type(ModelPropertyType.DATE)
-	@NotEditable
 	private Date datumUitgesteld;
 
 	@NotEditable
-	@EditableInStatus("UIT_TE_VOEREN")
-	@Label("Datum uit te voeren")
-	@Description("Datum uit te voeren")
+	@EditableInStatus({ "UIT_TE_VOEREN" })
+	@Label("Datum uitvoering")
+	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
@@ -114,7 +114,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier traject;
 
 	@NotEditable
-	@EditableInGroup("Routedokter")
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
@@ -122,13 +122,14 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
-	@EditableInGroup("Routedokter")
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter;
 
+	@NotEditable
 	@EditableInStatus({ "UIT_TE_VOEREN" })
 	@Label("Problemen")
 	@Description("Problemen")

@@ -10,7 +10,7 @@
 				var="property">
 				<c:choose>
 					<c:when test="#{propertyControleOpdrachtEditableBean.isEditableInStatus(cc.attrs.value, property)}">
-						<d:propertyField id="field_#{property.name}"
+						<d:propertyField id="field1_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"
@@ -20,7 +20,7 @@
 							simple="#{cc.attrs.simple}"/>
 					</c:when>
 					<c:when test="#{propertyControleOpdrachtEditableBean.isEditableInGroup(cc.attrs.value, property)}">
-						<d:propertyField id="field_#{property.name}"
+						<d:propertyField id="field2_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"
@@ -30,7 +30,7 @@
 							simple="#{cc.attrs.simple}"/>
 					</c:when>
 					<c:when test="#{property.isVisible('VIEW', cc.attrs.level, cc.attrs.simple)}">
-						<d:propertyField id="field2_#{property.name}"
+						<d:propertyField id="field3_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"

@@ -44,9 +44,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
 	@NotEditable
-	@EditableInStatus({ "GEMELD", "GEVALIDEERD_WERKOPDRACHT",
-			"GEVALIDEERD_GEEN_WERKOPDRACHT", "GEVALIDEERD_REEDS_GEMELD",
-			"GEVALIDEERD_IN_BEHANDELING" })
 	@Label("Status")
 	@Description("Status")
 	private MeldingStatus status;
@@ -119,7 +116,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
-	@EditableInStatus("")
+	@EditableInStatus({ "", "GEMELD" })
 	@Required
 	@NotSearchable
 	@Label("Probleem")
@@ -127,9 +124,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	private Probleem probleem;
 
 	@NotEditable
-	@EditableInStatus({ "GEMELD", "GEVALIDEERD_WERKOPDRACHT",
-			"GEVALIDEERD_GEEN_WERKOPDRACHT", "GEVALIDEERD_REEDS_GEMELD",
-			"GEVALIDEERD_IN_BEHANDELING" })
+	@EditableInStatus({ "GEMELD", "GEVALIDEERD" })
 	@NotSearchable
 	@Label("Commentaar TOV")
 	@Description("Commentaar TOV")

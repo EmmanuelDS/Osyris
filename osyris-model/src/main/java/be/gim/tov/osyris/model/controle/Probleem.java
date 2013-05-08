@@ -5,13 +5,18 @@ import static org.conscientia.api.model.SubClassPersistence.UNION;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
+
+import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 
 /**
  * 
@@ -22,10 +27,16 @@ import org.conscientia.core.model.AbstractModelObject;
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
 @Label("Probleem")
+@Edit(type = "probleem")
 public abstract class Probleem extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	@NotEditable
+	@Label("Status")
+	@Description("Status")
+	private ProbleemStatus status;
+
 	@NotSearchable
 	@Label("Fiche")
 	@Description("Fiche")
@@ -36,6 +47,7 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Description("Foto")
 	private String foto;
 
+	@Required
 	@NotSearchable
 	@Label("Commentaar")
 	@Description("Commentaar")
@@ -43,6 +55,14 @@ public abstract class Probleem extends AbstractModelObject implements
 	private String commentaar;
 
 	// GETTERS AND SETTERS
+	public ProbleemStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(ProbleemStatus status) {
+		this.status = status;
+	}
+
 	public String getFiche() {
 		return fiche;
 	}

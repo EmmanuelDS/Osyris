@@ -211,9 +211,10 @@ public class ControleOpdrachtOverzichtFormBase implements Serializable {
 		}
 	}
 
-	public void create() {
+	public void create(String modelClassName) {
 		try {
-			object = modelRepository.createObject(getModelClass(), null);
+			object = modelRepository.createObject(
+					modelRepository.getModelClass(modelClassName), null);
 		} catch (InstantiationException e) {
 			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
