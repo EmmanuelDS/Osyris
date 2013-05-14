@@ -15,6 +15,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
@@ -25,8 +26,9 @@ import be.gim.commons.filter.FilterUtils;
  * 
  */
 @Named
-public class MeldingOverzichtFormBase extends AbstractOverzichtForm {
+public class MeldingOverzichtFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = -3077755833706449795L;
 	private static final Log LOG = LogFactory
 			.getLog(MeldingOverzichtFormBase.class);
 
@@ -38,8 +40,14 @@ public class MeldingOverzichtFormBase extends AbstractOverzichtForm {
 	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "Melding";
+		name = getName();
 		search();
+	}
+
+	@Override
+	public String getName() {
+		String value = "Melding";
+		return value;
 	}
 
 	@Override

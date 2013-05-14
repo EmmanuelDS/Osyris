@@ -80,6 +80,11 @@
 			<version>${specto.version}</version>
 		</dependency>
 		<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-ui-web</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+		<dependency>
 			<groupId>be.gim.tov</groupId>
 			<artifactId>osyris-model</artifactId>
 			<version>${project.version}</version>

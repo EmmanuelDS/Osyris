@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
@@ -22,8 +23,9 @@ import be.gim.tov.osyris.model.user.UitvoerderProfiel;
  * 
  */
 @Named
-public class StockMateriaalOverzichtFormBase extends AbstractOverzichtForm {
+public class StockMateriaalOverzichtFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = -2212073755366628143L;
 	private static final Log LOG = LogFactory
 			.getLog(StockMateriaalOverzichtFormBase.class);
 
@@ -35,8 +37,14 @@ public class StockMateriaalOverzichtFormBase extends AbstractOverzichtForm {
 	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "StockMateriaal";
+		name = getName();
 		search();
+	}
+
+	@Override
+	public String getName() {
+		String value = "StockMateriaal";
+		return value;
 	}
 
 	@Override

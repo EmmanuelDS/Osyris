@@ -11,7 +11,6 @@ import javax.inject.Named;
 import org.apache.commons.lang.StringUtils;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
-import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.api.Group;
 
@@ -26,9 +25,6 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
  */
 @Named
 public class PropertyControleOpdrachtEditableBean {
-
-	@Inject
-	private ModelRepository modelRepository;
 
 	@Inject
 	private Identity identity;

@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 
 /**
@@ -19,8 +20,9 @@ import org.conscientia.core.search.DefaultQuery;
  * 
  */
 @Named
-public class UitvoeringsrondeOverzichtFormBase extends AbstractOverzichtForm {
+public class UitvoeringsrondeOverzichtFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = 3771393152252852618L;
 	private static final Log LOG = LogFactory
 			.getLog(UitvoeringsrondeOverzichtFormBase.class);
 
@@ -32,8 +34,14 @@ public class UitvoeringsrondeOverzichtFormBase extends AbstractOverzichtForm {
 	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "Uitvoeringsronde";
+		name = getName();
 		search();
+	}
+
+	@Override
+	public String getName() {
+		String value = "Uitvoeringsronde";
+		return value;
 	}
 
 	@Override

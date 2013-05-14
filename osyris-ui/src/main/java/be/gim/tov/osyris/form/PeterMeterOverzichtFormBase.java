@@ -27,6 +27,7 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
@@ -43,8 +44,9 @@ import be.gim.commons.resource.ResourceName;
  * 
  */
 @Named
-public class PeterMeterOverzichtFormBase extends AbstractOverzichtForm {
+public class PeterMeterOverzichtFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = 7761265026167905576L;
 	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
 
@@ -65,8 +67,14 @@ public class PeterMeterOverzichtFormBase extends AbstractOverzichtForm {
 	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "User";
+		name = getName();
 		search();
+	}
+
+	@Override
+	public String getName() {
+		String value = "User";
+		return value;
 	}
 
 	@Override
@@ -235,10 +243,8 @@ public class PeterMeterOverzichtFormBase extends AbstractOverzichtForm {
 		variables.put("password", password);
 		variables.put("group", userRepository.listGroupnames(username));
 
-		mailSender.sendMail(
-				preferences.getNoreplyEmail(),
-				Collections.singleton(user.getAspect("UserProfile")
-						.get("email").toString()),
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton(email),
 				"/META-INF/resources/core/mails/newPeterMeter.fmt", variables);
 	}
 

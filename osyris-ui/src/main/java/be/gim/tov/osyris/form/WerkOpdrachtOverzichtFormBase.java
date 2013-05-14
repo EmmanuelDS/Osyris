@@ -11,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
@@ -21,8 +22,9 @@ import be.gim.commons.filter.FilterUtils;
  * 
  */
 @Named
-public class WerkOpdrachtOverzichtFormBase extends AbstractOverzichtForm {
+public class WerkOpdrachtOverzichtFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = -7478667205313972513L;
 	private static final Log LOG = LogFactory
 			.getLog(WerkOpdrachtOverzichtFormBase.class);
 
@@ -34,8 +36,14 @@ public class WerkOpdrachtOverzichtFormBase extends AbstractOverzichtForm {
 	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "WerkOpdracht";
+		name = getName();
 		search();
+	}
+
+	@Override
+	public String getName() {
+		String value = "WerkOpdracht";
+		return value;
 	}
 
 	@Override

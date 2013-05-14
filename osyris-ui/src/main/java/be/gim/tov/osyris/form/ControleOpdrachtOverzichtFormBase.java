@@ -15,6 +15,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
@@ -25,9 +26,10 @@ import be.gim.commons.filter.FilterUtils;
  * 
  */
 @Named
-public class ControleOpdrachtOverzichtFormBase extends AbstractOverzichtForm {
+public class ControleOpdrachtOverzichtFormBase extends AbstractListForm {
 
-	private static final Log log = LogFactory
+	private static final long serialVersionUID = -86881009141250710L;
+	private static final Log LOG = LogFactory
 			.getLog(ControleOpdrachtOverzichtFormBase.class);
 
 	// VARIABLES
@@ -38,8 +40,14 @@ public class ControleOpdrachtOverzichtFormBase extends AbstractOverzichtForm {
 	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "ControleOpdracht";
+		name = getName();
 		search();
+	}
+
+	@Override
+	public String getName() {
+		String value = "ControleOpdracht";
+		return value;
 	}
 
 	@Override
@@ -67,7 +75,7 @@ public class ControleOpdrachtOverzichtFormBase extends AbstractOverzichtForm {
 				return query;
 			}
 		} catch (IOException e) {
-			log.error("Can not load user.", e);
+			LOG.error("Can not load user.", e);
 		}
 		return query;
 	}
@@ -92,7 +100,7 @@ public class ControleOpdrachtOverzichtFormBase extends AbstractOverzichtForm {
 			results = modelRepository.searchObjects(getQuery(), true, true,
 					PAGE_SIZE);
 		} catch (IOException e) {
-			log.error("Can not get search results.", e);
+			LOG.error("Can not get search results.", e);
 			results = null;
 		}
 	}
