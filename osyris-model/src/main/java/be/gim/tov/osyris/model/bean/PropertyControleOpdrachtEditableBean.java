@@ -89,6 +89,12 @@ public class PropertyControleOpdrachtEditableBean {
 		Field[] fields = object.getClass().getSuperclass().getDeclaredFields();
 		Set<Group> groups = identity.getGroups();
 
+		// Routedokter and admin can edit all properties
+		if (identity.inGroup("Routedokter", "CUSTOM")
+				|| identity.inGroup("admin", "CUSTOM")) {
+			return true;
+		}
+
 		// Status not editable field when ControleOpdracht is created
 		if (property.getName().equals("status") && object.get("status") == null) {
 			property.setEditable(false);

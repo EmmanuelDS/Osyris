@@ -1,12 +1,11 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.faces.bean.ViewScoped;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -14,7 +13,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.preferences.Preferences;
-import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.resource.ResourceName;
@@ -26,15 +24,11 @@ import be.gim.tov.osyris.model.controle.Melding;
  * 
  */
 @Named
-@ViewScoped
-public class MeldingFormBase implements Serializable {
+public class MeldingFormBase extends AbstractOverzichtForm {
 
 	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
 
 	// VARIABLES
-	@Inject
-	private ModelRepository modelRepository;
-
 	@Inject
 	private Preferences preferences;
 
@@ -45,6 +39,12 @@ public class MeldingFormBase implements Serializable {
 	private Messages messages;
 
 	private Melding melding;
+
+	@Override
+	@PostConstruct
+	public void init() throws IOException {
+		name = "Melding";
+	}
 
 	// GETTERS AND SETTERS
 	public Melding getMelding() {

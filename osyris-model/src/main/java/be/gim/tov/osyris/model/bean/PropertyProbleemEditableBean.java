@@ -20,7 +20,7 @@ public class PropertyProbleemEditableBean {
 	private Identity identity;
 
 	public boolean isEditable(ModelObject object, ModelProperty property) {
-
+		boolean editable = false;
 		// Fields not editable in certain groups, unless if problem is new.
 		if (!property.getName().equals("status")) {
 			if (identity.inGroup("Medewerker", "CUSTOM")
@@ -29,14 +29,10 @@ public class PropertyProbleemEditableBean {
 				if (object.get("commentaar") == null
 						|| StringUtils.isEmpty((String) object
 								.get("commentaar"))) {
-					property.setEditable(true);
-					return true;
-				} else {
-					property.setEditable(false);
-					return false;
+					editable = true;
 				}
 			} else {
-				return true;
+				editable = true;
 			}
 		}
 
@@ -47,20 +43,13 @@ public class PropertyProbleemEditableBean {
 					|| identity.inGroup("admin", "CUSTOM")) {
 
 				// If new problem status is not editable
-				if (object.get("commentaar") == null
-						|| StringUtils.isEmpty((String) object
+				if (object.get("commentaar") != null
+						|| !StringUtils.isEmpty((String) object
 								.get("commentaar"))) {
-					property.setEditable(false);
-					return false;
-				} else {
-					property.setEditable(true);
-					return true;
+					editable = true;
 				}
-			} else {
-				property.setEditable(false);
-				return false;
 			}
 		}
-		return property.isEditable();
+		return editable;
 	}
 }

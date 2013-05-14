@@ -24,7 +24,6 @@ import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditableInGroup;
-import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
@@ -55,7 +54,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	// VARIABLES
 	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Controle periode")
+	@Label("Periode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
@@ -69,7 +68,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Commentaar")
 	@Description("Commentaar")
 	@NotSearchable
-	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
@@ -99,7 +98,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private Date datumUitgesteld;
 
 	@NotEditable
-	@EditableInStatus({ "UIT_TE_VOEREN" })
+	@EditableInGroup({ "PeterMeter" })
 	@Label("Datum uitvoering")
 	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.DATE)
@@ -130,7 +129,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter;
 
 	@NotEditable
-	@EditableInStatus({ "UIT_TE_VOEREN" })
+	@EditableInGroup({ "PeterMeter" })
 	@Label("Problemen")
 	@Description("Problemen")
 	@NotSearchable

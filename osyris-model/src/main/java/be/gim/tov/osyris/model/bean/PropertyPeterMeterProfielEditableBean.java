@@ -10,7 +10,6 @@ import javax.inject.Named;
 
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
-import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.api.Group;
 
@@ -23,9 +22,6 @@ import be.gim.tov.osyris.model.annotation.EditableInGroup;
  */
 @Named
 public class PropertyPeterMeterProfielEditableBean {
-
-	@Inject
-	private ModelRepository modelRepository;
 
 	@Inject
 	private Identity identity;
