@@ -9,18 +9,8 @@
 			<c:forEach items="#{cc.attrs.modelClass.properties}"
 				var="property">
 				<c:choose>
-					<c:when test="#{propertyControleOpdrachtEditableBean.isEditableInStatus(cc.attrs.value, property)}">
-						<d:propertyField id="field_#{property.name}"
-							path="#{property.getPath(cc.attrs.path)}"
-							modelProperty="#{property}" 
-							modelClass="#{cc.attrs.modelClass}"
-							modelObject="#{cc.attrs.value}"
-							mode="#{cc.attrs.mode}"
-							level="#{cc.attrs.level}"
-							simple="#{cc.attrs.simple}"/>
-					</c:when>
 					<c:when test="#{propertyControleOpdrachtEditableBean.isEditableInGroup(cc.attrs.value, property)}">
-						<d:propertyField id="field_#{property.name}"
+						<d:propertyField id="field1_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 
 							modelClass="#{cc.attrs.modelClass}"

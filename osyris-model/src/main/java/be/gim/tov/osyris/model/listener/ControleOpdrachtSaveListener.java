@@ -11,6 +11,7 @@ import org.conscientia.api.model.event.ModelEvent;
 import org.jboss.seam.security.Identity;
 
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
+import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
@@ -38,6 +39,7 @@ public class ControleOpdrachtSaveListener {
 			controleOpdracht.setDatumUitgesteld(new Date());
 		}
 
+		// Report ControleOpdracht by PM
 		if (identity.inGroup("PeterMeter", "CUSTOM")
 				&& controleOpdracht.getStatus().equals(
 						ControleOpdrachtStatus.UIT_TE_VOEREN)) {
@@ -45,9 +47,21 @@ public class ControleOpdrachtSaveListener {
 			controleOpdracht.setDatumGerapporteerd(new Date());
 		}
 
-		if (controleOpdracht.getStatus().equals(
-				ControleOpdrachtStatus.GEVALIDEERD)) {
+		// If all problems have a status the ControleOpdracht is validated
+		if (checkOpenstaandeProblemen(controleOpdracht) == 0
+				&& !controleOpdracht.getProblemen().isEmpty()) {
+			controleOpdracht.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
 			controleOpdracht.setDatumGevalideerd(new Date());
 		}
+	}
+
+	private int checkOpenstaandeProblemen(ControleOpdracht controleOpdracht) {
+		int probleemNotChecked = 0;
+		for (Probleem p : controleOpdracht.getProblemen()) {
+			if (p.getStatus() == null) {
+				probleemNotChecked = +1;
+			}
+		}
+		return probleemNotChecked;
 	}
 }

@@ -1,12 +1,11 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
-import javax.faces.bean.ViewScoped;
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -14,7 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.preferences.Preferences;
-import org.conscientia.api.repository.ModelRepository;
+import org.conscientia.core.form.AbstractListForm;
 import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.resource.ResourceName;
@@ -26,27 +25,34 @@ import be.gim.tov.osyris.model.controle.Melding;
  * 
  */
 @Named
-@ViewScoped
-public class MeldingFormBase implements Serializable {
+public class MeldingFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = -8052917916776585407L;
 	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
 
 	// VARIABLES
 	@Inject
-	private ModelRepository modelRepository;
-
-	@Inject
 	private Preferences preferences;
-
 	@Inject
 	private MailSender mailSender;
-
 	@Inject
 	private Messages messages;
-
 	private Melding melding;
 
+	@Override
+	@PostConstruct
+	public void init() throws IOException {
+		name = getName();
+		search();
+	}
+
 	// GETTERS AND SETTERS
+	@Override
+	public String getName() {
+		String value = "Melding";
+		return value;
+	}
+
 	public Melding getMelding() {
 
 		if (melding == null) {

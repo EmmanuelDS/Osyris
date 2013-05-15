@@ -2,16 +2,23 @@
 	xmlns:u="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:a="http://richfaces.org/a4j" xmlns:r="http://richfaces.org/rich"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:q="http://specto.gim.be/search">
-	<!-- 	<u:param name="title" -->
-	<!-- 		value="List" /> -->
-	<h2>Overzicht Meldingen</h2>
+	
+<!-- 	<u:param name="title" -->
+<!-- 		value="List" /> -->
+
+<h2>Overzicht Meldingen</h2>
 	<j:layout style="height: 600px">
-		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
+		<j:layoutPane
+			region="west"
+			size="350"
+			minSize="200"
+			resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
 				<q:query value="#{meldingOverzichtFormBase.query}"
@@ -19,50 +26,64 @@
 					<c:if test="#{meldingOverzichtFormBase.index}">
 						<d:field for="term"
 							label="#{messages['page.search.query.term.title']}">
-							<q:phrase id="termFilter" value="#{searchForm.term}">
+							<q:phrase id="termFilter"
+								value="#{searchForm.term}">
 								<h:inputText value="#{searchForm.term}" />
 							</q:phrase>
 						</d:field>
 					</c:if>
-					<d:object mode="SEARCH" modelClass="#{meldingOverzichtFormBase.modelClass}" />
+					<d:object mode="SEARCH"
+						modelClass="#{meldingOverzichtFormBase.modelClass}" />
 				</q:query>
 				<d:buttons>
 					<j:commandButton rendered="true"
 						value="#{messages['page.general.button.search']}"
 						image="#{resource['core/images/actions/12x12/apply.png']}"
-						type="button" actionListener="#{meldingOverzichtFormBase.search()}" render="objects" />
+						type="button"
+						actionListener="#{meldingOverzichtFormBase.search()}"
+						render="objects" />
 				</d:buttons>
 			</div>
 		</j:layoutPane>
 		<j:layoutPane>
 			<div class="ui-layout-content">
 				<a:outputPanel id="result">
-					<d:objects id="objects" value="#{meldingOverzichtFormBase.results}"
-						modelClass="#{meldingOverzichtFormBase.modelClass}" mode="RESULT" level="SHORT">
+					<d:objects id="objects" 
+						value="#{meldingOverzichtFormBase.results}"
+						modelClass="#{meldingOverzichtFormBase.modelClass}" 
+						mode="RESULT" 
+						level="SHORT">
 						<f:facet name="right">
-							<a:outputPanel rendered="true" styleClass="model-table-actions">
+							<a:outputPanel rendered="true" 
+								styleClass="model-table-actions">
 								<h:panelGrid columns="3">
 									<j:commandButton rendered="#{meldingOverzichtFormBase.isCanView(object)}"
 										image="#{resource['core/images/actions/16x16/view.png']}"
-										type="image" title="#{messages['page.actions.view.label']}">
-										<j:renderListener target="#{r:clientId('viewPanel')}"
-											rendered="true" execute="@this" />
+										type="image" 
+										title="#{messages['page.actions.view.label']}">
+										<j:renderListener target="#{r:clientId('viewPanel')}" 
+											rendered="true"
+											execute="@this" />
 										<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
 											value="#{object}" />
 									</j:commandButton>
 									<j:commandButton rendered="#{meldingOverzichtFormBase.isCanEdit(object)}"
 										image="#{resource['core/images/actions/16x16/edit.png']}"
-										type="image" title="#{messages['page.actions.edit.label']}">
-										<j:renderListener target="#{r:clientId('editPanel')}"
-											rendered="true" execute="@this" />
+										type="image" 
+										title="#{messages['page.actions.edit.label']}">
+										<j:renderListener target="#{r:clientId('editPanel')}" 
+											rendered="true"
+											execute="@this" />
 										<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
 											value="#{object}" />
 									</j:commandButton>
 									<j:commandButton rendered="#{meldingOverzichtFormBase.isCanDelete(object)}"
 										image="#{resource['core/images/actions/16x16/delete.png']}"
-										type="image" title="#{messages['page.actions.delete.label']}">
-										<j:renderListener target="#{r:clientId('deletePanel')}"
-											rendered="true" execute="@this" />
+										type="image" 
+										title="#{messages['page.actions.delete.label']}">
+										<j:renderListener target="#{r:clientId('deletePanel')}" 
+											rendered="true"
+											execute="@this" />
 										<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
 											value="#{object}" />
 									</j:commandButton>
@@ -71,32 +92,40 @@
 						</f:facet>
 					</d:objects>
 				</a:outputPanel>
-
+				
 				<a:outputPanel>
 					<d:buttons>
-						<j:commandButton rendered="#{meldingOverzichtFormBase.canCreate}"
-							value="#{messages['page.actions.create.label']}"
-							image="#{resource['core/images/actions/12x12/create.png']}"
-							type="button" action="#{meldingOverzichtFormBase.create()}">
-							<j:renderListener target="createPanel" rendered="true"
-								execute="@this" />
-						</j:commandButton>
+<!-- 						<j:commandButton rendered="#{meldingOverzichtFormBase.canCreate}" -->
+<!-- 							value="#{messages['page.actions.create.label']}" -->
+<!-- 							image="#{resource['core/images/actions/12x12/create.png']}" -->
+<!-- 							type="button" -->
+<!-- 							action="#{meldingOverzichtFormBase.create()}"> -->
+<!-- 							<j:renderListener target="createPanel"  -->
+<!-- 								rendered="true" -->
+<!-- 								execute="@this" /> -->
+<!-- 						</j:commandButton> -->
 						<j:commandButton rendered="#{meldingOverzichtFormBase.canUpload}"
 							value="#{messages['page.actions.upload.label']}"
 							image="#{resource['core/images/actions/12x12/upload.png']}"
-							type="button" action="#{meldingOverzichtFormBase.clear()}">
-							<j:renderListener target="uploadPanel" rendered="true"
+							type="button"
+							action="#{meldingOverzichtFormBase.clear()}">
+							<j:renderListener target="uploadPanel" 
+								rendered="true"
 								execute="@this" />
 						</j:commandButton>
-						<d:fileDownload fileName="#{meldingOverzichtFormBase.fileName}" type="button"
+						<d:fileDownload fileName="#{meldingOverzichtFormBase.fileName}"
+							type="button"
 							image="#{resource['core/images/actions/12x12/download.png']}"
-							content="#{meldingOverzichtFormBase.report()}" value="Report" />
+							content="#{meldingOverzichtFormBase.report()}" 
+							value="Rapport" />
 					</d:buttons>
 				</a:outputPanel>
-
+				
 				<u:decorate template="/resources/core/includes/managePanels.xhtml">
-					<u:param name="form" value="#{meldingOverzichtFormBase}" />
-					<u:param name="render" value="#{r:clientId('result')}" />
+					<u:param name="form"
+						value="#{meldingOverzichtFormBase}" />
+					<u:param name="render"
+						value="#{r:clientId('result')}" />
 				</u:decorate>
 			</div>
 		</j:layoutPane>

@@ -24,7 +24,6 @@ import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditableInGroup;
-import be.gim.tov.osyris.model.annotation.EditableInStatus;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
@@ -55,7 +54,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	// VARIABLES
 	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Controle periode")
+	@Label("Periode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
@@ -69,7 +68,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Commentaar")
 	@Description("Commentaar")
 	@NotSearchable
-	@EditableInStatus({ "TE_CONTROLEREN", "UIT_TE_VOEREN" })
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
@@ -92,16 +91,16 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumTeControleren;
 
+	@NotEditable
 	@Label("Datum uitgesteld")
 	@Description("Datum uitgesteld")
 	@Type(ModelPropertyType.DATE)
-	@NotEditable
 	private Date datumUitgesteld;
 
 	@NotEditable
-	@EditableInStatus("UIT_TE_VOEREN")
-	@Label("Datum uit te voeren")
-	@Description("Datum uit te voeren")
+	@EditableInGroup({ "PeterMeter" })
+	@Label("Datum uitvoering")
+	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
@@ -114,7 +113,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier traject;
 
 	@NotEditable
-	@EditableInGroup("Routedokter")
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
@@ -122,14 +121,15 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
-	@EditableInGroup("Routedokter")
+	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
 	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter;
 
-	@EditableInStatus({ "UIT_TE_VOEREN" })
+	@NotEditable
+	@EditableInGroup({ "PeterMeter" })
 	@Label("Problemen")
 	@Description("Problemen")
 	@NotSearchable

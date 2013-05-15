@@ -9,7 +9,7 @@
 			<c:forEach items="#{cc.attrs.modelClass.properties}"
 				var="property">
 				<c:choose>
-					<c:when test="#{propertyPeterMeterProfielEditableBean.isEditableInGroup(cc.attrs.value, property)}">
+					<c:when test="#{propertyProbleemEditableBean.isEditable(cc.attrs.value, property)}">
 						<d:propertyField id="field1_#{property.name}"
 							path="#{property.getPath(cc.attrs.path)}"
 							modelProperty="#{property}" 

@@ -10,7 +10,6 @@ import javax.inject.Named;
 import org.apache.commons.lang.StringUtils;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
-import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.security.Identity;
 
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
@@ -22,9 +21,6 @@ import be.gim.tov.osyris.model.annotation.EditableInStatus;
  */
 @Named
 public class PropertyMeldingEditableBean {
-
-	@Inject
-	private ModelRepository modelRepository;
 
 	@Inject
 	private Identity identity;

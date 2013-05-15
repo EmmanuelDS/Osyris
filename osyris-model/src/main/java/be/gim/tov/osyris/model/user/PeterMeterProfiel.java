@@ -3,8 +3,6 @@ package be.gim.tov.osyris.model.user;
 import java.util.Date;
 import java.util.List;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
@@ -50,8 +48,6 @@ import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 		@Permission(profile = "group:PeterMeter", action = "edit", allow = true) })
 public class PeterMeterProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
-
-	private static final Log log = LogFactory.getLog(PeterMeterProfiel.class);
 
 	// VARIABLES
 	@NotSearchable

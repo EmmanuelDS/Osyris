@@ -44,18 +44,9 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 public class WerkOpdracht extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@Label("Type werkopdracht")
-	@Description("Type werkopdracht")
-	private String type;
-
 	@Label("Status")
 	@Description("Status")
 	private WerkopdrachtStatus status;
-
-	@NotSearchable
-	@Label("Beoordeling")
-	@Description("Beoordeling")
-	private String beoordeling;
 
 	@NotSearchable
 	@Label("Omschrijving opdracht")
@@ -132,28 +123,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	private List<WerkHandeling> handelingen;
 
 	// GETTERS AND SETTERS
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
-	}
-
 	public WerkopdrachtStatus getStatus() {
 		return status;
 	}
 
 	public void setStatus(WerkopdrachtStatus status) {
 		this.status = status;
-	}
-
-	public String getBeoordeling() {
-		return beoordeling;
-	}
-
-	public void setBeoordeling(String beoordeling) {
-		this.beoordeling = beoordeling;
 	}
 
 	public String getOmschrijvingOpdracht() {

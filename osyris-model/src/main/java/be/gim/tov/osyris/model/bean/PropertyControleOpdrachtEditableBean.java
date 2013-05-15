@@ -8,9 +8,9 @@ import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.StringUtils;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
-import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.security.Identity;
 import org.picketlink.idm.api.Group;
 
@@ -25,9 +25,6 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
  */
 @Named
 public class PropertyControleOpdrachtEditableBean {
-
-	@Inject
-	private ModelRepository modelRepository;
 
 	@Inject
 	private Identity identity;
@@ -45,9 +42,9 @@ public class PropertyControleOpdrachtEditableBean {
 		// Get status of the object
 		if (object.get("status") instanceof ControleOpdrachtStatus) {
 			status = object.get("status");
-			fields = object.getClass().getSuperclass().getDeclaredFields();
 		}
 
+		fields = object.getClass().getSuperclass().getDeclaredFields();
 		for (Field field : fields) {
 
 			// Get EditinStatus annotation if available for current property
@@ -62,10 +59,22 @@ public class PropertyControleOpdrachtEditableBean {
 				if (editInStatusAnnotation != null) {
 					String[] values = editInStatusAnnotation.value();
 					List<String> list = Arrays.asList(values);
-					if (list.contains(status.toString())) {
-						property.setEditable(true);
-						return true;
+					if (object.get("status") != null) {
+						status = object.get("status");
+						if (list.contains(status.toString())) {
+							property.setEditable(true);
+							return true;
+						}
 					}
+
+					if (object.get("status") == null) {
+						if (list.contains(StringUtils.EMPTY)) {
+							property.setEditable(true);
+							return true;
+						}
+
+					}
+
 				}
 			}
 		}
@@ -73,8 +82,20 @@ public class PropertyControleOpdrachtEditableBean {
 	}
 
 	public boolean isEditableInGroup(ModelObject object, ModelProperty property) {
-		Field[] fields = object.getClass().getDeclaredFields();
+		Field[] fields = object.getClass().getSuperclass().getDeclaredFields();
 		Set<Group> groups = identity.getGroups();
+
+		// Routedokter and admin can edit all properties
+		if (identity.inGroup("Routedokter", "CUSTOM")
+				|| identity.inGroup("admin", "CUSTOM")) {
+			return true;
+		}
+
+		// Status not editable field when ControleOpdracht is created
+		if (property.getName().equals("status") && object.get("status") == null) {
+			property.setEditable(false);
+			return false;
+		}
 
 		for (Field field : fields) {
 			if (field.getName().equals(property.getName())) {

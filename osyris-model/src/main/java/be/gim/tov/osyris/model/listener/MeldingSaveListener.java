@@ -21,6 +21,7 @@ import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
+import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 
@@ -46,17 +47,17 @@ public class MeldingSaveListener {
 
 		if (melding.getStatus() == null) {
 			melding.setStatus(MeldingStatus.GEMELD);
+			melding.setDatumGemeld(new Date());
 			melding.setMedewerker(zoekVerantwoordelijke(melding.getTraject()));
 		}
 
-		if (melding.getStatus().equals(MeldingStatus.GEMELD)) {
-			melding.setDatumGemeld(new Date());
-		}
-
-		else {
+		// If probleem has a status, Melding is validated
+		if (melding.getProbleem().getStatus() != null) {
+			melding.setStatus(MeldingStatus.GEVALIDEERD);
 			melding.setDatumGevalideerd(new Date());
-			if (melding.get("status").equals(
-					MeldingStatus.GEVALIDEERD_WERKOPDRACHT)) {
+
+			if (melding.getProbleem().getStatus()
+					.equals(ProbleemStatus.WERKOPDRACHT)) {
 				// TODO: nieuwe WerkOpdracht maken met te herstellen bording,
 				// uitvoerder,
 				// toezichthoudend medewerker, status te controleren, datum

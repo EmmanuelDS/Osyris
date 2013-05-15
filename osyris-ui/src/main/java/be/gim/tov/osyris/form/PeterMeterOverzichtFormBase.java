@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -9,23 +8,17 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
-import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.document.Document;
 import org.conscientia.api.group.Group;
-import org.conscientia.api.handler.data.DataHandler;
 import org.conscientia.api.mail.MailSender;
-import org.conscientia.api.model.ManagedObject;
 import org.conscientia.api.model.ModelClass;
-import org.conscientia.api.model.ModelObject;
-import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.permission.Permissions;
 import org.conscientia.api.preferences.Preferences;
@@ -34,26 +27,16 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
-import org.conscientia.core.encoder.SCSVModelEncoder;
-import org.conscientia.core.handler.data.annotation.ContentTypeLiteral;
-import org.conscientia.core.handler.data.annotation.ExtensionLiteral;
-import org.conscientia.core.model.DefaultModelObjectList;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
-import org.jboss.solder.servlet.http.RequestParam;
-import org.richfaces.event.FileUploadEvent;
-import org.richfaces.model.UploadedFile;
 
-import be.gim.commons.bean.Beans;
-import be.gim.commons.encoder.api.Encoder;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.localization.DefaultInternationalString;
 import be.gim.commons.resource.ResourceName;
-import be.gim.peritia.codec.EncodableContent;
-import be.gim.peritia.io.content.Content;
 
 /**
  * 
@@ -61,69 +44,45 @@ import be.gim.peritia.io.content.Content;
  * 
  */
 @Named
-@ViewScoped
-public class PeterMeterOverzichtFormBase implements Serializable {
+public class PeterMeterOverzichtFormBase extends AbstractListForm {
 
+	private static final long serialVersionUID = 7761265026167905576L;
 	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
 
 	// VARIABLES
 	@Inject
-	private ModelRepository modelRepository;
-
-	@Inject
 	private UserRepository userRepository;
-
 	@Inject
 	private Identity identity;
-
 	@Inject
 	private Preferences preferences;
-
 	@Inject
 	private MailSender mailSender;
-
 	@Inject
 	private Messages messages;
-
-	@Inject
-	@RequestParam
-	protected String name;
-
-	private Query query;
-	private List<?> results;
-	private ModelObject object;
 	private User user;
 
+	// METHODS
+	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = "User";
+		name = getName();
 		search();
 	}
 
-	// GETTERS AND SETTERS
-	@SuppressWarnings("unchecked")
+	@Override
+	public String getName() {
+		String value = "User";
+		return value;
+	}
+
+	@Override
 	public Query getQuery() {
 		if (query == null) {
 			query = new DefaultQuery(name);
 		}
 		return query;
-	}
-
-	public void setQuery(Query query) {
-		this.query = query;
-	}
-
-	public List<?> getResults() {
-		return results;
-	}
-
-	public ModelObject getObject() {
-		return object;
-	}
-
-	public void setObject(ModelObject object) {
-		this.object = object;
 	}
 
 	public User getUser() {
@@ -134,85 +93,34 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 		this.user = user;
 	}
 
-	// METHODS
+	@Override
 	public ModelClass getModelClass() {
 		return modelRepository.getModelClass(name);
 	}
 
-	public String getFileName() {
-		return getModelClass().getName() + ".csv";
-	}
-
-	public String getAction() {
-		return "search";
-	}
-
-	public boolean hasPermission() {
-		return identity.hasPermission(getModelClass(), getAction());
-	}
-
+	@Override
 	@SuppressWarnings("unchecked")
-	public void search() throws IOException {
+	public void search() {
 		try {
 			// Filter Peters and meters
 			List<User> users = new ArrayList<User>();
-			List<User> test = new ArrayList<User>();
+			List<User> petersMeters = new ArrayList<User>();
 			// TODO: possible to do it in a Query Filter?
 			users = (List<User>) modelRepository.searchObjects(getQuery(),
-					true, true);
+					true, true, PAGE_SIZE);
 			for (User user : users) {
 				if (userRepository.listGroupnames(user).contains("PeterMeter")) {
-					test.add(user);
+					petersMeters.add(user);
 				}
 			}
-			results = test;
+			results = petersMeters;
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;
 		}
 	}
 
-	public boolean isCanView(ModelObject object) {
-		return identity.hasPermission(object, "view");
-	}
-
-	public boolean isCanCreate() {
-		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(), "create");
-	}
-
-	public boolean isCanEdit(ModelObject object) {
-
-		if (object != null) {
-			return (getModelClass().hasInterface(StorableObject.class) || getModelClass()
-					.hasInterface(ManagedObject.class))
-					&& identity.hasPermission(object, "edit");
-		} else {
-			return (getModelClass().hasInterface(StorableObject.class) || getModelClass()
-					.hasInterface(ManagedObject.class))
-					&& identity.hasPermission(getModelClass(), "edit");
-		}
-	}
-
-	public boolean isCanDelete(ModelObject object) {
-		return isCanEdit(object)
-				&& identity.hasPermission(getModelClass(), "delete");
-	}
-
-	public boolean isCanDownload() {
-		return identity.hasPermission(getModelClass(), "search");
-	}
-
-	public void create() {
-		try {
-			object = modelRepository.createObject(getModelClass(), null);
-		} catch (InstantiationException e) {
-			LOG.error("Can not instantiate model object.", e);
-		} catch (IllegalAccessException e) {
-			LOG.error("Illegal access at creation model object.", e);
-		}
-	}
-
+	@Override
 	public void save() {
 		try {
 			user = (User) object;
@@ -291,6 +199,8 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 		}
 	}
 
+	@Override
+	@SuppressWarnings("unchecked")
 	public void delete() {
 		try {
 
@@ -324,48 +234,6 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 		}
 	}
 
-	public void clear() throws IOException {
-		object = null;
-	}
-
-	public void onFileUpload(FileUploadEvent event) throws Exception {
-
-		UploadedFile file = event.getUploadedFile();
-		try {
-			String fileName = file.getName();
-			String contentType = file.getContentType();
-			String extension = FilenameUtils.getExtension(fileName);
-
-			DataHandler<?> dataHandler = Beans.getReference(DataHandler.class,
-					new ContentTypeLiteral(contentType), new ExtensionLiteral(
-							extension));
-			if (dataHandler == null) {
-				dataHandler = Beans.getReference(DataHandler.class,
-						new ExtensionLiteral(extension));
-			}
-			if (dataHandler == null) {
-				dataHandler = Beans.getReference(DataHandler.class,
-						new ContentTypeLiteral(contentType));
-			}
-			if (dataHandler == null) {
-				dataHandler = Beans.getReference(DataHandler.class);
-			}
-
-			this.object = dataHandler.create(fileName, contentType,
-					file.getInputStream());
-		} finally {
-			file.delete();
-		}
-	}
-
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public Content<?> report() {
-		DefaultModelObjectList objectList = new DefaultModelObjectList<ModelObject>(
-				getModelClass(), (List<ModelObject>) getResults());
-		return new EncodableContent<ModelObjectList>(
-				(Encoder) new SCSVModelEncoder(), objectList);
-	}
-
 	private void sendCredentailsMail(String username, String email,
 			String password) throws Exception {
 		Map<String, Object> variables = new HashMap<String, Object>();
@@ -375,10 +243,8 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 		variables.put("password", password);
 		variables.put("group", userRepository.listGroupnames(username));
 
-		mailSender.sendMail(
-				preferences.getNoreplyEmail(),
-				Collections.singleton(user.getAspect("UserProfile")
-						.get("email").toString()),
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton(email),
 				"/META-INF/resources/core/mails/newPeterMeter.fmt", variables);
 	}
 
@@ -474,7 +340,6 @@ public class PeterMeterOverzichtFormBase implements Serializable {
 		for (DefaultPermission p : permissionList) {
 			p.setModelClassLoader(modelRepository.getModelContext());
 		}
-
 		return permissionList;
 	}
 }
