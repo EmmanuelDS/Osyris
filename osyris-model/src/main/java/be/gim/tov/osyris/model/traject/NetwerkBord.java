@@ -11,7 +11,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
-import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 /**
  * 
@@ -54,32 +54,27 @@ public abstract class NetwerkBord extends Bord {
 	@Label("Netwerkknooppunt 0")
 	@Description("Netwerkknooppunt 0")
 	@ModelClassName("NetwerkKnooppunt")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier kpid0;
+	private ResourceKey kpid0;
 
 	@Label("Netwerkknooppunt 1")
 	@Description("Netwerkknooppunt 1")
 	@ModelClassName("NetwerkKnooppunt")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier kpid1;
+	private ResourceKey kpid1;
 
 	@Label("Netwerkknooppunt 2")
 	@Description("Netwerkknooppunt 2")
 	@ModelClassName("NetwerkKnooppunt")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier kpid2;
+	private ResourceKey kpid2;
 
 	@Label("Netwerkknooppunt 3")
 	@Description("Netwerkknooppunt 3")
 	@ModelClassName("NetwerkKnooppunt")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier kpid3;
+	private ResourceKey kpid3;
 
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
 	@ModelClassName("NetwerkSegment")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private List<ResourceIdentifier> segmenten;
+	private List<ResourceKey> segmenten;
 
 	@Label("Afbeeldingscode knooppunt 1")
 	@Description("Afbeeldingscode knooppunt 1")
@@ -148,43 +143,43 @@ public abstract class NetwerkBord extends Bord {
 		this.kpnr3 = kpnr3;
 	}
 
-	public ResourceIdentifier getKpid0() {
+	public ResourceKey getKpid0() {
 		return kpid0;
 	}
 
-	public void setKpid0(ResourceIdentifier kpid0) {
+	public void setKpid0(ResourceKey kpid0) {
 		this.kpid0 = kpid0;
 	}
 
-	public ResourceIdentifier getKpid1() {
+	public ResourceKey getKpid1() {
 		return kpid1;
 	}
 
-	public void setKpid1(ResourceIdentifier kpid1) {
+	public void setKpid1(ResourceKey kpid1) {
 		this.kpid1 = kpid1;
 	}
 
-	public ResourceIdentifier getKpid2() {
+	public ResourceKey getKpid2() {
 		return kpid2;
 	}
 
-	public void setKpid2(ResourceIdentifier kpid2) {
+	public void setKpid2(ResourceKey kpid2) {
 		this.kpid2 = kpid2;
 	}
 
-	public ResourceIdentifier getKpid3() {
+	public ResourceKey getKpid3() {
 		return kpid3;
 	}
 
-	public void setKpid3(ResourceIdentifier kpid3) {
+	public void setKpid3(ResourceKey kpid3) {
 		this.kpid3 = kpid3;
 	}
 
-	public List<ResourceIdentifier> getSegmenten() {
+	public List<ResourceKey> getSegmenten() {
 		return segmenten;
 	}
 
-	public void setSegmenten(List<ResourceIdentifier> segmenten) {
+	public void setSegmenten(List<ResourceKey> segmenten) {
 		this.segmenten = segmenten;
 	}
 

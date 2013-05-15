@@ -13,7 +13,7 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 /**
  * 
@@ -52,14 +52,12 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@Label("Gemeente")
 	@Description("Gemeente")
 	@ModelClassName("Gemeente")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier gemeente;
+	private ResourceKey gemeente;
 
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier regio;
+	private ResourceKey regio;
 
 	// GETTERS AND SETTERS
 	public String getTrajectNaam() {
@@ -94,19 +92,19 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 		this.periode = periode;
 	}
 
-	public ResourceIdentifier getGemeente() {
+	public ResourceKey getGemeente() {
 		return gemeente;
 	}
 
-	public void setGemeente(ResourceIdentifier gemeente) {
+	public void setGemeente(ResourceKey gemeente) {
 		this.gemeente = gemeente;
 	}
 
-	public ResourceIdentifier getRegio() {
+	public ResourceKey getRegio() {
 		return regio;
 	}
 
-	public void setRegio(ResourceIdentifier regio) {
+	public void setRegio(ResourceKey regio) {
 		this.regio = regio;
 	}
 }

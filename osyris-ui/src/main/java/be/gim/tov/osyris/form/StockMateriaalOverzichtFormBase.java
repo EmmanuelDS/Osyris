@@ -37,6 +37,7 @@ import be.gim.commons.encoder.api.Encoder;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.peritia.io.content.Content;
+import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 
 /**
@@ -88,9 +89,13 @@ public class StockMateriaalOverzichtFormBase implements Serializable {
 			}
 
 			if (identity.inGroup("Uitvoerder", "CUSTOM")
-					&& !profiel.getBedrijf().getNaam().equals("TOV")) {
-				query.addFilter(FilterUtils.equal("magazijn", profiel
-						.getBedrijf().getNaam()));
+					&& profiel.getBedrijf() != null) {
+				UitvoerderBedrijf bedrijf = (UitvoerderBedrijf) modelRepository
+						.loadObject(profiel.getBedrijf());
+				if (!bedrijf.getNaam().equals("TOV")) {
+					query.addFilter(FilterUtils.equal("magazijn",
+							bedrijf.getNaam()));
+				}
 			}
 		} catch (IOException e) {
 			LOG.error("Can not load aspect.", e);

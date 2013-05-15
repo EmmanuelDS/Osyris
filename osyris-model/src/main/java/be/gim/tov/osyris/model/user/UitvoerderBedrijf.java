@@ -3,6 +3,7 @@ package be.gim.tov.osyris.model.user;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
+import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -47,6 +48,7 @@ public class UitvoerderBedrijf extends AbstractModelObject implements
 
 	@Label("Naam")
 	@Description("Naam")
+	@LabelProperty
 	private String naam;
 
 	@Label("Postcode")

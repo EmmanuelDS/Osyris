@@ -17,7 +17,7 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 /**
  * 
@@ -92,14 +92,12 @@ public class StockMateriaal extends AbstractModelObject implements
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier traject;
+	private ResourceKey traject;
 
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier regio;
+	private ResourceKey regio;
 
 	@Label("Datum besteld")
 	@Description("Datum besteld")
@@ -184,19 +182,19 @@ public class StockMateriaal extends AbstractModelObject implements
 		this.besteld = besteld;
 	}
 
-	public ResourceIdentifier getTraject() {
+	public ResourceKey getTraject() {
 		return traject;
 	}
 
-	public void setTraject(ResourceIdentifier traject) {
+	public void setTraject(ResourceKey traject) {
 		this.traject = traject;
 	}
 
-	public ResourceIdentifier getRegio() {
+	public ResourceKey getRegio() {
 		return regio;
 	}
 
-	public void setRegio(ResourceIdentifier regio) {
+	public void setRegio(ResourceKey regio) {
 		this.regio = regio;
 	}
 

@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
+import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
@@ -25,6 +26,7 @@ public class Gemeente extends AbstractModelObject {
 	// VARIABLES
 	@Label("Naam")
 	@Description("Naam")
+	@LabelProperty
 	private String naam;
 
 	@Label("NIS code")

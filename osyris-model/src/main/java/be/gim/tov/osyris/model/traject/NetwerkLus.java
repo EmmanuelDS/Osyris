@@ -2,15 +2,13 @@ package be.gim.tov.osyris.model.traject;
 
 import java.util.List;
 
-import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
-import org.conscientia.api.model.annotation.Type;
 
-import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 /**
  * 
@@ -29,8 +27,7 @@ public abstract class NetwerkLus extends Traject {
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
 	@ModelClassName("NetwerkSegment")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private List<ResourceIdentifier> segmenten;
+	private List<ResourceKey> segmenten;
 
 	// GETTERS AND SETTERS
 	public boolean isActief() {
@@ -41,11 +38,11 @@ public abstract class NetwerkLus extends Traject {
 		this.actief = actief;
 	}
 
-	public List<ResourceIdentifier> getSegmenten() {
+	public List<ResourceKey> getSegmenten() {
 		return segmenten;
 	}
 
-	public void setSegmenten(List<ResourceIdentifier> segmenten) {
+	public void setSegmenten(List<ResourceKey> segmenten) {
 		this.segmenten = segmenten;
 	}
 }

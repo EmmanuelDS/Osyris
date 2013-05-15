@@ -58,7 +58,6 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	@Label("Werkopdrachten")
 	@Description("Werkopdrachten")
 	@ModelClassName("WerkOpdracht")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private List<ResourceIdentifier> opdrachten;
 
 	// GETTERS AND SETTERS

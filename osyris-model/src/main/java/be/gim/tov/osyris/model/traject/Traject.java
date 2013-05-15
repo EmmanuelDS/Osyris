@@ -5,6 +5,7 @@ import static org.conscientia.api.model.SubClassPersistence.UNION;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -19,6 +20,7 @@ import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -53,25 +55,25 @@ public abstract class Traject extends AbstractModelObject implements
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier regio;
+	@Edit(type = "panels")
+	private ResourceKey regio;
 
 	@Label("Peter/Meter Lente")
 	@Description("Peter/Meter Lente")
 	@ModelClassName("User")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	@Edit(type = "panels")
 	private ResourceIdentifier peterMeter1;
 
 	@Label("Peter/Meter Zomer")
 	@Description("Peter/Meter Zomer")
 	@ModelClassName("User")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	@Edit(type = "panels")
 	private ResourceIdentifier peterMeter2;
 
 	@Label("Peter/Meter Herfst")
 	@Description("Peter/Meter Herfst")
 	@ModelClassName("User")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	@Edit(type = "panels")
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
@@ -99,11 +101,11 @@ public abstract class Traject extends AbstractModelObject implements
 		this.geom = geom;
 	}
 
-	public ResourceIdentifier getRegio() {
+	public ResourceKey getRegio() {
 		return regio;
 	}
 
-	public void setRegio(ResourceIdentifier regio) {
+	public void setRegio(ResourceKey regio) {
 		this.regio = regio;
 	}
 

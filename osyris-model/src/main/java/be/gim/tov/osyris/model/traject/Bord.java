@@ -5,6 +5,7 @@ import static org.conscientia.api.model.SubClassPersistence.UNION;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -19,6 +20,7 @@ import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -80,7 +82,9 @@ public abstract class Bord extends AbstractModelObject implements
 
 	@Label("Foto")
 	@Description("Foto")
-	private String foto;
+	@ModelClassName("File")
+	@Edit(type = "panels")
+	private ResourceIdentifier foto;
 
 	@Label("Fiche")
 	@Description("Fiche")
@@ -103,14 +107,13 @@ public abstract class Bord extends AbstractModelObject implements
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier regio;
+	@Edit(type = "panels")
+	private ResourceKey regio;
 
 	@Label("Gemeente")
 	@Description("Gemeente")
 	@ModelClassName("Gemeente")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
-	private ResourceIdentifier gemeente;
+	private String gemeente;
 
 	// GETTERS AND SETTERS
 	public String getNaam() {
@@ -177,11 +180,11 @@ public abstract class Bord extends AbstractModelObject implements
 		this.bordConst = bordConst;
 	}
 
-	public String getFoto() {
+	public ResourceIdentifier getFoto() {
 		return foto;
 	}
 
-	public void setFoto(String foto) {
+	public void setFoto(ResourceIdentifier foto) {
 		this.foto = foto;
 	}
 
@@ -217,19 +220,19 @@ public abstract class Bord extends AbstractModelObject implements
 		this.geom = geom;
 	}
 
-	public ResourceIdentifier getRegio() {
+	public ResourceKey getRegio() {
 		return regio;
 	}
 
-	public void setRegio(ResourceIdentifier regio) {
+	public void setRegio(ResourceKey regio) {
 		this.regio = regio;
 	}
 
-	public ResourceIdentifier getGemeente() {
+	public String getGemeente() {
 		return gemeente;
 	}
 
-	public void setGemeente(ResourceIdentifier gemeente) {
+	public void setGemeente(String gemeente) {
 		this.gemeente = gemeente;
 	}
 }

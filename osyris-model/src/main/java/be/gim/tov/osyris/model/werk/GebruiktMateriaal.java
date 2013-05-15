@@ -4,8 +4,11 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
+import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.core.model.AbstractModelObject;
+
+import be.gim.commons.resource.ResourceIdentifier;
 
 /**
  * 
@@ -24,7 +27,8 @@ public class GebruiktMateriaal extends AbstractModelObject implements
 
 	@Label("Stockmateriaal")
 	@Description("Stockmateriaal")
-	private StockMateriaal stockMateriaal;
+	@ModelClassName("StockMateriaal")
+	private ResourceIdentifier stockMateriaal;
 
 	// GETTERS AND SETTERS
 	public int getAantal() {
@@ -35,11 +39,11 @@ public class GebruiktMateriaal extends AbstractModelObject implements
 		this.aantal = aantal;
 	}
 
-	public StockMateriaal getStockMateriaal() {
+	public ResourceIdentifier getStockMateriaal() {
 		return stockMateriaal;
 	}
 
-	public void setStockMateriaal(StockMateriaal stockMateriaal) {
+	public void setStockMateriaal(ResourceIdentifier stockMateriaal) {
 		this.stockMateriaal = stockMateriaal;
 	}
 }
