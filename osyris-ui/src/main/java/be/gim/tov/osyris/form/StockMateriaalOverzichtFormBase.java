@@ -8,15 +8,14 @@ import javax.inject.Named;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
+import be.gim.tov.osyris.model.werk.StockMateriaal;
 
 /**
  * 
@@ -24,7 +23,8 @@ import be.gim.tov.osyris.model.user.UitvoerderProfiel;
  * 
  */
 @Named
-public class StockMateriaalOverzichtFormBase extends AbstractListForm {
+public class StockMateriaalOverzichtFormBase extends
+		AbstractListForm<StockMateriaal> {
 	private static final long serialVersionUID = -2212073755366628143L;
 
 	private static final Log LOG = LogFactory
@@ -35,17 +35,14 @@ public class StockMateriaalOverzichtFormBase extends AbstractListForm {
 	private UserRepository userRepository;
 
 	// METHODS
-	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = getName();
 		search();
 	}
 
 	@Override
 	public String getName() {
-		String value = "StockMateriaal";
-		return value;
+		return "StockMateriaal";
 	}
 
 	@Override
@@ -59,7 +56,7 @@ public class StockMateriaalOverzichtFormBase extends AbstractListForm {
 									.loadUser(identity.getUser().getId())));
 
 			if (query == null) {
-				query = new DefaultQuery(name);
+				query = getDefaultQuery();
 			}
 
 			if (identity.inGroup("Uitvoerder", "CUSTOM")
@@ -74,22 +71,7 @@ public class StockMateriaalOverzichtFormBase extends AbstractListForm {
 		} catch (IOException e) {
 			LOG.error("Can not load aspect.", e);
 		}
+
 		return query;
-	}
-
-	@Override
-	public ModelClass getModelClass() {
-		return modelRepository.getModelClass(name);
-	}
-
-	@Override
-	public void search() {
-		try {
-			results = modelRepository.searchObjects(getQuery(), true, true,
-					PAGE_SIZE);
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			results = null;
-		}
 	}
 }

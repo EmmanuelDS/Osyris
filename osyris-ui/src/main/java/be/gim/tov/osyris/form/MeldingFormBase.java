@@ -25,48 +25,45 @@ import be.gim.tov.osyris.model.controle.Melding;
  * 
  */
 @Named
-public class MeldingFormBase extends AbstractListForm {
-
+public class MeldingFormBase extends AbstractListForm<Melding> {
 	private static final long serialVersionUID = -8052917916776585407L;
+
 	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
 
 	// VARIABLES
 	@Inject
-	private Preferences preferences;
+	protected Preferences preferences;
 	@Inject
-	private MailSender mailSender;
+	protected MailSender mailSender;
 	@Inject
-	private Messages messages;
-	private Melding melding;
+	protected Messages messages;
 
-	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = getName();
 		search();
 	}
 
 	// GETTERS AND SETTERS
 	@Override
 	public String getName() {
-		String value = "Melding";
-		return value;
+		return "Melding";
 	}
 
 	public Melding getMelding() {
 
-		if (melding == null) {
-			melding = createMelding();
+		if (object == null) {
+			object = createMelding();
 		}
-		return melding;
+		return object;
 	}
 
 	public void setMelding(Melding melding) {
-		this.melding = melding;
+		this.object = melding;
 	}
 
 	// METHODS
 	public Melding createMelding() {
+
 		Melding melding = null;
 
 		try {
@@ -84,6 +81,7 @@ public class MeldingFormBase extends AbstractListForm {
 	}
 
 	public void saveMelding() {
+
 		try {
 			// Save Melding
 			modelRepository.saveObject(getMelding());
@@ -92,8 +90,8 @@ public class MeldingFormBase extends AbstractListForm {
 			// Email bevestiging sturen naar gebruiker
 			// sendConfirmationMail(melding);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
-					+ melding.getEmail() + ".");
-			melding = createMelding();
+					+ object.getEmail() + ".");
+			object = createMelding();
 		} catch (IOException e) {
 			LOG.error("Can not save model object.", e);
 			messages.error("Melding niet verzonden");
@@ -105,6 +103,7 @@ public class MeldingFormBase extends AbstractListForm {
 	}
 
 	private void sendConfirmationMail(Melding melding) throws Exception {
+
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
 
@@ -119,6 +118,4 @@ public class MeldingFormBase extends AbstractListForm {
 				Collections.singleton(melding.getEmail()),
 				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
 	}
-
-	// TODO: Uploaden foto bij een probleem
 }

@@ -18,8 +18,8 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.document.Document;
 import org.conscientia.api.group.Group;
 import org.conscientia.api.mail.MailSender;
-import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.permission.Permission;
 import org.conscientia.api.permission.Permissions;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
@@ -28,6 +28,7 @@ import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.model.AbstractModelObject;
 import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
@@ -44,7 +45,7 @@ import be.gim.commons.resource.ResourceName;
  * 
  */
 @Named
-public class PeterMeterOverzichtFormBase extends AbstractListForm {
+public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 	private static final long serialVersionUID = 7761265026167905576L;
 	private static final Log LOG = LogFactory
@@ -52,101 +53,71 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm {
 
 	// VARIABLES
 	@Inject
-	private UserRepository userRepository;
+	protected UserRepository userRepository;
 	@Inject
-	private Identity identity;
+	protected Identity identity;
 	@Inject
-	private Preferences preferences;
+	protected Preferences preferences;
 	@Inject
-	private MailSender mailSender;
+	protected MailSender mailSender;
 	@Inject
-	private Messages messages;
-	private User user;
+	protected Messages messages;
 
 	// METHODS
-	@Override
 	@PostConstruct
 	public void init() throws IOException {
-		name = getName();
 		search();
 	}
 
 	@Override
 	public String getName() {
-		String value = "User";
-		return value;
-	}
-
-	@Override
-	public Query getQuery() {
-		if (query == null) {
-			query = new DefaultQuery(name);
-		}
-		return query;
+		return "User";
 	}
 
 	public User getUser() {
-		return user;
+		return object;
 	}
 
 	public void setUser(User user) {
-		this.user = user;
-	}
-
-	@Override
-	public ModelClass getModelClass() {
-		return modelRepository.getModelClass(name);
+		this.object = user;
 	}
 
 	@Override
 	@SuppressWarnings("unchecked")
 	public void search() {
 		try {
+			results = new ArrayList<User>();
+
 			// Filter Peters and meters
 			List<User> users = new ArrayList<User>();
-			List<User> petersMeters = new ArrayList<User>();
 			// TODO: possible to do it in a Query Filter?
 			users = (List<User>) modelRepository.searchObjects(getQuery(),
 					true, true, PAGE_SIZE);
 			for (User user : users) {
 				if (userRepository.listGroupnames(user).contains("PeterMeter")) {
-					petersMeters.add(user);
+					((List<User>) results).add(user);
 				}
 			}
-			results = petersMeters;
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;
 		}
 	}
 
-	@Override
-	public void save() {
-		try {
-			user = (User) object;
-			modelRepository.saveObject(user);
-			clear();
-			search();
-		} catch (IOException e) {
-			LOG.error("Can not save model object.", e);
-		}
-	}
-
 	@SuppressWarnings("unchecked")
 	public void saveNewPeterMeter() {
 		try {
-			user = (User) object;
-			UserProfile userProfile = (UserProfile) user
+			UserProfile userProfile = (UserProfile) object
 					.getAspect("UserProfile");
 
-			if (!checkUsernameExists(user.getUsername())) {
+			if (!checkUsernameExists(object.getUsername())) {
 
 				// Generate password
 				String password = RandomStringUtils.randomAlphanumeric(8);
-				user.setPassword(password);
+				object.setPassword(password);
 
 				// Document
-				ResourceName name = UserUtils.getUserDocumentName(user
+				ResourceName name = UserUtils.getUserDocumentName(object
 						.getUsername());
 
 				Document<User> document = (Document<User>) modelRepository
@@ -161,29 +132,30 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm {
 					document.setTitle(new DefaultInternationalString(firstName
 							+ " " + lastName));
 				} else {
-					document.setTitle(new DefaultInternationalString(user
+					document.setTitle(new DefaultInternationalString(object
 							.getUsername()));
 				}
 				document.setOwner(name);
-				document.set("object", user);
+				document.set("object", object);
 				modelRepository.saveDocument(document);
 
 				// User
-				user.putAspect(userProfile);
-				user.putAspect(user.getAspect("PeterMeterProfiel"));
-				modelRepository.saveObject(user);
+				object.putAspect(userProfile);
+				object.putAspect(object.getAspect("PeterMeterProfiel"));
+				modelRepository.saveObject(object);
 
 				// Set permissions
 				setDocumentPermissions(name, document);
 
 				// Assign to group
-				ResourceName resourceName = new ResourceName("user",
-						user.getUsername());
+				ResourceName resourceName = new ResourceName("object",
+						object.getUsername());
 				addUserToPeterMeterGroup(resourceName);
 
 				// Send mail
-				sendCredentailsMail(user.getUsername(),
-						user.getAspect("UserProfile").get("email").toString(),
+				sendCredentailsMail(
+						object.getUsername(),
+						object.getAspect("UserProfile").get("email").toString(),
 						password);
 				clear();
 				search();
@@ -202,12 +174,11 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm {
 	@Override
 	@SuppressWarnings("unchecked")
 	public void delete() {
-		try {
 
-			User user = (User) object;
+		try {
 			Permissions permissions = (Permissions) modelRepository.loadAspect(
 					modelRepository.getModelClass("Permissions"),
-					new ResourceName("user", user.getUsername()),
+					new ResourceName("user", object.getUsername()),
 					FilterUtils.equal("scope", "document"));
 
 			// Delete user from PM group
@@ -216,7 +187,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm {
 			for (Group group : groups) {
 				if (group.getGroupname().equals("PeterMeter")) {
 					group.getMembers().remove(
-							modelRepository.getResourceName(user));
+							modelRepository.getResourceName(object));
 				}
 			}
 
@@ -295,13 +266,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm {
 			permissions.set("scope", "document");
 
 			// Add necessary permissions
-			for (DefaultPermission p : getAllowedPermissions(name)) {
-				permissions.addPermission(p);
-			}
+			permissions.getPermissions().addAll(getAllowedPermissions(name));
 
-			// Save
+			// Save permissions
 			modelRepository.saveAspect(permissions);
-
 		} catch (IOException e) {
 			LOG.error("Can not load aspect.", e);
 		} catch (InstantiationException e) {
@@ -311,35 +279,25 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm {
 		}
 	}
 
-	private List<DefaultPermission> getAllowedPermissions(ResourceName name) {
+	private List<Permission> getAllowedPermissions(ResourceName name) {
+		List<Permission> permissions = new ArrayList<Permission>();
 
-		DefaultPermission p1 = new DefaultPermission(name, "view", true);
+		permissions.add(new DefaultPermission(name, "view", true));
+		permissions.add(new DefaultPermission(name, "edit", true));
+		permissions.add(new DefaultPermission(new ResourceName("group",
+				"Routedokter"), "view", true));
+		permissions.add(new DefaultPermission(new ResourceName("group",
+				"Routedokter"), "edit", true));
+		permissions.add(new DefaultPermission(new ResourceName("group",
+				"Medewerker"), "view", true));
+		permissions.add(new DefaultPermission(new ResourceName("group",
+				"Medewerker"), "edit", true));
 
-		DefaultPermission p2 = new DefaultPermission(name, "edit", true);
-
-		DefaultPermission p3 = new DefaultPermission(new ResourceName("group",
-				"Routedokter"), "view", true);
-
-		DefaultPermission p4 = new DefaultPermission(new ResourceName("group",
-				"Routedokter"), "edit", true);
-
-		DefaultPermission p5 = new DefaultPermission(new ResourceName("group",
-				"Medewerker"), "view", true);
-
-		DefaultPermission p6 = new DefaultPermission(new ResourceName("group",
-				"Medewerker"), "edit", true);
-
-		List<DefaultPermission> permissionList = new ArrayList<DefaultPermission>();
-		permissionList.add(p1);
-		permissionList.add(p2);
-		permissionList.add(p3);
-		permissionList.add(p4);
-		permissionList.add(p5);
-		permissionList.add(p6);
-
-		for (DefaultPermission p : permissionList) {
-			p.setModelClassLoader(modelRepository.getModelContext());
+		for (Permission permission : permissions) {
+			((AbstractModelObject) permission)
+					.setModelClassLoader(modelRepository.getModelContext());
 		}
-		return permissionList;
+
+		return permissions;
 	}
 }
