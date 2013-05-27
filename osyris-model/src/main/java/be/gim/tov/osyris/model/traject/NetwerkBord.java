@@ -8,10 +8,11 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceIdentifier;
 
 /**
  * 
@@ -51,43 +52,51 @@ public abstract class NetwerkBord extends Bord {
 	@Description("Knooppuntnummer 3")
 	private int kpnr3;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 0")
 	@Description("Netwerkknooppunt 0")
 	@ModelClassName("NetwerkKnooppunt")
-	private ResourceKey kpid0;
+	private ResourceIdentifier kpid0;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 1")
 	@Description("Netwerkknooppunt 1")
 	@ModelClassName("NetwerkKnooppunt")
-	private ResourceKey kpid1;
+	private ResourceIdentifier kpid1;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 2")
 	@Description("Netwerkknooppunt 2")
 	@ModelClassName("NetwerkKnooppunt")
-	private ResourceKey kpid2;
+	private ResourceIdentifier kpid2;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 3")
 	@Description("Netwerkknooppunt 3")
 	@ModelClassName("NetwerkKnooppunt")
-	private ResourceKey kpid3;
+	private ResourceIdentifier kpid3;
 
+	@NotSearchable
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
 	@ModelClassName("NetwerkSegment")
-	private List<ResourceKey> segmenten;
+	private List<ResourceIdentifier> segmenten;
 
+	@NotSearchable
 	@Label("Afbeeldingscode knooppunt 1")
 	@Description("Afbeeldingscode knooppunt 1")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp1ImageCode;
 
+	@NotSearchable
 	@Label("Afbeeldingscode knooppunt 2")
 	@Description("Afbeeldingscode knooppunt 2")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp2ImageCode;
 
+	@NotSearchable
 	@Label("Afbeeldingscode knooppunt 3")
 	@Description("Afbeeldingscode knooppunt 3")
 	@Type(value = ModelPropertyType.ENUM)
@@ -143,43 +152,43 @@ public abstract class NetwerkBord extends Bord {
 		this.kpnr3 = kpnr3;
 	}
 
-	public ResourceKey getKpid0() {
+	public ResourceIdentifier getKpid0() {
 		return kpid0;
 	}
 
-	public void setKpid0(ResourceKey kpid0) {
+	public void setKpid0(ResourceIdentifier kpid0) {
 		this.kpid0 = kpid0;
 	}
 
-	public ResourceKey getKpid1() {
+	public ResourceIdentifier getKpid1() {
 		return kpid1;
 	}
 
-	public void setKpid1(ResourceKey kpid1) {
+	public void setKpid1(ResourceIdentifier kpid1) {
 		this.kpid1 = kpid1;
 	}
 
-	public ResourceKey getKpid2() {
+	public ResourceIdentifier getKpid2() {
 		return kpid2;
 	}
 
-	public void setKpid2(ResourceKey kpid2) {
+	public void setKpid2(ResourceIdentifier kpid2) {
 		this.kpid2 = kpid2;
 	}
 
-	public ResourceKey getKpid3() {
+	public ResourceIdentifier getKpid3() {
 		return kpid3;
 	}
 
-	public void setKpid3(ResourceKey kpid3) {
+	public void setKpid3(ResourceIdentifier kpid3) {
 		this.kpid3 = kpid3;
 	}
 
-	public List<ResourceKey> getSegmenten() {
+	public List<ResourceIdentifier> getSegmenten() {
 		return segmenten;
 	}
 
-	public void setSegmenten(List<ResourceKey> segmenten) {
+	public void setSegmenten(List<ResourceIdentifier> segmenten) {
 		this.segmenten = segmenten;
 	}
 

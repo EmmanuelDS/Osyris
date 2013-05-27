@@ -4,7 +4,6 @@ import java.util.Date;
 import java.util.List;
 
 import org.conscientia.api.model.ModelAspect;
-import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
@@ -17,7 +16,6 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
-import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -55,7 +53,6 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@NotEditable
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier _for;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
@@ -64,13 +61,13 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	private PeterMeterStatus status;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
-	@Label("Actief sinds")
-	@Description("Actief sinds")
+	@Label("Sinds")
+	@Description("Sinds")
 	private Date actiefSinds;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
-	@Label("Actief tot")
-	@Description("Actief tot")
+	@Label("Tot")
+	@Description("Tot")
 	private Date actiefTot;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin", "PeterMeter" })

@@ -2,6 +2,7 @@ package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -37,7 +38,11 @@ import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.localization.DefaultInternationalString;
+import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.user.PeterMeterProfiel;
+import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
 
 /**
  * 
@@ -50,6 +55,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	private static final long serialVersionUID = 7761265026167905576L;
 	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
+	private static final String PERIODE_LENTE = "1";
+	private static final String PERIODE_ZOMER = "2";
+	private static final String PERIODE_HERFST = "3";
 
 	// VARIABLES
 	@Inject
@@ -83,25 +91,8 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	}
 
 	@Override
-	@SuppressWarnings("unchecked")
 	public void search() {
-		try {
-			results = new ArrayList<User>();
-
-			// Filter Peters and meters
-			List<User> users = new ArrayList<User>();
-			// TODO: possible to do it in a Query Filter?
-			users = (List<User>) modelRepository.searchObjects(getQuery(),
-					true, true, PAGE_SIZE);
-			for (User user : users) {
-				if (userRepository.listGroupnames(user).contains("PeterMeter")) {
-					((List<User>) results).add(user);
-				}
-			}
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			results = null;
-		}
+		results = getAllPetersMeters();
 	}
 
 	@SuppressWarnings("unchecked")
@@ -153,10 +144,12 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				addUserToPeterMeterGroup(resourceName);
 
 				// Send mail
+
 				sendCredentailsMail(
 						object.getUsername(),
 						object.getAspect("UserProfile").get("email").toString(),
 						password);
+
 				clear();
 				search();
 
@@ -214,8 +207,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		variables.put("password", password);
 		variables.put("group", userRepository.listGroupnames(username));
 
-		mailSender.sendMail(preferences.getNoreplyEmail(),
-				Collections.singleton(email),
+		mailSender.sendMail(
+				preferences.getNoreplyEmail(),
+				Collections.singleton(object.getAspect("UserProfile")
+						.get("email").toString()),
 				"/META-INF/resources/core/mails/newPeterMeter.fmt", variables);
 	}
 
@@ -299,5 +294,125 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		}
 
 		return permissions;
+	}
+
+	@SuppressWarnings("unchecked")
+	private List<User> getAllPetersMeters() {
+
+		try {
+			List<User> petersMeters = new ArrayList<User>();
+
+			// Filter Peters and meters
+			// TODO: possible to do it in a Query Filter?
+			List<User> users = (List<User>) modelRepository.searchObjects(
+					getQuery(), true, true, true);
+			for (User user : users) {
+				if (userRepository.listGroupnames(user).contains("PeterMeter")) {
+					petersMeters.add(user);
+				}
+			}
+
+			return petersMeters;
+		} catch (IOException e) {
+			LOG.error("Can not get search results.", e);
+			return null;
+		}
+	}
+
+	/**
+	 * Toekennen van Peters en Meters aan Trajecten, voorlopig enkel voor
+	 * PetersMeters met 1 specifieke voorkeur
+	 * 
+	 * TODO: toekenning in geval van meerdere voorkeuren TODO: toekenning aan
+	 * lussen
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public void kenPetersMetersToe() {
+
+		DefaultQuery query = new DefaultQuery();
+		query.setModelClassName("Traject");
+		try {
+			List<User> petersMeters = getAllPetersMeters();
+
+			for (User peterMeter : petersMeters) {
+				PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
+						.getAspect("PeterMeterProfiel");
+				ResourceName resourceName = modelRepository
+						.getResourceName(peterMeter);
+
+				// Peters en Meters met 1 voorkeur krijgen voorrang
+				if (profiel.getVoorkeuren().size() == 1) {
+					for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+						DefaultQuery q = new DefaultQuery();
+						q.setModelClassName("Traject");
+						q.addFilter(FilterUtils.equal("naam",
+								voorkeur.getTrajectNaam()));
+
+						// Zoeken naar voorkeurstraject
+						List<Traject> t = (List<Traject>) modelRepository
+								.searchObjects(q, false, false);
+						if (t.size() == 1) {
+							Traject tr = t.get(0);
+							// Voor elke periode PM toekennen
+							tr.setPeterMeter1(assignPeterMeter(tr,
+									resourceName, voorkeur.getPeriode()));
+							modelRepository.saveObject(tr);
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("Can not search trajecten", e);
+		}
+	}
+
+	/**
+	 * Eigenlijke toekenning van de PeterMeter aan een traject in een bepaalde
+	 * periode. In geval van conflict wordt de PeterMeter met langste staat van
+	 * dienst gekozen.
+	 * 
+	 **/
+	private ResourceName assignPeterMeter(Traject traject,
+			ResourceName peterMeter1, String periode) {
+		try {
+			// Identificeren van de periode
+			ResourceIdentifier compareToPeterMeterInPeriode = null;
+			if (periode.equals(PERIODE_LENTE)) {
+				compareToPeterMeterInPeriode = traject.getPeterMeter1();
+			}
+			if (periode.equals(PERIODE_ZOMER)) {
+				compareToPeterMeterInPeriode = traject.getPeterMeter2();
+			}
+			if (periode.equals(PERIODE_HERFST)) {
+				compareToPeterMeterInPeriode = traject.getPeterMeter3();
+			}
+
+			// Indien al een andere peterMeter is toegekend
+			if (compareToPeterMeterInPeriode != null
+					&& compareToPeterMeterInPeriode != peterMeter1) {
+
+				PeterMeterProfiel profielPM1 = (PeterMeterProfiel) modelRepository
+						.loadObject(peterMeter1).getAspect("PeterMeterProfiel");
+				PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
+						.loadObject(traject.getPeterMeter1()).getAspect(
+								"PeterMeterProfiel");
+
+				Calendar cal1 = Calendar.getInstance();
+				Calendar cal2 = Calendar.getInstance();
+				cal1.setTime(profielPM1.getActiefSinds());
+				cal2.setTime(profielPM2.getActiefSinds());
+
+				// Degene met de langste staat van dienst wordt toegekend
+				if (cal1.before(cal2)) {
+					return peterMeter1;
+				} else {
+					return (ResourceName) compareToPeterMeterInPeriode;
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+		return peterMeter1;
 	}
 }

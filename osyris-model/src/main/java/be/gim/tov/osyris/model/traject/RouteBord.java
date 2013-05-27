@@ -2,14 +2,17 @@ package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceIdentifier;
 
 /**
  * 
@@ -21,20 +24,26 @@ import be.gim.commons.resource.ResourceKey;
 public class RouteBord extends Bord {
 
 	// VARIABLES
+	@NotSearchable
 	@Label("Volgnummer")
 	@Description("Volgnummer")
 	private String volg;
 
+	@NotSearchable
 	@Label("Afbeeldingscode")
 	@Description("Afbeeldingscode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String imageCode;
 
+	// @NotSearchable
 	@Label("Route")
 	@Description("Route")
 	@ModelClassName("Route")
-	private ResourceKey route;
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	// @ValuesExpression("#{osyrisModelFunctions.getRoutes()}")
+	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS
 	public String getVolg() {
@@ -53,11 +62,11 @@ public class RouteBord extends Bord {
 		this.imageCode = imageCode;
 	}
 
-	public ResourceKey getRoute() {
+	public ResourceIdentifier getRoute() {
 		return route;
 	}
 
-	public void setRoute(ResourceKey route) {
+	public void setRoute(ResourceIdentifier route) {
 		this.route = route;
 	}
 }

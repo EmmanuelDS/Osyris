@@ -44,7 +44,7 @@
 					</d:fields>
 				</a:outputPanel>
 			</r:tab>
-			<r:tab header="Administration"
+			<r:tab header="Administratie"
 				rendered="#{identity.inGroup('admin', 'CUSTOM')}">
 				<a:outputPanel>
 					<d:fields>
@@ -56,7 +56,7 @@
 				</a:outputPanel>
 			</r:tab>
 			
-			<r:tab header="Voorkeuren"
+			<r:tab header="Peter/Meter"
 				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or
 							 identity.inGroup('Medewerker','CUSTOM') or 
 							 identity.inGroup('PeterMeter','CUSTOM') or
@@ -89,7 +89,7 @@
 				</a:outputPanel>
 			</r:tab>
 			
-			<r:tab header="Trajecttype"
+			<r:tab header="Trajectverantwoordelijkheid"
 				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or 
 							 identity.inGroup('Medewerker','CUSTOM') or 
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker')}">

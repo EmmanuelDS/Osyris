@@ -14,7 +14,7 @@ import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.traject.Traject;
 
 /**
@@ -40,16 +40,16 @@ public class TrajectToewijzingBean {
 		List<String> result = new ArrayList<String>();
 
 		try {
-			ResourceKey resourceKey = modelRepository
-					.getResourceKey(userRepository.loadUser(username));
+			ResourceName resourceName = modelRepository
+					.getResourceName((userRepository.loadUser(username)));
 
 			// Get Trajecten with PM
 			DefaultQuery query = new DefaultQuery();
 			query.setModelClassName("Traject");
 			query.setFilter(FilterUtils.or(
-					FilterUtils.equal("peterMeter1", resourceKey),
-					FilterUtils.equal("peterMeter2", resourceKey),
-					FilterUtils.equal("peterMeter3", resourceKey)));
+					FilterUtils.equal("peterMeter1", resourceName),
+					FilterUtils.equal("peterMeter2", resourceName),
+					FilterUtils.equal("peterMeter3", resourceName)));
 
 			List<Traject> trajecten = (List<Traject>) modelRepository
 					.searchObjects(query, true, true);
@@ -57,15 +57,15 @@ public class TrajectToewijzingBean {
 			// Add results foreach periode
 			for (Traject traject : trajecten) {
 				if (traject.getPeterMeter1() != null
-						&& traject.getPeterMeter1().equals(resourceKey)) {
+						&& traject.getPeterMeter1().equals(resourceName)) {
 					result.add("Periode Lente: " + getTrajectFormat(traject));
 				}
 				if (traject.getPeterMeter2() != null
-						&& traject.getPeterMeter2().equals(resourceKey)) {
+						&& traject.getPeterMeter2().equals(resourceName)) {
 					result.add("Periode Zomer: " + getTrajectFormat(traject));
 				}
 				if (traject.getPeterMeter3() != null
-						&& traject.getPeterMeter3().equals(resourceKey)) {
+						&& traject.getPeterMeter3().equals(resourceName)) {
 					result.add("Periode Herfst: " + getTrajectFormat(traject));
 				}
 			}

@@ -11,6 +11,8 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
@@ -40,10 +42,11 @@ public class MedewerkerProfiel extends AbstractModelObject implements
 		StorableObject, ModelAspect {
 
 	// VARIABLES
+	@NotSearchable
+	@NotViewable
 	@NotEditable
 	@Label("Medewerker")
 	@Description("Medewerker")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier _for;
 
 	@Label("Trajecttype")

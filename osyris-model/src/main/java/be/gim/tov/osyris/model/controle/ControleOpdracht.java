@@ -109,7 +109,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
 	@NotEditable
@@ -117,7 +116,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
@@ -125,7 +123,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier peterMeter;
 
 	@NotEditable

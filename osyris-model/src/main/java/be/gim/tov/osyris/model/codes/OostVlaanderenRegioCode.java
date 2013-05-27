@@ -12,13 +12,11 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class TrajectNaamCode extends AbstractModelObject implements
+public class OostVlaanderenRegioCode extends AbstractModelObject implements
 		StorableObject {
-
 	// VARIABLES
 	private String code;
 	private String label;
-	private String type;
 
 	// GETTERS AND SETTERS
 	public String getCode() {
@@ -35,13 +33,5 @@ public class TrajectNaamCode extends AbstractModelObject implements
 
 	public void setLabel(String label) {
 		this.label = label;
-	}
-
-	public String getType() {
-		return type;
-	}
-
-	public void setType(String type) {
-		this.type = type;
 	}
 }
