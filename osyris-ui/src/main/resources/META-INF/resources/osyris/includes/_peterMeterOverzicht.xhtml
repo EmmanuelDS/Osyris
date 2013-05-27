@@ -7,8 +7,7 @@
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:j="http://conscientia.org/jsf"
-	xmlns:q="http://specto.gim.be/search"
-	xmlns:cc="http://java.sun.com/jsf/composite">
+	xmlns:q="http://specto.gim.be/search">
 	
 	<div><h2>Overzicht Peters en Meters</h2></div>
 	
@@ -185,7 +184,7 @@
 					type="button"
 					image="#{resource['core/images/actions/12x12/download.png']}"
 					content="#{peterMeterOverzichtFormBase.report()}" 
-					value="Rapport" />
+					value="#{messages['page.actions.report.label']}" />
 			</d:buttons>
 	</a:outputPanel>
 	
@@ -195,7 +194,8 @@
 		<j:commandButton rendered="true"
 				value="Voer algoritme uit"
 				image="#{resource['core/images/actions/12x12/apply.png']}"
-				type="button"/>
+				type="button"
+				action="#{peterMeterOverzichtFormBase.kenPetersMetersToe()}"/>
 	</r:panel>
 	
 	<u:decorate template="/resources/core/includes/managePanels.xhtml">

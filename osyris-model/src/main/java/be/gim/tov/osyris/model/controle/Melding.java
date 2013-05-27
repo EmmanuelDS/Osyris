@@ -17,7 +17,9 @@ import org.conscientia.api.model.annotation.Pattern;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Required;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -105,14 +107,14 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Label("Traject")
 	@Description("Traject")
 	@ModelClassName("Traject")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
 	private ResourceIdentifier traject;
 
 	@NotEditable
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
-	@Type(value = ModelPropertyType.RESOURCE_IDENTIFIER)
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
 	private ResourceIdentifier medewerker;
 
 	@NotEditable

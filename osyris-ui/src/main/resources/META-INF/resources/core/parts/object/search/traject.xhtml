@@ -1,0 +1,29 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="org.conscientia.ui.ModelObject" />
+	<cc:implementation>
+		<div class="#{cc.attrs.contentClass}">
+			<d:propertyFields id="properties"
+				modelProperties="#{cc.attrs.modelClass.properties}"
+				modelClass="#{cc.attrs.modelClass}"
+				path="#{cc.attrs.path}"
+				mode="#{cc.attrs.mode}"
+				level="#{cc.attrs.level}"
+				simple="#{cc.attrs.simple}" />
+		<a:outputPanel>
+			<d:fields>
+				<d:field label="Peter/Meter">
+					<d:propertyValue id="peterMeter"
+						modelProperty="#{cc.attrs.modelClass.getProperty('peterMeter1')}"
+						mode="SEARCH" 
+						path="peterMeter"/>
+				</d:field>
+			</d:fields>
+		</a:outputPanel>
+		
+		</div>
+	</cc:implementation>
+</div>

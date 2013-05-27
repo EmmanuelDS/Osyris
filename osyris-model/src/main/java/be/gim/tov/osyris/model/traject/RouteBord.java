@@ -9,7 +9,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceIdentifier;
 
 /**
  * 
@@ -34,7 +34,7 @@ public class RouteBord extends Bord {
 	@Label("Route")
 	@Description("Route")
 	@ModelClassName("Route")
-	private ResourceKey route;
+	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS
 	public String getVolg() {
@@ -53,11 +53,11 @@ public class RouteBord extends Bord {
 		this.imageCode = imageCode;
 	}
 
-	public ResourceKey getRoute() {
+	public ResourceIdentifier getRoute() {
 		return route;
 	}
 
-	public void setRoute(ResourceKey route) {
+	public void setRoute(ResourceIdentifier route) {
 		this.route = route;
 	}
 }

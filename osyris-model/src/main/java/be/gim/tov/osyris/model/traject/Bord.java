@@ -20,7 +20,6 @@ import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.commons.resource.ResourceKey;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -86,14 +85,14 @@ public abstract class Bord extends AbstractModelObject implements
 	@Edit(type = "panels")
 	private ResourceIdentifier foto;
 
-	@Label("Fiche")
-	@Description("Fiche")
-	private String fiche;
-
+	@NotSearchable
+	@NotEditable
 	@Label("X")
 	@Description("X")
 	private double x;
 
+	@NotSearchable
+	@NotEditable
 	@Label("Y")
 	@Description("Y")
 	private double y;
@@ -108,7 +107,7 @@ public abstract class Bord extends AbstractModelObject implements
 	@Description("Regio")
 	@ModelClassName("Regio")
 	@Edit(type = "panels")
-	private ResourceKey regio;
+	private ResourceIdentifier regio;
 
 	@Label("Gemeente")
 	@Description("Gemeente")
@@ -188,14 +187,6 @@ public abstract class Bord extends AbstractModelObject implements
 		this.foto = foto;
 	}
 
-	public String getFiche() {
-		return fiche;
-	}
-
-	public void setFiche(String fiche) {
-		this.fiche = fiche;
-	}
-
 	public double getX() {
 		return x;
 	}
@@ -220,11 +211,11 @@ public abstract class Bord extends AbstractModelObject implements
 		this.geom = geom;
 	}
 
-	public ResourceKey getRegio() {
+	public ResourceIdentifier getRegio() {
 		return regio;
 	}
 
-	public void setRegio(ResourceKey regio) {
+	public void setRegio(ResourceIdentifier regio) {
 		this.regio = regio;
 	}
 

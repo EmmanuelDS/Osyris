@@ -38,11 +38,6 @@ public abstract class Probleem extends AbstractModelObject implements
 	private ProbleemStatus status;
 
 	@NotSearchable
-	@Label("Fiche")
-	@Description("Fiche")
-	private String fiche;
-
-	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
 	private String foto;
@@ -61,14 +56,6 @@ public abstract class Probleem extends AbstractModelObject implements
 
 	public void setStatus(ProbleemStatus status) {
 		this.status = status;
-	}
-
-	public String getFiche() {
-		return fiche;
-	}
-
-	public void setFiche(String fiche) {
-		this.fiche = fiche;
 	}
 
 	public String getFoto() {

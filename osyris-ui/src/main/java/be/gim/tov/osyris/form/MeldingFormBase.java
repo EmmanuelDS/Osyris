@@ -90,7 +90,7 @@ public class MeldingFormBase extends AbstractListForm {
 			messages.info("Melding sucessvol verzonden naar TOV.");
 
 			// Email bevestiging sturen naar gebruiker
-			// sendConfirmationMail(melding);
+			sendConfirmationMail(melding);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ melding.getEmail() + ".");
 			melding = createMelding();

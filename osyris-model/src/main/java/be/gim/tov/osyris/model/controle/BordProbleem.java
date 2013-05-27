@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.controle;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -30,6 +31,7 @@ public abstract class BordProbleem extends Probleem {
 	@Label("Bord")
 	@Description("Bord")
 	@ModelClassName("Bord")
+	@Edit(type = "bordProbleem")
 	private ResourceIdentifier bord;
 
 	// GETTERS AND SETTERS

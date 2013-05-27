@@ -13,7 +13,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceIdentifier;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -49,10 +49,11 @@ public class Regio extends AbstractModelObject implements StorableObject {
 	@SrsName("EPSG:31370")
 	private Geometry geom;
 
+	// Changed back to ResourceIdentifier
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
 	@ModelClassName("UitvoerderBedrijf")
-	private ResourceKey uitvoerder;
+	private ResourceIdentifier uitvoerder;
 
 	// GETTERS AND SETTERS
 	public String getNaam() {
@@ -87,11 +88,11 @@ public class Regio extends AbstractModelObject implements StorableObject {
 		this.geom = geom;
 	}
 
-	public ResourceKey getUitvoerder() {
+	public ResourceIdentifier getUitvoerder() {
 		return uitvoerder;
 	}
 
-	public void setUitvoerder(ResourceKey uitvoerder) {
+	public void setUitvoerder(ResourceIdentifier uitvoerder) {
 		this.uitvoerder = uitvoerder;
 	}
 }
