@@ -91,7 +91,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@Description("Peter/Meter Zomer")
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
 	private ResourceIdentifier peterMeter2;
 
@@ -100,7 +99,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@Description("Peter/Meter Herfst")
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
 	private ResourceIdentifier peterMeter3;
 

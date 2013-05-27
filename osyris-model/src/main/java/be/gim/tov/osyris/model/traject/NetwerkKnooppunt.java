@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -9,7 +10,9 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -38,12 +41,17 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
 	private ResourceIdentifier regio;
 
+	@NotSearchable
 	@Label("X")
 	@Description("X")
 	private double x;
 
+	@NotSearchable
 	@Label("Y")
 	@Description("Y")
 	private double y;

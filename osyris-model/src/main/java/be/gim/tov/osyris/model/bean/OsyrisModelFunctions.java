@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -20,6 +22,8 @@ import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Gemeente;
 
 /**
  * 
@@ -31,15 +35,17 @@ public class OsyrisModelFunctions {
 
 	private static final Log LOG = LogFactory
 			.getLog(OsyrisModelFunctions.class);
-
 	private static final String GEEN_PETER_METER = "Geen PeterMeter toegewezen";
 
 	@Inject
 	private ModelRepository modelRepository;
-
 	@Inject
 	private UserRepository userRepository;
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Object[]> getStockMateriaalStates() {
 		List<Object[]> stockMateriaalStates = new ArrayList<Object[]>();
 		Object[] statusBesteld = { "1", "Besteld" };
@@ -50,6 +56,10 @@ public class OsyrisModelFunctions {
 		return stockMateriaalStates;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Object[]> getEnkeleRichting() {
 		List<Object[]> enkeleRichting = new ArrayList<Object[]>();
 		Object[] statusTrue = { "1", "Ja" };
@@ -60,6 +70,10 @@ public class OsyrisModelFunctions {
 		return enkeleRichting;
 	}
 
+	/**
+	 * 
+	 * @return
+	 */
 	public List<Object[]> getImageCodes() {
 		List<Object[]> imageCodes = new ArrayList<Object[]>();
 		Object[] code1 = { "1", "1" };
@@ -157,6 +171,11 @@ public class OsyrisModelFunctions {
 		return suggestions;
 	}
 
+	/**
+	 * Gets regios OVL
+	 * 
+	 * @return
+	 */
 	public List<Object[]> getRegiosOostVlaanderen() {
 		List<Object[]> regios = new ArrayList<Object[]>();
 		Object[] code1 = { "Regio@1", "Leiestreek" };
@@ -173,5 +192,68 @@ public class OsyrisModelFunctions {
 		regios.add(code5);
 		regios.add(code6);
 		return regios;
+	}
+
+	/**
+	 * Gets gemeentes
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getGemeentes() {
+		List<Object[]> gemeentes = new ArrayList<Object[]>();
+
+		try {
+			List<Gemeente> objects = (List<Gemeente>) modelRepository
+					.searchObjects(new DefaultQuery("Gemeente"), false, false);
+
+			List<String> gemeenteList = new ArrayList<String>();
+			for (Gemeente gemeente : objects) {
+				gemeenteList.add(gemeente.getNaam());
+			}
+
+			// Verwijderen duplicates
+			Set<String> nonDuplicatedGemeentes = new HashSet<String>(
+					gemeenteList);
+			for (String naam : nonDuplicatedGemeentes) {
+				Object[] gemeente = { naam, naam };
+				gemeentes.add(gemeente);
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not find gemeentes.", e);
+		}
+		return gemeentes;
+	}
+
+	/**
+	 * Gets straatNamen
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getStraten() {
+		List<Object[]> straten = new ArrayList<Object[]>();
+
+		try {
+			List<Bord> objects = (List<Bord>) modelRepository.searchObjects(
+					new DefaultQuery("Bord"), false, false);
+
+			List<String> stratenList = new ArrayList<String>();
+			for (Bord bord : objects) {
+				stratenList.add(bord.getStraatnaam());
+			}
+
+			// Verwijderen duplicates
+			Set<String> nonDuplicatedStraten = new HashSet<String>(stratenList);
+			for (String naam : nonDuplicatedStraten) {
+				Object[] straat = { naam, naam };
+				straten.add(straat);
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not find straten.", e);
+		}
+		return straten;
 	}
 }

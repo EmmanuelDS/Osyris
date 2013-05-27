@@ -40,8 +40,10 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
 	private ResourceIdentifier regio;
 
+	// @Edit(type = "trajectType")
 	@Label("Trajecttype")
 	@Description("Trajecttype")
 	@Type(value = ModelPropertyType.ENUM)

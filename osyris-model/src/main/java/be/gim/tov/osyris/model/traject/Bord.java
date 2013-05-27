@@ -13,6 +13,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
@@ -35,16 +36,20 @@ public abstract class Bord extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@Label("Naam")
-	@Description("Naam")
+	@Label("Trajectnaam")
+	@Description("Trajectnaam")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
 	private String naam;
 
 	@Label("Straatnaam")
 	@Description("Straatnaam")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getStraten()}")
 	private String straatnaam;
 
-	@Label("Wegbevoegd")
-	@Description("Wegbevoegd")
+	@Label("Wegbevoegdheid")
+	@Description("Wegbevoegdheid")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('WegbevoegdCode')}")
 	private String wegBevoegd;
@@ -79,6 +84,7 @@ public abstract class Bord extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordConstructieCode')}")
 	private String bordConst;
 
+	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
 	@ModelClassName("File")
@@ -106,12 +112,15 @@ public abstract class Bord extends AbstractModelObject implements
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
-	@Edit(type = "panels")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
 	private ResourceIdentifier regio;
 
 	@Label("Gemeente")
 	@Description("Gemeente")
-	@ModelClassName("Gemeente")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getGemeentes()}")
 	private String gemeente;
 
 	// GETTERS AND SETTERS

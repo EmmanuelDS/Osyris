@@ -8,6 +8,7 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -51,43 +52,51 @@ public abstract class NetwerkBord extends Bord {
 	@Description("Knooppuntnummer 3")
 	private int kpnr3;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 0")
 	@Description("Netwerkknooppunt 0")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid0;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 1")
 	@Description("Netwerkknooppunt 1")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid1;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 2")
 	@Description("Netwerkknooppunt 2")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid2;
 
+	@NotSearchable
 	@Label("Netwerkknooppunt 3")
 	@Description("Netwerkknooppunt 3")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid3;
 
+	@NotSearchable
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
 	@ModelClassName("NetwerkSegment")
 	private List<ResourceIdentifier> segmenten;
 
+	@NotSearchable
 	@Label("Afbeeldingscode knooppunt 1")
 	@Description("Afbeeldingscode knooppunt 1")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp1ImageCode;
 
+	@NotSearchable
 	@Label("Afbeeldingscode knooppunt 2")
 	@Description("Afbeeldingscode knooppunt 2")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp2ImageCode;
 
+	@NotSearchable
 	@Label("Afbeeldingscode knooppunt 3")
 	@Description("Afbeeldingscode knooppunt 3")
 	@Type(value = ModelPropertyType.ENUM)

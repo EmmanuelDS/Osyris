@@ -7,6 +7,7 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotSearchable;
 
 import be.gim.commons.resource.ResourceKey;
 
@@ -20,10 +21,12 @@ import be.gim.commons.resource.ResourceKey;
 public abstract class NetwerkLus extends Traject {
 
 	// VARIABLES
+	@NotSearchable
 	@Label("Actief")
 	@Description("Actief")
 	private boolean actief;
 
+	@NotSearchable
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
 	@ModelClassName("NetwerkSegment")
