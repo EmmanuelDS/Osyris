@@ -42,7 +42,6 @@ public class RouteBord extends Bord {
 	@ModelClassName("Route")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
-	// @ValuesExpression("#{osyrisModelFunctions.getRoutes()}")
 	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS

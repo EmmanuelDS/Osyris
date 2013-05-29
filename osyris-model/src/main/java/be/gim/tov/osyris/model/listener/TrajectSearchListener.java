@@ -4,20 +4,31 @@ import java.io.IOException;
 
 import org.conscientia.api.model.annotation.Listener;
 import org.conscientia.api.model.annotation.Rule;
+import org.conscientia.api.model.event.CountModelEvent;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.model.event.SearchModelEvent;
+import org.conscientia.api.search.Query;
 import org.opengis.filter.Filter;
 
-@Listener(rules = @Rule(_for = "Traject", type = "search"))
+@Listener(rules = { @Rule(_for = "Traject", type = "search"),
+		@Rule(_for = "Traject", type = "count") })
 public class TrajectSearchListener {
 
 	public void processEvent(ModelEvent event) throws IOException {
 
-		SearchModelEvent searchEvent = (SearchModelEvent) event;
+		Filter filter = (Filter) getQuery(event).getFilter().accept(
+				new TrajectVisitor(), event.getModelObject());
 
-		Filter filter = (Filter) searchEvent.getQuery().getFilter()
-				.accept(new TrajectVisitor(), searchEvent.getModelObject());
+		getQuery(event).setFilter(filter);
+	}
 
-		searchEvent.getQuery().setFilter(filter);
+	protected Query getQuery(ModelEvent event) {
+		if (event instanceof SearchModelEvent) {
+			return ((SearchModelEvent) event).getQuery();
+		}
+		if (event instanceof CountModelEvent) {
+			return ((CountModelEvent) event).getQuery();
+		}
+		return null;
 	}
 }

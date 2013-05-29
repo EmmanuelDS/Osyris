@@ -42,6 +42,7 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true) })
+@Label("Melding")
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES

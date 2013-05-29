@@ -87,10 +87,12 @@ public class MeldingFormBase extends AbstractListForm<Melding> {
 			modelRepository.saveObject(getMelding());
 			messages.info("Melding sucessvol verzonden naar TOV.");
 
-			// Email bevestiging sturen naar gebruiker
+			// Email bevestiging sturen naar melder
 			sendConfirmationMail(object);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ object.getEmail() + ".");
+			// TODO: Email versturen naar medewerker TOV
+
 			object = createMelding();
 		} catch (IOException e) {
 			LOG.error("Can not save model object.", e);

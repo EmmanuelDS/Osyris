@@ -8,6 +8,9 @@ import org.conscientia.api.model.event.ModelEvent;
 
 import be.gim.tov.osyris.model.traject.Traject;
 
+import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+
 /**
  * 
  * @author kristof
@@ -33,6 +36,13 @@ public class TrajectSaveListener {
 		if (traject.getPeterMeter3() != null
 				&& traject.getPeterMeter3().equals(GEEN_PETER_METER)) {
 			traject.setPeterMeter3(null);
+		}
+
+		// Automatically set lengte traject in km
+		if (traject.getGeom() != null
+				&& traject.getGeom() instanceof LineString) {
+			Geometry g = traject.getGeom();
+			traject.setLengte((float) g.getLength() / 1000);
 		}
 	}
 }
