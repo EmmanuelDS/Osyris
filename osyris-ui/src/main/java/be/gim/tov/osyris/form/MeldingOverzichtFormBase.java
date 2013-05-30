@@ -3,6 +3,7 @@ package be.gim.tov.osyris.form;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -21,6 +22,7 @@ import be.gim.tov.osyris.model.controle.Melding;
  * 
  */
 @Named
+@ViewScoped
 public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	private static final long serialVersionUID = -3077755833706449795L;
 
@@ -55,13 +57,12 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 		if (identity.inGroup("Medewerker", "CUSTOM")) {
 			try {
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
-						.getResourceKey(userRepository.loadUser(identity
+						.getResourceIdentifier(userRepository.loadUser(identity
 								.getUser().getId()))));
 			} catch (IOException e) {
 				LOG.error("Can not load user.", e);
 			}
 		}
-
 		return query;
 	}
 }

@@ -3,6 +3,7 @@ package be.gim.tov.osyris.form;
 import java.io.IOException;
 
 import javax.annotation.PostConstruct;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -22,6 +23,7 @@ import be.gim.tov.osyris.model.controle.ControleOpdracht;
  * 
  */
 @Named
+@ViewScoped
 public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
 	private static final long serialVersionUID = -86881009141250710L;

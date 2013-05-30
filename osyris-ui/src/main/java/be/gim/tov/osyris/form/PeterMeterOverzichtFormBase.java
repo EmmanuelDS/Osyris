@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -19,7 +20,6 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.document.Document;
 import org.conscientia.api.group.Group;
 import org.conscientia.api.mail.MailSender;
-import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.permission.Permission;
 import org.conscientia.api.permission.Permissions;
 import org.conscientia.api.preferences.Preferences;
@@ -50,6 +50,7 @@ import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
  * 
  */
 @Named
+@ViewScoped
 public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 	private static final long serialVersionUID = 7761265026167905576L;
@@ -185,7 +186,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			}
 
 			// Delete user and document permissions
-			modelRepository.deleteObject((StorableObject) object);
+			modelRepository.deleteObject(object);
 
 			if (permissions != null) {
 				modelRepository.deleteAspect(permissions);

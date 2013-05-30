@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
+import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -25,6 +26,7 @@ import be.gim.tov.osyris.model.controle.Melding;
  * 
  */
 @Named
+@ViewScoped
 public class MeldingFormBase extends AbstractListForm<Melding> {
 	private static final long serialVersionUID = -8052917916776585407L;
 
