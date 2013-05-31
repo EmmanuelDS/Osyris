@@ -19,11 +19,12 @@ import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.functions.ModelFunctions;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.QueryBuilder;
 
+import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.traject.Bord;
-import be.gim.tov.osyris.model.traject.Gemeente;
 
 /**
  * 
@@ -32,9 +33,9 @@ import be.gim.tov.osyris.model.traject.Gemeente;
  */
 @Named
 public class OsyrisModelFunctions {
-
 	private static final Log LOG = LogFactory
 			.getLog(OsyrisModelFunctions.class);
+	
 	private static final String GEEN_PETER_METER = "Geen PeterMeter toegewezen";
 
 	@Inject
@@ -76,9 +77,9 @@ public class OsyrisModelFunctions {
 	 */
 	public List<Object[]> getImageCodes() {
 		List<Object[]> imageCodes = new ArrayList<Object[]>();
-		Object[] code1 = { "1", "1" };
-		Object[] code2 = { "2", "2" };
-		Object[] code3 = { "3", "3" };
+		Object[] code1 = { "1" };
+		Object[] code2 = { "2" };
+		Object[] code3 = { "3" };
 
 		imageCodes.add(code1);
 		imageCodes.add(code2);
@@ -137,6 +138,7 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<User> getUsersInGroup(String groupName) {
+		
 		List<User> users = new ArrayList<User>();
 		List<User> medewerkers = new ArrayList<User>();
 		try {
@@ -160,7 +162,9 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<? extends ResourceIdentifier> getSuggestions(String groupName) {
+		
 		List<User> users = getUsersInGroup(groupName);
+		
 		List<ResourceIdentifier> suggestions = new ArrayList<ResourceIdentifier>();
 		for (User u : users) {
 			suggestions.add(modelRepository.getResourceIdentifier(u));
@@ -168,6 +172,7 @@ public class OsyrisModelFunctions {
 		if (groupName.equals("PeterMeter")) {
 			suggestions.add(new ResourceName(GEEN_PETER_METER));
 		}
+		
 		return suggestions;
 	}
 
@@ -177,6 +182,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getRegiosOostVlaanderen() {
+	
 		List<Object[]> regios = new ArrayList<Object[]>();
 		Object[] code1 = { "Regio@1", "Leiestreek" };
 		Object[] code2 = { "Regio@2", "Meetjesland" };
@@ -191,6 +197,7 @@ public class OsyrisModelFunctions {
 		regios.add(code4);
 		regios.add(code5);
 		regios.add(code6);
+		
 		return regios;
 	}
 
@@ -199,31 +206,13 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getGemeentes() {
-		List<Object[]> gemeentes = new ArrayList<Object[]>();
+	public List<?> getGemeentes() throws IOException {
 
-		try {
-			List<Gemeente> objects = (List<Gemeente>) modelRepository
-					.searchObjects(new DefaultQuery("Gemeente"), false, false);
+		QueryBuilder builder = new QueryBuilder("Gemeente");
+		builder.results(FilterUtils.properties("naam"));
+		builder.groupBy(FilterUtils.properties("naam"));
 
-			List<String> gemeenteList = new ArrayList<String>();
-			for (Gemeente gemeente : objects) {
-				gemeenteList.add(gemeente.getNaam());
-			}
-
-			// Verwijderen duplicates
-			Set<String> nonDuplicatedGemeentes = new HashSet<String>(
-					gemeenteList);
-			for (String naam : nonDuplicatedGemeentes) {
-				Object[] gemeente = { naam, naam };
-				gemeentes.add(gemeente);
-			}
-
-		} catch (IOException e) {
-			LOG.error("Can not find gemeentes.", e);
-		}
-		return gemeentes;
+		return modelRepository.searchObjects(builder.build(), true, true);
 	}
 
 	/**
@@ -231,29 +220,12 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getStraten() {
-		List<Object[]> straten = new ArrayList<Object[]>();
+	public List<?> getStraten()  throws IOException {
+		
+		QueryBuilder builder = new QueryBuilder("Bord");
+		builder.results(FilterUtils.properties("straatnaam"));
+		builder.groupBy(FilterUtils.properties("straatnaam"));
 
-		try {
-			List<Bord> objects = (List<Bord>) modelRepository.searchObjects(
-					new DefaultQuery("Bord"), false, false);
-
-			List<String> stratenList = new ArrayList<String>();
-			for (Bord bord : objects) {
-				stratenList.add(bord.getStraatnaam());
-			}
-
-			// Verwijderen duplicates
-			Set<String> nonDuplicatedStraten = new HashSet<String>(stratenList);
-			for (String naam : nonDuplicatedStraten) {
-				Object[] straat = { naam, naam };
-				straten.add(straat);
-			}
-
-		} catch (IOException e) {
-			LOG.error("Can not find straten.", e);
-		}
-		return straten;
+		return modelRepository.searchObjects(builder.build(), true, true);
 	}
 }

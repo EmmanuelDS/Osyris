@@ -3,11 +3,15 @@ package be.gim.tov.osyris.model.traject;
 import static org.conscientia.api.model.SubClassPersistence.UNION;
 
 import java.io.IOException;
+import java.io.Serializable;
+import java.util.Map;
 
 import javax.persistence.Transient;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
@@ -164,25 +168,42 @@ public abstract class Traject extends AbstractModelObject implements
 	@NotEditable
 	@Label("Medewerker TOV")
 	public ResourceIdentifier getMedewerker() {
-		try {
-			for (User u : Beans.getReference(OsyrisModelFunctions.class)
-					.getUsersInGroup("Medewerker")) {
 
-				MedewerkerProfiel profiel = (MedewerkerProfiel) Beans
-						.getReference(ModelRepository.class).loadAspect(
-								Beans.getReference(ModelRepository.class)
-										.getModelClass("MedewerkerProfiel"), u);
+		Map<Serializable, Object> cache = Beans.getReference(
+				CacheProducer.class).getCache("trajectMedewerkerCache",
+				new Transformer() {
 
-				if (profiel.getTrajectType()
-						.contains(getModelClass().getName())) {
-					return Beans.getReference(ModelRepository.class)
-							.getResourceIdentifier(u);
-				}
-			}
+					@Override
+					public Object transform(Object key) {
 
-		} catch (IOException e) {
-			LOG.error("Can not search objects.", e);
-		}
-		return null;
+						try {
+							for (User user : Beans.getReference(
+									OsyrisModelFunctions.class)
+									.getUsersInGroup("Medewerker")) {
+
+								MedewerkerProfiel profiel = (MedewerkerProfiel) Beans
+										.getReference(ModelRepository.class)
+										.loadAspect(
+												Beans.getReference(
+														ModelRepository.class)
+														.getModelClass(
+																"MedewerkerProfiel"),
+												user);
+
+								if (profiel.getTrajectType().contains(key)) {
+									return Beans.getReference(
+											ModelRepository.class)
+											.getResourceIdentifier(user);
+								}
+							}
+						} catch (IOException e) {
+							LOG.error("Can not search objects.", e);
+						}
+
+						return null;
+					}
+				});
+
+		return (ResourceIdentifier) cache.get(getModelClass().getName());
 	}
 }

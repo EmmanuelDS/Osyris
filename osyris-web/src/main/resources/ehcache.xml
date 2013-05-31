@@ -23,6 +23,30 @@
 		timeToLiveSeconds="14400"
 		memoryStoreEvictionPolicy="LRU" />
 	<cache
+		name="modelObjectMetaCache"
+		maxElementsInMemory="2000"
+		eternal="false"
+		overflowToDisk="true"
+		timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache
+		name="enumValuesCache"
+		maxElementsInMemory="200"
+		eternal="false"
+		overflowToDisk="true"
+		timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache
+		name="enumValueLabelCache"
+		maxElementsInMemory="2000"
+		eternal="false"
+		overflowToDisk="true"
+		timeToIdleSeconds="7200"
+		timeToLiveSeconds="14400"
+		memoryStoreEvictionPolicy="LRU" />
+	<cache
 		name="permissionCache"
 		maxElementsInMemory="100"
 		eternal="false"
