@@ -14,6 +14,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.preferences.Preferences;
+import org.conscientia.api.user.UserProfile;
 import org.conscientia.core.form.AbstractListForm;
 import org.jboss.seam.international.status.Messages;
 
@@ -93,7 +94,6 @@ public class MeldingFormBase extends AbstractListForm<Melding> {
 			sendConfirmationMail(object);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ object.getEmail() + ".");
-			// TODO: Email versturen naar medewerker TOV
 
 			object = createMelding();
 		} catch (IOException e) {
@@ -110,16 +110,28 @@ public class MeldingFormBase extends AbstractListForm<Melding> {
 
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
-
-		// TODO: Extra melding properties toevoegen?
 		variables.put("firstname", melding.getVoornaam());
 		variables.put("lastname", melding.getNaam());
 		variables.put("phone", melding.getTelefoon());
 		variables.put("status", melding.getStatus());
 		variables.put("problem", melding.getProbleem());
 
+		// Send mail to Melder
 		mailSender.sendMail(preferences.getNoreplyEmail(),
 				Collections.singleton(melding.getEmail()),
+				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
+
+		// Get email Medewerker
+		UserProfile profiel = (UserProfile) modelRepository.loadAspect(
+				modelRepository.getModelClass("UserProfile"),
+				modelRepository.loadObject(melding.getMedewerker()));
+		String medewerkerEmail = profiel.getEmail();
+
+		// Only for testing
+		String testEmail = "kristof.spiessens@gim.be";
+		// Send mail to Medewerker TOV
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton(testEmail),
 				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
 	}
 }
