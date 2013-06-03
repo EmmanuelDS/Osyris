@@ -33,7 +33,6 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Edit(type = "melding")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),

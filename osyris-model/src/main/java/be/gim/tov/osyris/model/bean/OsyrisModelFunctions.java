@@ -4,9 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -24,7 +22,6 @@ import org.conscientia.core.search.QueryBuilder;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
-import be.gim.tov.osyris.model.traject.Bord;
 
 /**
  * 
@@ -35,7 +32,7 @@ import be.gim.tov.osyris.model.traject.Bord;
 public class OsyrisModelFunctions {
 	private static final Log LOG = LogFactory
 			.getLog(OsyrisModelFunctions.class);
-	
+
 	private static final String GEEN_PETER_METER = "Geen PeterMeter toegewezen";
 
 	@Inject
@@ -138,7 +135,7 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<User> getUsersInGroup(String groupName) {
-		
+
 		List<User> users = new ArrayList<User>();
 		List<User> medewerkers = new ArrayList<User>();
 		try {
@@ -162,9 +159,9 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<? extends ResourceIdentifier> getSuggestions(String groupName) {
-		
+
 		List<User> users = getUsersInGroup(groupName);
-		
+
 		List<ResourceIdentifier> suggestions = new ArrayList<ResourceIdentifier>();
 		for (User u : users) {
 			suggestions.add(modelRepository.getResourceIdentifier(u));
@@ -172,7 +169,7 @@ public class OsyrisModelFunctions {
 		if (groupName.equals("PeterMeter")) {
 			suggestions.add(new ResourceName(GEEN_PETER_METER));
 		}
-		
+
 		return suggestions;
 	}
 
@@ -182,7 +179,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getRegiosOostVlaanderen() {
-	
+
 		List<Object[]> regios = new ArrayList<Object[]>();
 		Object[] code1 = { "Regio@1", "Leiestreek" };
 		Object[] code2 = { "Regio@2", "Meetjesland" };
@@ -197,7 +194,7 @@ public class OsyrisModelFunctions {
 		regios.add(code4);
 		regios.add(code5);
 		regios.add(code6);
-		
+
 		return regios;
 	}
 
@@ -216,12 +213,32 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Gets traject namen
+	 * 
+	 * @return
+	 */
+	public List<?> getTrajectNamen(ResourceIdentifier regio, String trajectType)
+			throws IOException {
+
+		if (trajectType != null && !trajectType.isEmpty()) {
+			QueryBuilder builder = new QueryBuilder(trajectType);
+			builder.filter(FilterUtils.equal("regio", regio));
+			builder.results(FilterUtils.properties("naam"));
+			builder.groupBy(FilterUtils.properties("naam"));
+
+			return modelRepository.searchObjects(builder.build(), true, true);
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
+	/**
 	 * Gets straatNamen
 	 * 
 	 * @return
 	 */
-	public List<?> getStraten()  throws IOException {
-		
+	public List<?> getStraten() throws IOException {
+
 		QueryBuilder builder = new QueryBuilder("Bord");
 		builder.results(FilterUtils.properties("straatnaam"));
 		builder.groupBy(FilterUtils.properties("straatnaam"));

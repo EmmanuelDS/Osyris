@@ -6,73 +6,122 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
-	xmlns:j="http://conscientia.org/jsf">
-	
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
 	<div><h2>Routedokter - Melding problemen ivm route infrastructuur</h2></div>
-	
 	<table width="100%">
 	<tr>
 	<td width="50%">
 	<r:panel>
-		<d:object mode="EDIT" 
-				modelClass="#{modelRepository.getModelClass('Melding')}"
-				value="#{meldingFormBase.melding}">
-		</d:object>
-		
-     <!-- 		<a:outputPanel> -->
-<!-- 			<d:fields> -->
-<!-- 				<d:field label="Voornaam"> -->
-<!-- 					<d:propertyValue id="voornaam" -->
-<!-- 						modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" -->
-<!-- 						value="#{form.melding.voornaam}" -->
-<!-- 						mode="EDIT" /> -->
-<!-- 				</d:field> -->
-<!-- 				<d:field label="Naam">	 -->
-<!-- 					<d:propertyValue id="naam" -->
-<!-- 						modelProperty="#{d:modelClass('Melding').getProperty('naam')}" -->
-<!-- 						value="#{form.melding.naam}" -->
-<!-- 						mode="EDIT" /> -->
-<!-- 				</d:field> -->
-<!-- 				<d:field label="Telefoon/GSM">	 -->
-<!-- 					<d:propertyValue id="telefoon" -->
-<!-- 						modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" -->
-<!-- 						value="#{form.melding.telefoon}" -->
-<!-- 						mode="EDIT" /> -->
-<!-- 				</d:field> -->
-<!-- 				<d:field label="E-mail">	 -->
-<!-- 					<d:propertyValue id="email" -->
-<!-- 						modelProperty="#{d:modelClass('Melding').getProperty('email')}" -->
-<!-- 						value="#{form.melding.email}" -->
-<!-- 						mode="EDIT" /> -->
-<!-- 				</d:field> -->
-<!-- 				<d:field label="Datum vastgesteld">	 -->
-<!-- 					<d:propertyValue id="datumVaststelling" -->
-<!-- 						modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" -->
-<!-- 						value="#{form.melding.datumVaststelling}" -->
-<!-- 						mode="EDIT" /> -->
-<!-- 				</d:field> -->
-<!-- 				<d:field label ="Probleem"> -->
-<!-- 					<d:propertyValue id="probleem" -->
-<!-- 						modelProperty="#{d:modelClass('Melding').getProperty('probleem')}" -->
-<!-- 						value="#{form.melding.probleem}" -->
-<!-- 						mode="EDIT" /> -->
-<!-- 				</d:field>	 -->
-<!-- 			</d:fields> -->
-<!-- 		</a:outputPanel> -->
-
-
+		<d:fields>
+			<d:field for="regio" label="Regio" required="true">
+				<h:selectOneMenu id="regio" value="#{form.regio}" required="true">
+					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+					<a:ajax
+						event="change"
+						render="trajectNaam"
+						execute="@this" />
+				</h:selectOneMenu>
+			</d:field>
+			<d:field for="trajectType" label="Traject type" required="true">
+				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" required="true">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+					<a:ajax
+						event="change"
+						render="trajectNaam"
+						execute="@this" />
+				</h:selectOneMenu>
+			</d:field>
+			<d:field for="trajectNaam" label="Traject naam" required="true">
+				<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" required="true">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+				</h:selectOneMenu>
+			</d:field>
+		</d:fields>
+		<d:buttons>
+			<j:commandButton value="Zoeken"
+				image="#{resource['core/images/actions/12x12/search.png']}"
+				type="button"
+				action="#{form.searchTraject()}"
+				render="probleemPanel">
+			</j:commandButton>
+		</d:buttons>
+	</r:panel>
+	<r:panel>
+		<d:object mode="EDIT"
+				value="#{form.melding}" />
+	</r:panel>
+	<r:panel>
+		<div>
+				<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+					<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+					<a:ajax
+						event="change"
+						render="probleemPanel"
+						listener="#{form.createProbleem()}"
+						execute="@this" />
+				</h:selectOneMenu>
+		</div>
+		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
+			<d:object mode="EDIT"
+					value="#{form.melding.probleem}" />
+			<j:commandButton
+				id="selectFeatures"
+				rendered="#{form.probleemType == 'bord'}"
+				image="#{resource['core/images/actions/24x24/select.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['model.entry.mapContext.tools.selectFeatures.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+				submit="false">
+				<j:activateControl
+					for="viewer"
+					event="click"
+					control="selectBox" />
+			</j:commandButton>
+			<j:commandButton
+				id="drawPoint"
+				rendered="#{form.probleemType == 'ander'}"
+				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['model.entry.mapLayer.tools.drawPoint.btn.label']}">
+				<j:activateControl
+					for="viewer"
+					event="click"
+					control="drawPoint" />
+			</j:commandButton>
+		</j:renderPanel>
 		<d:buttons>
 			<j:commandButton value="Verzenden"
 				image="#{resource['core/images/actions/12x12/apply.png']}"
 				type="button"
-				action="#{meldingFormBase.saveMelding()}">
+				action="#{form.saveMelding()}">
 			</j:commandButton>
 		</d:buttons>
 	</r:panel>
 	</td>
 	<td width="50%">
 	<r:panel>
-		<div>Map to be inserted</div>
+		<div style="height: 400px">
+			<m:mapViewer id="viewer"
+				configuration="#{form.configuration}">
+				<j:controllerListener name="selectedFeatures"
+					listener="#{form.onSelectFeatures}" />
+				<j:controllerListener name="unselectedFeatures"
+					listener="#{form.onUnselectFeatures}" />
+				<j:controllerListener name="addedFeature"
+					listener="#{form.onUpdateFeatures}" />
+				<j:controllerListener name="updatedFeature"
+					listener="#{form.onUpdateFeatures}" />
+				<j:controllerListener name="deletedFeature"
+					listener="#{form.onDeleteFeatures}" />
+			</m:mapViewer>
+		</div>
 	</r:panel>
 	</td>
 	</tr>
