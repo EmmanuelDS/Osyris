@@ -61,6 +61,46 @@
 					 var="user" 
 					 style="width: 100%;"
 					 styleClass="model-table #{cc.attrs.contentClass}">
+						<r:column label="Acties">
+				<a:outputPanel rendered="true" 
+					styleClass="model-table-actions">
+					<h:panelGrid columns="3">
+						<j:commandButton
+							image="#{resource['core/images/actions/16x16/view.png']}"
+							type="image" 
+							title="#{messages['page.actions.view.label']}"
+							rendered="true">
+							<j:renderListener target="#{r:clientId('viewPanel')}" 
+								rendered="true"
+								execute="@this" />
+							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
+								value="#{user}" />
+						</j:commandButton>
+						<j:commandButton
+							image="#{resource['core/images/actions/16x16/edit.png']}"
+							type="image" 
+							title="#{messages['page.actions.edit.label']}"
+							rendered="true">
+							<j:renderListener target="#{r:clientId('editPanel')}" 
+								rendered="true"
+								execute="@this" />
+							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
+								value="#{user}" />
+						</j:commandButton>
+						<j:commandButton 
+							rendered="true"
+							image="#{resource['core/images/actions/16x16/delete.png']}"
+							type="image" 
+							title="#{messages['page.actions.delete.label']}">
+							<j:renderListener target="#{r:clientId('deletePanel')}" 
+								rendered="true"
+								execute="@this" />
+							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
+								value="#{user}" />
+						</j:commandButton>
+					</h:panelGrid>
+				</a:outputPanel>
+			</r:column>
 			<r:column label="Voornaam"
 				sortable="true">
 				<f:facet name="header">
@@ -120,46 +160,6 @@
 							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}"
 							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).voorkeuren }"
 							mode="VIEW" />
-			</r:column>
-			<r:column label="Acties">
-				<a:outputPanel rendered="true" 
-					styleClass="model-table-actions">
-					<h:panelGrid columns="3">
-						<j:commandButton
-							image="#{resource['core/images/actions/16x16/view.png']}"
-							type="image" 
-							title="#{messages['page.actions.view.label']}"
-							rendered="true">
-							<j:renderListener target="#{r:clientId('viewPanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
-								value="#{user}" />
-						</j:commandButton>
-						<j:commandButton
-							image="#{resource['core/images/actions/16x16/edit.png']}"
-							type="image" 
-							title="#{messages['page.actions.edit.label']}"
-							rendered="true">
-							<j:renderListener target="#{r:clientId('editPanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
-								value="#{user}" />
-						</j:commandButton>
-						<j:commandButton 
-							rendered="true"
-							image="#{resource['core/images/actions/16x16/delete.png']}"
-							type="image" 
-							title="#{messages['page.actions.delete.label']}">
-							<j:renderListener target="#{r:clientId('deletePanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
-								value="#{user}" />
-						</j:commandButton>
-					</h:panelGrid>
-				</a:outputPanel>
 			</r:column>
 			<f:facet name="footer">
 				<r:dataScroller for="objects" />

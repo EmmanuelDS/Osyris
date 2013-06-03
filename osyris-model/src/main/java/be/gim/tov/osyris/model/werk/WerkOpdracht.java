@@ -13,11 +13,14 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.werk.status.BeoordelingStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
 /**
@@ -47,6 +50,10 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Label("Status")
 	@Description("Status")
 	private WerkopdrachtStatus status;
+
+	@Label("Beoordeling")
+	@Description("Beoordeling")
+	private BeoordelingStatus beoordeling;
 
 	@NotSearchable
 	@Label("Omschrijving opdracht")
@@ -101,11 +108,15 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
 	private ResourceIdentifier medewerker;
 
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
 	@ModelClassName("User")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Uitvoerder')}")
 	private ResourceIdentifier uitvoerder;
 
 	@NotSearchable
@@ -129,6 +140,14 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setStatus(WerkopdrachtStatus status) {
 		this.status = status;
+	}
+
+	public BeoordelingStatus getBeoordeling() {
+		return beoordeling;
+	}
+
+	public void setBeoordeling(BeoordelingStatus beoordeling) {
+		this.beoordeling = beoordeling;
 	}
 
 	public String getOmschrijvingOpdracht() {

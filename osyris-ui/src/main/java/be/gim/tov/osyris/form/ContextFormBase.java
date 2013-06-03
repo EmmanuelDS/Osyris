@@ -68,7 +68,7 @@ public class ContextFormBase {
 					DefaultMapGroup group = (DefaultMapGroup) getViewer()
 							.getContext().getLayer((type.toLowerCase()));
 					for (MapLayer layer : group.getLayers()) {
-						// TODO: Lussen should not be editable
+						// TODO: Lussen should not be editable?
 						layer.set("editable", true);
 					}
 				}

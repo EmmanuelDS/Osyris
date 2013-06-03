@@ -29,12 +29,6 @@ public class PropertyMeldingEditableBean {
 		Object status = null;
 		Field[] fields = null;
 
-		// Routedokter and admin can edit all properties
-		if (identity.inGroup("Routedokter", "CUSTOM")
-				|| identity.inGroup("admin", "CUSTOM")) {
-			return true;
-		}
-
 		fields = object.getClass().getDeclaredFields();
 
 		for (Field field : fields) {

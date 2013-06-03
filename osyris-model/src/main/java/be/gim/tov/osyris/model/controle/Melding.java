@@ -47,6 +47,13 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
 	@NotEditable
+	@EditableInStatus("")
+	@Label("Traject")
+	@Description("Traject")
+	@ModelClassName("Traject")
+	private ResourceIdentifier traject;
+
+	@NotEditable
 	@Label("Status")
 	@Description("Status")
 	private MeldingStatus status;
@@ -85,6 +92,14 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	private String telefoon;
 
 	@NotEditable
+	@Label("Medewerker")
+	@Description("Medewerker")
+	@ModelClassName("User")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	private ResourceIdentifier medewerker;
+
+	@NotEditable
 	@EditableInStatus("")
 	@Label("Datum vaststelling")
 	@Description("Datum vaststelling")
@@ -104,21 +119,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	private Date datumGevalideerd;
 
 	@NotEditable
-	@EditableInStatus("")
-	@Label("Traject")
-	@Description("Traject")
-	@ModelClassName("Traject")
-	private ResourceIdentifier traject;
-
-	@NotEditable
-	@Label("Medewerker")
-	@Description("Medewerker")
-	@ModelClassName("User")
-	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
-	private ResourceIdentifier medewerker;
-
-	@NotEditable
 	@EditableInStatus({ "", "GEMELD" })
 	@Required
 	@NotSearchable
@@ -135,6 +135,14 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	private String commentaar;
 
 	// GETTERS AND SETTERS
+	public ResourceIdentifier getTraject() {
+		return traject;
+	}
+
+	public void setTraject(ResourceIdentifier traject) {
+		this.traject = traject;
+	}
+
 	public MeldingStatus getStatus() {
 		return status;
 	}
@@ -175,6 +183,14 @@ public class Melding extends AbstractModelObject implements StorableObject {
 		this.telefoon = telefoon;
 	}
 
+	public ResourceIdentifier getMedewerker() {
+		return medewerker;
+	}
+
+	public void setMedewerker(ResourceIdentifier medewerker) {
+		this.medewerker = medewerker;
+	}
+
 	public Date getDatumVaststelling() {
 		return datumVaststelling;
 	}
@@ -197,22 +213,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	public void setDatumGevalideerd(Date datumGevalideerd) {
 		this.datumGevalideerd = datumGevalideerd;
-	}
-
-	public ResourceIdentifier getTraject() {
-		return traject;
-	}
-
-	public void setTraject(ResourceIdentifier traject) {
-		this.traject = traject;
-	}
-
-	public ResourceIdentifier getMedewerker() {
-		return medewerker;
-	}
-
-	public void setMedewerker(ResourceIdentifier medewerker) {
-		this.medewerker = medewerker;
 	}
 
 	public Probleem getProbleem() {

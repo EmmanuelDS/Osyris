@@ -15,6 +15,8 @@ import org.conscientia.core.form.AbstractListForm;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.controle.Melding;
+import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.Traject;
 
 /**
  * 
@@ -64,5 +66,21 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			}
 		}
 		return query;
+	}
+
+	public String getTrajectNaam() {
+		if (object != null) {
+			try {
+				Melding melding = object;
+				Traject traject = (Traject) modelRepository.loadObject(melding
+						.getTraject());
+				Regio regio = (Regio) modelRepository.loadObject(traject
+						.getRegio());
+				return traject.getNaam() + "(" + regio.getNaam() + ")";
+			} catch (IOException e) {
+				LOG.error("Can not load Traject.", e);
+			}
+		}
+		return null;
 	}
 }

@@ -42,24 +42,6 @@
 						type="button"
 						actionListener="#{meldingOverzichtFormBase.search()}"
 						render="objects" />
-					<j:commandButton rendered="#{meldingOverzichtFormBase.canCreate}"
-						value="#{messages['page.actions.create.label']}"
-						image="#{resource['core/images/actions/12x12/create.png']}"
-						type="button"
-						action="#{meldingOverzichtFormBase.create()}">
-						<j:renderListener target="createPanel" 
-							rendered="true"
-							execute="@this" />
-					</j:commandButton>
-					<j:commandButton rendered="#{meldingOverzichtFormBase.canUpload}"
-						value="#{messages['page.actions.upload.label']}"
-						image="#{resource['core/images/actions/12x12/upload.png']}"
-						type="button"
-						action="#{meldingOverzichtFormBase.clear()}">
-						<j:renderListener target="uploadPanel" 
-							rendered="true"
-							execute="@this" />
-					</j:commandButton>
 					<d:fileDownload fileName="#{meldingOverzichtFormBase.fileName}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/download.png']}"
@@ -75,7 +57,7 @@
 					modelClass="#{meldingOverzichtFormBase.modelClass}" 
 					mode="RESULT" 
 					level="SHORT">
-					<f:facet name="right">
+					<f:facet name="left">
 						<a:outputPanel rendered="true" 
 							styleClass="model-table-actions">
 							<j:commandButton rendered="#{meldingOverzichtFormBase.isCanView(object)}"
@@ -83,16 +65,6 @@
 								type="image" 
 								title="#{messages['page.actions.view.label']}">
 								<j:renderListener target="#{r:clientId('viewPanel')}" 
-									rendered="true"
-									execute="@this" />
-								<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-							<j:commandButton rendered="#{meldingOverzichtFormBase.isCanEdit(object)}"
-								image="#{resource['core/images/actions/16x16/edit.png']}"
-								type="image" 
-								title="#{messages['page.actions.edit.label']}">
-								<j:renderListener target="#{r:clientId('editPanel')}" 
 									rendered="true"
 									execute="@this" />
 								<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
@@ -115,7 +87,7 @@
 			</a:outputPanel>
 			
 			<div style="display: none">
-				<u:decorate template="/resources/core/includes/managePanels.xhtml">
+				<u:decorate template="/resources/osyris/includes/meldingPanels.xhtml">
 					<u:param name="form"
 						value="#{meldingOverzichtFormBase}" />
 					<u:param name="render"

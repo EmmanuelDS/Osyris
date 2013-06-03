@@ -16,14 +16,18 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.search.DefaultQuery;
+import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
+import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
+import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
 /**
  * 
@@ -41,10 +45,14 @@ public class MeldingSaveListener {
 	@Inject
 	private UserRepository userRepository;
 
+	@Inject
+	protected Messages messages;
+
 	public void processEvent(ModelEvent event) throws IOException,
 			InstantiationException, IllegalAccessException {
 		Melding melding = (Melding) event.getModelObject();
 
+		// New melding
 		if (melding.getStatus() == null) {
 			melding.setStatus(MeldingStatus.GEMELD);
 			melding.setDatumGemeld(new Date());
@@ -56,18 +64,21 @@ public class MeldingSaveListener {
 			melding.setStatus(MeldingStatus.GEVALIDEERD);
 			melding.setDatumGevalideerd(new Date());
 
+			// Create new werkopdracht if status probleem is werkopdracht
 			if (melding.getProbleem().getStatus()
 					.equals(ProbleemStatus.WERKOPDRACHT)) {
-				// TODO: nieuwe WerkOpdracht maken met te herstellen bording,
-				// uitvoerder,
-				// toezichthoudend medewerker, status te controleren, datum
-				// creatie
+				createWerkOpdracht(melding);
 			}
 		}
 	}
 
+	/**
+	 * 
+	 * @param traject
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
-	private ResourceKey zoekVerantwoordelijke(ResourceIdentifier traject) {
+	private ResourceName zoekVerantwoordelijke(ResourceIdentifier traject) {
 		try {
 			Traject t = (Traject) modelRepository.loadObject(traject);
 			List<User> users = new ArrayList<User>();
@@ -87,7 +98,7 @@ public class MeldingSaveListener {
 				if (profiel != null) {
 					for (String trajectType : profiel.getTrajectType()) {
 						if (trajectType.equals(t.getModelClass().getName())) {
-							return modelRepository.getResourceKey(u);
+							return modelRepository.getResourceName(u);
 						}
 					}
 				}
@@ -98,6 +109,52 @@ public class MeldingSaveListener {
 			LOG.error("Can not instantiate object.", e);
 		} catch (IllegalAccessException e) {
 			LOG.error("Can not access object.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param melding
+	 */
+	private void createWerkOpdracht(Melding melding) {
+		try {
+			String modelClassName = "WerkOpdracht";
+			WerkOpdracht werkOpdracht = (WerkOpdracht) modelRepository
+					.createObject(
+							modelRepository.getModelClass(modelClassName),
+							(ResourceName) ResourceName
+									.fromString(modelClassName));
+			werkOpdracht.setDatumTeControleren(new Date());
+			werkOpdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
+			werkOpdracht.setMedewerker(melding.getMedewerker());
+			werkOpdracht.setProbleem(melding.getProbleem());
+			werkOpdracht.setUitvoerder(zoekUitvoerder(melding.getTraject()));
+			modelRepository.saveObject(werkOpdracht);
+			messages.info("Nieuwe werkopdracht aangemaakt.");
+		} catch (IOException e) {
+			messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
+			LOG.error("Can not save WerkOpdracht", e);
+		} catch (InstantiationException e) {
+			messages.error("Fout bij het aanmaken van een nieuwe werkopdracht.");
+			LOG.error("Can not create WerkOpdracht.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Can not access WerkOpdracht.", e);
+		}
+	}
+
+	/**
+	 * 
+	 * @param traject
+	 * @return
+	 */
+	private ResourceName zoekUitvoerder(ResourceIdentifier traject) {
+		try {
+			Traject t = (Traject) modelRepository.loadObject(traject);
+			Regio regio = (Regio) modelRepository.loadObject(t.getRegio());
+			return (ResourceName) regio.getUitvoerder();
+		} catch (IOException e) {
+			LOG.error("Can not load Traject.", e);
 		}
 		return null;
 	}

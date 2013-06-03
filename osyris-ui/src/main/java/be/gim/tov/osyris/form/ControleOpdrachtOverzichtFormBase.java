@@ -62,13 +62,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 			if (identity.inGroup("Medewerker", "CUSTOM")) {
 
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
-						.getResourceKey(userRepository.loadUser(identity
+						.getResourceIdentifier(userRepository.loadUser(identity
 								.getUser().getId()))));
 				return query;
 			}
 			if (identity.inGroup("PeterMeter", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("peterMeter", modelRepository
-						.getResourceKey(userRepository.loadUser(identity
+						.getResourceIdentifier(userRepository.loadUser(identity
 								.getUser().getId()))));
 				return query;
 			}

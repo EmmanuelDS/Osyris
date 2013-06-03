@@ -3,60 +3,53 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:d="http://specto.gim.be/display"
-	xmlns:j="http://conscientia.org/jsf"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:a="http://richfaces.org/a4j"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
 	xmlns:cc="http://java.sun.com/jsf/composite">
 	<cc:interface componentType="org.conscientia.ui.ModelObject" />
 	<cc:implementation>
+		<j:bind var="c" />
 		<r:tabPanel switchType="ajax"
 			styleClass="model-propertyGroups"
 			contentClass="model-propertyGroup">
 			<r:tab header="#{messages['page.user.profile']}">
-				<a:outputPanel>
-					<d:aspect id="profile"
-						value="#{cc.attrs.value.getAspect('UserProfile', modelRepository, true)}"
-						mode="#{cc.attrs.mode}"
-						level="#{cc.attrs.level}"/>
-				</a:outputPanel>
-			</r:tab>
-			<r:tab header="#{messages['page.user.password']}">
-				<a:outputPanel>
-					<d:fields>
-						<d:field for="password"
-							label="Password">
-							<h:inputSecret id="password"
-								value="#{cc.attrs.value.newPassword}"
-								required="false">
-								<f:validateLength minimum="4"
-									maximum="64" />
-							</h:inputSecret>
-						</d:field>
-						<d:field for="confirm"
-							label="Confirmation">
-							<h:inputSecret id="confirm"
-								required="false">
-								<f:validateLength minimum="4"
-									maximum="64" />
-							</h:inputSecret>
-						</d:field>
-					</d:fields>
-				</a:outputPanel>
-			</r:tab>
-			<r:tab header="Administratie"
-				rendered="#{identity.inGroup('admin', 'CUSTOM')}">
-				<a:outputPanel>
-					<d:fields>
-						<d:checkboxField id="active"
-							value="#{cc.attrs.value.active}"
-							label="#{cc.attrs.modelClass.getProperty('active').label}"
-							description="#{cc.attrs.modelClass.getProperty('active').description}" />
-					</d:fields>
-				</a:outputPanel>
-			</r:tab>
+			<div class="#{cc.attrs.contentClass}">
 			
-			<r:tab header="Peter/Meter"
+			<div style="float: right">
+				<j:commandButton value="#{messages['page.user.password.title']}"
+					image="#{resource['core/images/actions/12x12/login.png']}"
+					type="button">
+					<j:renderListener target="passwordPanel" 
+						rendered="true"
+						execute="@this" />
+				</j:commandButton>
+				<j:commandButton value="#{messages['page.user.admin.title']}"
+					rendered="#{identity.inGroup('admin', 'CUSTOM')}"
+					image="#{resource['core/images/actions/12x12/preferences.png']}"
+					type="button">
+					<j:renderListener target="adminPanel" 
+						rendered="true"
+						execute="@this" />
+				</j:commandButton>
+			</div>
+			<d:aspect id="profile"
+				value="#{c.attrs.value.getAspect('UserProfile', modelRepository, true)}"
+				mode="#{c.attrs.mode}"
+				level="#{c.attrs.level}"/>
+			
+			<div style="display: none">
+				<u:decorate template="/resources/core/includes/userPanels.xhtml">
+					<u:param name="form"
+						value="#{c}" />
+				</u:decorate>
+			</div>
+		</div>
+		</r:tab>
+		
+		<r:tab header="Peter/Meter"
 				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or
 							 identity.inGroup('Medewerker','CUSTOM') or 
 							 identity.inGroup('PeterMeter','CUSTOM') or
@@ -99,8 +92,8 @@
 						mode="#{cc.attrs.mode}"
 						level="#{cc.attrs.level}"/>
 				</a:outputPanel>
-			</r:tab>
-			
+			</r:tab>	
 		</r:tabPanel>			
+		
 	</cc:implementation>
 </div>
