@@ -17,6 +17,7 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
+import org.conscientia.api.user.UserProfile;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
 import org.jboss.seam.international.status.Messages;
@@ -141,16 +142,28 @@ public class MeldingFormBase implements Serializable {
 
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
-
-		// TODO: Extra melding properties toevoegen?
 		variables.put("firstname", melding.getVoornaam());
 		variables.put("lastname", melding.getNaam());
 		variables.put("phone", melding.getTelefoon());
 		variables.put("status", melding.getStatus());
 		variables.put("problem", melding.getProbleem());
 
+		// Send mail to Melder
 		mailSender.sendMail(preferences.getNoreplyEmail(),
 				Collections.singleton(melding.getEmail()),
+				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
+
+		// Get email Medewerker
+		UserProfile profiel = (UserProfile) modelRepository.loadAspect(
+				modelRepository.getModelClass("UserProfile"),
+				modelRepository.loadObject(melding.getMedewerker()));
+		String medewerkerEmail = profiel.getEmail();
+
+		// Only for testing
+		String testEmail = "kristof.spiessens@gim.be";
+		// Send mail to Medewerker TOV
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton(testEmail),
 				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
 	}
 
@@ -270,7 +283,6 @@ public class MeldingFormBase implements Serializable {
 			sendConfirmationMail(object);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ object.getEmail() + ".");
-			// TODO: Email versturen naar medewerker TOV
 
 			object = createMelding();
 		} catch (IOException e) {
