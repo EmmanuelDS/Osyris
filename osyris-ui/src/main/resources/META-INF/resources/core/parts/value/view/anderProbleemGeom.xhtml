@@ -12,7 +12,7 @@
 	<cc:interface componentType="org.conscientia.ui.ModelValue" />
 	<cc:implementation>
 		<div>
-			<m:mapViewer configuration="#{mapViewerBean.getConfiguration(cc.attrs.property)}" />
+			<m:mapViewer configuration="#{mapViewerBean.getConfiguration(cc.attrs.property, cc.attrs.value)}" />
 		</div>
 	</cc:implementation>
 </div>

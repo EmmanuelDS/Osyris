@@ -38,14 +38,12 @@ public abstract class Bord extends AbstractModelObject implements
 	// VARIABLES
 	@Label("Trajectnaam")
 	@Description("Trajectnaam")
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
+	@Edit(type = "suggestions")
 	private String naam;
 
 	@Label("Straatnaam")
 	@Description("Straatnaam")
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getStraten()}")
+	@Edit(type = "suggestions")
 	private String straatnaam;
 
 	@Label("Wegbevoegdheid")
@@ -119,8 +117,7 @@ public abstract class Bord extends AbstractModelObject implements
 
 	@Label("Gemeente")
 	@Description("Gemeente")
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getGemeentes()}")
+	@Edit(type = "suggestions")
 	private String gemeente;
 
 	// GETTERS AND SETTERS

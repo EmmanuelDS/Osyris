@@ -213,6 +213,26 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Gets traject namen
+	 * 
+	 * @return
+	 */
+	public List<?> getTrajectNamen(ResourceIdentifier regio, String trajectType)
+			throws IOException {
+
+		if (trajectType != null && !trajectType.isEmpty()) {
+			QueryBuilder builder = new QueryBuilder(trajectType);
+			builder.filter(FilterUtils.equal("regio", regio));
+			builder.results(FilterUtils.properties("naam"));
+			builder.groupBy(FilterUtils.properties("naam"));
+
+			return modelRepository.searchObjects(builder.build(), true, true);
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
+	/**
 	 * Gets straatNamen
 	 * 
 	 * @return

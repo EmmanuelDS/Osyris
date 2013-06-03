@@ -1,14 +1,13 @@
 package be.gim.tov.osyris.bean;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.logging.Log;
-import org.apache.commons.logging.LogFactory;
+import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelProperty;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.util.ModelUtils;
@@ -27,39 +26,27 @@ import be.gim.specto.core.context.MapFactory;
 @Named
 public class MapViewerBean {
 
-	private static final Log LOG = LogFactory.getLog(MapViewerBean.class);
+	protected static final List<String> TOOLS = Arrays
+			.asList(new String[] { "drawPoint" });
 
 	@Inject
 	private ModelRepository modelRepository;
-
 	@Inject
 	private MapFactory mapFactory;
 
-	private MapConfiguration configuration;
+	public MapConfiguration getConfiguration(ModelProperty property,
+			ModelObject object) throws IOException {
 
-	public MapConfiguration getConfiguration(ModelProperty property) {
-		MapContext context;
-		List<String> tools = new ArrayList<String>();
-		tools.add("drawLineString");
+		MapContext context = (MapContext) modelRepository
+				.loadObject(new ResourceKey("Form@12"));
 
-		try {
-			context = (MapContext) modelRepository.loadObject(new ResourceKey(
-					"Form@12"));
+		if (context != null) {
+			Reference<?> reference = ModelUtils.valuePointer(object, "geom");
 
-			if (context != null) {
-				// Bind reference and start Mapconfiguration
-				Reference<?> reference = ModelUtils.valuePointer(property,
-						"geom");
-				reference.getType();
-				// configuration = mapFactory.getConfiguration(context.getId()
-				// .toString(), context, reference, true, null, tools,
-				// null);
-				configuration = mapFactory.getConfiguration(context.getId()
-						.toString(), context);
-			}
-		} catch (IOException e) {
-			LOG.error("Can not load mapcontext.", e);
+			return mapFactory.getConfiguration(context.getId().toString(),
+					context, reference, true, null, TOOLS, null);
 		}
-		return configuration;
+
+		return null;
 	}
 }

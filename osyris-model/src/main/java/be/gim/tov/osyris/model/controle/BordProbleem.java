@@ -7,6 +7,8 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -28,6 +30,8 @@ public abstract class BordProbleem extends Probleem {
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordProbleemCode')}")
 	private String type;
 
+	@NotViewable
+	@NotEditable
 	@Label("Bord")
 	@Description("Bord")
 	@ModelClassName("Bord")

@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -15,8 +16,6 @@ import org.conscientia.core.form.AbstractListForm;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.controle.Melding;
-import be.gim.tov.osyris.model.traject.Regio;
-import be.gim.tov.osyris.model.traject.Traject;
 
 /**
  * 
@@ -25,7 +24,8 @@ import be.gim.tov.osyris.model.traject.Traject;
  */
 @Named
 @ViewScoped
-public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
+public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
+		implements Serializable {
 	private static final long serialVersionUID = -3077755833706449795L;
 
 	private static final Log LOG = LogFactory
@@ -66,21 +66,5 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			}
 		}
 		return query;
-	}
-
-	public String getTrajectNaam() {
-		if (object != null) {
-			try {
-				Melding melding = object;
-				Traject traject = (Traject) modelRepository.loadObject(melding
-						.getTraject());
-				Regio regio = (Regio) modelRepository.loadObject(traject
-						.getRegio());
-				return traject.getNaam() + "(" + regio.getNaam() + ")";
-			} catch (IOException e) {
-				LOG.error("Can not load Traject.", e);
-			}
-		}
-		return null;
 	}
 }
