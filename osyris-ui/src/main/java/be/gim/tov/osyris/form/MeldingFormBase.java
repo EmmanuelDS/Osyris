@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.mail.MailSender;
@@ -20,7 +21,11 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
 import org.jboss.seam.international.status.Messages;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
@@ -193,6 +198,7 @@ public class MeldingFormBase implements Serializable {
 		MapContext context = viewer.getConfiguration().getContext();
 
 		getMelding().setProbleem(null);
+		probleemType = StringUtils.EMPTY;
 
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
 			if (layer.getLayerId().equalsIgnoreCase(trajectType)
@@ -200,6 +206,10 @@ public class MeldingFormBase implements Serializable {
 							.equalsIgnoreCase(trajectType + "Bord")) {
 				layer.setHidden(false);
 				layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+
+				// SEARCH TRAJECT ID
+				searchTrajectId(layer);
+
 			} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 				layer.setHidden(true);
 				((GeometryListFeatureMapLayer) layer)
@@ -225,10 +235,10 @@ public class MeldingFormBase implements Serializable {
 
 		Probleem probleem = null;
 		if ("bord".equals(probleemType)) {
-			if (trajectType.endsWith("Route"))
+			if (trajectType.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
-			else if (trajectType.endsWith("Netwerk")) {
+			} else if (trajectType.endsWith("Netwerk")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkBordProbleem", null);
 			}
@@ -247,10 +257,10 @@ public class MeldingFormBase implements Serializable {
 				}
 			}
 		} else if ("ander".equals(probleemType)) {
-			if (trajectType.endsWith("Route"))
+			if (trajectType.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
-			else if (trajectType.endsWith("Netwerk")) {
+			} else if (trajectType.endsWith("Netwerk")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkAnderProbleem", null);
 			}
@@ -279,8 +289,8 @@ public class MeldingFormBase implements Serializable {
 			modelRepository.saveObject(getMelding());
 			messages.info("Melding sucessvol verzonden naar TOV.");
 
-			// Email bevestiging sturen naar melder
-			sendConfirmationMail(object);
+			// Email bevestiging sturen naar melder en medewerker
+			// sendConfirmationMail(object);
 			messages.info("Er is een bevestigingsmail gestuurd naar "
 					+ object.getEmail() + ".");
 
@@ -332,6 +342,32 @@ public class MeldingFormBase implements Serializable {
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
 		if (ids.size() > 0) {
 			((AnderProbleem) object.getProbleem()).setGeom(null);
+		}
+	}
+
+	// EXPERIMENTAL SEARCH TRAJECT ID
+	public void searchTrajectId(FeatureMapLayer layer) {
+		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+					.getFeature(layer, getViewer().getContext().getSrsName(),
+							getViewer().getContext().getBoundingBox(), null,
+							FilterUtils.equal("naam", trajectNaam), null, 1);
+			FeatureIterator<SimpleFeature> iterator = features.features();
+
+			try {
+				if (features.size() == 1) {
+					while (iterator.hasNext()) {
+						SimpleFeature feature = iterator.next();
+						getMelding().setTraject(
+								ResourceIdentifier
+										.fromString("Traject@"
+												+ feature.getAttribute("id")
+														.toString()));
+					}
+				}
+			} finally {
+				iterator.close();
+			}
 		}
 	}
 }

@@ -1,0 +1,184 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf">
+	<a:outputPanel>
+		<j:renderPanel id="createPanel"
+			rendered="false">
+			<d:popupPanel header="#{messages['page.create.title']} #{form.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/create.png']}"
+				show="true" 
+				modal="true"
+				width="600">
+				<div>
+				<h:outputText value="Kies type controleopdracht: " />
+				<h:selectOneMenu id="controleOpdrachtType" value="#{form.controleOpdrachtType}">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItem itemValue="route" itemLabel="Route Controleopdracht" />
+					<f:selectItem itemValue="netwerk" itemLabel="Netwerk Controleopdracht" />
+					<a:ajax
+						event="change"
+						render="createControleOpdrachtPanel"
+						listener="#{form.create()}"
+						execute="@this" />
+				</h:selectOneMenu>
+			</div>	
+		<j:renderPanel id="createControleOpdrachtPanel" rendered="#{form.controleOpdrachtType != null}">	
+				<d:object mode="EDIT" 
+					modelClass="#{form.modelClass}"
+					value="#{form.object}">
+				</d:object>
+				
+				<d:buttons>
+					<j:commandButton value="#{messages['page.create.create.button']}"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						action="#{form.save()}"
+						render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton value="#{messages['form.general.cancel.button']}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/cancel.png']}"
+						action="#{form.cancel()}"
+						execute="@this">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
+				</j:renderPanel>
+			</d:popupPanel>
+		</j:renderPanel>
+		
+		<j:renderPanel id="uploadPanel"
+			rendered="false">
+			<d:popupPanel header="#{messages['page.upload.title']} #{form.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/upload.png']}"
+				show="true"
+				modal="true"
+				width="422">
+				<a:region>
+					<r:fileUpload id="data"
+			           	fileUploadListener="#{form.onFileUpload}"
+						maxFilesQuantity="1"
+						immediateUpload="true"
+						autoclear="true"
+						listHeight="auto"
+						listWidth="100%"
+						execute="@this"
+						render="fileData" />
+				</a:region>
+				<br />
+				<a:outputPanel id="fileData">
+					<d:object value="#{form.object}"
+						mode="VIEW" />
+				</a:outputPanel>
+				<d:buttons>
+					<j:commandButton value="#{messages['page.upload.save.button']}"
+						image="#{resource['core/images/actions/12x12/save.png']}"
+						type="button"
+						action="#{form.save()}"
+						render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton value="#{messages['form.general.cancel.button']}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/cancel.png']}"
+						action="#{form.cancel()}"
+						execute="@this">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
+			</d:popupPanel>
+		</j:renderPanel>
+		
+		<j:renderPanel id="viewPanel" 
+			rendered="false">
+			<d:popupPanel header="#{messages['page.view.title']} #{form.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/view.png']}"
+				show="true" 
+				modal="true"
+				width="600">
+				<d:object mode="VIEW" 
+					modelClass="#{form.modelClass}"
+					value="#{form.object}">
+				</d:object>
+				<d:buttons>
+					<j:commandButton value="#{messages['form.general.close.button']}"
+						image="#{resource['core/images/actions/12x12/close.png']}"
+						type="button"
+						submit="false">
+						<j:renderControl event="click" 
+							rendered="false"
+							execute="@this" />
+					</j:commandButton>
+				</d:buttons>
+			</d:popupPanel>
+		</j:renderPanel>
+		
+		<j:renderPanel id="editPanel"
+			rendered="false">
+			<d:popupPanel header="#{messages['page.edit.title']} #{form.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/edit.png']}"
+				show="true"
+				modal="true"
+				width="600">
+				<d:object mode="EDIT" 
+					modelClass="#{form.modelClass}"
+					value="#{form.object}">
+				</d:object>
+				<d:buttons>
+					<j:commandButton value="#{messages['form.general.save.button']}"
+						image="#{resource['core/images/actions/12x12/save.png']}"
+						type="button" 
+						action="#{form.save()}"
+						render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton value="#{messages['form.general.cancel.button']}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/cancel.png']}"
+						action="#{form.cancel()}"
+						execute="@this">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
+			</d:popupPanel>
+		</j:renderPanel>
+		
+		<j:renderPanel id="deletePanel"
+			rendered="false">
+			<d:popupPanel header="#{messages['page.delete.title']}  #{form.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/delete.png']}"
+				show="true"
+				modal="true"
+				width="600">
+				<h3><h:outputText value="#{messages['form.general.delete.confirm.label']}" /></h3>
+				<br/>
+				<d:object mode="VIEW" 
+					modelClass="#{form.modelClass}"
+					value="#{form.object}">
+				</d:object>
+				<d:buttons>
+					<j:commandButton value="#{messages['form.general.delete.button']}"
+						image="#{resource['core/images/actions/12x12/delete.png']}"
+						type="button" 
+						action="#{form.delete()}"
+						render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton value="#{messages['form.general.cancel.button']}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/cancel.png']}"
+						action="#{form.cancel()}"
+						execute="@this">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
+			</d:popupPanel>
+		</j:renderPanel>
+	</a:outputPanel>
+</u:composition>

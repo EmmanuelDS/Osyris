@@ -8,7 +8,6 @@ import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
-import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
@@ -17,7 +16,6 @@ import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 
 /**
@@ -39,12 +37,12 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Description("Status")
 	private ProbleemStatus status;
 
-	@Edit(type = "panels")
-	@NotSearchable
-	@Label("Foto")
-	@Description("Foto")
-	@ModelClassName("File")
-	private ResourceKey foto;
+	// @Edit(type = "panels")
+	// @NotSearchable
+	// @Label("Foto")
+	// @Description("Foto")
+	// @ModelClassName("File")
+	// private ResourceKey foto;
 
 	@Required
 	@NotSearchable
@@ -62,13 +60,14 @@ public abstract class Probleem extends AbstractModelObject implements
 		this.status = status;
 	}
 
-	public ResourceKey getFoto() {
-		return foto;
-	}
-
-	public void setFoto(ResourceKey foto) {
-		this.foto = foto;
-	}
+	// TODO: Nakijken argument type mismatch resourceKey resourceName
+	// public ResourceKey getFoto() {
+	// return foto;
+	// }
+	//
+	// public void setFoto(ResourceKey foto) {
+	// this.foto = foto;
+	// }
 
 	public String getCommentaar() {
 		return commentaar;

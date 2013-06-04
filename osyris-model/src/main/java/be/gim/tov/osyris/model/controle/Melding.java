@@ -42,9 +42,11 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true) })
 @Label("Melding")
+@Edit(type = "melding")
 public class Melding extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
+	@NotSearchable
 	@NotEditable
 	@EditableInStatus("")
 	@Label("Traject")

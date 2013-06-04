@@ -80,8 +80,8 @@ public class ContextFormBase {
 				// Every layer is editable except regio and gemeente
 				for (FeatureMapLayer mapLayer : mapLayers) {
 					mapLayer.set("editable", false);
-					if (!mapLayer.getId().equals("regio")
-							|| !mapLayer.getId().equals("gemeente")) {
+					if (!mapLayer.getLayerId().equals("regio")
+							|| !mapLayer.getLayerId().equals("gemeente")) {
 						mapLayer.set("editable", true);
 					}
 				}

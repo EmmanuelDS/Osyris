@@ -11,8 +11,8 @@
 	<div><h2>Routedokter - Melding problemen ivm route infrastructuur</h2></div>
 	<table width="100%">
 	<tr>
-	<td width="40%">
-	<r:panel header="Zoek Traject">
+	<td width="40%" valign="top">
+	<r:panel id="searchTrajectPanel" header="Zoek traject">
 		<d:fields>
 			<d:field for="regio" label="Regio" required="true">
 				<h:selectOneMenu id="regio" value="#{form.regio}" required="true">
@@ -47,21 +47,19 @@
 				image="#{resource['core/images/actions/12x12/search.png']}"
 				type="button"
 				action="#{form.searchTraject()}"
-				render="probleemPanel">
+				render="problemPanel"
+				execute="searchTrajectPanel">
 			</j:commandButton>
 		</d:buttons>
 	</r:panel>
-	<br/>
 	<r:panel header="Uw gegevens">
-<!-- 		<d:object mode="EDIT" -->
-<!-- 				value="#{form.melding}" /> -->
 				<d:fields>
 				<d:field label="Voornaam" for="voornaam">	 
 					<d:propertyValue id="voornaam" 
  						modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
  						value="#{form.melding.voornaam}" 
  						mode="EDIT" />
- 				</d:field> 
+ 				</d:field>
  				<d:field label="Naam" for="naam">	 
 					<d:propertyValue id="naam" 
  						modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
@@ -74,10 +72,10 @@
  						value="#{form.melding.telefoon}" 
  						mode="EDIT" />
  				</d:field>
- 				<d:field label="Email" for="email" required="true">	 
-					<d:propertyValue id="email" required="true" 
- 						modelProperty="#{d:modelClass('Melding').getProperty('email')}" 
- 						value="#{form.melding.email}" 
+ 				<d:field label="Email" for="email" required="true">
+ 				<d:propertyValue id="email" required="true"
+ 				 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
+ 						value="#{form.melding.email}"
  						mode="EDIT" />
  				</d:field>
 				<d:field label="Datum vastgesteld" for="datumVastelling">	 
@@ -88,9 +86,8 @@
  				</d:field> 
  			</d:fields>
 	</r:panel>
-	<br/>
-	<r:panel header="Probleem">
-		<div>
+	<r:panel id="problemPanel" header="Probleem">
+			<div>
 				<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
@@ -101,10 +98,10 @@
 						listener="#{form.createProbleem()}"
 						execute="@this" />
 				</h:selectOneMenu>
-		</div>
+			</div>	
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 			<d:object mode="EDIT"
-					value="#{form.melding.probleem}" />
+					value="#{form.melding.probleem}" />	
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"
@@ -139,7 +136,7 @@
 		</d:buttons>
 	</r:panel>
 	</td>
-	<td width="60%">
+	<td width="60%" valign="top">
 	<r:panel>
 		<div style="height: 400px">
 			<m:mapViewer id="viewer"

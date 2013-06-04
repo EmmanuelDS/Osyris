@@ -35,6 +35,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@Inject
 	protected UserRepository userRepository;
 
+	protected String controleOpdrachtType;
+
+	public String getControleOpdrachtType() {
+		return controleOpdrachtType;
+	}
+
+	public void setControleOpdrachtType(String controleOpdrachtType) {
+		this.controleOpdrachtType = controleOpdrachtType;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -77,5 +87,26 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 
 		return query;
+	}
+
+	@Override
+	public void create() {
+		try {
+
+			object = null;
+			if (controleOpdrachtType.equals("route")) {
+				object = (ControleOpdracht) modelRepository.createObject(
+						modelRepository.getModelClass("RouteControleOpdracht"),
+						null);
+			} else if (controleOpdrachtType.equals("netwerk")) {
+				object = (ControleOpdracht) modelRepository
+						.createObject(modelRepository
+								.getModelClass("NetwerkControleOpdracht"), null);
+			}
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate model object.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Illegal access at creation model object.", e);
+		}
 	}
 }

@@ -19,7 +19,7 @@
 					value="#{form.object}">
 				</d:object>
 				<d:buttons>
-					<j:commandButton rendered="#{form.isCanEdit(object) and form.object.status == 'GEMELD'}"
+					<j:commandButton rendered="#{form.isCanEdit(form.object) and form.object.status == 'GEMELD'}"
 									value="Valideren"
 									image="#{resource['core/images/actions/12x12/apply.png']}"
 									type="button" 

@@ -98,8 +98,7 @@
 						<j:commandButton rendered="#{controleOpdrachtOverzichtFormBase.canCreate}"
 							value="#{messages['page.actions.create.label']}"
 							image="#{resource['core/images/actions/12x12/create.png']}"
-							type="button"
-							action="#{controleOpdrachtOverzichtFormBase.create()}">
+							type="button">
 							<j:renderListener target="createPanel" 
 								rendered="true"
 								execute="@this" />
@@ -121,7 +120,7 @@
 					</d:buttons>
 				</a:outputPanel>
 				
-				<u:decorate template="/resources/core/includes/managePanels.xhtml">
+				<u:decorate template="/resources/osyris/includes/controleOpdrachtPanels.xhtml">
 					<u:param name="form"
 						value="#{controleOpdrachtOverzichtFormBase}" />
 					<u:param name="render"
