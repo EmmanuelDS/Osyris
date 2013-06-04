@@ -29,7 +29,6 @@ import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.core.model.AbstractModelObject;
 import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
@@ -288,11 +287,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				"Medewerker"), "view", true));
 		permissions.add(new DefaultPermission(new ResourceName("group",
 				"Medewerker"), "edit", true));
-
-		for (Permission permission : permissions) {
-			((AbstractModelObject) permission)
-					.setModelClassLoader(modelRepository.getModelContext());
-		}
 
 		return permissions;
 	}
