@@ -26,6 +26,10 @@ public class PropertyProbleemEditableBean {
 			if (identity.inGroup("Medewerker", "CUSTOM")
 					|| identity.inGroup("Routedokter", "CUSTOM")
 					|| identity.inGroup("admin", "CUSTOM")) {
+				// Set geom property to editable false
+				if (property.getName().equals("geom")) {
+					editable = false;
+				}
 				if (object.get("commentaar") == null
 						|| StringUtils.isEmpty((String) object
 								.get("commentaar"))) {

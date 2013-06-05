@@ -201,14 +201,26 @@ public class MeldingFormBase implements Serializable {
 		probleemType = StringUtils.EMPTY;
 
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
-			if (layer.getLayerId().equalsIgnoreCase(trajectType)
-					|| layer.getLayerId()
-							.equalsIgnoreCase(trajectType + "Bord")) {
+			if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+
+				if (trajectType.contains("Segment")) {
+					layer.setHidden(false);
+					layer.setFilter(FilterUtils.equal("regio", regio));
+				} else {
+					layer.setHidden(false);
+					layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+				}
+
+			} else if (layer.getLayerId()
+					.equalsIgnoreCase(trajectType + "Bord")) {
 				layer.setHidden(false);
 				layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+			}
 
-				// SEARCH TRAJECT ID
-				searchTrajectId(layer);
+			else if (layer.getLayerId().equalsIgnoreCase(
+					trajectType.replace("Segment", "") + "Bord")) {
+				layer.setHidden(false);
+				layer.setFilter(FilterUtils.equal("regio", regio));
 
 			} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 				layer.setHidden(true);
@@ -238,7 +250,7 @@ public class MeldingFormBase implements Serializable {
 			if (trajectType.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
-			} else if (trajectType.endsWith("Netwerk")) {
+			} else if (trajectType.contains("Netwerk")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkBordProbleem", null);
 			}
@@ -247,7 +259,13 @@ public class MeldingFormBase implements Serializable {
 				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				} else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType.replace("Segment", "") + "Bord")) {
+					layer.set("selectable", true);
+					layer.setSelection(new ArrayList<String>(1));
+				}
+
+				else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(Collections.EMPTY_LIST);
@@ -260,7 +278,7 @@ public class MeldingFormBase implements Serializable {
 			if (trajectType.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
-			} else if (trajectType.endsWith("Netwerk")) {
+			} else if (trajectType.contains("Netwerk")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkAnderProbleem", null);
 			}
@@ -285,6 +303,19 @@ public class MeldingFormBase implements Serializable {
 	public void saveMelding() {
 
 		try {
+			// SEARCH TRAJECT IDENTIFIER TO SET TO MELDING
+			MapViewer viewer = getViewer();
+			MapContext context = viewer.getConfiguration().getContext();
+
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				if (layer.getLayerId().equalsIgnoreCase(trajectType)
+						|| layer.getLayerId().equalsIgnoreCase(
+								trajectType + "Bord")) {
+					layer.setHidden(false);
+					layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+					searchTrajectId(layer);
+				}
+			}
 			// Save Melding
 			modelRepository.saveObject(getMelding());
 			messages.info("Melding sucessvol verzonden naar TOV.");
@@ -295,6 +326,9 @@ public class MeldingFormBase implements Serializable {
 					+ object.getEmail() + ".");
 
 			object = createMelding();
+
+			getMelding().setProbleem(null);
+
 		} catch (IOException e) {
 			LOG.error("Can not save model object.", e);
 			messages.error("Melding niet verzonden");

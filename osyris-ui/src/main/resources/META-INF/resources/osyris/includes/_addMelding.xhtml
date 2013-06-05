@@ -35,8 +35,8 @@
 						execute="@this" />
 				</h:selectOneMenu>
 			</d:field>
-			<d:field for="trajectNaam" label="Traject naam" required="true">
-				<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" required="true">
+			<d:field for="trajectNaam" label="Traject naam">
+				<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}">
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
 				</h:selectOneMenu>
@@ -101,13 +101,26 @@
 			</div>	
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 			<d:object mode="EDIT"
-					value="#{form.melding.probleem}" />	
+					value="#{form.melding.probleem}" />		
+<!-- 			<j:commandButton -->
+<!-- 				id="selectSegment" -->
+<!-- 				rendered="#{form.trajectType.contains('Segment')}" -->
+<!-- 				image="#{resource['core/images/actions/24x24/select.png']}" -->
+<!-- 				styleClass="component-toolbar-button" -->
+<!-- 				value="Selecteer Segment" -->
+<!-- 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
+<!-- 				submit="false"> -->
+<!-- 				<j:activateControl -->
+<!-- 					for="viewer" -->
+<!-- 					event="click" -->
+<!-- 					control="selectBox" /> -->
+<!-- 			</j:commandButton> -->
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"
 				image="#{resource['core/images/actions/24x24/select.png']}"
 				styleClass="component-toolbar-button"
-				value="#{messages['model.entry.mapContext.tools.selectFeatures.btn.label']}"
+				value="Selecteer Bord"
 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
 				submit="false">
 				<j:activateControl
@@ -126,7 +139,6 @@
 					event="click"
 					control="drawPoint" />
 			</j:commandButton>
-		</j:renderPanel>
 		<d:buttons>
 			<j:commandButton value="Verzenden"
 				image="#{resource['core/images/actions/12x12/apply.png']}"
@@ -134,6 +146,7 @@
 				action="#{form.saveMelding()}">
 			</j:commandButton>
 		</d:buttons>
+		</j:renderPanel>
 	</r:panel>
 	</td>
 	<td width="60%" valign="top">

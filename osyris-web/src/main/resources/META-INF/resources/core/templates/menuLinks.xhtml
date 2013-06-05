@@ -8,6 +8,14 @@
 	<j:cache var="menuItems"
 		value="#{systemManager.menu.menuItems}"
 		transient="true" />
+		
+	
+	<r:toolbarGroup location="left" rendered="#{!identity.isLoggedIn()}">
+		<d:link value="form:MeldingForm"
+							mode="view"
+							label="Routedokter"/>
+	</r:toolbarGroup>
+	
 	<r:toolbarGroup location="left"
 		rendered="#{menuItems.size() gt 0}">
 		<c:forEach items="#{menuItems}"
