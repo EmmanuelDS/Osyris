@@ -17,6 +17,7 @@ import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
@@ -116,6 +117,9 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
@@ -123,6 +127,9 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
 	@ModelClassName("User")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
 	private ResourceIdentifier peterMeter;
 
 	@NotEditable

@@ -79,10 +79,10 @@ public class ContextFormBase {
 					|| identity.inGroup("admin", "CUSTOM")) {
 				// Every layer is editable except regio and gemeente
 				for (FeatureMapLayer mapLayer : mapLayers) {
-					mapLayer.set("editable", false);
-					if (!mapLayer.getLayerId().equals("regio")
-							|| !mapLayer.getLayerId().equals("gemeente")) {
-						mapLayer.set("editable", true);
+					mapLayer.set("editable", true);
+					if (mapLayer.getLayerId().equals("regio")
+							|| mapLayer.getLayerId().equals("gemeente")) {
+						mapLayer.set("editable", false);
 					}
 				}
 			}

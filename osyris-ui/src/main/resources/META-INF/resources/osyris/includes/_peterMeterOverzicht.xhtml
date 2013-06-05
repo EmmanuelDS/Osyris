@@ -7,10 +7,9 @@
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:j="http://conscientia.org/jsf"
-	xmlns:q="http://specto.gim.be/search">
-	
-	<div><h2>Overzicht Peters en Meters</h2></div>
-	
+	xmlns:q="http://specto.gim.be/search"
+	xmlns:p="http://primefaces.org/ui">
+
 	<j:layout style="height: 600px">
 		<j:layoutPane
 			region="west"
@@ -55,13 +54,24 @@
 	<a:outputPanel id="result"
 		renderend="true">
 		
-		<r:dataTable id="objects"
+		<p:dataTable id="objects"
 					 value="#{peterMeterOverzichtFormBase.results}"  
 					 mode="RESULT" 
 					 var="user" 
 					 style="width: 100%;"
-					 styleClass="model-table #{cc.attrs.contentClass}">
-						<r:column label="Acties">
+					 styleClass="model-table #{cc.attrs.contentClass}"
+					 paginator="true" rows="20"
+					 paginatorPosition="bottom"
+                 	 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+                 	 rowsPerPageTemplate="20,30,40,50"
+                 	 draggableColumns="true">
+        <f:facet name="header">
+            <div><h2>Overzicht Peters en Meters</h2></div>
+        </f:facet>
+			<p:column style="width:2%">
+		            <p:rowToggler />
+		    </p:column>
+			<p:column label="Acties">
 				<a:outputPanel rendered="true" 
 					styleClass="model-table-actions">
 					<h:panelGrid columns="3">
@@ -100,9 +110,9 @@
 						</j:commandButton>
 					</h:panelGrid>
 				</a:outputPanel>
-			</r:column>
-			<r:column label="Voornaam"
-				sortable="true">
+			</p:column>
+			<p:column label="Voornaam"
+				sortBy="#{user.getAspect('UserProfile', modelRepository, true).firstName }">
 				<f:facet name="header">
 					<d:displayLabel property="#{d:modelClass('UserProfile').getProperty('firstName')}" />
 				</f:facet>
@@ -110,9 +120,9 @@
 							modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
 							value="#{user.getAspect('UserProfile', modelRepository, true).firstName }"
 							mode="VIEW" />
-			</r:column>
-			<r:column label="Familienaam"
-				sortable="true">
+			</p:column>
+			<p:column label="Familienaam"
+				sortBy="#{user.getAspect('UserProfile', modelRepository, true).lastName}">
 				<f:facet name="header">
 					<d:displayLabel property="#{d:modelClass('UserProfile').getProperty('lastName')}" />
 				</f:facet>
@@ -120,9 +130,9 @@
 							modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
 							value="#{user.getAspect('UserProfile', modelRepository, true).lastName}"
 							mode="VIEW" />
-			</r:column>
-			<r:column label="Email"
-				sortable="true">
+			</p:column>
+			<p:column label="Email"
+				sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
 				<f:facet name="header">
 					<d:displayLabel property="#{d:modelClass('UserProfile').getProperty('email')}" />
 				</f:facet>
@@ -130,9 +140,9 @@
 							modelProperty="#{d:modelClass('UserProfile').getProperty('email')}"
 							value="#{user.getAspect('UserProfile', modelRepository, true).email }"
 							mode="VIEW" />
-			</r:column>
-				<r:column label="Status"
-				sortable="true">
+			</p:column>
+			<p:column label="Status"
+				sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }">
 				<f:facet name="header">
 					<d:displayLabel property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" />
 				</f:facet>
@@ -140,9 +150,9 @@
 							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('status')}"
 							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }"
 							mode="VIEW" />
-			</r:column>
-				<r:column label="ActiefSinds"
-				sortable="true">
+			</p:column>
+			<p:column label="ActiefSinds"
+				sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }">
 				<f:facet name="header">
 					<d:displayLabel property="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}" />
 				</f:facet>
@@ -150,9 +160,9 @@
 							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}"
 							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }"
 							mode="VIEW" />
-			</r:column>
-			<r:column label="Voorkeuren"
-				sortable="true">
+			</p:column>
+			 <p:rowExpansion label="Voorkeuren">
+			 <h:panelGrid id="display" columns="1" style="width:400px;">
 				<f:facet name="header">
 					<d:displayLabel property="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}" />
 				</f:facet>
@@ -160,11 +170,9 @@
 							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}"
 							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).voorkeuren }"
 							mode="VIEW" />
-			</r:column>
-			<f:facet name="footer">
-				<r:dataScroller for="objects" />
-			</f:facet>
-		</r:dataTable>
+			</h:panelGrid>
+			</p:rowExpansion>
+		</p:dataTable>
 	</a:outputPanel>
 	<br/>
 	<a:outputPanel rendered="true">
