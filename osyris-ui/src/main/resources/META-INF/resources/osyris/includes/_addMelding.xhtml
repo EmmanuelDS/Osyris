@@ -52,7 +52,7 @@
 			</j:commandButton>
 		</d:buttons>
 	</r:panel>
-	<r:panel header="Uw gegevens">
+	<r:panel id="gegevensPanel" header="Uw gegevens">
 				<d:fields>
 				<d:field label="Voornaam" for="voornaam">	 
 					<d:propertyValue id="voornaam" 
@@ -102,25 +102,12 @@
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 			<d:object mode="EDIT"
 					value="#{form.melding.probleem}" />		
-<!-- 			<j:commandButton -->
-<!-- 				id="selectSegment" -->
-<!-- 				rendered="#{form.trajectType.contains('Segment')}" -->
-<!-- 				image="#{resource['core/images/actions/24x24/select.png']}" -->
-<!-- 				styleClass="component-toolbar-button" -->
-<!-- 				value="Selecteer Segment" -->
-<!-- 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
-<!-- 				submit="false"> -->
-<!-- 				<j:activateControl -->
-<!-- 					for="viewer" -->
-<!-- 					event="click" -->
-<!-- 					control="selectBox" /> -->
-<!-- 			</j:commandButton> -->
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"
 				image="#{resource['core/images/actions/24x24/select.png']}"
 				styleClass="component-toolbar-button"
-				value="Selecteer Bord"
+				value="Selecteer bord op kaart"
 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
 				submit="false">
 				<j:activateControl
@@ -133,11 +120,29 @@
 				rendered="#{form.probleemType == 'ander'}"
 				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
 				styleClass="component-toolbar-button"
-				value="#{messages['model.entry.mapLayer.tools.drawPoint.btn.label']}">
+				value="Duid probleem aan op kaart">
 				<j:activateControl
 					for="viewer"
 					event="click"
 					control="drawPoint" />
+			</j:commandButton>
+			<br/>
+			<j:commandButton
+				id="selectSegment"
+				rendered="#{form.trajectType.contains('Segment')}"
+				image="#{resource['core/images/actions/24x24/select.png']}"
+				styleClass="component-toolbar-button"
+				value="Selecteer segment op kaart"
+				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+				submit="false">
+				<j:activateControl
+					for="viewer"
+					event="click"
+					control="selectBox" >
+					<f:param
+							name="layerId"
+							value="#{trajectType}" />
+				</j:activateControl>
 			</j:commandButton>
 		<d:buttons>
 			<j:commandButton value="Verzenden"

@@ -17,6 +17,7 @@ import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.specto.core.context.MapFactory;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.traject.Traject;
 
@@ -36,6 +37,9 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	// VARIABLES
 	@Inject
 	protected UserRepository userRepository;
+
+	@Inject
+	protected MapFactory mapFactory;
 
 	protected ResourceIdentifier regio;
 	protected String trajectType;

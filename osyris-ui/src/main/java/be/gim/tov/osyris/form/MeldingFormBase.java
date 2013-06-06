@@ -40,7 +40,11 @@ import be.gim.specto.ui.component.MapViewer;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
+import be.gim.tov.osyris.model.controle.NetwerkAnderProbleem;
+import be.gim.tov.osyris.model.controle.NetwerkBordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Traject;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -206,6 +210,10 @@ public class MeldingFormBase implements Serializable {
 				if (trajectType.contains("Segment")) {
 					layer.setHidden(false);
 					layer.setFilter(FilterUtils.equal("regio", regio));
+
+					if (trajectNaam != null) {
+						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+					}
 				} else {
 					layer.setHidden(false);
 					layer.setFilter(FilterUtils.equal("naam", trajectNaam));
@@ -221,6 +229,9 @@ public class MeldingFormBase implements Serializable {
 					trajectType.replace("Segment", "") + "Bord")) {
 				layer.setHidden(false);
 				layer.setFilter(FilterUtils.equal("regio", regio));
+				if (trajectNaam != null) {
+					layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+				}
 
 			} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 				layer.setHidden(true);
@@ -256,7 +267,8 @@ public class MeldingFormBase implements Serializable {
 			}
 
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
+				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")
+						|| layer.getLayerId().equalsIgnoreCase(trajectType)) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
 				} else if (layer.getLayerId().equalsIgnoreCase(
@@ -284,7 +296,10 @@ public class MeldingFormBase implements Serializable {
 			}
 
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+					layer.set("selectable", true);
+					layer.setSelection(new ArrayList<String>(1));
+				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 					layer.setHidden(false);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
@@ -303,35 +318,41 @@ public class MeldingFormBase implements Serializable {
 	public void saveMelding() {
 
 		try {
-			// SEARCH TRAJECT IDENTIFIER TO SET TO MELDING
-			MapViewer viewer = getViewer();
-			MapContext context = viewer.getConfiguration().getContext();
+			// GET TRAJECT ID FOR ROUTE VIA TRAJECTNAAM
+			if (trajectType.contains("Route")) {
+				MapViewer viewer = getViewer();
+				MapContext context = viewer.getConfiguration().getContext();
 
-			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				if (layer.getLayerId().equalsIgnoreCase(trajectType)
-						|| layer.getLayerId().equalsIgnoreCase(
-								trajectType + "Bord")) {
-					layer.setHidden(false);
-					layer.setFilter(FilterUtils.equal("naam", trajectNaam));
-					searchTrajectId(layer);
+				for (FeatureMapLayer layer : context.getFeatureLayers()) {
+					if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+						// In case of route get the traject id via trajectnaam
+						searchTrajectId(layer);
+					}
 				}
 			}
 			// Save Melding
-			modelRepository.saveObject(getMelding());
-			messages.info("Melding sucessvol verzonden naar TOV.");
+			if (object.getTraject() != null) {
+				modelRepository.saveObject(getMelding());
+				messages.info("Melding sucessvol verzonden naar TOV.");
 
-			// Email bevestiging sturen naar melder en medewerker
-			// sendConfirmationMail(object);
-			messages.info("Er is een bevestigingsmail gestuurd naar "
-					+ object.getEmail() + ".");
+				// Email bevestiging sturen naar melder en medewerker
+				// sendConfirmationMail(object);
+				messages.info("Er is een bevestigingsmail gestuurd naar "
+						+ object.getEmail() + ".");
 
-			object = createMelding();
+				object = createMelding();
 
-			getMelding().setProbleem(null);
+				getMelding().setProbleem(null);
+			}
+
+			else {
+				messages.error("Melding niet verzonden: Er is geen segment geselecteerd.");
+			}
 
 		} catch (IOException e) {
 			LOG.error("Can not save model object.", e);
-			messages.error("Melding niet verzonden");
+			messages.error("Melding niet verzonden.");
 		} catch (Exception e) {
 			LOG.error("Can not send mail.", e);
 			messages.error("Bevestigingsmail niet verstuurd.");
@@ -339,24 +360,75 @@ public class MeldingFormBase implements Serializable {
 		}
 	}
 
-	public void onSelectFeatures(ControllerEvent event) {
+	@SuppressWarnings("unchecked")
+	public void onSelectFeatures(ControllerEvent event) throws IOException {
 
-		List<String> ids = (List<String>) event.getParams().get("featureIds");
-		if (ids.size() > 0) {
-			String id = ids.iterator().next();
-			((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
-					"Bord", id));
+		// Get selected segment
+		if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+			List<String> ids = (List<String>) event.getParams().get(
+					"featureIds");
+			if (ids.size() > 0) {
+				String id = ids.iterator().next();
+				object.setTraject(new ResourceKey("Traject", id));
+
+			}
+		}
+
+		// FIXME: Get selected bord and segment
+		else if (object.getProbleem() instanceof NetwerkBordProbleem) {
+			List<String> ids = (List<String>) event.getParams().get(
+					"featureIds");
+			if (ids.size() > 0) {
+				String id = ids.iterator().next();
+
+				if ((Traject) modelRepository.loadObject(new ResourceKey(
+						"Traject", id)) != null) {
+					object.setTraject(new ResourceKey("Traject", id));
+				}
+
+				if ((Bord) modelRepository.loadObject(new ResourceKey("Bord",
+						id)) != null) {
+					((BordProbleem) object.getProbleem())
+							.setBord(new ResourceKey("Bord", id));
+				}
+			}
+		}
+
+		// Get selected bord
+		else {
+			List<String> ids = (List<String>) event.getParams().get(
+					"featureIds");
+			if (ids.size() > 0) {
+				String id = ids.iterator().next();
+				((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
+						"Bord", id));
+			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void onUnselectFeatures(ControllerEvent event) {
 
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		for (FeatureMapLayer layer : context.getFeatureLayers()) {
+			layer.setSelection(null);
+		}
+
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
 		if (ids.size() > 0) {
-			((BordProbleem) object.getProbleem()).setBord(null);
+			if (object.getProbleem() instanceof BordProbleem) {
+				((BordProbleem) object.getProbleem()).setBord(null);
+			}
+
+			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+				object.setTraject(null);
+			}
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void onUpdateFeatures(ControllerEvent event) {
 
 		MapViewer viewer = getViewer();
@@ -371,6 +443,7 @@ public class MeldingFormBase implements Serializable {
 		}
 	}
 
+	@SuppressWarnings("unchecked")
 	public void onDeleteFeatures(ControllerEvent event) {
 
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
@@ -379,7 +452,13 @@ public class MeldingFormBase implements Serializable {
 		}
 	}
 
-	// EXPERIMENTAL SEARCH TRAJECT ID
+	// SEARCH TRAJECT ID FOR ROUTES: GET ID FROM TRAJECTNAAM
+	/**
+	 * Filters the layer based on trajectNaam and sets the TrajectID via
+	 * trajectNaam
+	 * 
+	 * @param layer
+	 */
 	public void searchTrajectId(FeatureMapLayer layer) {
 		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
@@ -393,10 +472,8 @@ public class MeldingFormBase implements Serializable {
 					while (iterator.hasNext()) {
 						SimpleFeature feature = iterator.next();
 						getMelding().setTraject(
-								ResourceIdentifier
-										.fromString("Traject@"
-												+ feature.getAttribute("id")
-														.toString()));
+								new ResourceKey("Traject", feature
+										.getAttribute("id").toString()));
 					}
 				}
 			} finally {
