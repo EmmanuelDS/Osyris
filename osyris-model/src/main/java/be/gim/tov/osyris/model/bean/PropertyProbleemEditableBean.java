@@ -20,16 +20,18 @@ public class PropertyProbleemEditableBean {
 	private Identity identity;
 
 	public boolean isEditable(ModelObject object, ModelProperty property) {
+
+		// Set geom property to editable false
+		if (property.getName().equals("geom")) {
+			return false;
+		}
+
 		boolean editable = false;
 		// Fields not editable in certain groups, unless if problem is new.
 		if (!property.getName().equals("status")) {
 			if (identity.inGroup("Medewerker", "CUSTOM")
 					|| identity.inGroup("Routedokter", "CUSTOM")
 					|| identity.inGroup("admin", "CUSTOM")) {
-				// Set geom property to editable false
-				if (property.getName().equals("geom")) {
-					editable = false;
-				}
 				if (object.get("commentaar") == null
 						|| StringUtils.isEmpty((String) object
 								.get("commentaar"))) {
