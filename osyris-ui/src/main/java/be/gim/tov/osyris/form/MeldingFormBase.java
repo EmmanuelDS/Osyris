@@ -267,12 +267,12 @@ public class MeldingFormBase implements Serializable {
 			}
 
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")
-						|| layer.getLayerId().equalsIgnoreCase(trajectType)) {
+				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
 				} else if (layer.getLayerId().equalsIgnoreCase(
-						trajectType.replace("Segment", "") + "Bord")) {
+						trajectType.replace("Segment", "") + "Bord")
+						|| trajectType.contains("Netwerk")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
 				}

@@ -39,7 +39,7 @@ public class RouteBord extends Bord {
 	// @NotSearchable
 	@Label("Route")
 	@Description("Route")
-	@ModelClassName("Route")
+	@ModelClassName("Traject")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	private ResourceIdentifier route;
