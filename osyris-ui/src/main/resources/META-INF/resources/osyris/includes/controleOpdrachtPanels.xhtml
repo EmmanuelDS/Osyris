@@ -2,179 +2,258 @@
 	xmlns:u="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:a="http://richfaces.org/a4j"
+	xmlns:a="http://richfaces.org/a4j" 
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
-	xmlns:j="http://conscientia.org/jsf">
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui">
+
 	<a:outputPanel>
-		<j:renderPanel id="createPanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.create.title']} #{form.modelClass.label}"
+		<j:renderPanel id="createPanel" rendered="false">
+			<d:popupPanel header="Aanmaken Controleopdracht"
 				icon="#{resources['core/images/actions/16x16/create.png']}"
-				show="true" 
-				modal="true"
-				width="600">
+				show="true" modal="true" width="1100" height="700">
 				<div>
-				<h:outputText value="Kies type controleopdracht: " />
-				<h:selectOneMenu id="controleOpdrachtType" value="#{form.controleOpdrachtType}">
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItem itemValue="route" itemLabel="Route Controleopdracht" />
-					<f:selectItem itemValue="netwerk" itemLabel="Netwerk Controleopdracht" />
-					<a:ajax
-						event="change"
-						render="createControleOpdrachtPanel"
-						listener="#{form.create()}"
-						execute="@this" />
-				</h:selectOneMenu>
-			</div>	
-		<j:renderPanel id="createControleOpdrachtPanel" rendered="#{form.controleOpdrachtType != null}">	
-				<d:object mode="EDIT" 
-					modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
-				
-				<d:buttons>
-					<j:commandButton value="#{messages['page.create.create.button']}"
-						image="#{resource['core/images/actions/12x12/apply.png']}"
-						type="button"
-						action="#{form.save()}"
-						render="#{render}">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-					<j:commandButton value="#{messages['form.general.cancel.button']}"
-						type="button"
-						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-				</d:buttons>
+					<h:outputText value="Type controleopdracht: " />
+					<h:selectOneMenu id="controleOpdrachtType"
+						value="#{form.controleOpdrachtType}">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItem itemValue="route" itemLabel="Route Controleopdracht" />
+						<f:selectItem itemValue="netwerk"
+							itemLabel="Netwerk Controleopdracht" />
+						<a:ajax event="change" render="createControleOpdrachtPanel"
+							listener="#{form.create()}" execute="@this" />
+					</h:selectOneMenu>
+				</div>
+				<br />
+				<j:renderPanel id="createControleOpdrachtPanel"
+					rendered="#{form.controleOpdrachtType != null}">
+					<table width="100%">
+						<tr>
+							<td width="40%" valign="top"><r:panel
+									id="searchTrajectPanel" header="Zoek traject">
+									<d:fields>
+										<d:field for="trajectType" label="Traject type"
+											required="true">
+											<h:selectOneMenu id="trajectType" value="#{form.trajectType}"
+												required="true">
+												<f:selectItem itemValue="" itemLabel="" />
+												<f:selectItems
+													value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectTypes(form.controleOpdrachtType))}" />
+												<a:ajax event="change" render="detailSearchPanel"
+													execute="@this" />
+											</h:selectOneMenu>
+										</d:field>
+										<j:renderPanel id="detailSearchPanel"
+											rendered="#{form.trajectType != null}">
+											<d:field for="trajectNaam" label="Traject naam"
+												rendered="true"
+												required="#{form.trajectType.contains('Route')}">
+												<h:selectOneMenu id="trajectNaam"
+													value="#{form.trajectNaam}" rendered="true"
+													required="#{form.trajectType.contains('Route')}">
+													<f:selectItem itemValue="" itemLabel="" />
+													<f:selectItems
+														value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+												</h:selectOneMenu>
+											</d:field>
+											<br />
+											<j:commandButton id="selectSegment"
+												rendered="#{form.trajectType.contains('Segment')}"
+												image="#{resource['core/images/actions/24x24/select.png']}"
+												styleClass="component-toolbar-button"
+												value="Selecteer segment op kaart"
+												title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+												submit="false">
+												<j:activateControl for="viewer" event="click"
+													control="selectBox">
+													<f:param name="layerId" value="#{trajectType}" />
+												</j:activateControl>
+											</j:commandButton>
+											<d:buttons>
+												<j:commandButton value="Zoeken"
+													image="#{resource['core/images/actions/12x12/search.png']}"
+													type="button" action="#{form.searchTraject()}"
+													execute="searchTrajectPanel"
+													render="map">
+												</j:commandButton>
+											</d:buttons>
+										</j:renderPanel>
+									</d:fields>
+								</r:panel> 
+								<br/>
+								<r:panel id="controleOpdrachtPanel">
+									<d:buttons>
+										<j:commandButton value="Maak bewegwijzeringsverslag"
+											image="#{resource['core/images/actions/12x12/search.png']}"
+											type="button" action="#{form.getBewegwijzeringVerslag()}"
+											execute="@this"
+											render="bewegwijzering">
+										</j:commandButton>
+									</d:buttons>
+									<j:renderPanel id="bewegwijzering"
+										rendered="true" height="100">
+										<p:dataTable id="borden"
+											value="#{form.bewegwijzering}" mode="RESULT"
+											var="bord" style="width: 100%;"
+											styleClass="model-table #{cc.attrs.contentClass}"
+											paginator="true" rows="5" paginatorPosition="bottom" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+											emptyMessage="Geen resultaten gevonden">
+											<f:facet name="header">
+												<div>Bewegwijzering</div>
+											</f:facet>
+											<p:column>
+												<f:facet name="header">
+												<div>Nummer</div>
+												</f:facet>
+												<d:propertyValue id="bordVolgColumn"
+													modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
+													value="#{bord.volg }" mode="VIEW" />
+											</p:column>
+											<p:column>
+												<f:facet name="header">
+												<d:displayLabel
+													property="#{d:modelClass('Bord').getProperty('straatnaam')}" />
+												</f:facet>
+												<d:propertyValue id="straatnaamColumn"
+													modelProperty="#{d:modelClass('Bord').getProperty('straatnaam')}"
+													value="#{bord.straatnaam }" mode="VIEW" />
+											</p:column>
+										</p:dataTable>
+									</j:renderPanel>
+									<br/>
+									<d:fields>
+										<d:field label="Periode" for="periode">
+											<d:propertyValue id="periode"
+												modelProperty="#{d:modelClass('ControleOpdracht').getProperty('periode')}"
+												value="#{form.object.periode}" mode="EDIT" />
+										</d:field>
+										<d:field label="Peter/Meter" for="peterMeter">
+											<d:propertyValue id="peterMeter"
+												modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
+												value="#{form.object.peterMeter}" mode="EDIT" />
+										</d:field>
+										<d:field label="Datum controle" for="datumTeControleren">
+											<d:propertyValue id="datumTeControleren"
+												modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTeControleren')}"
+												value="#{form.object.datumTeControleren}" mode="EDIT" />
+										</d:field>
+										<d:field label="Medewerker" for="medewerker">
+											<d:propertyValue id="medewerker"
+												modelProperty="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}"
+												value="#{form.object.medewerker}" mode="EDIT" />
+										</d:field>
+										<d:field label="Commentaar" for="commentaar">
+											<d:propertyValue id="commentaar"
+												modelProperty="#{d:modelClass('ControleOpdracht').getProperty('commentaar')}"
+												value="#{form.object.commentaar}" mode="EDIT" />
+										</d:field>
+
+									</d:fields>
+								</r:panel></td>
+							<td width="60%" valign="top"><r:panel id="map">
+									<div style="height: 500px">
+										<m:mapViewer id="viewer"
+											configuration="#{form.getConfiguration()}">
+											<j:controllerListener name="selectedFeatures"
+												listener="#{form.onSelectFeatures}" />
+											<j:controllerListener name="unselectedFeatures"
+												listener="#{form.onUnselectFeatures}" />
+											<j:controllerListener name="addedFeature"
+												listener="#{form.onUpdateFeatures}" />
+											<j:controllerListener name="updatedFeature"
+												listener="#{form.onUpdateFeatures}" />
+											<j:controllerListener name="deletedFeature"
+												listener="#{form.onDeleteFeatures}" />
+										</m:mapViewer>
+									</div>
+								</r:panel></td>
+						</tr>
+					</table>
+
+					<d:buttons>
+						<j:commandButton value="#{messages['page.create.create.button']}"
+							image="#{resource['core/images/actions/12x12/apply.png']}"
+							type="button" action="#{form.save()}" render="#{render}">
+							<j:renderListener rendered="false" />
+						</j:commandButton>
+						<j:commandButton value="#{messages['form.general.cancel.button']}"
+							type="button"
+							image="#{resource['core/images/actions/12x12/cancel.png']}"
+							action="#{form.cancel()}" execute="@this">
+							<j:renderListener rendered="false" />
+						</j:commandButton>
+					</d:buttons>
 				</j:renderPanel>
 			</d:popupPanel>
 		</j:renderPanel>
-		
-		<j:renderPanel id="uploadPanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.upload.title']} #{form.modelClass.label}"
-				icon="#{resources['core/images/actions/16x16/upload.png']}"
-				show="true"
-				modal="true"
-				width="422">
-				<a:region>
-					<r:fileUpload id="data"
-			           	fileUploadListener="#{form.onFileUpload}"
-						maxFilesQuantity="1"
-						immediateUpload="true"
-						autoclear="true"
-						listHeight="auto"
-						listWidth="100%"
-						execute="@this"
-						render="fileData" />
-				</a:region>
-				<br />
-				<a:outputPanel id="fileData">
-					<d:object value="#{form.object}"
-						mode="VIEW" />
-				</a:outputPanel>
-				<d:buttons>
-					<j:commandButton value="#{messages['page.upload.save.button']}"
-						image="#{resource['core/images/actions/12x12/save.png']}"
-						type="button"
-						action="#{form.save()}"
-						render="#{render}">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-					<j:commandButton value="#{messages['form.general.cancel.button']}"
-						type="button"
-						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-				</d:buttons>
-			</d:popupPanel>
-		</j:renderPanel>
-		
-		<j:renderPanel id="viewPanel" 
-			rendered="false">
-			<d:popupPanel header="#{messages['page.view.title']} #{form.modelClass.label}"
+
+		<j:renderPanel id="viewPanel" rendered="false">
+			<d:popupPanel
+				header="#{messages['page.view.title']} #{form.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/view.png']}"
-				show="true" 
-				modal="true"
-				width="600">
-				<d:object mode="VIEW" 
-					modelClass="#{form.modelClass}"
+				show="true" modal="true" width="600">
+				<d:object mode="VIEW" modelClass="#{form.modelClass}"
 					value="#{form.object}">
 				</d:object>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.close.button']}"
 						image="#{resource['core/images/actions/12x12/close.png']}"
-						type="button"
-						submit="false">
-						<j:renderControl event="click" 
-							rendered="false"
-							execute="@this" />
+						type="button" submit="false">
+						<j:renderControl event="click" rendered="false" execute="@this" />
 					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-		
-		<j:renderPanel id="editPanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.edit.title']} #{form.modelClass.label}"
+
+		<j:renderPanel id="editPanel" rendered="false">
+			<d:popupPanel
+				header="#{messages['page.edit.title']} #{form.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/edit.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<d:object mode="EDIT" 
-					modelClass="#{form.modelClass}"
+				show="true" modal="true" width="600">
+				<d:object mode="EDIT" modelClass="#{form.modelClass}"
 					value="#{form.object}">
 				</d:object>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.save.button']}"
 						image="#{resource['core/images/actions/12x12/save.png']}"
-						type="button" 
-						action="#{form.save()}"
-						render="#{render}">
+						type="button" action="#{form.save()}" render="#{render}">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
+						action="#{form.cancel()}" execute="@this">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-		
-		<j:renderPanel id="deletePanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.delete.title']}  #{form.modelClass.label}"
+
+		<j:renderPanel id="deletePanel" rendered="false">
+			<d:popupPanel
+				header="#{messages['page.delete.title']}  #{form.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/delete.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<h3><h:outputText value="#{messages['form.general.delete.confirm.label']}" /></h3>
-				<br/>
-				<d:object mode="VIEW" 
-					modelClass="#{form.modelClass}"
+				show="true" modal="true" width="600">
+				<h3>
+					<h:outputText
+						value="#{messages['form.general.delete.confirm.label']}" />
+				</h3>
+				<br />
+				<d:object mode="VIEW" modelClass="#{form.modelClass}"
 					value="#{form.object}">
 				</d:object>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.delete.button']}"
 						image="#{resource['core/images/actions/12x12/delete.png']}"
-						type="button" 
-						action="#{form.delete()}"
-						render="#{render}">
+						type="button" action="#{form.delete()}" render="#{render}">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
+						action="#{form.cancel()}" execute="@this">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>

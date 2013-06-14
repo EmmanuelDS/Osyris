@@ -4,6 +4,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
+import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -32,6 +33,7 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	// VARIABLES
 	@Label("Nummer")
 	@Description("Nummer")
+	@LabelProperty
 	private int nummer;
 
 	@Label("Naam")

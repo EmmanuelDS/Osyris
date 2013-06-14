@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -17,11 +18,16 @@ import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.functions.ModelFunctions;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.controle.ControleOpdracht;
+import be.gim.tov.osyris.model.controle.Melding;
+import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.Traject;
 
 /**
  * 
@@ -110,6 +116,41 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Haalt de trajectTypes op afhankelijk van het gekozen controleOpdracht
+	 * type
+	 * 
+	 * @param controleOpdrachtType
+	 * @return
+	 */
+	public List<Object[]> getTrajectTypes(String controleOpdrachtType) {
+
+		List<Object[]> trajectTypes = new ArrayList<Object[]>();
+
+		if (controleOpdrachtType != null
+				&& controleOpdrachtType.contains("route")) {
+			Collection<ModelClass> subClassesRoute = Collections.emptyList();
+			subClassesRoute = modelRepository.getModelClass("Route")
+					.getSubClasses();
+			for (ModelClass modelClass : subClassesRoute) {
+				Object[] object = { modelClass.getName(), modelClass.getLabel() };
+				trajectTypes.add(object);
+			}
+		}
+
+		if (controleOpdrachtType != null
+				&& controleOpdrachtType.contains("netwerk")) {
+			Collection<ModelClass> subClassesNetwerk = Collections.emptyList();
+			subClassesNetwerk = modelRepository.getModelClass("NetwerkSegment")
+					.getSubClasses();
+			for (ModelClass modelClass : subClassesNetwerk) {
+				Object[] object = { modelClass.getName(), modelClass.getLabel() };
+				trajectTypes.add(object);
+			}
+		}
+		return trajectTypes;
+	}
+
+	/**
 	 * Gets codes and labels for a given modelClass.
 	 * 
 	 * @param modelClassName
@@ -169,7 +210,6 @@ public class OsyrisModelFunctions {
 		if (groupName.equals("PeterMeter")) {
 			suggestions.add(new ResourceName(GEEN_PETER_METER));
 		}
-
 		return suggestions;
 	}
 
@@ -222,7 +262,9 @@ public class OsyrisModelFunctions {
 
 		if (trajectType != null && !trajectType.isEmpty()) {
 			QueryBuilder builder = new QueryBuilder(trajectType);
-			builder.filter(FilterUtils.equal("regio", regio));
+			if (regio != null) {
+				builder.filter(FilterUtils.equal("regio", regio));
+			}
 			builder.results(FilterUtils.properties("naam"));
 			builder.groupBy(FilterUtils.properties("naam"));
 
@@ -244,5 +286,99 @@ public class OsyrisModelFunctions {
 		builder.groupBy(FilterUtils.properties("straatnaam"));
 
 		return modelRepository.searchObjects(builder.build(), true, true);
+	}
+
+	/**
+	 * Zoekt knooppuntnummers
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	public List<?> getKnooppuntNummers() throws IOException {
+		QueryBuilder builder = new QueryBuilder("NetwerkKnooppunt");
+		builder.results(FilterUtils.properties("nummer"));
+		builder.groupBy(FilterUtils.properties("nummer"));
+		builder.orderBy(new DefaultQueryOrderBy(FilterUtils.property("nummer")));
+		return modelRepository.searchObjects(builder.build(), true, true);
+	}
+
+	/**
+	 * Zoekt de meest recente datum van een statuswijziging voor wat betreft een
+	 * ControleOpdracht
+	 * 
+	 * @param controleOpdracht
+	 * @return
+	 */
+	public Date getDatumLaatsteWijziging(ControleOpdracht controleOpdracht) {
+		List<Date> dates = new ArrayList<Date>();
+		dates.add(controleOpdracht.getDatumTeControleren());
+		dates.add(controleOpdracht.getDatumUitTeVoeren());
+		dates.add(controleOpdracht.getDatumGerapporteerd());
+		dates.add(controleOpdracht.getDatumGevalideerd());
+		dates.add(controleOpdracht.getDatumUitgesteld());
+		dates.removeAll(Collections.singleton(null));
+		if (dates.size() > 0) {
+			Date mostRecent = Collections.max(dates);
+			return mostRecent;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Zoekt de meest recente datum van een statuswijziging voor wat betreft een
+	 * Melding
+	 * 
+	 * @param melding
+	 * @return
+	 */
+	public Date getDatumLaatsteWijziging(Melding melding) {
+		List<Date> dates = new ArrayList<Date>();
+		dates.add(melding.getDatumVaststelling());
+		dates.add(melding.getDatumGemeld());
+		dates.add(melding.getDatumGevalideerd());
+		dates.removeAll(Collections.singleton(null));
+		if (dates.size() > 0) {
+			Date mostRecent = Collections.max(dates);
+			return mostRecent;
+		} else {
+			return null;
+		}
+	}
+
+	/**
+	 * Zoekt de regionaam van een traject om te tonen in het overzichtsformulier
+	 * 
+	 * @param trajectId
+	 * @return
+	 */
+	public String getTrajectRegio(ResourceIdentifier trajectId) {
+		try {
+			Traject t = (Traject) modelRepository.loadObject(trajectId);
+			Regio r = (Regio) modelRepository.loadObject(t.getRegio());
+			return r.getNaam();
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Zoekt het type traject om te tonen in het overzichtformulier
+	 * 
+	 * @param trajectId
+	 * @return
+	 */
+	public String getTrajectType(ResourceIdentifier trajectId) {
+		try {
+			Traject t = (Traject) modelRepository.loadObject(trajectId);
+			return t.getModelClass().getLabel().toString();
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+
+		return null;
+
 	}
 }
