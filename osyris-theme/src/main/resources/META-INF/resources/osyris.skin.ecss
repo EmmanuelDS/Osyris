@@ -1,0 +1,61 @@
+
+html, body, div, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center, dl, dt, dd,
+fieldset, form, label, legend, caption, figcaption,
+header, footer, article, section, nav, menu, hgroup {
+	margin:0;
+	padding:0;
+	border:0;
+	outline:0;
+	font-size:100%;
+	background:transparent;
+}
+
+.page-normal-body {
+    background-color: #4988CA;
+    background-image: "url(#{resource['osyris/images/clouds.png']})";
+    background-position: center top;
+    background-repeat: no-repeat;
+    font-family: "Arial,Helvetica,sans-serif";
+}
+
+.page-normal-container {
+    background-color: #FFFFFF;
+    background-image: "url(#{resource['osyris/images/circles.png']})";
+    background-position: right top;
+    background-repeat: no-repeat;
+    box-shadow: 0 5px 15px rgba(50, 50, 50, 0.5);
+    margin: auto;
+    position: relative;
+    width: 1125px;
+}
+
+.page-footer {
+	width:1125px;
+	height:300px;
+	padding: 0;
+	border: none;
+	border-top:8px solid #57891b;
+	background-color:#73a42b;
+	background-image: "url(#{resource['osyris/images/bush.jpg']})";
+	background-position:top;
+	background-repeat:no-repeat;
+}
+
+.page-footer .address {
+	text-align:center;
+	margin-top:25px;
+	color:#fff;
+	font-size:0.8em;
+}
+
+.page-footer .address a {
+	color:#fff;
+}
+.page-footer .toerisme_oost_vlaanderen {
+	margin-top:25px;
+}
