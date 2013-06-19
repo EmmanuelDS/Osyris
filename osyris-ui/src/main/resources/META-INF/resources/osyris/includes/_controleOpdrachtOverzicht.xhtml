@@ -60,8 +60,8 @@
 						modelClass="#{controleOpdrachtOverzichtFormBase.modelClass}" />
 				</q:query>
 				<d:fields>
-					<d:field label="Datum laatste statuswijziging">
-					</d:field>
+					<b><h:outputText value="Datum laatste statuswijziging">
+					</h:outputText></b>
 					<d:field for="vanDatum">
 						<div>Van:</div>
 						<r:calendar id="vanDatum" value="#{controleOpdrachtOverzichtFormBase.vanDatum}"
@@ -136,9 +136,12 @@
 						</p:column>
 						<p:column label="TrajectType">
 							<f:facet name="header">
-								<div>Type traject</div>
+							<d:displayLabel
+									property="#{d:modelClass('ControleOpdracht').getProperty('trajectType')}" />
 							</f:facet>
-							 <h:outputText value="#{osyrisModelFunctions.getTrajectType(controleOpdracht.traject)}" /> 
+							<d:propertyValue id="trajectTypeColumn"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('trajectType')}"
+								value="#{controleOpdracht.trajectType }" mode="VIEW" />
 						</p:column>
 						<p:column label="Periode" sortBy="#{controleOpdracht.periode }">
 							<f:facet name="header">
@@ -159,9 +162,12 @@
 						</p:column>
 						<p:column label="Regio">
 							<f:facet name="header">
-								<div>Regio</div>
+							<d:displayLabel
+									property="#{d:modelClass('ControleOpdracht').getProperty('regio')}" />
 							</f:facet>
-							 <h:outputText value="#{osyrisModelFunctions.getTrajectRegio(controleOpdracht.traject)}" /> 
+							<d:propertyValue id="regioColumn"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('regio')}"
+								value="#{controleOpdracht.regio }" mode="VIEW" />
 						</p:column>
 						<p:column label="Peter/Meter" sortBy="#{controleOpdracht.peterMeter }">
 							<f:facet name="header">

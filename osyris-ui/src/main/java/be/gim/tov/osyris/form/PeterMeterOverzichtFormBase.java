@@ -296,9 +296,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 		try {
 			List<User> petersMeters = new ArrayList<User>();
-
-			// Filter Peters and meters
-			// TODO: possible to do it in a Query Filter?
 			List<User> users = (List<User>) modelRepository.searchObjects(
 					getQuery(), true, true, true);
 			for (User user : users) {

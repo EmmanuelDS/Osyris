@@ -203,6 +203,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			layer = (FeatureMapLayer) context.getLayer(layerId);
 			layer.setHidden(false);
 			layer.setFilter(FilterUtils.equal("naam", t.getNaam()));
+			context.setBoundingBox(viewer.getContentExtent(layer));
 
 			// Get borden voor bordproblemen
 			if (object.getProbleem() instanceof BordProbleem) {
@@ -229,8 +230,6 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 				geomLayer.setGeometries(list);
 				geomLayer.setHidden(false);
 			}
-
-			context.setBoundingBox(viewer.getContentExtent());
 			viewer.updateContext(null);
 
 		} catch (IOException e) {

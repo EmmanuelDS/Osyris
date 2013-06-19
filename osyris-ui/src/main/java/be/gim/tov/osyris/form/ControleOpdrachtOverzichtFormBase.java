@@ -2,8 +2,11 @@ package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -12,12 +15,15 @@ import javax.inject.Named;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
+import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.conscientia.jsf.event.ControllerEvent;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.jboss.seam.international.status.Messages;
@@ -31,11 +37,18 @@ import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
 import be.gim.specto.core.context.MapFactory;
+import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.controle.AnderProbleem;
+import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
+import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Traject;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -59,6 +72,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Messages messages;
 	@Inject
 	protected MapFactory mapFactory;
+	@Inject
+	protected Preferences preferences;
+	@Inject
+	protected MailSender mailSender;
 
 	protected String controleOpdrachtType;
 	protected ResourceIdentifier regio;
@@ -67,6 +84,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Date vanDatum;
 	protected Date totDatum;
 	protected List<Bord> bewegwijzering;
+	protected String probleemType;
+	protected Probleem probleem;
+	protected Probleem selectedProbleem;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -128,6 +148,30 @@ public class ControleOpdrachtOverzichtFormBase extends
 		this.bewegwijzering = bewegwijzering;
 	}
 
+	public String getProbleemType() {
+		return probleemType;
+	}
+
+	public void setProbleemType(String probleemType) {
+		this.probleemType = probleemType;
+	}
+
+	public Probleem getProbleem() {
+		return probleem;
+	}
+
+	public void setProbleem(Probleem probleem) {
+		this.probleem = probleem;
+	}
+
+	public Probleem getSelectedProbleem() {
+		return selectedProbleem;
+	}
+
+	public void setSelectedProbleem(Probleem selectedProbleem) {
+		this.selectedProbleem = selectedProbleem;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -144,6 +188,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		return modelRepository.getModelClass(getName());
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public Query getQuery() {
 
@@ -158,10 +203,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
-				query.addFilter(FilterUtils.notEqual("status",
-						ControleOpdrachtStatus.GEVALIDEERD));
-				query.addFilter(FilterUtils.notEqual("status",
-						ControleOpdrachtStatus.GEANNULEERD));
+				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
+						ControleOpdrachtStatus.GEVALIDEERD), FilterUtils
+						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
 				return query;
 			}
 			// PeterMeter kan enkel status uit te voeren zien
@@ -205,12 +249,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@Override
 	public void search() {
 		try {
+			List<ControleOpdracht> list = (List<ControleOpdracht>) modelRepository
+					.searchObjects(getQuery(), true, true, true);
+			List<ControleOpdracht> filteredList = new ArrayList<ControleOpdracht>();
 
 			// Kan dit op een betere manier gebeuren?
 			if (vanDatum != null && totDatum != null) {
-				List<ControleOpdracht> list = (List<ControleOpdracht>) modelRepository
-						.searchObjects(getQuery(), true, true, true);
-				List<ControleOpdracht> filteredList = new ArrayList<ControleOpdracht>();
 				for (ControleOpdracht c : list) {
 					if (c.getDatumLaatsteWijziging().before(totDatum)
 							&& c.getDatumLaatsteWijziging().after(vanDatum)) {
@@ -218,11 +262,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 					}
 				}
 				results = filteredList;
-			}
-
-			else {
+			} else {
 				results = (List<ControleOpdracht>) modelRepository
-						.searchObjects(getQuery(), true, true, true);
+						.searchObjects(getQuery(), true, true);
 			}
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
@@ -235,14 +277,17 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		try {
 			// Indien route achterhalen van de TrajectId via de routeNaam
-			if (trajectType.contains("Route")) {
-				MapViewer viewer = getViewer();
-				MapContext context = viewer.getConfiguration().getContext();
+			if (object.getTraject() == null) {
+				if (trajectType.contains("Route")) {
+					MapViewer viewer = getViewer();
+					MapContext context = viewer.getConfiguration().getContext();
 
-				for (FeatureMapLayer layer : context.getFeatureLayers()) {
-					if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
-						searchTrajectId(layer);
+					for (FeatureMapLayer layer : context.getFeatureLayers()) {
+						if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+							layer.setFilter(FilterUtils.equal("naam",
+									trajectNaam));
+							searchTrajectId(layer);
+						}
 					}
 				}
 			}
@@ -290,20 +335,52 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Zoekt de borden die bij de gekozen route behoren
+	 * Maakt het bewegwijzeringsverslag voor het gekozen traject.
 	 * 
 	 */
-	public void getBewegwijzeringVerslag() {
+	@SuppressWarnings("unchecked")
+	public void createBewegwijzeringVerslag() {
 
 		try {
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName("Bord");
-			query.addFilter(FilterUtils.equal("naam", trajectNaam));
-			bewegwijzering = (List<Bord>) modelRepository.searchObjects(query,
+			// Routes
+			QueryBuilder builder = new QueryBuilder("Bord");
+			builder.addFilter(FilterUtils.equal("naam", trajectNaam));
+			// TODO: volgnummers voor netwerkborden moeten nog toegevoegd worden
+			// in DB
+			// TODO: volgnummers zijn geen numerieke velden
+			// builder.orderBy(new
+			// DefaultQueryOrderBy(FilterUtils.property("volg")));
+			bewegwijzering = (List<Bord>) modelRepository.searchObjects(
+					builder.build(), true, true);
+		} catch (IOException e) {
+			LOG.error("Can not search objects.", e);
+			bewegwijzering = null;
+		}
+	}
+
+	/**
+	 * Zoekt het bewegwijzeringsverslag voor een opgegeven traject
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Bord> createBewegwijzering(ResourceIdentifier trajectId) {
+
+		try {
+			// Routes
+			Traject t = (Traject) modelRepository.loadObject(trajectId);
+			if (t == null) {
+				return null;
+			}
+			QueryBuilder builder = new QueryBuilder("Bord");
+			builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
+			// TODO: volgnummers voor netwerkborden moeten nog toegevoegd worden
+			// in DB
+			// TODO: volgnummers zijn geen numerieke velden
+			return (List<Bord>) modelRepository.searchObjects(builder.build(),
 					true, true);
 		} catch (IOException e) {
-			LOG.error("", e);
-			bewegwijzering = null;
+			LOG.error("Can not search objects.", e);
+			return null;
 		}
 	}
 
@@ -392,5 +469,365 @@ public class ControleOpdrachtOverzichtFormBase extends
 				iterator.close();
 			}
 		}
+	}
+
+	/**
+	 * Toont het traject met bijbehorende borden voor controleopdrachten in
+	 * raadpleeg modus.
+	 * 
+	 * @param controleOpdracht
+	 */
+	public void showOpdrachtMapData(ResourceIdentifier trajectId) {
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+		FeatureMapLayer layer = null;
+		String layerId = null;
+		try {
+			// Get traject
+			Traject t = (Traject) modelRepository.loadObject(trajectId);
+
+			// Routes
+			layerId = Character.toLowerCase(t.getModelClass().getName()
+					.charAt(0))
+					+ t.getModelClass().getName().substring(1);
+			layer = (FeatureMapLayer) context.getLayer(layerId);
+			layer.setHidden(false);
+			layer.setFilter(FilterUtils.equal("naam", t.getNaam()));
+			context.setBoundingBox(viewer.getContentExtent(layer));
+
+			// Routeborden
+			layerId = layerId + "Bord";
+			layer = (FeatureMapLayer) context.getLayer(layerId);
+			layer.setHidden(false);
+			layer.setFilter(FilterUtils.equal("naam", t.getNaam()));
+
+			viewer.updateContext(null);
+
+		} catch (IOException e) {
+			LOG.error("Can load object", e);
+		}
+	}
+
+	/**
+	 * Annuleren van een controleopdracht
+	 * 
+	 */
+	public void annuleerControleOpdracht() {
+		if (object != null) {
+			object.setStatus(ControleOpdrachtStatus.GEANNULEERD);
+			try {
+				modelRepository.saveObject(object);
+				clear();
+				search();
+			} catch (IOException e) {
+				LOG.error("Can not save object.", e);
+			}
+		}
+	}
+
+	/**
+	 * Verzenden van controleOpdracht naar de betrokken peterMeter
+	 * 
+	 */
+	public void verzendenControleOpdracht() {
+		if (object != null) {
+			object.setStatus(ControleOpdrachtStatus.UIT_TE_VOEREN);
+			try {
+				modelRepository.saveObject(object);
+				clear();
+				search();
+				// send confirmatie mail naar peterMeter
+				// sendConfirmationMail();
+			} catch (IOException e) {
+				LOG.error("Can not save object.", e);
+			} catch (Exception e) {
+				LOG.error("Can not send email", e);
+			}
+		}
+	}
+
+	/**
+	 * Rapporteren van controleOpdracht naar TOV
+	 * 
+	 */
+	public void rapporterenControleOpdracht() {
+		if (object != null) {
+			object.setStatus(ControleOpdrachtStatus.GERAPPORTEERD);
+			object.setDatumGerapporteerd(new Date());
+			try {
+				modelRepository.saveObject(object);
+				clear();
+				search();
+			} catch (IOException e) {
+				LOG.error("Can not save object.", e);
+			} catch (Exception e) {
+				LOG.error("Can not send email", e);
+			}
+		}
+	}
+
+	/**
+	 * Stuurt een mail naar de betrokken peterMeter dat er een nieuwe
+	 * controleOpdracht op status uit te voeren beschikbaar is
+	 * 
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void sendConfirmationMail() throws IOException, Exception {
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("preferences", preferences);
+		// TODO: hardcoded link vervangen
+		variables
+				.put("link",
+						"http://www.tov-osyris.gim.be/geocms/web/view/form:ControleOpdrachtOverzichtForm");
+
+		mailSender.sendMail(
+				preferences.getNoreplyEmail(),
+				Collections.singleton(modelRepository
+						.loadObject(object.getPeterMeter())
+						.getAspect("UserProfile").get("email").toString()),
+				"/META-INF/resources/core/mails/confirmControleOpdracht.fmt",
+				variables);
+	}
+
+	/**
+	 * Zoomt naar een bepaald bord op de kaart
+	 * 
+	 * @param bord
+	 */
+	public void zoomToBord(Bord bord) {
+		MapViewer viewer = getViewer();
+		Envelope envelope = new Envelope(bord.getGeom().getCoordinate());
+		viewer.updateCurrentExtent(envelope);
+	}
+
+	/**
+	 * Oplijsten van problemen van het type BordProbleem
+	 * 
+	 * @return
+	 */
+	public List<BordProbleem> getBordProblemen() {
+		List<BordProbleem> bordProblemen = new ArrayList<BordProbleem>();
+
+		if (object != null) {
+			for (Probleem probleem : object.getProblemen()) {
+				if (probleem instanceof BordProbleem) {
+					bordProblemen.add((BordProbleem) probleem);
+				}
+			}
+		}
+		return bordProblemen;
+	}
+
+	/**
+	 * Oplijsten van problemen van het type AnderProbleem
+	 * 
+	 * @return
+	 */
+	public List<AnderProbleem> getAndereProblemen() {
+		List<AnderProbleem> andereProblemen = new ArrayList<AnderProbleem>();
+		if (object != null) {
+			for (Probleem probleem : object.getProblemen()) {
+				if (probleem instanceof AnderProbleem) {
+					andereProblemen.add((AnderProbleem) probleem);
+				}
+			}
+		}
+		return andereProblemen;
+	}
+
+	/**
+	 * Aanmaken van een probleem bij een controleopdracht
+	 * 
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public void createProbleem() throws InstantiationException,
+			IllegalAccessException {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+		probleem = null;
+
+		// Bordprobleem
+		if ("bord".equals(probleemType)) {
+			if (object.getTrajectType().contains("route")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"RouteBordProbleem", null);
+			} else if (object.getTrajectType().contains("netwerk")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"NetwerkBordProbleem", null);
+			}
+			// Itereren over de lagen en de correctie lagen selecteerbaar zetten
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				if (layer.getLayerId().equalsIgnoreCase(
+						object.getTrajectType() + "Bord")) {
+					layer.set("selectable", true);
+					layer.setSelection(new ArrayList<String>(1));
+				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+					layer.setHidden(true);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(Collections.EMPTY_LIST);
+				} else {
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+		}
+		// Ander probleem
+		else if ("ander".equals(probleemType)) {
+			if (object.getTrajectType().contains("route")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"RouteAnderProbleem", null);
+			} else if (trajectType.contains("netwerk")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"NetwerkAnderProbleem", null);
+			}
+
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+					layer.set("selectable", true);
+					layer.setSelection(new ArrayList<String>(1));
+				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+					layer.setHidden(false);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(new ArrayList<Geometry>(1));
+				} else {
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+		}
+		viewer.updateContext(null);
+	}
+
+	/**
+	 * Toevoegen van een probleem aan de controleOpdracht
+	 * 
+	 */
+	public void addProbleem() {
+		// Toevoegen probleem aan controleOpdracht
+		Probleem p = getProbleem();
+		object.getProblemen().add(p);
+
+		// Reset probleem
+		probleemType = null;
+		setProbleem(null);
+
+		// Deselect all features
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+		for (FeatureMapLayer layer : context.getFeatureLayers()) {
+			layer.setSelection(null);
+		}
+		viewer.updateContext(null);
+	}
+
+	/**
+	 * Event bij het selecteren van features op de kaart
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public void onSelectFeatures(ControllerEvent event) throws IOException {
+		// Routes
+		if (object.getTrajectType().contains("route")) {
+			if (getProbleem() != null) {
+				if (getProbleem() instanceof BordProbleem) {
+					List<String> ids = (List<String>) event.getParams().get(
+							"featureIds");
+					if (ids.size() > 0) {
+						String id = ids.iterator().next();
+						((BordProbleem) getProbleem()).setBord(new ResourceKey(
+								"Bord", id));
+					}
+				}
+			}
+		}
+	}
+
+	/**
+	 * Event bij het updaten van features op de kaart
+	 * 
+	 * @param event
+	 */
+	@SuppressWarnings("unchecked")
+	public void onUpdateFeatures(ControllerEvent event) {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		List<String> ids = (List<String>) event.getParams().get("featureIds");
+		if (ids.size() > 0) {
+			GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
+					.getLayer("geometry");
+			if (probleem instanceof AnderProbleem) {
+				((AnderProbleem) probleem).setGeom(layer.getGeometries()
+						.iterator().next());
+			}
+		}
+	}
+
+	/**
+	 * Zoomen naar bordprobleem op de kaart
+	 * 
+	 * @param bordProbleem
+	 */
+	public void zoomToBordProbleem(BordProbleem bordProbleem) {
+		MapViewer viewer = getViewer();
+		Envelope envelope;
+		try {
+			envelope = new Envelope(
+					((Bord) modelRepository.loadObject(bordProbleem.getBord()))
+							.getGeom().getCoordinate());
+			viewer.updateCurrentExtent(envelope);
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+	}
+
+	/**
+	 * Zoomen naar een anderProbleem op de kaart
+	 * 
+	 * @param bordProbleem
+	 */
+	public void zoomToAnderProbleem(AnderProbleem anderProbleem) {
+		MapViewer viewer = getViewer();
+		Envelope envelope;
+		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) viewer
+				.getConfiguration().getContext().getLayer("geometry");
+		layer.setHidden(false);
+		if (anderProbleem.getGeom() instanceof Point) {
+			envelope = new Envelope(anderProbleem.getGeom().getCoordinate());
+			viewer.updateCurrentExtent(envelope);
+		}
+	}
+
+	/**
+	 * Valideren ven een probleem
+	 * 
+	 */
+	public void validateProbleem() {
+		try {
+			modelRepository.saveObject(selectedProbleem);
+		} catch (IOException e) {
+			LOG.error("Can not save object.", e);
+		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public boolean hasBordInfo() {
+		if (selectedProbleem != null) {
+			if (selectedProbleem instanceof BordProbleem) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
 	}
 }

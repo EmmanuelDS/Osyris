@@ -30,24 +30,13 @@ public class ControleOpdrachtSaveListener {
 		ControleOpdracht controleOpdracht = (ControleOpdracht) event
 				.getModelObject();
 
+		// Een nieuw aangemaakte ControleOpdracht krit status te controleren
 		if (controleOpdracht.getStatus() == null) {
 			controleOpdracht.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
 		}
 
-		if (controleOpdracht.getStatus().equals(
-				ControleOpdrachtStatus.UITGESTELD)) {
-			controleOpdracht.setDatumUitgesteld(new Date());
-		}
-
-		// Report ControleOpdracht by PM
-		if (identity.inGroup("PeterMeter", "CUSTOM")
-				&& controleOpdracht.getStatus().equals(
-						ControleOpdrachtStatus.UIT_TE_VOEREN)) {
-			controleOpdracht.setStatus(ControleOpdrachtStatus.GERAPPORTEERD);
-			controleOpdracht.setDatumGerapporteerd(new Date());
-		}
-
-		// If all problems have a status the ControleOpdracht is validated
+		// Indien alle problemen in een ControleOpdracht een status hebben is de
+		// ControleOpdracht gevalideerd
 		if (checkOpenstaandeProblemen(controleOpdracht) == 0
 				&& !controleOpdracht.getProblemen().isEmpty()) {
 			controleOpdracht.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
@@ -55,10 +44,16 @@ public class ControleOpdrachtSaveListener {
 		}
 	}
 
+	/**
+	 * Check of problemen bij een controleOpdracht een status hebben
+	 * 
+	 * @param controleOpdracht
+	 * @return
+	 */
 	private int checkOpenstaandeProblemen(ControleOpdracht controleOpdracht) {
 		int probleemNotChecked = 0;
 		for (Probleem p : controleOpdracht.getProblemen()) {
-			if (p.getStatus() == null) {
+			if (p.getStatus() == null || p.getStatus().toString().isEmpty()) {
 				probleemNotChecked = +1;
 			}
 		}
