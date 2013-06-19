@@ -2,103 +2,93 @@
 	xmlns:u="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:a="http://richfaces.org/a4j"
-	xmlns:r="http://richfaces.org/rich"
+	xmlns:a="http://richfaces.org/a4j" xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
-	xmlns:j="http://conscientia.org/jsf">
-	<a:outputPanel>	
-		<j:renderPanel id="viewPanel" 
-			rendered="false">
-			<d:popupPanel header="#{messages['page.view.title']} #{form.modelClass.label}"
+	xmlns:j="http://conscientia.org/jsf" xmlns:m="http://specto.gim.be/map">
+	<a:outputPanel>
+		<j:renderPanel id="viewPanel" rendered="false">
+			<d:popupPanel
+				header="#{messages['page.view.title']} #{form.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/view.png']}"
-				show="true" 
-				modal="true"
-				width="600">
-				<d:object mode="VIEW" 
-					modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
+				show="true" modal="true" width="1000" height="700">
+				<table width="100%">
+					<tr>
+						<td width="40%" valign="top"><d:object mode="VIEW"
+								modelClass="#{form.modelClass}" value="#{form.object}">
+							</d:object></td>
+						<td width="60%" valign="top"><r:panel>
+								<div style="height: 500px">
+									<m:mapViewer id="viewer" configuration="#{form.getConfiguration()}">
+									</m:mapViewer>
+								</div>
+							</r:panel></td>
+					</tr>
+				</table>
 				<d:buttons>
-					<j:commandButton rendered="#{form.isCanEdit(form.object) and form.object.status == 'GEMELD'}"
-									value="Valideren"
-									image="#{resource['core/images/actions/12x12/apply.png']}"
-									type="button" 
-									title="#{messages['page.actions.edit.label']}">
-									<j:renderListener target="#{r:clientId('editPanel')}" 
-										rendered="true"
-										execute="@this" />
-									<j:renderControl event="click" 
-										rendered="false"
-										execute="@this" />
+					<j:commandButton
+						rendered="#{form.isCanEdit(form.object) and form.object.status == 'GEMELD'}"
+						value="Valideren"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button" title="#{messages['page.actions.edit.label']}">
+						<j:renderListener target="#{r:clientId('editPanel')}"
+							rendered="true" execute="@this" />
+						<j:renderControl event="click" rendered="false" execute="@this" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.close.button']}"
 						image="#{resource['core/images/actions/12x12/close.png']}"
-						type="button"
-						submit="false">
-						<j:renderControl event="click" 
-							rendered="false"
-							execute="@this" />
-					</j:commandButton>						
+						type="button" submit="false">
+						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-		
-		<j:renderPanel id="editPanel"
-			rendered="false">
+
+		<j:renderPanel id="editPanel" rendered="false">
 			<d:popupPanel header="Valideren #{form.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/edit.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<d:object mode="EDIT" 
-					modelClass="#{form.modelClass}"
+				show="true" modal="true" width="600">
+				<d:object mode="EDIT" modelClass="#{form.modelClass}"
 					value="#{form.object}">
 				</d:object>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.save.button']}"
 						image="#{resource['core/images/actions/12x12/save.png']}"
-						type="button" 
-						action="#{form.save()}"
-						render="#{render}">
+						type="button" action="#{form.save()}" render="#{render}">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
+						action="#{form.cancel()}" execute="@this">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-		
-		<j:renderPanel id="deletePanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.delete.title']}  #{form.modelClass.label}"
+
+		<j:renderPanel id="deletePanel" rendered="false">
+			<d:popupPanel
+				header="#{messages['page.delete.title']}  #{form.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/delete.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<h3><h:outputText value="#{messages['form.general.delete.confirm.label']}" /></h3>
-				<br/>
-				<d:object mode="VIEW" 
-					modelClass="#{form.modelClass}"
+				show="true" modal="true" width="600">
+				<h3>
+					<h:outputText
+						value="#{messages['form.general.delete.confirm.label']}" />
+				</h3>
+				<br />
+				<d:object mode="VIEW" modelClass="#{form.modelClass}"
 					value="#{form.object}">
 				</d:object>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.delete.button']}"
 						image="#{resource['core/images/actions/12x12/delete.png']}"
-						type="button" 
-						action="#{form.delete()}"
-						render="#{render}">
+						type="button" action="#{form.delete()}" render="#{render}">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
+						action="#{form.cancel()}" execute="@this">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>

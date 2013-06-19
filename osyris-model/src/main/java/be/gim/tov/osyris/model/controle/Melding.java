@@ -2,6 +2,8 @@ package be.gim.tov.osyris.model.controle;
 
 import java.util.Date;
 
+import javax.persistence.Transient;
+
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
@@ -13,6 +15,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Pattern;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
@@ -22,8 +25,10 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
 /**
@@ -100,6 +105,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
 	private ResourceIdentifier medewerker;
 
+	@NotSearchable
 	@NotEditable
 	@EditableInStatus("")
 	@Label("Datum vaststelling")
@@ -107,12 +113,14 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(ModelPropertyType.DATE)
 	private Date datumVaststelling;
 
+	@NotSearchable
 	@NotEditable
 	@Label("Datum gemeld")
 	@Description("Datum gemeld")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGemeld;
 
+	@NotSearchable
 	@NotEditable
 	@Label("Datum gevalideerd")
 	@Description("Peter/Meter")
@@ -230,5 +238,15 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	public void setCommentaar(String commentaar) {
 		this.commentaar = commentaar;
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("Datum laatste statuswijziging")
+	public Date getDatumLaatsteWijziging() {
+		return Beans.getReference(OsyrisModelFunctions.class)
+				.getDatumLaatsteWijziging(this);
 	}
 }

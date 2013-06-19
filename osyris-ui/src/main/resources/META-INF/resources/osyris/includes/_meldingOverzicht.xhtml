@@ -2,64 +2,59 @@
 	xmlns:u="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:a="http://richfaces.org/a4j"
+	xmlns:a="http://richfaces.org/a4j" 
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:q="http://specto.gim.be/search"
-	xmlns:m="http://specto.gim.be/map">
-	
-<!-- 	<u:param name="title" -->
-<!-- 		value="List" /> -->
-		
-	<h2>Mijn Meldingen</h2>
+	xmlns:m="http://specto.gim.be/map" 
+	xmlns:p="http://primefaces.org/ui">
+
 	<j:layout style="height: 600px">
-		<j:layoutPane
-			region="west"
-			size="350"
-			minSize="200"
-			resizable="true"
+		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
-			
-			<d:fields>
-			<d:field for="regio" label="Regio">
-				<h:selectOneMenu id="regio" value="#{meldingOverzichtFormBase.regio}">
-					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
-					<a:ajax
-						event="change"
-						render="trajectNaam"
-						execute="@this" />
-				</h:selectOneMenu>
-			</d:field>
-			<d:field for="trajectType" label="Traject type">
-				<h:selectOneMenu id="trajectType" value="#{meldingOverzichtFormBase.trajectType}">
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
-					<a:ajax
-						event="change"
-						render="trajectNaam"
-						execute="@this" />
-				</h:selectOneMenu>
-			</d:field>
-			<d:field for="trajectNaam" label="Traject naam">
-				<h:selectOneMenu id="trajectNaam" value="#{meldingOverzichtFormBase.trajectNaam}">
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(meldingOverzichtFormBase.regio, meldingOverzichtFormBase.trajectType))}" />
-				</h:selectOneMenu>
-			</d:field>
-		</d:fields>
-		
+				<d:fields>
+					<d:field for="trajectType" label="Traject type">
+						<h:selectOneMenu id="trajectType"
+							value="#{meldingOverzichtFormBase.trajectType}">
+							<f:selectItem itemValue="" itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+							<a:ajax event="change" render="detailSearchPanel" execute="@this" />
+						</h:selectOneMenu>
+					</d:field>
+					<d:field for="regio" label="Regio">
+						<h:selectOneMenu id="regio"
+							value="#{meldingOverzichtFormBase.regio}">
+							<f:converter
+								converterId="be.gim.commons.ResourceIdentifierConverter" />
+							<f:selectItem itemValue="" itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+							<a:ajax event="change" render="trajectNaam" execute="@this" />
+						</h:selectOneMenu>
+					</d:field>
+					<j:renderPanel id="detailSearchPanel"
+						rendered="#{meldingOverzichtFormBase.trajectType.contains('Route')}">
+						<d:field for="trajectNaam" label="Traject naam">
+							<h:selectOneMenu id="trajectNaam"
+								value="#{meldingOverzichtFormBase.trajectNaam}">
+								<f:selectItem itemValue="" itemLabel="" />
+								<f:selectItems
+									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(meldingOverzichtFormBase.regio, meldingOverzichtFormBase.trajectType))}" />
+							</h:selectOneMenu>
+						</d:field>
+					</j:renderPanel>
+				</d:fields>
+
 				<q:query value="#{meldingOverzichtFormBase.query}"
 					modelClassName="#{meldingOverzichtFormBase.modelClass.name}">
 					<c:if test="#{meldingOverzichtFormBase.index}">
 						<d:field for="term"
 							label="#{messages['page.search.query.term.title']}">
-							<q:phrase id="termFilter"
-								value="#{searchForm.term}">
+							<q:phrase id="termFilter" value="#{searchForm.term}">
 								<h:inputText value="#{searchForm.term}" />
 							</q:phrase>
 						</d:field>
@@ -67,6 +62,25 @@
 					<d:object mode="SEARCH"
 						modelClass="#{meldingOverzichtFormBase.modelClass}" />
 				</q:query>
+				
+				<d:fields>
+					<d:field label="Datum laatste statuswijziging">
+					</d:field>
+					<d:field for="vanDatum">
+						<div>Van:</div>
+						<r:calendar id="vanDatum" value="#{meldingOverzichtFormBase.vanDatum}"
+							inputStyle="width:60px"
+    						datePattern="dd/MM/yyyy">
+						</r:calendar>
+					</d:field>
+					<d:field for="totDatum">
+						<div>Tot:</div>
+						<r:calendar id="totDatum" value="#{meldingOverzichtFormBase.totDatum}"
+							inputStyle="width:60px"
+    						datePattern="dd/MM/yyyy">
+						</r:calendar>
+					</d:field>
+				</d:fields>
 				<d:buttons>
 					<j:commandButton rendered="true"
 						value="#{messages['page.general.button.search']}"
@@ -77,53 +91,106 @@
 					<d:fileDownload fileName="#{meldingOverzichtFormBase.fileName}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/download.png']}"
-						content="#{meldingOverzichtFormBase.report()}" 
+						content="#{meldingOverzichtFormBase.report()}"
 						value="#{messages['page.actions.report.label']}" />
 				</d:buttons>
 			</div>
 		</j:layoutPane>
 		<j:layoutPane>
 			<a:outputPanel id="result">
-				<d:objects id="objects" 
-					value="#{meldingOverzichtFormBase.results}"
-					modelClass="#{meldingOverzichtFormBase.modelClass}" 
-					mode="RESULT" 
-					level="SHORT">
-					<f:facet name="left">
-						<a:outputPanel rendered="true" 
-							styleClass="model-table-actions">
-							<j:commandButton rendered="#{meldingOverzichtFormBase.isCanView(object)}"
-								image="#{resource['core/images/actions/16x16/view.png']}"
-								type="image" 
-								title="#{messages['page.actions.view.label']}">
-								<j:renderListener target="#{r:clientId('viewPanel')}" 
-									rendered="true"
-									execute="@this" />
-								<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-							<j:commandButton rendered="#{meldingOverzichtFormBase.isCanDelete(object)}"
-								image="#{resource['core/images/actions/16x16/delete.png']}"
-								type="image" 
-								title="#{messages['page.actions.delete.label']}">
-								<j:renderListener target="#{r:clientId('deletePanel')}" 
-									rendered="true"
-									execute="@this" />
-								<f:setPropertyActionListener target="#{meldingOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-						</a:outputPanel>
+				<p:dataTable id="objects"
+					value="#{meldingOverzichtFormBase.results}" mode="RESULT"
+					var="melding" style="width: 100%;"
+					styleClass="model-table #{cc.attrs.contentClass}" paginator="true"
+					rows="20" paginatorPosition="bottom"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="20,30,40,50"
+					emptyMessage="Geen resultaten gevonden">
+					<f:facet name="header">
+						<div>
+							<h2>Mijn meldingen</h2>
+						</div>
 					</f:facet>
-				</d:objects>
-				<j:layoutContent selector="*[id='#{j:clientId('objects', 'table')}']" />
+					<p:column label="Acties">
+						<a:outputPanel rendered="true" styleClass="model-table-actions">
+							<h:panelGrid columns="3">
+								<j:commandButton
+									rendered="#{meldingOverzichtFormBase.isCanView(melding)}"
+									image="#{resource['core/images/actions/16x16/view.png']}"
+									type="image" title="#{messages['page.actions.view.label']}"
+									action="#{meldingOverzichtFormBase.showMeldingMapData(meldingOverzichtFormBase.object)}">
+									<j:renderListener target="#{r:clientId('viewPanel')}"
+										rendered="true" execute="@this" />
+									<f:setPropertyActionListener
+										target="#{meldingOverzichtFormBase.object}" value="#{melding}" />
+								</j:commandButton>
+								<j:commandButton
+									rendered="#{meldingOverzichtFormBase.isCanDelete(melding)}"
+									image="#{resource['core/images/actions/16x16/delete.png']}"
+									type="image" title="#{messages['page.actions.delete.label']}">
+									<j:renderListener target="#{r:clientId('deletePanel')}"
+										rendered="true" execute="@this" />
+									<f:setPropertyActionListener
+										target="#{meldingOverzichtFormBase.object}" value="#{melding}" />
+								</j:commandButton>
+							</h:panelGrid>
+						</a:outputPanel>
+					</p:column>
+					<p:column label="TrajectType">
+							<f:facet name="header">
+								<div>Type traject</div>
+							</f:facet>
+							 <h:outputText value="#{osyrisModelFunctions.getTrajectType(melding.traject)}" /> 
+						</p:column>
+					<p:column label="Traject" sortBy="#{melding.traject }">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('Melding').getProperty('traject')}" />
+						</f:facet>
+						<d:propertyValue id="trajectColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('traject')}"
+							value="#{melding.traject }" mode="VIEW" />
+					</p:column>
+					<p:column label="Regio">
+							<f:facet name="header">
+								<div>Regio</div>
+							</f:facet>
+							 <h:outputText value="#{osyrisModelFunctions.getTrajectRegio(melding.traject)}" /> 
+						</p:column>
+					<p:column label="Status" sortBy="#{melding.status }">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('Melding').getProperty('status')}" />
+						</f:facet>
+						<d:propertyValue id="statusColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('status')}"
+							value="#{melding.status }" mode="VIEW" />
+					</p:column>
+					<p:column label="Medewerker" sortBy="#{melding.medewerker }">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('Melding').getProperty('medewerker')}" />
+						</f:facet>
+						<d:propertyValue id="medewerkerColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('medewerker')}"
+							value="#{melding.medewerker }" mode="VIEW" />
+					</p:column>
+					<p:column label="Datum">
+							<f:facet name="header">
+								<div>Datum</div>
+							</f:facet>
+							<d:propertyValue id="datumLaatsteWijzigingColumn"
+								modelProperty="#{d:modelClass('Melding').getProperty('datumLaatsteWijziging')}"
+								value="#{melding.datumLaatsteWijziging }" mode="VIEW" /> 
+						</p:column>
+				</p:dataTable>
 			</a:outputPanel>
-			
+
 			<div style="display: none">
-				<u:decorate template="/resources/osyris/includes/meldingPanels.xhtml">
-					<u:param name="form"
-						value="#{meldingOverzichtFormBase}" />
-					<u:param name="render"
-						value="#{r:clientId('result')}" />
+				<u:decorate
+					template="/resources/osyris/includes/meldingPanels.xhtml">
+					<u:param name="form" value="#{meldingOverzichtFormBase}" />
+					<u:param name="render" value="#{r:clientId('result')}" />
 				</u:decorate>
 			</div>
 		</j:layoutPane>

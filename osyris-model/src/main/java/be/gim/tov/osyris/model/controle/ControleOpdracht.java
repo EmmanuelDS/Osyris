@@ -5,6 +5,8 @@ import static org.conscientia.api.model.SubClassPersistence.UNION;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Transient;
+
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
@@ -15,6 +17,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
@@ -23,8 +26,10 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditableInGroup;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 
 /**
@@ -73,18 +78,21 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
+	@NotSearchable
 	@Label("Datum gerapporteerd")
 	@Description("Datum gerapporteerd")
 	@Type(ModelPropertyType.DATE)
 	@NotEditable
 	private Date datumGerapporteerd;
 
+	@NotSearchable
 	@Label("Datum gevalideerd")
 	@Description("Datum gevalideerd")
 	@Type(ModelPropertyType.DATE)
 	@NotEditable
 	private Date datumGevalideerd;
 
+	@NotSearchable
 	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Datum te controleren")
@@ -92,12 +100,14 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumTeControleren;
 
+	@NotSearchable
 	@NotEditable
 	@Label("Datum uitgesteld")
 	@Description("Datum uitgesteld")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitgesteld;
 
+	@NotSearchable
 	@NotEditable
 	@EditableInGroup({ "PeterMeter" })
 	@Label("Datum uitvoering")
@@ -105,6 +115,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
+	@NotSearchable
 	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Traject")
@@ -234,5 +245,15 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 
 	public void setProblemen(List<Probleem> problemen) {
 		this.problemen = problemen;
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("Datum laatste statuswijziging")
+	public Date getDatumLaatsteWijziging() {
+		return Beans.getReference(OsyrisModelFunctions.class)
+				.getDatumLaatsteWijziging(this);
 	}
 }

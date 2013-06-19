@@ -72,6 +72,15 @@
 	</context-param>
 	
 	<context-param>
+		<param-name>primefaces.PUBLIC_CAPTCHA_KEY</param-name>
+		<param-value>6Lf_TOISAAAAAGu8qZ_HBNC3_qICMPGv7eIwcR_f</param-value>
+	</context-param>
+	<context-param>
+		<param-name>primefaces.PRIVATE_CAPTCHA_KEY</param-name>
+		<param-value>6Lf_TOISAAAAAJdiQUfP7rgYt5Fqubr-a-drAWG3</param-value>
+	</context-param>
+	
+	<context-param>
 		<param-name>resteasy.injector.factory</param-name>
 		<param-value>org.jboss.resteasy.cdi.CdiInjectorFactory</param-value>
 	</context-param>
