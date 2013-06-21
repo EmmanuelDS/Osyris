@@ -308,14 +308,23 @@
 						value="Verzenden"
 						image="#{resource['core/images/actions/12x12/next.png']}"
 						type="button"
-						action="#{form.verzendenOpdracht()}">
-						<j:renderControl event="click" rendered="false" execute="@this" />
+						action="#{form.verzendenControleOpdracht()}"
+						render="#{render}">
+						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton 
 						value="Printen"
 						image="#{resource['core/images/actions/12x12/print.png']}"
 						type="button">
 						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
+					<j:commandButton 
+						rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
+						value="Opnieuw te controleren"
+						image="#{resource['core/images/actions/12x12/reload.png']}"
+						type="button"
+						action="#{form.reopenControleOpdracht()}" render="#{render}">
+						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>

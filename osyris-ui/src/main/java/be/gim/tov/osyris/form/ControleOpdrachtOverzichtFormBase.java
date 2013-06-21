@@ -526,6 +526,23 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
+	 * Heropenen geannuleerde controleOpdracht
+	 * 
+	 */
+	public void reopenControleOpdracht() {
+		if (object != null) {
+			object.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
+			try {
+				modelRepository.saveObject(object);
+				clear();
+				search();
+			} catch (IOException e) {
+				LOG.error("Can not save object.", e);
+			}
+		}
+	}
+
+	/**
 	 * Verzenden van controleOpdracht naar de betrokken peterMeter
 	 * 
 	 */

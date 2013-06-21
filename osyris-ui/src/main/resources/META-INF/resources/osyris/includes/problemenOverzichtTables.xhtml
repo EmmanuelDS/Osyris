@@ -92,6 +92,14 @@
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToAnderProbleem(anderProbleem)}" />
    		</p:column>
+   		<p:column>
+			<f:facet name="header">
+			<div>Categorie</div>
+			</f:facet>
+			<d:propertyValue id="categorieColumn"
+				modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+				value="#{anderProbleem.categorie}" mode="VIEW" />
+		</p:column>
 		<p:column>
 			<f:facet name="header">
 			<div>Commentaar</div>

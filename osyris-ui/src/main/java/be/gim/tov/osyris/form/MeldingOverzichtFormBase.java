@@ -221,6 +221,8 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 				ids.add(b.getId().toString());
 				layer.setSelection(ids);
 			}
+
+			// Get anderProbleem
 			if (object.getProbleem() instanceof AnderProbleem) {
 				AnderProbleem p = (AnderProbleem) object.getProbleem();
 				GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) context
@@ -229,6 +231,8 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 				list.add(p.getGeom());
 				geomLayer.setGeometries(list);
 				geomLayer.setHidden(false);
+				context.setBoundingBox(viewer.getFeatureExtent(geomLayer,
+						FilterUtils.contains(p.getGeom())));
 			}
 			viewer.updateContext(null);
 
