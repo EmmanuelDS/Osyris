@@ -26,7 +26,9 @@ import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.controle.Melding;
+import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 
 /**
@@ -284,7 +286,6 @@ public class OsyrisModelFunctions {
 		QueryBuilder builder = new QueryBuilder("Bord");
 		builder.results(FilterUtils.properties("straatnaam"));
 		builder.groupBy(FilterUtils.properties("straatnaam"));
-
 		return modelRepository.searchObjects(builder.build(), true, true);
 	}
 
@@ -360,12 +361,11 @@ public class OsyrisModelFunctions {
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
-
 		return null;
 	}
 
 	/**
-	 * Zoekt het type traject om te tonen in het overzichtformulier
+	 * Zoekt het type traject om te tonen in het overzicht formulier
 	 * 
 	 * @param trajectId
 	 * @return
@@ -377,8 +377,58 @@ public class OsyrisModelFunctions {
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
-
 		return null;
+	}
 
+	/**
+	 * Zoekt de naam van het traject om te tonen in het overzicht formulier
+	 * 
+	 * @param trajectId
+	 * @return
+	 */
+	public String getTrajectNaam(ResourceIdentifier trajectId) {
+		try {
+			Traject t = (Traject) modelRepository.loadObject(trajectId);
+			return t.getNaam();
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Zoekt het Bordvolgnummer aan de hand van de resourceIdentifier
+	 * 
+	 * @param BordId
+	 * @return
+	 */
+	public String getBordVolg(ResourceIdentifier BordId) {
+		try {
+			Bord bord = (Bord) modelRepository.loadObject(BordId);
+			if (bord instanceof RouteBord) {
+				return ((RouteBord) bord).getVolg();
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Zoekt de straatnaam van het Bord aan de hand van de resourceIdentifier
+	 * 
+	 * @param BordId
+	 * @return
+	 */
+	public String getBordStraatNaam(ResourceIdentifier BordId) {
+		try {
+			Bord bord = (Bord) modelRepository.loadObject(BordId);
+			if (bord instanceof RouteBord) {
+				return ((RouteBord) bord).getStraatnaam();
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+		return null;
 	}
 }

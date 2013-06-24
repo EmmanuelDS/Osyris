@@ -28,6 +28,7 @@ import org.geotools.feature.FeatureIterator;
 import org.jboss.seam.international.status.Messages;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
 import be.gim.commons.decoder.api.DecoderException;
 import be.gim.commons.filter.FilterUtils;
@@ -36,6 +37,7 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
+import be.gim.specto.api.context.FeatureSelectionMode;
 import be.gim.specto.api.context.MapContext;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
@@ -44,12 +46,13 @@ import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.NetwerkAnderProbleem;
-import be.gim.tov.osyris.model.controle.NetwerkBordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.controle.RouteAnderProbleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.RouteBord;
-import be.gim.tov.osyris.model.traject.Traject;
 
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
@@ -83,6 +86,7 @@ public class MeldingFormBase implements Serializable {
 	protected String trajectNaam;
 	protected String probleemType;
 	protected int knooppuntNummer;
+	protected Envelope envelope = null;
 
 	// GETTERS AND SETTERS
 	public Melding getMelding() {
@@ -171,33 +175,42 @@ public class MeldingFormBase implements Serializable {
 	 * @param melding
 	 * @throws Exception
 	 */
-	private void sendConfirmationMail(Melding melding) throws Exception {
+	private void sendConfirmationMail(Melding melding) {
 
-		Map<String, Object> variables = new HashMap<String, Object>();
-		variables.put("preferences", preferences);
-		variables.put("firstname", melding.getVoornaam());
-		variables.put("lastname", melding.getNaam());
-		variables.put("phone", melding.getTelefoon());
-		variables.put("status", melding.getStatus());
-		variables.put("problem", melding.getProbleem());
+		try {
+			Map<String, Object> variables = new HashMap<String, Object>();
+			variables.put("preferences", preferences);
+			variables.put("firstname", melding.getVoornaam());
+			variables.put("lastname", melding.getNaam());
+			variables.put("phone", melding.getTelefoon());
+			variables.put("status", melding.getStatus());
+			variables.put("problem", melding.getProbleem());
 
-		// Send mail to Melder
-		mailSender.sendMail(preferences.getNoreplyEmail(),
-				Collections.singleton(melding.getEmail()),
-				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
+			// Mail naar melder
+			mailSender.sendMail(preferences.getNoreplyEmail(),
+					Collections.singleton(melding.getEmail()),
+					"/META-INF/resources/core/mails/confirmMelding.fmt",
+					variables);
 
-		// Get email Medewerker
-		UserProfile profiel = (UserProfile) modelRepository.loadAspect(
-				modelRepository.getModelClass("UserProfile"),
-				modelRepository.loadObject(melding.getMedewerker()));
-		String medewerkerEmail = profiel.getEmail();
+			// Ophalen emailadres Medewerker
+			UserProfile profiel = (UserProfile) modelRepository.loadAspect(
+					modelRepository.getModelClass("UserProfile"),
+					modelRepository.loadObject(melding.getMedewerker()));
+			String medewerkerEmail = profiel.getEmail();
 
-		// Only for testing
-		String testEmail = "kristof.spiessens@gim.be";
-		// Send mail to Medewerker TOV
-		mailSender.sendMail(preferences.getNoreplyEmail(),
-				Collections.singleton(testEmail),
-				"/META-INF/resources/core/mails/confirmMelding.fmt", variables);
+			// DEBUG ONLY
+			String testEmail = "kristof.spiessens@gim.be";
+
+			// Mail naar Medewerker TOV
+			mailSender.sendMail(preferences.getNoreplyEmail(),
+					Collections.singleton(testEmail),
+					"/META-INF/resources/core/mails/confirmMelding.fmt",
+					variables);
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		} catch (Exception e) {
+			LOG.error("Can not send email.", e);
+		}
 	}
 
 	/**
@@ -239,6 +252,7 @@ public class MeldingFormBase implements Serializable {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
+		envelope = viewer.getContentExtent();
 
 		getMelding().setProbleem(null);
 		probleemType = StringUtils.EMPTY;
@@ -246,46 +260,46 @@ public class MeldingFormBase implements Serializable {
 		// Itereren over de lagen en de correcte operaties uitvoeren
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
 			layer.setFilter(null);
-			// Traject
+			layer.setHidden(true);
 			if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 				// Netwerk
 				if (trajectType.contains("Segment")) {
-					searchNetwerkLayer(layer, viewer);
+					searchNetwerkLayer(layer);
 				}
 				// Route
 				else {
-					searchRouteLayer(layer, viewer);
+					searchRouteLayer(layer);
+					envelope = viewer.getContentExtent(layer);
 				}
 			}
 			// RouteBord
 			else if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
-				searchRouteLayer(layer, viewer);
+				searchRouteBordLayer(layer);
 			}
 			// NetwerkBord
 			// Filtering op de borden
 			else if (layer.getLayerId().equalsIgnoreCase(
 					trajectType.replace("Segment", "") + "Bord")) {
 				layer.setHidden(false);
-				searchNetwerkBordLayer(layer, viewer);
+				searchNetwerkBordLayer(layer);
 			}
 			// WandelKnooppunt
 			else if (layer.getLayerId().contains("Knooppunt")
 					&& trajectType.contains("WandelNetwerk")) {
-
 				FeatureMapLayer mapLayer = (FeatureMapLayer) context
 						.getLayer("wandelNetwerkKnooppunt");
-				searchKnooppuntLayer(mapLayer, viewer);
+				searchKnooppuntLayer(mapLayer);
 			}
 
 			// FietsKnooppunt
 			else if (layer.getLayerId().contains("Knooppunt")
 					&& trajectType.contains("FietsNetwerk")) {
-
 				FeatureMapLayer mapLayer = (FeatureMapLayer) context
 						.getLayer("fietsNetwerkKnooppunt");
-				searchKnooppuntLayer(mapLayer, viewer);
+				searchKnooppuntLayer(mapLayer);
 			}
 
+			// Intekenen Punt
 			else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 				layer.setHidden(true);
 				((GeometryListFeatureMapLayer) layer)
@@ -298,7 +312,7 @@ public class MeldingFormBase implements Serializable {
 			}
 		}
 
-		context.setBoundingBox(viewer.getContentExtent());
+		context.setBoundingBox(envelope);
 		viewer.updateContext(null);
 	}
 
@@ -327,9 +341,10 @@ public class MeldingFormBase implements Serializable {
 
 			// Itereren over de lagen en de correctie lagen selecteerbaar zetten
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-
+				layer.setSelection(null);
 				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
 					layer.set("selectable", true);
+					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 					layer.setSelection(new ArrayList<String>(1));
 				} else if (layer.getLayerId().equalsIgnoreCase(
 						trajectType.replace("Segment", "") + "Bord")) {
@@ -386,8 +401,40 @@ public class MeldingFormBase implements Serializable {
 	public void saveMelding() {
 
 		try {
-			// Indien route achterhalen van de TrajectId via de routeNaam
-			if (trajectType.contains("Route")) {
+			// Save Melding
+			if (checkMelding(object)) {
+				modelRepository.saveObject(getMelding());
+				messages.info("Melding sucessvol verzonden naar TOV.");
+
+				// Email bevestiging sturen naar melder en medewerker
+				// sendConfirmationMail(object);
+				messages.info("Er is een bevestigingsmail gestuurd naar "
+						+ object.getEmail() + ".");
+
+				reset();
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not save model object.", e);
+			messages.error("Melding niet verzonden:" + e.getMessage());
+		}
+	}
+
+	/**
+	 * Checkt of een melding mag bewaard worden in de databank.
+	 * 
+	 * @param melding
+	 * @return
+	 */
+	public boolean checkMelding(Melding melding) {
+		if (object.getProbleem() instanceof AnderProbleem) {
+			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
+				messages.error("Melding niet verzonden: Er is geen punt aangeduid op de kaart.");
+				return false;
+			}
+			// Indien RouteAnderProbleem koppel trajectId aan de melding via de
+			// routeNaam
+			if (object.getProbleem() instanceof RouteAnderProbleem) {
 				MapViewer viewer = getViewer();
 				MapContext context = viewer.getConfiguration().getContext();
 
@@ -398,36 +445,24 @@ public class MeldingFormBase implements Serializable {
 					}
 				}
 			}
-			// Save Melding
-			if (object.getTraject() != null) {
-				modelRepository.saveObject(getMelding());
-				messages.info("Melding sucessvol verzonden naar TOV.");
-
-				// Email bevestiging sturen naar melder en medewerker
-				// sendConfirmationMail(object);
-				messages.info("Er is een bevestigingsmail gestuurd naar "
-						+ object.getEmail() + ".");
-
-				object = createMelding();
-				getMelding().setProbleem(null);
-				reset();
-			}
-
-			else if (object.getProbleem() instanceof BordProbleem) {
-				BordProbleem b = (BordProbleem) object.getProbleem();
-				if (b.getBord() == null) {
-					messages.error("Melding niet verzonden: Geen bord geselecteerd.");
+			// Indien NetwerkAnderProbleem check of segment geselecteerd is
+			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+				if (object.getTraject() == null) {
+					messages.error("Melding niet verzonden: Er is geen segment geselecteerd.");
+					return false;
 				}
 			}
 
-		} catch (IOException e) {
-			LOG.error("Can not save model object.", e);
-			messages.error("Melding niet verzonden.");
-		} catch (Exception e) {
-			LOG.error("Can not send mail.", e);
-			messages.error("Bevestigingsmail niet verstuurd.");
-			throw new RuntimeException(e);
 		}
+		// Indien BordProbleem check of bord geselecteerd is
+		if (object.getProbleem() instanceof BordProbleem) {
+			BordProbleem b = (BordProbleem) object.getProbleem();
+			if (b.getBord() == null) {
+				messages.error("Melding niet verzonden: Geen bord geselecteerd.");
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -439,8 +474,9 @@ public class MeldingFormBase implements Serializable {
 	@SuppressWarnings("unchecked")
 	public void onSelectFeatures(ControllerEvent event) throws IOException {
 
-		// Get selected segment
-		if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+		// Selecteren segment
+		if (object.getProbleem() != null
+				&& object.getProbleem() instanceof NetwerkAnderProbleem) {
 			List<String> ids = (List<String>) event.getParams().get(
 					"featureIds");
 			if (ids.size() > 0) {
@@ -450,41 +486,38 @@ public class MeldingFormBase implements Serializable {
 			}
 		}
 
-		// FIXME: Get selected bord and segment
-		else if (object.getProbleem() instanceof NetwerkBordProbleem) {
+		// Selecteren bord
+		else if (object.getProbleem() != null
+				&& object.getProbleem() instanceof BordProbleem) {
+
 			List<String> ids = (List<String>) event.getParams().get(
 					"featureIds");
-			if (ids.size() > 0) {
+			String layerId = (String) event.getParams().get("layerId");
+			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
+					.getLayer(layerId);
+
+			if (layer.getSelection().size() == 1) {
 				String id = ids.iterator().next();
+				((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
+						"Bord", id));
 
-				if ((Traject) modelRepository.loadObject(new ResourceKey(
-						"Traject", id)) != null) {
-					object.setTraject(new ResourceKey("Traject", id));
+				Bord selectedBord = (Bord) modelRepository
+						.loadObject(new ResourceKey("Bord", id));
+
+				// Zoek traject dat bij routebord hoort
+				if (selectedBord instanceof RouteBord) {
+					object.setTraject(((RouteBord) selectedBord).getRoute());
 				}
 
-				if ((Bord) modelRepository.loadObject(new ResourceKey("Bord",
-						id)) != null) {
-					((BordProbleem) object.getProbleem())
-							.setBord(new ResourceKey("Bord", id));
+				// Zoek segment dat bij NetwerkBord hoort
+				else if (selectedBord instanceof NetwerkBord) {
+					object.setTraject(new ResourceKey("Traject",
+							((NetwerkBord) selectedBord).getSegmenten().get(0)
+									.toString()));
 				}
-			}
-		}
-
-		// Get selected bord
-		else {
-			if (object.getProbleem() != null) {
-				List<String> ids = (List<String>) event.getParams().get(
-						"featureIds");
-				if (ids.size() > 0) {
-					String id = ids.iterator().next();
-					((BordProbleem) object.getProbleem())
-							.setBord(new ResourceKey("Bord", id));
-
-					// Set traject behorend bij routebord
-					RouteBord selectedBord = (RouteBord) modelRepository
-							.loadObject(new ResourceKey("Bord", id));
-					object.setTraject(selectedBord.getRoute());
-				}
+			} else {
+				messages.error("Gelieve precies 1 bord te selecteren.");
+				layer.setSelection(new ArrayList<String>(1));
 			}
 		}
 	}
@@ -551,8 +584,8 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
-	 * Filters the layer based on trajectNaam and sets the TrajectID via
-	 * trajectNaam. Dit is enkel toepasbaar op routes.
+	 * Filteren van de laag op basis van de trajectNaam en setten van TrajectID
+	 * via trajectNaam. Dit is enkel toepasbaar op routes.
 	 * 
 	 * @param layer
 	 */
@@ -584,6 +617,7 @@ public class MeldingFormBase implements Serializable {
 	 * 
 	 * @return
 	 */
+	@SuppressWarnings("unchecked")
 	public List<ResourceIdentifier> getKnooppuntIds() {
 		List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>();
 		try {
@@ -607,31 +641,60 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
+	 * Operaties op de Netwerklagen
 	 * 
 	 * @param layer
 	 * @param viewer
 	 */
-	private void searchNetwerkLayer(FeatureMapLayer layer, MapViewer viewer) {
+	private void searchNetwerkLayer(FeatureMapLayer layer) {
 		layer.setHidden(false);
-		// layer.setFilter(FilterUtils.equal("regio", regio));
-		if (regio != null && trajectNaam == null) {
-			viewer.updateCurrentExtent(viewer.getFeatureExtent(layer,
-					FilterUtils.equal("regio", regio)));
+		layer.set("selectable", false);
+		layer.setSelection(Collections.EMPTY_LIST);
+		Filter filter = null;
+
+		if (regio != null && trajectNaam == null && knooppuntNummer == 0) {
+			filter = FilterUtils.equal("regio", regio);
+			envelope = getViewer().getFeatureExtent(layer, filter);
+			List<String> ids = new ArrayList<String>();
+			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+					.getFeature(layer, getViewer().getContext().getSrsName(),
+							getViewer().getContext().getBoundingBox(), null,
+							filter, null, null);
+			FeatureIterator<SimpleFeature> iterator = features.features();
+			while (iterator.hasNext()) {
+				ids.add(iterator.next().getID());
+			}
+			layer.setSelection(ids);
 		}
 
 		else if (trajectNaam != null) {
-			// layer.setFilter(FilterUtils.equal("naam", trajectNaam));
-			viewer.updateCurrentExtent(viewer.getFeatureExtent(layer,
-					FilterUtils.equal("naam", trajectNaam)));
+			filter = FilterUtils.equal("naam", trajectNaam);
+			layer.set("selectable", true);
+
+			if (knooppuntNummer == 0) {
+				List<String> ids = new ArrayList<String>();
+				FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+						.getFeature(layer,
+								getViewer().getContext().getSrsName(),
+								getViewer().getContext().getBoundingBox(),
+								null, filter, null, null);
+				FeatureIterator<SimpleFeature> iterator = features.features();
+				while (iterator.hasNext()) {
+					ids.add(iterator.next().getID());
+				}
+				layer.setSelection(ids);
+				envelope = getViewer().getFeatureExtent(layer, filter);
+			}
 		}
 	}
 
 	/**
+	 * Operaties op de Routelagen
 	 * 
 	 * @param layer
 	 * @param viewer
 	 */
-	private void searchRouteLayer(FeatureMapLayer layer, MapViewer viewer) {
+	private void searchRouteLayer(FeatureMapLayer layer) {
 		layer.setHidden(false);
 		if (regio != null && trajectNaam == null) {
 			layer.setFilter(FilterUtils.equal("regio", regio));
@@ -641,96 +704,130 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
+	 * Operaties op de RouteBordlagen
 	 * 
 	 * @param layer
 	 * @param viewer
 	 */
-	private void searchNetwerkBordLayer(FeatureMapLayer layer, MapViewer viewer) {
+	private void searchRouteBordLayer(FeatureMapLayer layer) {
+		layer.setHidden(false);
+		layer.setSelection(Collections.EMPTY_LIST);
+		if (regio != null && trajectNaam == null) {
+			layer.setFilter(FilterUtils.equal("regio", regio));
+		} else if (trajectNaam != null) {
+			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		}
+		layer.set("selectionMode", FeatureSelectionMode.SINGLE);
+	}
+
+	/**
+	 * Operaties op de NetwerkBord lagen
+	 * 
+	 * @param layer
+	 * @param viewer
+	 */
+	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+		layer.setFilter(null);
 		layer.setHidden(false);
 		layer.setFilter(FilterUtils.equal("regio", regio));
-		// Voorlopig Filter de borden die verbonden zijn met het opgegeven
-		// knooppunt nummer
-		if (knooppuntNummer != 0 && regio != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("regio", regio),
-					FilterUtils.or(FilterUtils.equal("kpnr0", knooppuntNummer),
-							FilterUtils.equal("kpnr1", knooppuntNummer),
-							FilterUtils.equal("kpnr2", knooppuntNummer),
-							FilterUtils.equal("kpnr3", knooppuntNummer))));
+		// Filter met de borden die verbonden zijn met het opgegeven
+		// knooppuntNr
+		Filter knooppuntFilter = FilterUtils.or(
+				FilterUtils.equal("kpnr0", knooppuntNummer),
+				FilterUtils.equal("kpnr1", knooppuntNummer),
+				FilterUtils.equal("kpnr2", knooppuntNummer),
+				FilterUtils.equal("kpnr3", knooppuntNummer));
+
+		// Default filter
+		layer.setFilter(knooppuntFilter);
+
+		Filter filter = null;
+		if (regio != null) {
+			filter = FilterUtils.and(FilterUtils.equal("regio", regio),
+					knooppuntFilter);
+			layer.setFilter(filter);
 		}
-
-		if (knooppuntNummer != 0 && trajectNaam != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("naam",
-					trajectNaam), FilterUtils.or(
-					FilterUtils.equal("kpnr0", knooppuntNummer),
-					FilterUtils.equal("kpnr1", knooppuntNummer),
-					FilterUtils.equal("kpnr2", knooppuntNummer),
-					FilterUtils.equal("kpnr3", knooppuntNummer))));
-
-		}
-
-		if (knooppuntNummer != 0) {
-			layer.setFilter(FilterUtils.or(
-					FilterUtils.equal("kpnr0", knooppuntNummer),
-					FilterUtils.equal("kpnr1", knooppuntNummer),
-					FilterUtils.equal("kpnr2", knooppuntNummer),
-					FilterUtils.equal("kpnr3", knooppuntNummer)));
-		}
-
-		if (knooppuntNummer == 0 && trajectNaam != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("naam",
-					trajectNaam), FilterUtils.or(
-					FilterUtils.equal("kpnr0", knooppuntNummer),
-					FilterUtils.equal("kpnr1", knooppuntNummer),
-					FilterUtils.equal("kpnr2", knooppuntNummer),
-					FilterUtils.equal("kpnr3", knooppuntNummer))));
-
-		}
-
-		if (knooppuntNummer == 0 && regio != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("regio", regio),
-					FilterUtils.or(FilterUtils.equal("kpnr0", knooppuntNummer),
-							FilterUtils.equal("kpnr1", knooppuntNummer),
-							FilterUtils.equal("kpnr2", knooppuntNummer),
-							FilterUtils.equal("kpnr3", knooppuntNummer))));
+		if (trajectNaam != null) {
+			filter = FilterUtils.and(FilterUtils.equal("naam", trajectNaam),
+					knooppuntFilter);
+			layer.setFilter(filter);
 		}
 	}
 
 	/**
+	 * Operaties op de knooppuntlagen
 	 * 
 	 * @param layer
 	 * @param viewer
 	 */
-	private void searchKnooppuntLayer(FeatureMapLayer layer, MapViewer viewer) {
+	private void searchKnooppuntLayer(FeatureMapLayer layer) {
 		layer.setHidden(false);
 		layer.setFilter(null);
-		if (knooppuntNummer == 0 && regio != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("regio", regio)));
+		layer.setSelection(Collections.EMPTY_LIST);
+		Filter filter = null;
+
+		if (knooppuntNummer == 0) {
+			if (regio != null) {
+				filter = FilterUtils.equal("regio", regio);
+				layer.setFilter(filter);
+			}
+
+			if (trajectNaam != null) {
+				filter = FilterUtils.equal("naam", trajectNaam);
+				layer.setFilter(filter);
+			}
 		}
 
-		if (knooppuntNummer == 0 && trajectNaam != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("naam",
-					trajectNaam)));
-		}
-		if (knooppuntNummer != 0 && regio != null) {
-			layer.setFilter(FilterUtils.and(FilterUtils.equal("regio", regio),
-					(FilterUtils.equal("nummer", knooppuntNummer))));
-		}
+		else if (knooppuntNummer != 0) {
+			if (regio != null) {
+				filter = FilterUtils.and(FilterUtils.equal("regio", regio),
+						(FilterUtils.equal("nummer", knooppuntNummer)));
+				layer.setFilter(filter);
+			}
 
-		if (knooppuntNummer != 0 && trajectNaam != null) {
-			layer.setFilter(FilterUtils.and(
-					FilterUtils.equal("naam", trajectNaam),
-					(FilterUtils.equal("nummer", knooppuntNummer))));
+			if (trajectNaam != null) {
+				filter = FilterUtils.and(
+						FilterUtils.equal("naam", trajectNaam),
+						(FilterUtils.equal("nummer", knooppuntNummer)));
+				layer.setFilter(filter);
+			}
+
+			if (trajectNaam == null && regio == null) {
+				filter = FilterUtils.equal("nummer", knooppuntNummer);
+				layer.setFilter(filter);
+			}
+			// Set Selectie enkel als specifiel knooppuntNr is opgegeven
+			layer.set("selectable", true);
+			List<String> ids = new ArrayList<String>();
+			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+					.getFeature(layer, getViewer().getContext().getSrsName(),
+							getViewer().getContext().getBoundingBox(), null,
+							filter, null, null);
+			FeatureIterator<SimpleFeature> iterator = features.features();
+			while (iterator.hasNext()) {
+				ids.add(iterator.next().getID());
+			}
+			layer.setSelection(ids);
+			envelope = getViewer().getFeatureExtent(layer, filter);
 		}
 	}
 
+	// FIX ME
+	/**
+	 * Reset het routedokter formulier. Enkel het gegevensinfo panel moet na het
+	 * melden van een probleem ingevuld zijn met eerder ingevoerde gegevens.
+	 */
 	public void reset() {
 		setTrajectType(null);
 		setRegio(null);
 		setTrajectNaam(null);
-		String email = object.getEmail();
+		// String email = object.getEmail();
+
 		object = null;
 		object = createMelding();
-		object.setEmail(email);
+		getMelding().setProbleem(null);
+
+		// object.setEmail(email);
 
 		// Reset map
 		MapViewer viewer = getViewer();

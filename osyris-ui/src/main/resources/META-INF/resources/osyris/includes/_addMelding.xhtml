@@ -12,6 +12,8 @@
 	<table width="100%">
 	<tr>
 	<td width="40%" valign="top">
+	
+<!-- SEARCH TRAJECT PANEL -->
 	<r:panel id="searchTrajectPanel" header="Zoek traject">
 		<d:fields>
 		<d:field for="trajectType" label="Traject type" required="true">
@@ -60,6 +62,8 @@
 			</j:commandButton>
 		</d:buttons>
 	</r:panel>
+	
+<!-- MELDER GEGEVENS PANEL -->
 	<r:panel id="gegevensPanel" header="Uw gegevens">
 				<d:fields>
 				<d:field label="Voornaam" for="voornaam">	 
@@ -94,9 +98,11 @@
  				</d:field> 
  			</d:fields>
 	</r:panel>
+	
+<!-- PROBLEEM TOEVOEGEN PANEL -->
 	<r:panel header="Probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
-				<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
+				Kies het type probleem: <h:selectOneMenu id="probleemType" value="#{form.probleemType}">
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
 					<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
@@ -136,7 +142,7 @@
 			<br/>
 			<j:commandButton
 				id="selectSegment"
-				rendered="#{form.trajectType.contains('Segment')}"
+				rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}"
 				image="#{resource['core/images/actions/24x24/select.png']}"
 				styleClass="component-toolbar-button"
 				value="Selecteer segment op kaart"
@@ -151,7 +157,7 @@
 							value="#{trajectType}" />
 				</j:activateControl>
 			</j:commandButton>
-		<d:buttons>
+			<d:buttons>
 			<j:commandButton value="Verzenden"
 				image="#{resource['core/images/actions/12x12/apply.png']}"
 				type="button"

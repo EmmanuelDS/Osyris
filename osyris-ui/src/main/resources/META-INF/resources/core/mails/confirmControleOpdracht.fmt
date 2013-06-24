@@ -1,0 +1,12 @@
+<#assign subject>
+[${preferences.title?string}] Nieuwe controleopdracht verzonden
+</#assign>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<body>
+		<div>Toerisme Oost-Vlaanderen heeft een controleopdracht naar U verzonden.</div>
+		<dl>
+			<dt>U kan het overzicht van Uw controleopdrachten via onderstaande link raadplegen:</dt>
+			<dd>${link}</dd>
+		</dl>
+	</body>
+</html>

@@ -11,7 +11,7 @@ import org.conscientia.api.model.annotation.ModelStore;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Netwerk controle opdracht")
+@Label("Controleopdracht (netwerk)")
 public class NetwerkControleOpdracht extends ControleOpdracht {
 
 }

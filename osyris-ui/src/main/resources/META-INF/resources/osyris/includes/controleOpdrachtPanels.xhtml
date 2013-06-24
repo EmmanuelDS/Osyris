@@ -8,12 +8,13 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
-
+	
+<!-- CONTROLE OPDRACHT TYPE POPUP -->
 	<a:outputPanel>
 		<j:renderPanel id="createPanel" rendered="false">
-			<d:popupPanel header="Aanmaken Controleopdracht"
+			<d:popupPanel header="Kies type controleopdracht"
 				icon="#{resources['core/images/actions/16x16/create.png']}"
-				show="true" modal="true" width="1100" height="700">
+				show="true" modal="true" width="600">
 				<div>
 					<h:outputText value="Type controleopdracht: " />
 					<h:selectOneMenu id="controleOpdrachtType"
@@ -22,44 +23,63 @@
 						<f:selectItem itemValue="route" itemLabel="Route Controleopdracht" />
 						<f:selectItem itemValue="netwerk"
 							itemLabel="Netwerk Controleopdracht" />
-						<a:ajax event="change" render="createControleOpdrachtPanel"
-							listener="#{form.create()}" execute="@this" />
+							<a:ajax event="change" execute="@this" />
 					</h:selectOneMenu>
+					<d:buttons>
+					<j:commandButton value="Volgende"
+						image="#{resource['core/images/actions/12x12/next.png']}"
+						type="button" action="#{form.create()}">
+						<j:renderListener target="#{r:clientId('createControleOpdrachtPanel')}"
+							rendered="true" execute="@this" />
+						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
+					<j:commandButton value="#{messages['form.general.cancel.button']}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/cancel.png']}"
+						action="#{form.cancel()}" execute="@this">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
 				</div>
-				<br />
-				<j:renderPanel id="createControleOpdrachtPanel"
-					rendered="#{form.controleOpdrachtType != null}">
+			</d:popupPanel>
+		</j:renderPanel>
+				
+<!-- AANMAKEN CONTROLEOPDRACHT POPUP -->		
+		<j:renderPanel id="createControleOpdrachtPanel" rendered="false">
+			<d:popupPanel header="Aanmaken Controleopdracht (#{form.controleOpdrachtType})"
+				icon="#{resources['core/images/actions/16x16/create.png']}"
+				show="true" modal="true" width="1100" height="700">
 					<table width="100%">
 						<tr>
-							<td width="40%" valign="top"><r:panel
-									id="searchTrajectPanel" header="Zoek traject">
-									<d:fields>
-										<d:field for="trajectType" label="Traject type"
+						<td width="50%" valign="top">
+						<r:panel id="searchTrajectPanel" header="Zoek traject">
+								<d:fields>
+									<d:field for="trajectType" label="Traject type"
 											required="true">
-											<h:selectOneMenu id="trajectType" value="#{form.trajectType}"
+										<h:selectOneMenu id="trajectType" value="#{form.trajectType}"
 												required="true">
-												<f:selectItem itemValue="" itemLabel="" />
-												<f:selectItems
-													value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectTypes(form.controleOpdrachtType))}" />
-												<a:ajax event="change" render="detailSearchPanel"
-													execute="@this" />
-											</h:selectOneMenu>
-										</d:field>
-										<j:renderPanel id="detailSearchPanel"
+											<f:selectItem itemValue="" itemLabel="" />
+											<f:selectItems
+												value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectTypes(form.controleOpdrachtType))}" />
+											<a:ajax event="change" render="detailSearchPanel"
+												execute="@this" />
+										</h:selectOneMenu>
+									</d:field>
+									<j:renderPanel id="detailSearchPanel"
 											rendered="#{form.trajectType != null}">
-											<d:field for="trajectNaam" label="Traject naam"
+										<d:field for="trajectNaam" label="Traject naam"
 												rendered="true"
 												required="#{form.trajectType.contains('Route')}">
-												<h:selectOneMenu id="trajectNaam"
+											<h:selectOneMenu id="trajectNaam"
 													value="#{form.trajectNaam}" rendered="true"
 													required="#{form.trajectType.contains('Route')}">
 													<f:selectItem itemValue="" itemLabel="" />
 													<f:selectItems
 														value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
-												</h:selectOneMenu>
-											</d:field>
-											<br />
-											<j:commandButton id="selectSegment"
+											</h:selectOneMenu>
+										</d:field>
+										<br />
+										<j:commandButton id="selectSegment"
 												rendered="#{form.trajectType.contains('Segment')}"
 												image="#{resource['core/images/actions/24x24/select.png']}"
 												styleClass="component-toolbar-button"
@@ -70,48 +90,63 @@
 													control="selectBox">
 													<f:param name="layerId" value="#{trajectType}" />
 												</j:activateControl>
-											</j:commandButton>
-											<d:buttons>
-												<j:commandButton value="Zoeken"
+										</j:commandButton>
+										<d:buttons>
+											<j:commandButton value="Zoeken"
 													image="#{resource['core/images/actions/12x12/search.png']}"
 													type="button" action="#{form.searchTraject()}"
 													execute="searchTrajectPanel"
 													render="map">
-												</j:commandButton>
-											</d:buttons>
-										</j:renderPanel>
-									</d:fields>
-								</r:panel> 
+											</j:commandButton>
+										</d:buttons>
+									</j:renderPanel>
+								</d:fields>
+							</r:panel> 
 								<br/>
 								<r:panel id="controleOpdrachtPanel">
 									<d:buttons>
 										<j:commandButton value="Maak bewegwijzeringsverslag"
 											image="#{resource['core/images/actions/12x12/search.png']}"
-											type="button" action="#{form.getBewegwijzeringVerslag()}"
+											type="button" action="#{form.createBewegwijzeringVerslag()}"
 											execute="@this"
 											render="bewegwijzering">
 										</j:commandButton>
 									</d:buttons>
+									<!-- BEWEGWIJZERING TABEL -->
 									<j:renderPanel id="bewegwijzering"
 										rendered="true" height="100">
 										<p:dataTable id="borden"
 											value="#{form.bewegwijzering}" mode="RESULT"
-											var="bord" style="width: 100%;"
+											var="bord"
 											styleClass="model-table #{cc.attrs.contentClass}"
 											paginator="true" rows="5" paginatorPosition="bottom" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 											emptyMessage="Geen resultaten gevonden">
 											<f:facet name="header">
 												<div>Bewegwijzering</div>
 											</f:facet>
-											<p:column>
+											<p:column >
 												<f:facet name="header">
-												<div>Nummer</div>
+												<div>BordID</div>
+												</f:facet>
+												<h:outputText value="#{d:modelObject(bord).getId()}" />
+											</p:column>
+											<p:column filterBy="#{bord.volg}" filterMatchMode="exact">
+												<f:facet name="header">
+												<div>Volgnr</div>
 												</f:facet>
 												<d:propertyValue id="bordVolgColumn"
 													modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
 													value="#{bord.volg }" mode="VIEW" />
 											</p:column>
-											<p:column>
+											<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact">
+												<f:facet name="header">
+													<div>Pijl</div>
+												</f:facet>
+												<d:propertyValue id="imageCodeColumn"
+													modelProperty="#{d:modelClass('Bord').getProperty('imageCode')}"
+													value="#{bord.imageCode }" mode="VIEW" />
+											</p:column>
+											<p:column filterBy="#{bord.straatnaam}" filterMatchMode="contains">
 												<f:facet name="header">
 												<d:displayLabel
 													property="#{d:modelClass('Bord').getProperty('straatnaam')}" />
@@ -119,6 +154,15 @@
 												<d:propertyValue id="straatnaamColumn"
 													modelProperty="#{d:modelClass('Bord').getProperty('straatnaam')}"
 													value="#{bord.straatnaam }" mode="VIEW" />
+											</p:column>
+											<p:column filterBy="#{bord.paalConst}" filterMatchMode="contains">
+												<f:facet name="header">
+												<d:displayLabel
+													property="#{d:modelClass('Bord').getProperty('paalConst')}" />
+												</f:facet>
+												<d:propertyValue id="paalConstColumn"
+													modelProperty="#{d:modelClass('Bord').getProperty('paalConst')}"
+													value="#{bord.paalConst }" mode="VIEW" />
 											</p:column>
 										</p:dataTable>
 									</j:renderPanel>
@@ -151,8 +195,10 @@
 										</d:field>
 
 									</d:fields>
-								</r:panel></td>
-							<td width="60%" valign="top"><r:panel id="map">
+							</r:panel></td>
+							<!-- MINI MAP -->
+							<td width="50%" valign="top">
+							<r:panel id="map">
 									<div style="height: 500px">
 										<m:mapViewer id="viewer"
 											configuration="#{form.getConfiguration()}">
@@ -168,10 +214,9 @@
 												listener="#{form.onDeleteFeatures}" />
 										</m:mapViewer>
 									</div>
-								</r:panel></td>
+							</r:panel></td>
 						</tr>
 					</table>
-
 					<d:buttons>
 						<j:commandButton value="#{messages['page.create.create.button']}"
 							image="#{resource['core/images/actions/12x12/apply.png']}"
@@ -185,40 +230,385 @@
 							<j:renderListener rendered="false" />
 						</j:commandButton>
 					</d:buttons>
+					</d:popupPanel>
 				</j:renderPanel>
-			</d:popupPanel>
-		</j:renderPanel>
 
+<!-- RAADPLEGEN CONTROLEOPDRACHT POPUP -->
 		<j:renderPanel id="viewPanel" rendered="false">
 			<d:popupPanel
-				header="#{messages['page.view.title']} #{form.modelClass.label}"
+				header="#{messages['page.view.title']} #{form.object.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/view.png']}"
-				show="true" modal="true" width="600">
+				show="true" modal="true" width="1100" height="700">
+				<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+					<j:commandButton
+						rendered="true"
+						value="Toon op kaart"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						action="#{form.showOpdrachtMapData(form.object.traject)}">
+					</j:commandButton>
+				<table width="100%">
+						<tr>
+						<td width="50%" valign="top">	
+							<a:outputPanel>	
+								<u:decorate
+								template="/resources/osyris/includes/bewegwijzering.xhtml">
+								<u:param name="form" value="#{form}" />
+								</u:decorate>
+							</a:outputPanel>
+				<br/>
+				<r:panel id="controleOpdrachtInfo" header="Praktische Info">
 				<d:object mode="VIEW" modelClass="#{form.modelClass}"
 					value="#{form.object}">
 				</d:object>
+				</r:panel>
+				</td>
+				<!-- MINI MAP -->
+				<td width="50%" valign="top">
+					<r:panel>
+						<div style="height: 500px">
+							<m:mapViewer id="viewer"
+								configuration="#{form.getConfiguration()}">
+							</m:mapViewer>
+						</div>
+					</r:panel>
+				</td>
+				</tr>
+				</table>
 				<d:buttons>
-					<j:commandButton value="#{messages['form.general.close.button']}"
-						image="#{resource['core/images/actions/12x12/close.png']}"
-						type="button" submit="false">
+				<j:commandButton
+						rendered="#{form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN' }"
+						value="Bewerken"
+						image="#{resource['core/images/actions/12x12/edit.png']}"
+						type="button">
+						<j:renderListener target="#{r:clientId('editPanel')}"
+							rendered="true" execute="@this" />
 						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
+					<j:commandButton
+						rendered="#{identity.inGroup('PeterMeter','CUSTOM') and form.object.status == 'UIT_TE_VOEREN' }"
+						value="Rapporteren"
+						image="#{resource['core/images/actions/12x12/edit.png']}"
+						type="button">
+						<j:renderListener target="#{r:clientId('reportPanel')}"
+							rendered="true" execute="@this" />
+						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
+					<j:commandButton
+						rendered="#{form.object.status == 'GERAPPORTEERD' }"
+						value="Valideren"
+						image="#{resource['core/images/actions/12x12/edit.png']}"
+						type="button">
+						<j:renderListener target="#{r:clientId('validatePanel')}"
+							rendered="true" execute="@this" />
+						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
+					<j:commandButton 
+						rendered="#{form.object.status == 'TE_CONTROLEREN' }"
+						value="Verzenden"
+						image="#{resource['core/images/actions/12x12/next.png']}"
+						type="button"
+						action="#{form.verzendenControleOpdracht()}"
+						render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton 
+						value="Printen"
+						image="#{resource['core/images/actions/12x12/print.png']}"
+						type="button">
+						<j:renderControl event="click" rendered="false" execute="@this" />
+					</j:commandButton>
+					<j:commandButton 
+						rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
+						value="Opnieuw te controleren"
+						image="#{resource['core/images/actions/12x12/reload.png']}"
+						type="button"
+						action="#{form.reopenControleOpdracht()}" render="#{render}">
+						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
 
+<!-- BEWERKEN CONTROLEOPDRACHT POPUP -->
 		<j:renderPanel id="editPanel" rendered="false">
 			<d:popupPanel
-				header="#{messages['page.edit.title']} #{form.modelClass.label}"
+				header="#{messages['page.view.title']} #{form.object.modelClass.label}"
 				icon="#{resources['core/images/actions/16x16/edit.png']}"
 				show="true" modal="true" width="600">
-				<d:object mode="EDIT" modelClass="#{form.modelClass}"
-					value="#{form.object}">
-				</d:object>
+				<div>
+				<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+				<a:outputPanel>	
+						<u:decorate
+						template="/resources/osyris/includes/bewegwijzering.xhtml">
+						<u:param name="form" value="#{form}" />
+						</u:decorate>
+				</a:outputPanel>
+				<br/>
+				<d:fields>
+					<d:field label="Periode" for="periode">	 
+					<d:propertyValue id="periode" 
+ 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('periode')}" 
+ 						value="#{form.object.periode}" 
+ 						mode="VIEW" />
+ 					</d:field>
+					<d:field label="Status" for="status">	 
+					<d:propertyValue id="status" 
+ 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('status')}" 
+ 						value="#{form.object.status}" 
+ 						mode="VIEW" />
+ 					</d:field>
+ 					<d:field label="Datum controle" for="datumTeControleren">	 
+					<d:propertyValue id="datumTeControleren" 
+ 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTeControleren')}" 
+ 						value="#{form.object.datumTeControleren}" 
+ 						mode="EDIT" />
+ 					</d:field>
+ 						<d:field label="Peter/Meter" for="peterMeter">	 
+					<d:propertyValue id="peterMeter" 
+ 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" 
+ 						value="#{form.object.peterMeter}" 
+ 						mode="EDIT" />
+ 					</d:field>
+ 					<d:field label="Commentaar TOV" for="commentaar">	 
+					<d:propertyValue id="commentaar" 
+ 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('commentaar')}" 
+ 						value="#{form.object.commentaar}" 
+ 						mode="EDIT" />
+ 					</d:field>
+				</d:fields>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.save.button']}"
 						image="#{resource['core/images/actions/12x12/save.png']}"
 						type="button" action="#{form.save()}" render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton 
+						rendered="#{form.object.status != 'GEANNULEERD'}"
+						value="Annuleer opdracht"
+						type="button"
+						image="#{resource['core/images/actions/12x12/cancel.png']}"
+						action="#{form.annuleerControleOpdracht()}" execute="@this" render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
+				</div>
+			</d:popupPanel>
+		</j:renderPanel>
+		
+		
+<!-- RAPPORTEREN CONTROLEOPDRACHT POPUP -->
+		<j:renderPanel id="reportPanel" rendered="false">
+			<d:popupPanel
+				header="Rapporteren #{form.object.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/edit.png']}"
+				show="true" modal="true" width="1100" height="700">
+				<div>
+				<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+				<j:commandButton
+						rendered="true"
+						value="Toon op kaart"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						action="#{form.showOpdrachtMapData(form.object.traject)}"
+						execute="@this">
+				</j:commandButton>
+				<br/>
+				<table width="100%">
+						<tr>
+						<td width="50%" valign="top">
+				<r:panel id="ProblemenPanel" header="Problemen">	
+				<j:renderPanel id="problemPanel">
+				Kies type probleem:<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+					<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+					<a:ajax
+						event="change"
+						render="probleemPanel"
+						listener="#{form.createProbleem()}"
+						execute="@this" />
+				</h:selectOneMenu>
+				<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
+					<d:object mode="EDIT"
+							value="#{form.probleem}" />		
+					<j:commandButton
+						id="selectFeatures"
+						rendered="#{form.probleemType == 'bord'}"
+						image="#{resource['core/images/actions/24x24/select.png']}"
+						styleClass="component-toolbar-button"
+						value="Selecteer bord op kaart"
+						title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+						submit="false">
+						<j:activateControl
+							for="viewer"
+							event="click"
+							control="selectBox" />
+					</j:commandButton>
+					<j:commandButton
+						id="drawPoint"
+						rendered="#{form.probleemType == 'ander'}"
+						image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+						styleClass="component-toolbar-button"
+						value="Duid probleem aan op kaart">
+						<j:activateControl
+							for="viewer"
+							event="click"
+							control="drawPoint" />
+					</j:commandButton>
+					<br/>
+					<j:commandButton
+						id="selectSegment"
+						rendered="#{form.object.trajectType.contains('netwerk')}"
+						image="#{resource['core/images/actions/24x24/select.png']}"
+						styleClass="component-toolbar-button"
+						value="Selecteer segment op kaart"
+						title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+						submit="false">
+						<j:activateControl
+							for="viewer"
+							event="click"
+							control="selectBox" >
+						</j:activateControl>
+					</j:commandButton>
+					<br/>
+<!-- 					<j:commandButton -->
+<!-- 						id="drawLine" -->
+<!-- 						rendered="#{form.probleemType == 'ander' and form.object.trajectType.contains('route')}" -->
+<!-- 						image="#{resource['core/images/actions/24x24/drawLine.png']}" -->
+<!-- 						styleClass="component-toolbar-button" -->
+<!-- 						value="Duid omleiding aan op de kaart"> -->
+<!-- 						<j:activateControl -->
+<!-- 							for="viewer" -->
+<!-- 							event="click" -->
+<!-- 							control="drawLine" /> -->
+<!-- 					</j:commandButton> -->
+					
+				<d:buttons>
+					<j:commandButton value="Probleem toevoegen" rendered="true"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						action="#{form.addProbleem()}" render="problemPanel">
+					</j:commandButton>
+				</d:buttons>
+				</j:renderPanel>
+				<br/>
+				
+				<!-- Probleem tabellen -->
+				<u:decorate
+					template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
+					<u:param name="form" value="#{form}" />
+				</u:decorate>
+				
+		    	</j:renderPanel>
+		    	</r:panel>
+		    	<br/>
+		    	<r:panel>
+	    		<d:fields>
+		    		<d:field label="Datum Uitvoering" for="datumUitvoering">	 
+					<d:propertyValue id="datumUitvoering" 
+ 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumUitTeVoeren')}" 
+ 						value="#{form.object.datumUitTeVoeren}" 
+ 						mode="EDIT" />
+ 					</d:field>
+				</d:fields>
+				</r:panel>
+				</td>
+				<td width="50%" valign="top">
+					<r:panel>
+						<div style="height: 500px">
+							<m:mapViewer id="viewer"
+								configuration="#{form.getConfiguration()}">
+								<j:controllerListener name="selectedFeatures"
+									listener="#{form.onSelectFeatures}" />
+								<j:controllerListener name="addedFeature"
+									listener="#{form.onUpdateFeatures}" />
+							</m:mapViewer>
+						</div>
+					</r:panel>
+				</td>
+				</tr>
+				</table>
+				</div>
+				<div>
+					<d:buttons>
+					<j:commandButton value="#{messages['form.general.save.button']}"
+						image="#{resource['core/images/actions/12x12/save.png']}"
+						type="button" action="#{form.save()}" render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+					<j:commandButton value="Verzenden"
+						image="#{resource['core/images/actions/12x12/next.png']}"
+						type="button" action="#{form.rapporterenControleOpdracht()}" render="#{render}">
+						<j:renderListener rendered="false" />
+					</j:commandButton>
+				</d:buttons>
+				</div>
+			</d:popupPanel>
+		</j:renderPanel>
+		
+<!-- CONTROLE OPDRACHT VALIDEREN POPUP -->
+		<j:renderPanel id="validatePanel" rendered="false">
+			<d:popupPanel
+				header="Valideren  #{form.object.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/edit.png']}"
+				show="true" modal="true" width="1100" height="700">
+				<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+				<j:commandButton
+						rendered="true"
+						value="Toon op kaart"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						action="#{form.showOpdrachtMapData(form.object.traject)}"
+						execute="@this">
+				</j:commandButton>
+				<br />
+				<table width="100%">
+					<tr>
+					<td width="50%" valign="top">
+					<!-- Probleem tabellen -->
+					<u:decorate
+						template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
+						<u:param name="form" value="#{form}" />
+					</u:decorate>
+					<br/>
+					<r:panel id="infoPanel" header="Info">
+					<d:fields>
+						<d:displayLabel
+								property="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" />
+						<d:field>
+						<d:propertyValue id="peterMeter" 
+	 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" 
+	 						value="#{form.object.peterMeter}" 
+	 						mode="VIEW" />
+						</d:field>
+						<d:displayLabel
+								property="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" />
+						<d:field>
+						<d:propertyValue id="datumGerapporteerd" 
+	 						modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" 
+	 						value="#{form.object.datumGerapporteerd}" 
+	 						mode="VIEW" />
+						</d:field>
+					</d:fields>
+					</r:panel>
+			
+					</td>
+					<td width="50%" valign="top">
+						<r:panel>
+							<div style="height: 500px">
+								<m:mapViewer id="viewer"
+									configuration="#{form.getConfiguration()}">
+								</m:mapViewer>
+							</div>
+						</r:panel>
+					</td>
+					</tr>
+				</table>
+				<d:buttons>	
+					<j:commandButton value="#{messages['form.general.save.button']}"
+						image="#{resource['core/images/actions/12x12/delete.png']}"
+						type="button" action="#{form.save}" render="#{render}">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
@@ -230,7 +620,8 @@
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-
+		
+<!-- CONTROLE OPDRACHT VERWIJDEREN POPUP -->
 		<j:renderPanel id="deletePanel" rendered="false">
 			<d:popupPanel
 				header="#{messages['page.delete.title']}  #{form.modelClass.label}"

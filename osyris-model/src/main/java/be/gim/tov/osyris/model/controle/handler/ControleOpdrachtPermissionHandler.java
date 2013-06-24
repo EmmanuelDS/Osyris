@@ -39,6 +39,12 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 			if (controleOpdracht != null) {
 				ControleOpdrachtStatus status = controleOpdracht.getStatus();
 
+				if (!identity.inGroup("PeterMeter", "CUSTOM")
+						&& status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)
+						&& action.equals(Permission.EDIT_ACTION)) {
+					return false;
+				}
+
 				// PETER EN METER
 				if (identity.inGroup("PeterMeter", "CUSTOM")
 						&& status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
