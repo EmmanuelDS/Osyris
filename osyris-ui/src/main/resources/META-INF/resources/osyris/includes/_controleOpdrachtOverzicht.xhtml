@@ -9,7 +9,11 @@
 	xmlns:q="http://specto.gim.be/search"
 	xmlns:p="http://primefaces.org/ui">
 
-	<j:layout style="height: 600px">
+	<div>
+		<h2>Mijn controleopdrachten</h2>
+	</div>
+
+	<j:layout style="height: 400px">
 		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
@@ -64,14 +68,16 @@
 					</h:outputText></b>
 					<d:field for="vanDatum">
 						<div>Van:</div>
-						<r:calendar id="vanDatum" value="#{controleOpdrachtOverzichtFormBase.vanDatum}"
+						<r:calendar id="vanDatum"
+							value="#{controleOpdrachtOverzichtFormBase.vanDatum}"
 							inputStyle="width:60px"
     						datePattern="dd/MM/yyyy">
 						</r:calendar>
 					</d:field>
 					<d:field for="totDatum">
 						<div>Tot:</div>
-						<r:calendar id="totDatum" value="#{controleOpdrachtOverzichtFormBase.totDatum}"
+						<r:calendar id="totDatum"
+							value="#{controleOpdrachtOverzichtFormBase.totDatum}"
 							inputStyle="width:60px"
     						datePattern="dd/MM/yyyy">
 						</r:calendar>
@@ -96,25 +102,30 @@
 			<div class="ui-layout-content">
 				<a:outputPanel id="result">
 					<p:dataTable id="objects"
-						value="#{controleOpdrachtOverzichtFormBase.results}" mode="RESULT"
-						var="controleOpdracht" style="width: 100%;"
-						styleClass="model-table #{cc.attrs.contentClass}" paginator="true"
-						rows="20" paginatorPosition="bottom"
+						value="#{controleOpdrachtOverzichtFormBase.results}"
+						lazy="true"
+						var="controleOpdracht"
+						style="width: 100%;"
+						styleClass="model-table"
+						paginator="true"
+						rows="20"
 						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-						rowsPerPageTemplate="20,30,40,50"
-						emptyMessage="Geen resultaten gevonden">
-						<f:facet name="header">
-							<div>
-								<h2>Mijn controleopdrachten</h2>
-							</div>
-						</f:facet>
+						rowsPerPageTemplate="10,20,30,40,50"
+						scrollable="true"
+						resizableColumns="true"
+						tableStyle="min-width: 850px"
+						emptyMessage="#{messages['ui.dataTable.empty']}">
+						<j:layoutContent />
+						<j:bindAttribute var="controleOpdracht"
+							name="rowData" />
 						<p:column label="Acties">
 							<a:outputPanel rendered="true" styleClass="model-table-actions">
 								<h:panelGrid columns="3">
 									<j:commandButton
 										rendered="#{controleOpdrachtOverzichtFormBase.isCanView(controleOpdracht)}"
 										image="#{resource['core/images/actions/16x16/view.png']}"
-										type="image" title="#{messages['page.actions.view.label']}">
+										type="image"
+										title="#{messages['page.actions.view.label']}">
 										<j:renderListener target="#{r:clientId('viewPanel')}"
 											rendered="true" execute="@this" />
 										<f:setPropertyActionListener
@@ -124,7 +135,8 @@
 									<j:commandButton
 										rendered="#{controleOpdrachtOverzichtFormBase.isCanDelete(controleOpdracht)}"
 										image="#{resource['core/images/actions/16x16/delete.png']}"
-										type="image" title="#{messages['page.actions.delete.label']}">
+										type="image"
+										title="#{messages['page.actions.delete.label']}">
 										<j:renderListener target="#{r:clientId('deletePanel')}"
 											rendered="true" execute="@this" />
 										<f:setPropertyActionListener
@@ -141,18 +153,22 @@
 							</f:facet>
 							<d:propertyValue id="trajectTypeColumn"
 								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('trajectType')}"
-								value="#{controleOpdracht.trajectType }" mode="VIEW" />
+								value="#{controleOpdracht.trajectType }"
+								mode="VIEW" />
 						</p:column>
-						<p:column label="Periode" sortBy="#{controleOpdracht.periode }">
+						<p:column label="Periode"
+							sortBy="#{controleOpdracht.periode }">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('ControleOpdracht').getProperty('periode')}" />
 							</f:facet>
 							<d:propertyValue id="periodeColumn"
 								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('periode')}"
-								value="#{controleOpdracht.periode }" mode="VIEW" />
+								value="#{controleOpdracht.periode }"
+								mode="VIEW" />
 						</p:column>
-						<p:column label="Traject" sortBy="#{controleOpdracht.traject }">
+						<p:column label="Traject"
+							sortBy="#{controleOpdracht.traject }">
 							<f:facet name="header">
 								<div>Routenaam</div>
 							</f:facet>
@@ -185,7 +201,8 @@
 							</f:facet>
 							<d:propertyValue id="medewerkerColumn"
 								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}"
-								value="#{controleOpdracht.medewerker }" mode="VIEW" />
+								value="#{controleOpdracht.medewerker }"
+								mode="VIEW" />
 						</p:column>
 						<p:column label="Status" sortBy="#{controleOpdracht.status }">
 							<f:facet name="header">
@@ -194,7 +211,8 @@
 							</f:facet>
 							<d:propertyValue id="statusColumn"
 								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('status')}"
-								value="#{controleOpdracht.status }" mode="VIEW" />
+								value="#{controleOpdracht.status }"
+								mode="VIEW" />
 						</p:column>
 						<p:column label="Datum">
 							<f:facet name="header">
@@ -202,7 +220,8 @@
 							</f:facet>
 							<d:propertyValue id="datumLaatsteWijzigingColumn"
 								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumLaatsteWijziging')}"
-								value="#{controleOpdracht.datumLaatsteWijziging }" mode="VIEW" /> 
+								value="#{controleOpdracht.datumLaatsteWijziging }"
+								mode="VIEW" /> 
 						</p:column>
 					</p:dataTable>
 				</a:outputPanel>

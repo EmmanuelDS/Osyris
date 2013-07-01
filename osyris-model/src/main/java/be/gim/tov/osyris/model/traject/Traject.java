@@ -16,6 +16,7 @@ import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
@@ -30,11 +31,11 @@ import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.repository.ModelRepository;
-import org.conscientia.api.user.User;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 
@@ -71,6 +72,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@NotSearchable
 	@NotEditable
 	@SrsName("EPSG:31370")
+	@Index
 	private Geometry geom;
 
 	@Label("Regio")
@@ -78,7 +80,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
+	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
 	private ResourceIdentifier regio;
 
 	@NotSearchable
@@ -177,7 +179,7 @@ public abstract class Traject extends AbstractModelObject implements
 					public Object transform(Object key) {
 
 						try {
-							for (User user : Beans.getReference(
+							for (ResourceName user : Beans.getReference(
 									OsyrisModelFunctions.class)
 									.getUsersInGroup("Medewerker")) {
 
@@ -190,10 +192,10 @@ public abstract class Traject extends AbstractModelObject implements
 																"MedewerkerProfiel"),
 												user);
 
-								if (profiel.getTrajectType().contains(key)) {
-									return Beans.getReference(
-											ModelRepository.class)
-											.getResourceIdentifier(user);
+								if (profiel != null
+										&& profiel.getTrajectType().contains(
+												key)) {
+									return user;
 								}
 							}
 						} catch (IOException e) {

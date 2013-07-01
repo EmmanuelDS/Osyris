@@ -10,243 +10,218 @@
 	xmlns:q="http://specto.gim.be/search"
 	xmlns:p="http://primefaces.org/ui">
 
-	<j:layout style="height: 600px">
-		<j:layoutPane
-			region="west"
-			size="350"
-			minSize="200"
-			resizable="true"
-			slidable="true">
-		<div class="ui-layout-content">
-		<r:panel id="query" rendered="true"
-			style="max-width: 600px; text-align: left; margin: 10px;">
-			<q:query value="#{peterMeterOverzichtFormBase.query}"
-				modelClassName="#{peterMeterOverzichtFormBase.modelClass.getName()}">
-				<d:fields>
-					<d:propertyField id="firstName"
-						modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
-						path="#UserProfile/firstName"
-						mode="SEARCH" />
-					<d:propertyField id="lastName"
-						modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
-						path="#UserProfile/lastName"
-						mode="SEARCH" />
-				</d:fields>
-				<d:aspect id="peterMeterProfiel"
-					modelClass="#{d:modelClass('PeterMeterProfiel')}"
-					path="#PeterMeterProfiel"
-					mode="SEARCH" />
-			</q:query>
-			<d:buttons>
-				<j:commandButton rendered="true"
-					value="#{messages['page.general.button.search']}"
-					image="#{resource['core/images/actions/12x12/apply.png']}"
-					type="button"
-					actionListener="#{peterMeterOverzichtFormBase.search()}"
-					render="objects" />
-			</d:buttons>
-		</r:panel>
+	<div>
+		<h2>Overzicht Peters en Meters</h2>
 	</div>
-	</j:layoutPane>
-	
-	<j:layoutPane>
-		<div class="ui-layout-content">
-	<a:outputPanel id="result"
-		renderend="true">
-		
-		<p:dataTable id="objects"
-					 value="#{peterMeterOverzichtFormBase.results}"  
-					 mode="RESULT" 
-					 var="user" 
-					 style="width: 100%;"
-					 styleClass="model-table #{cc.attrs.contentClass}"
-					 paginator="true" rows="20"
-					 paginatorPosition="bottom"
-                 	 paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-                 	 rowsPerPageTemplate="20,30,40,50"
-                 	 emptyMessage="Geen resultaten gevonden">
-        <f:facet name="header">
-            <div><h2>Overzicht Peters en Meters</h2></div>
-        </f:facet>
-			<p:column style="width:2%">
-		            <p:rowToggler />
-		    </p:column>
-			<p:column label="Acties">
-				<a:outputPanel rendered="true" 
-					styleClass="model-table-actions">
-					<h:panelGrid columns="3">
-						<j:commandButton
-							image="#{resource['core/images/actions/16x16/view.png']}"
-							type="image" 
-							title="#{messages['page.actions.view.label']}"
-							rendered="true">
-							<j:renderListener target="#{r:clientId('viewPanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
-								value="#{user}" />
-						</j:commandButton>
-						<j:commandButton
-							image="#{resource['core/images/actions/16x16/edit.png']}"
-							type="image" 
-							title="#{messages['page.actions.edit.label']}"
-							rendered="true">
-							<j:renderListener target="#{r:clientId('editPanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
-								value="#{user}" />
-						</j:commandButton>
-						<j:commandButton 
-							rendered="true"
-							image="#{resource['core/images/actions/16x16/delete.png']}"
-							type="image" 
-							title="#{messages['page.actions.delete.label']}">
-							<j:renderListener target="#{r:clientId('deletePanel')}" 
-								rendered="true"
-								execute="@this" />
-							<f:setPropertyActionListener target="#{peterMeterOverzichtFormBase.object}"
-								value="#{user}" />
-						</j:commandButton>
-					</h:panelGrid>
+
+	<j:layout style="height: 400px">
+		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
+			slidable="true">
+			<div class="ui-layout-content">
+				<r:panel id="query" rendered="true"
+					style="max-width: 600px; text-align: left; margin: 10px;">
+					<q:query value="#{peterMeterOverzichtFormBase.query}"
+						modelClassName="#{peterMeterOverzichtFormBase.modelClass.getName()}">
+						<d:fields>
+							<d:propertyField id="firstName"
+								modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
+								path="#UserProfile/firstName" mode="SEARCH" />
+							<d:propertyField id="lastName"
+								modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
+								path="#UserProfile/lastName" mode="SEARCH" />
+						</d:fields>
+						<d:aspect id="peterMeterProfiel"
+							modelClass="#{d:modelClass('PeterMeterProfiel')}"
+							path="#PeterMeterProfiel" mode="SEARCH" />
+					</q:query>
+					<d:buttons>
+						<j:commandButton rendered="true"
+							value="#{messages['page.general.button.search']}"
+							image="#{resource['core/images/actions/12x12/apply.png']}"
+							type="button"
+							actionListener="#{peterMeterOverzichtFormBase.search()}"
+							render="objects" />
+					</d:buttons>
+				</r:panel>
+			</div>
+		</j:layoutPane>
+
+		<j:layoutPane>
+			<div class="ui-layout-content">
+				<a:outputPanel id="result" renderend="true">
+					<p:dataTable id="objects"
+						value="#{peterMeterOverzichtFormBase.results}" var="user"
+						style="width: 100%;" styleClass="model-table" paginator="true"
+						rows="20"
+						paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+						rowsPerPageTemplate="10,20,30,40,50" tableStyle="min-width: 550px"
+						emptyMessage="#{messages['ui.dataTable.empty']}">
+						<p:column style="width:2%">
+							<p:rowToggler />
+						</p:column>
+						<p:column>
+						<a:outputPanel rendered="true" styleClass="model-table-actions">
+							<h:panelGrid columns="3">
+								<j:commandButton
+									image="#{resource['core/images/actions/16x16/view.png']}"
+									type="image" title="#{messages['page.actions.view.label']}"
+									rendered="true">
+									<j:renderListener target="#{r:clientId('viewPanel')}"
+										rendered="true" execute="@this" />
+									<f:setPropertyActionListener
+										target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
+								</j:commandButton>
+								<j:commandButton
+									image="#{resource['core/images/actions/16x16/edit.png']}"
+									type="image" title="#{messages['page.actions.edit.label']}"
+									rendered="true">
+									<j:renderListener target="#{r:clientId('editPanel')}"
+										rendered="true" execute="@this" />
+									<f:setPropertyActionListener
+										target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
+								</j:commandButton>
+								<j:commandButton rendered="true"
+									image="#{resource['core/images/actions/16x16/delete.png']}"
+									type="image" title="#{messages['page.actions.delete.label']}">
+									<j:renderListener target="#{r:clientId('deletePanel')}"
+										rendered="true" execute="@this" />
+									<f:setPropertyActionListener
+										target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
+								</j:commandButton>
+							</h:panelGrid>
+						</a:outputPanel>
+						</p:column>
+						<p:column label="Voornaam"
+							sortBy="#{user.getAspect('UserProfile', modelRepository, true).firstName }">
+							<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('UserProfile').getProperty('firstName')}" />
+							</f:facet>
+							<d:propertyValue id="firstNameColumn"
+								modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
+								value="#{user.getAspect('UserProfile', modelRepository, true).firstName }"
+								mode="VIEW" />
+						</p:column>
+						<p:column label="Familienaam"
+							sortBy="#{user.getAspect('UserProfile', modelRepository, true).lastName}">
+							<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('UserProfile').getProperty('lastName')}" />
+							</f:facet>
+							<d:propertyValue id="lastNameColumn"
+								modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
+								value="#{user.getAspect('UserProfile', modelRepository, true).lastName}"
+								mode="VIEW" />
+						</p:column>
+						<p:column label="Email"
+							sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
+							<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('UserProfile').getProperty('email')}" />
+							</f:facet>
+							<d:propertyValue id="emailColumn"
+								modelProperty="#{d:modelClass('UserProfile').getProperty('email')}"
+								value="#{user.getAspect('UserProfile', modelRepository, true).email }"
+								mode="VIEW" />
+						</p:column>
+						<p:column label="Status"
+							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }">
+							<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" />
+							</f:facet>
+							<d:propertyValue id="statusColumn"
+								modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('status')}"
+								value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }"
+								mode="VIEW" />
+						</p:column>
+						<p:column label="ActiefSinds"
+							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }">
+							<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}" />
+							</f:facet>
+							<d:propertyValue id="actiefSindsColumn"
+								modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}"
+								value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }"
+								mode="VIEW" />
+						</p:column>
+						<p:rowExpansion label="Voorkeuren">
+							<h:panelGrid id="display" columns="1" style="width:400px;">
+								<f:facet name="header">
+									<d:displayLabel
+										property="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}" />
+								</f:facet>
+								<d:propertyValue id="voorkeurenColumn"
+									modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}"
+									value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).voorkeuren }"
+									mode="VIEW" />
+							</h:panelGrid>
+						</p:rowExpansion>
+					</p:dataTable>
 				</a:outputPanel>
-			</p:column>
-			<p:column label="Voornaam"
-				sortBy="#{user.getAspect('UserProfile', modelRepository, true).firstName }">
-				<f:facet name="header">
-					<d:displayLabel property="#{d:modelClass('UserProfile').getProperty('firstName')}" />
-				</f:facet>
-				<d:propertyValue id="firstNameColumn"
-							modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
-							value="#{user.getAspect('UserProfile', modelRepository, true).firstName }"
-							mode="VIEW" />
-			</p:column>
-			<p:column label="Familienaam"
-				sortBy="#{user.getAspect('UserProfile', modelRepository, true).lastName}">
-				<f:facet name="header">
-					<d:displayLabel property="#{d:modelClass('UserProfile').getProperty('lastName')}" />
-				</f:facet>
-				<d:propertyValue id="lastNameColumn"
-							modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
-							value="#{user.getAspect('UserProfile', modelRepository, true).lastName}"
-							mode="VIEW" />
-			</p:column>
-			<p:column label="Email"
-				sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
-				<f:facet name="header">
-					<d:displayLabel property="#{d:modelClass('UserProfile').getProperty('email')}" />
-				</f:facet>
-				<d:propertyValue id="emailColumn"
-							modelProperty="#{d:modelClass('UserProfile').getProperty('email')}"
-							value="#{user.getAspect('UserProfile', modelRepository, true).email }"
-							mode="VIEW" />
-			</p:column>
-			<p:column label="Status"
-				sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }">
-				<f:facet name="header">
-					<d:displayLabel property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" />
-				</f:facet>
-				<d:propertyValue id="statusColumn"
-							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('status')}"
-							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }"
-							mode="VIEW" />
-			</p:column>
-			<p:column label="ActiefSinds"
-				sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }">
-				<f:facet name="header">
-					<d:displayLabel property="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}" />
-				</f:facet>
-				<d:propertyValue id="actiefSindsColumn"
-							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}"
-							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }"
-							mode="VIEW" />
-			</p:column>
-			 <p:rowExpansion label="Voorkeuren">
-			 <h:panelGrid id="display" columns="1" style="width:400px;">
-				<f:facet name="header">
-					<d:displayLabel property="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}" />
-				</f:facet>
-				<d:propertyValue id="voorkeurenColumn"
-							modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}"
-							value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).voorkeuren }"
-							mode="VIEW" />
-			</h:panelGrid>
-			</p:rowExpansion>
-		</p:dataTable>
-	</a:outputPanel>
-	<br/>
-	<a:outputPanel rendered="true">
-			<d:buttons>
-				<j:commandButton rendered="true"
-					value="#{messages['page.create.create.button']}"
-					image="#{resource['core/images/actions/12x12/create.png']}"
-					type="button"
-					action="#{peterMeterOverzichtFormBase.create()}">
-					<j:renderListener target="createPeterMeterPanel" 
-						rendered="true"
-						execute="@this" />
-				</j:commandButton>
-				<d:fileDownload 
-					rendered="true"
-					fileName="#{peterMeterOverzichtFormBase.fileName}"
-					type="button"
-					image="#{resource['core/images/actions/12x12/download.png']}"
-					content="#{peterMeterOverzichtFormBase.report()}" 
-					value="#{messages['page.actions.report.label']}" />
-			</d:buttons>
-	</a:outputPanel>
-	
-	<r:panel id="algoritme" rendered="true">
-		<div>Ken Peters en Meters toe aan netwerken of routes:</div>
-		<br/>
-		<j:commandButton rendered="true"
-				value="Voer algoritme uit"
-				image="#{resource['core/images/actions/12x12/apply.png']}"
-				type="button"
-				action="#{peterMeterOverzichtFormBase.kenPetersMetersToe()}"/>
-	</r:panel>
-	
-	<u:decorate template="/resources/core/includes/managePanels.xhtml">
-		<u:param name="form"
-			value="#{peterMeterOverzichtFormBase}" />
-		<u:param name="render"
-			value="#{r:clientId('result')}" />
-	</u:decorate>
-	
-	<a:outputPanel>
-		<j:renderPanel id="createPeterMeterPanel"
-			rendered="false">
-			<d:popupPanel header="#{messages['page.create.title']}"
-				icon="#{resources['core/images/actions/16x16/create.png']}"
-				show="true" 
-				modal="true"
-				width="600">
-				<u:decorate template="/resources/osyris/includes/_createPeterMeter.xhtml">
-					<u:param name="form"
-						value="#{peterMeterOverzichtFormBase}" />
-					<u:param name="render"
-						value="#{r:clientId('result')}" />
-				</u:decorate>
-				<d:buttons>
-					<j:commandButton value="#{messages['page.create.create.button']}"
+				<br />
+				<a:outputPanel rendered="true">
+					<d:buttons>
+						<j:commandButton rendered="true"
+							value="#{messages['page.create.create.button']}"
+							image="#{resource['core/images/actions/12x12/create.png']}"
+							type="button" action="#{peterMeterOverzichtFormBase.create()}">
+							<j:renderListener target="createPeterMeterPanel" rendered="true"
+								execute="@this" />
+						</j:commandButton>
+						<d:fileDownload rendered="true"
+							fileName="#{peterMeterOverzichtFormBase.fileName}" type="button"
+							image="#{resource['core/images/actions/12x12/download.png']}"
+							content="#{peterMeterOverzichtFormBase.report()}"
+							value="#{messages['page.actions.report.label']}" />
+					</d:buttons>
+				</a:outputPanel>
+
+				<r:panel id="algoritme" rendered="true">
+					<div>Ken Peters en Meters toe aan netwerken of routes:</div>
+					<br />
+					<j:commandButton rendered="true" value="Voer algoritme uit"
 						image="#{resource['core/images/actions/12x12/apply.png']}"
 						type="button"
-						action="#{peterMeterOverzichtFormBase.saveNewPeterMeter()}"
-						render="result">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-					<j:commandButton value="#{messages['form.general.cancel.button']}"
-						type="button"
-						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						submit="false">
-						<j:renderControl event="click" 
-							rendered="false" />
-					</j:commandButton>
-				</d:buttons>
-			</d:popupPanel>
-		</j:renderPanel>
-	</a:outputPanel>
-	</div>
-	</j:layoutPane>
+						action="#{peterMeterOverzichtFormBase.kenPetersMetersToe()}" />
+				</r:panel>
+
+				<u:decorate template="/resources/core/includes/managePanels.xhtml">
+					<u:param name="form" value="#{peterMeterOverzichtFormBase}" />
+					<u:param name="render" value="#{r:clientId('result')}" />
+				</u:decorate>
+
+				<a:outputPanel>
+					<j:renderPanel id="createPeterMeterPanel" rendered="false">
+						<d:popupPanel header="#{messages['page.create.title']}"
+							icon="#{resources['core/images/actions/16x16/create.png']}"
+							show="true" modal="true" width="600">
+							<u:decorate
+								template="/resources/osyris/includes/_createPeterMeter.xhtml">
+								<u:param name="form" value="#{peterMeterOverzichtFormBase}" />
+								<u:param name="render" value="#{r:clientId('result')}" />
+							</u:decorate>
+							<d:buttons>
+								<j:commandButton
+									value="#{messages['page.create.create.button']}"
+									image="#{resource['core/images/actions/12x12/apply.png']}"
+									type="button"
+									action="#{peterMeterOverzichtFormBase.saveNewPeterMeter()}"
+									render="result">
+									<j:renderListener rendered="false" />
+								</j:commandButton>
+								<j:commandButton
+									value="#{messages['form.general.cancel.button']}" type="button"
+									image="#{resource['core/images/actions/12x12/cancel.png']}"
+									submit="false">
+									<j:renderControl event="click" rendered="false" />
+								</j:commandButton>
+							</d:buttons>
+						</d:popupPanel>
+					</j:renderPanel>
+				</a:outputPanel>
+			</div>
+		</j:layoutPane>
 	</j:layout>
 </u:composition>

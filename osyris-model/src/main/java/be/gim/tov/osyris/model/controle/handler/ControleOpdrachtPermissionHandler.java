@@ -2,6 +2,9 @@ package be.gim.tov.osyris.model.controle.handler;
 
 import java.io.IOException;
 
+import javax.inject.Inject;
+
+import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Handler;
@@ -20,6 +23,9 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 @Handler(type = "permission")
 @For("ControleOpdracht")
 public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler {
+
+	@Inject
+	protected CacheProducer cacheProducer;
 
 	@Override
 	public Boolean hasPermission(String action, ResourceIdentifier identifier,
@@ -80,6 +86,7 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 				}
 			}
 		}
+
 		return super.hasPermission(action, identifier, modelClass, isOwner);
 	}
 }

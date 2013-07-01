@@ -7,34 +7,30 @@
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:j="http://conscientia.org/jsf">
-	
-	<r:tabPanel switchType="ajax"
-			styleClass="model-propertyGroups"
-			contentClass="model-propertyGroup">
-			<r:tab header="Gebruikersgegevens">
+
+	<r:tabPanel switchType="ajax" styleClass="model-propertyGroups"
+		contentClass="model-propertyGroup">
+		<r:tab header="Gebruikersgegevens">
 			<a:outputPanel>
 				<d:fieldList>
-				<d:field label="#{messages['page.login.username.label']}">
-					<d:propertyValue id="username"
-						modelProperty="#{d:modelClass('User').getProperty('username')}"
-						value="#{form.object.username}"
-						mode="EDIT" />
-				</d:field>
+					<d:field label="#{messages['page.login.username.label']}">
+						<d:propertyValue id="username"
+							modelProperty="#{d:modelClass('User').getProperty('username')}"
+							value="#{form.object.username}" mode="EDIT" />
+					</d:field>
 				</d:fieldList>
-				
+
 				<d:aspect id="profile"
 					value="#{form.object.getAspect('UserProfile', modelRepository, true)}"
-					mode="EDIT"
-					level="SHORT"/>
-						
+					mode="EDIT" level="SHORT" />
+
 			</a:outputPanel>
-			</r:tab>
-			<r:tab header="Peter/Meter Profiel">
+		</r:tab>
+		<r:tab header="Peter/Meter Profiel">
 			<d:aspect id="peterMeterProfile"
-						value="#{form.object.getAspect('PeterMeterProfiel', modelRepository, true)}"
-						mode="EDIT"
-						level="SHORT"/>
-			</r:tab>
+				value="#{form.object.getAspect('PeterMeterProfiel', modelRepository, true)}"
+				mode="EDIT" level="SHORT" />
+		</r:tab>
 	</r:tabPanel>
-	
+
 </u:composition>

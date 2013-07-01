@@ -5,21 +5,20 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:r="http://richfaces.org/rich"
-	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich" xmlns:a="http://richfaces.org/a4j"
 	xmlns:cc="http://java.sun.com/jsf/composite">
-
-	<br/>
 	<r:panel>
-	<div><b>U bent momenteel toegewezen aan: </b></div>
-	<br/>
-	<c:forEach items="#{trajectToewijzingBean.getTrajectToewijzingen(username)}" 
-				var="toewijzing">			
 		<div>
-			#{toewijzing}
+			<b>U bent momenteel toegewezen aan: </b>
 		</div>
-	</c:forEach>
-	<br/>
-	<div>Deze informatie is louter informatief, bekijk uw controleopdrachten voor concrete richtlijnen.</div>
+		<br />
+		<c:forEach
+			items="#{trajectToewijzingBean.getTrajectToewijzingen(username)}"
+			var="toewijzing">
+			<div>#{toewijzing}</div>
+		</c:forEach>
+		<br />
+		<div>Deze informatie is louter informatief, bekijk uw
+			controleopdrachten voor concrete richtlijnen.</div>
 	</r:panel>
 </div>

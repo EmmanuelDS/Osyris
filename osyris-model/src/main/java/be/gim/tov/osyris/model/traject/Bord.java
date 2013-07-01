@@ -6,6 +6,7 @@ import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -105,6 +106,7 @@ public abstract class Bord extends AbstractModelObject implements
 	@NotSearchable
 	@NotEditable
 	@SrsName("EPSG:31370")
+	@Index
 	private Geometry geom;
 
 	@Label("Regio")

@@ -9,11 +9,11 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 	<div><h2>Routedokter - Melding problemen ivm route infrastructuur</h2></div>
+	
 	<table width="100%">
 	<tr>
 	<td width="40%" valign="top">
 	
-<!-- SEARCH TRAJECT PANEL -->
 	<r:panel id="searchTrajectPanel" header="Zoek traject">
 		<d:fields>
 		<d:field for="trajectType" label="Traject type" required="true">
@@ -63,7 +63,6 @@
 		</d:buttons>
 	</r:panel>
 	
-<!-- MELDER GEGEVENS PANEL -->
 	<r:panel id="gegevensPanel" header="Uw gegevens">
 				<d:fields>
 				<d:field label="Voornaam" for="voornaam">	 
@@ -99,7 +98,6 @@
  			</d:fields>
 	</r:panel>
 	
-<!-- PROBLEEM TOEVOEGEN PANEL -->
 	<r:panel header="Probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
 				Kies het type probleem: <h:selectOneMenu id="probleemType" value="#{form.probleemType}">

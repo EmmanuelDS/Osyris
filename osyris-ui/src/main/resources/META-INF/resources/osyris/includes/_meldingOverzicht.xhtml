@@ -11,7 +11,11 @@
 	xmlns:m="http://specto.gim.be/map" 
 	xmlns:p="http://primefaces.org/ui">
 
-	<j:layout style="height: 600px">
+	<div>
+		<h2>Meldingen</h2>
+	</div>
+
+	<j:layout style="height: 400px">
 		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
@@ -99,19 +103,23 @@
 		<j:layoutPane>
 			<a:outputPanel id="result">
 				<p:dataTable id="objects"
-					value="#{meldingOverzichtFormBase.results}" mode="RESULT"
-					var="melding" style="width: 100%;"
-					styleClass="model-table #{cc.attrs.contentClass}" paginator="true"
-					rows="20" paginatorPosition="bottom"
+					value="#{meldingOverzichtFormBase.results}"
+					lazy="true"
+					var="melding"
+					style="width: 100%;"
+					styleClass="model-table"
+					paginator="true"
+					rows="20"
 					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-					rowsPerPageTemplate="20,30,40,50"
-					emptyMessage="Geen resultaten gevonden">
-					<f:facet name="header">
-						<div>
-							<h2>Mijn meldingen</h2>
-						</div>
-					</f:facet>
-					<p:column label="Acties">
+					rowsPerPageTemplate="10,20,30,40,50"
+					scrollable="true"
+					resizableColumns="true"
+					tableStyle="min-width: 650px"
+					emptyMessage="#{messages['ui.dataTable.empty']}">
+					<j:layoutContent />
+					<j:bindAttribute var="melding"
+						name="rowData" />
+					<p:column>
 						<a:outputPanel rendered="true" styleClass="model-table-actions">
 							<h:panelGrid columns="3">
 								<j:commandButton
@@ -142,7 +150,8 @@
 							</f:facet>
 							 <h:outputText value="#{osyrisModelFunctions.getTrajectType(melding.traject)}" /> 
 						</p:column>
-					<p:column label="Traject" sortBy="#{melding.traject }">
+					<p:column label="Traject"
+						sortBy="#{melding.traject }">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('traject')}" />
@@ -157,7 +166,8 @@
 							</f:facet>
 							 <h:outputText value="#{osyrisModelFunctions.getTrajectRegio(melding.traject)}" /> 
 						</p:column>
-					<p:column label="Status" sortBy="#{melding.status }">
+					<p:column label="Status"
+						sortBy="#{melding.status }">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('status')}" />
@@ -166,7 +176,8 @@
 							modelProperty="#{d:modelClass('Melding').getProperty('status')}"
 							value="#{melding.status }" mode="VIEW" />
 					</p:column>
-					<p:column label="Medewerker" sortBy="#{melding.medewerker }">
+					<p:column label="Medewerker"
+						sortBy="#{melding.medewerker }">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('medewerker')}" />

@@ -6,7 +6,6 @@ import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Handler;
 import org.conscientia.api.permission.Permission;
-import org.conscientia.api.user.User;
 import org.conscientia.core.permission.DefaultPermissionHandler;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -34,25 +33,23 @@ public class WerkopdrachtPermissionHandler extends DefaultPermissionHandler {
 			WerkOpdracht werkOpdracht = (WerkOpdracht) modelRepository
 					.loadObject(identifier);
 			if (werkOpdracht != null) {
-
-				User toegewezenMedewerker = (User) modelRepository
-						.loadObject(werkOpdracht.getMedewerker());
+				String medewerkerName = modelRepository
+						.getObjectName(werkOpdracht.getMedewerker());
 
 				if (identity.inGroup("Medewerker", "CUSTOM")
-						&& toegewezenMedewerker != null
+						&& medewerkerName != null
 						&& action.equals(Permission.VIEW_ACTION)) {
-
 					return true;
 				}
 
-				if (!toegewezenMedewerker.getUsername().equals(
-						identity.getUser().getId())) {
+				if (!medewerkerName.equals(identity.getUser().getId())) {
 					if (action.equals(Permission.EDIT_ACTION)) {
 						return false;
 					}
 				}
 			}
 		}
+
 		return super.hasPermission(action, identifier, modelClass, isOwner);
 	}
 }

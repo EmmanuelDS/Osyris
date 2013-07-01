@@ -60,6 +60,8 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
+	private static final String GEOMETRY_LAYER_NAME = "geometry";
+
 	private static final long serialVersionUID = -86881009141250710L;
 
 	private static final Log LOG = LogFactory
@@ -326,7 +328,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					.getConfiguration(context);
 
 			mapFactory.createGeometryLayer(configuration.getContext(),
-					"geometry", null, Point.class, null, true, "single", null,
+					GEOMETRY_LAYER_NAME, null, Point.class, null, true, "single", null,
 					null);
 
 			return configuration;
@@ -681,7 +683,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 						object.getTrajectType() + "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				} else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(Collections.EMPTY_LIST);
@@ -705,7 +707,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				} else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(false);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
@@ -778,7 +780,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
 		if (ids.size() > 0) {
 			GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
-					.getLayer("geometry");
+					.getLayer(GEOMETRY_LAYER_NAME);
 			if (probleem instanceof AnderProbleem) {
 				((AnderProbleem) probleem).setGeom(layer.getGeometries()
 						.iterator().next());
@@ -813,7 +815,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		MapViewer viewer = getViewer();
 		Envelope envelope;
 		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) viewer
-				.getConfiguration().getContext().getLayer("geometry");
+				.getConfiguration().getContext().getLayer(GEOMETRY_LAYER_NAME);
 		layer.setHidden(false);
 		if (anderProbleem.getGeom() instanceof Point) {
 			envelope = new Envelope(anderProbleem.getGeom().getCoordinate());

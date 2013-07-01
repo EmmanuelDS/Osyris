@@ -59,3 +59,18 @@ header, footer, article, section, nav, menu, hgroup {
 .page-footer .toerisme_oost_vlaanderen {
 	margin-top:25px;
 }
+
+.model-field-label {
+	display: block;
+	float: left;
+	width: 100px;
+	vertical-align: baseline;
+}
+
+.model-field-value {
+	margin-left: 105px;
+}
+
+.model-field-tail {
+	clear: both;
+}
