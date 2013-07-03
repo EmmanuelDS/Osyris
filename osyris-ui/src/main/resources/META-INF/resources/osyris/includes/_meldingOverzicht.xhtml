@@ -11,9 +11,7 @@
 	xmlns:m="http://specto.gim.be/map" 
 	xmlns:p="http://primefaces.org/ui">
 
-	<div>
-		<h2>Meldingen</h2>
-	</div>
+	<h2>Meldingen</h2>
 
 	<j:layout style="height: 400px">
 		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
@@ -120,28 +118,27 @@
 					<j:bindAttribute var="melding"
 						name="rowData" />
 					<p:column>
-						<a:outputPanel rendered="true" styleClass="model-table-actions">
-							<h:panelGrid columns="3">
-								<j:commandButton
-									rendered="#{meldingOverzichtFormBase.isCanView(melding)}"
-									image="#{resource['core/images/actions/16x16/view.png']}"
-									type="image" title="#{messages['page.actions.view.label']}"
-									action="#{meldingOverzichtFormBase.showMeldingMapData(meldingOverzichtFormBase.object)}">
-									<j:renderListener target="#{r:clientId('viewPanel')}"
-										rendered="true" execute="@this" />
-									<f:setPropertyActionListener
-										target="#{meldingOverzichtFormBase.object}" value="#{melding}" />
-								</j:commandButton>
-								<j:commandButton
-									rendered="#{meldingOverzichtFormBase.isCanDelete(melding)}"
-									image="#{resource['core/images/actions/16x16/delete.png']}"
-									type="image" title="#{messages['page.actions.delete.label']}">
-									<j:renderListener target="#{r:clientId('deletePanel')}"
-										rendered="true" execute="@this" />
-									<f:setPropertyActionListener
-										target="#{meldingOverzichtFormBase.object}" value="#{melding}" />
-								</j:commandButton>
-							</h:panelGrid>
+						<a:outputPanel styleClass="model-table-actions">
+							<j:commandButton
+								rendered="#{meldingOverzichtFormBase.isCanView(melding)}"
+								image="#{resource['core/images/actions/16x16/view.png']}"
+								type="image"
+								title="#{messages['page.actions.view.label']}"
+								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();" >
+								<f:setPropertyActionListener
+									target="#{meldingOverzichtFormBase.object}"
+									value="#{melding}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{meldingOverzichtFormBase.isCanDelete(melding)}"
+								image="#{resource['core/images/actions/16x16/delete.png']}"
+								type="image"
+								title="#{messages['page.actions.delete.label']}"
+								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();" >
+								<f:setPropertyActionListener
+									target="#{meldingOverzichtFormBase.object}"
+									value="#{melding}" />
+							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
 					<p:column label="TrajectType">

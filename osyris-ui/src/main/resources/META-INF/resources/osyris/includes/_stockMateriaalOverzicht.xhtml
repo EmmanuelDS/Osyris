@@ -8,9 +8,7 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:q="http://specto.gim.be/search">
 
-	<div>
-		<h2>Overzicht Stockmateriaal</h2>
-	</div>
+	<h2>Overzicht Stockmateriaal</h2>
 
 	<j:layout style="height: 400px">
 		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
@@ -36,82 +34,72 @@
 						type="button"
 						actionListener="#{stockMateriaalOverzichtFormBase.search()}"
 						render="objects" />
+					<j:commandButton
+						rendered="#{stockMateriaalOverzichtFormBase.canCreate}"
+						value="#{messages['page.actions.create.label']}"
+						image="#{resource['core/images/actions/12x12/create.png']}"
+						type="button"
+						action="#{stockMateriaalOverzichtFormBase.create()}"
+						oncomplete="conscientia.widget(#{r:element('createPopup')}).show();" />
+					<d:fileDownload
+						fileName="#{stockMateriaalOverzichtFormBase.fileName}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/download.png']}"
+						content="#{stockMateriaalOverzichtFormBase.report()}"
+						value="#{messages['page.actions.report.label']}" />
 				</d:buttons>
 			</div>
 		</j:layoutPane>
 		<j:layoutPane>
-			<div class="ui-layout-content">
-				<a:outputPanel id="result">
-					<d:objects id="objects"
-						value="#{stockMateriaalOverzichtFormBase.results}"
-						modelClass="#{stockMateriaalOverzichtFormBase.modelClass}"
-						mode="RESULT" level="SHORT">
-						<f:facet name="left">
-							<a:outputPanel rendered="true" styleClass="model-table-actions">
-								<h:panelGrid columns="3">
-									<j:commandButton
-										rendered="#{stockMateriaalOverzichtFormBase.isCanView(object)}"
-										image="#{resource['core/images/actions/16x16/view.png']}"
-										type="image" title="#{messages['page.actions.view.label']}">
-										<j:renderListener target="#{r:clientId('viewPanel')}"
-											rendered="true" execute="@this" />
-										<f:setPropertyActionListener
-											target="#{stockMateriaalOverzichtFormBase.object}"
-											value="#{object}" />
-									</j:commandButton>
-									<j:commandButton
-										rendered="#{stockMateriaalOverzichtFormBase.isCanEdit(object)}"
-										image="#{resource['core/images/actions/16x16/edit.png']}"
-										type="image" title="#{messages['page.actions.edit.label']}">
-										<j:renderListener target="#{r:clientId('editPanel')}"
-											rendered="true" execute="@this" />
-										<f:setPropertyActionListener
-											target="#{stockMateriaalOverzichtFormBase.object}"
-											value="#{object}" />
-									</j:commandButton>
-									<j:commandButton
-										rendered="#{stockMateriaalOverzichtFormBase.isCanDelete(object)}"
-										image="#{resource['core/images/actions/16x16/delete.png']}"
-										type="image" title="#{messages['page.actions.delete.label']}">
-										<j:renderListener target="#{r:clientId('deletePanel')}"
-											rendered="true" execute="@this" />
-										<f:setPropertyActionListener
-											target="#{stockMateriaalOverzichtFormBase.object}"
-											value="#{object}" />
-									</j:commandButton>
-								</h:panelGrid>
-							</a:outputPanel>
-						</f:facet>
-					</d:objects>
-					<j:layoutContent
-						selector="*[id='#{j:clientId('objects', 'table')}']" />
-				</a:outputPanel>
+			<a:outputPanel id="result">
+				<d:objects id="objects"
+					value="#{stockMateriaalOverzichtFormBase.results}"
+					modelClass="#{stockMateriaalOverzichtFormBase.modelClass}"
+					mode="RESULT" level="SHORT">
+					<f:facet name="left">
+						<a:outputPanel rendered="true"
+							styleClass="model-table-actions">
+							<j:commandButton
+								rendered="#{stockMateriaalOverzichtFormBase.isCanView(object)}"
+								image="#{resource['core/images/actions/16x16/view.png']}"
+								type="image"
+								title="#{messages['page.actions.view.label']}"
+								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{stockMateriaalOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{stockMateriaalOverzichtFormBase.isCanEdit(object)}"
+								image="#{resource['core/images/actions/16x16/edit.png']}"
+								type="image"
+								title="#{messages['page.actions.edit.label']}"
+								oncomplete="conscientia.widget(#{r:element('editPopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{stockMateriaalOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{stockMateriaalOverzichtFormBase.isCanDelete(object)}"
+								image="#{resource['core/images/actions/16x16/delete.png']}"
+								type="image"
+								title="#{messages['page.actions.delete.label']}"
+								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{stockMateriaalOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+						</a:outputPanel>
+					</f:facet>
+				</d:objects>
+				<j:layoutContent
+					selector="*[id='#{j:clientId('objects', 'table')}']" />
+			</a:outputPanel>
 
-				<a:outputPanel>
-					<d:buttons>
-						<j:commandButton
-							rendered="#{stockMateriaalOverzichtFormBase.canCreate}"
-							value="#{messages['page.actions.create.label']}"
-							image="#{resource['core/images/actions/12x12/create.png']}"
-							type="button"
-							action="#{stockMateriaalOverzichtFormBase.create()}">
-							<j:renderListener target="createPanel" rendered="true"
-								execute="@this" />
-						</j:commandButton>
-						<d:fileDownload
-							fileName="#{stockMateriaalOverzichtFormBase.fileName}"
-							type="button"
-							image="#{resource['core/images/actions/12x12/download.png']}"
-							content="#{stockMateriaalOverzichtFormBase.report()}"
-							value="#{messages['page.actions.report.label']}" />
-					</d:buttons>
-				</a:outputPanel>
-
-				<u:decorate template="/resources/core/includes/managePanels.xhtml">
-					<u:param name="form" value="#{stockMateriaalOverzichtFormBase}" />
-					<u:param name="render" value="#{r:clientId('result')}" />
-				</u:decorate>
-			</div>
+			<u:decorate template="/resources/core/includes/managePanels.xhtml">
+				<u:param name="form" value="#{stockMateriaalOverzichtFormBase}" />
+				<u:param name="render" value="#{r:clientId('result')}" />
+			</u:decorate>
 		</j:layoutPane>
 	</j:layout>
 </u:composition>

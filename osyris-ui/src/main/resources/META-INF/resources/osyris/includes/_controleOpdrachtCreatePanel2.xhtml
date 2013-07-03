@@ -1,0 +1,197 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<table width="100%">
+		<tr>
+		<td width="50%" valign="top">
+		<r:panel id="searchTrajectPanel" header="Zoek traject">
+				<d:fields>
+					<d:field for="trajectType"
+						label="Traject type"
+						required="true">
+						<h:selectOneMenu id="trajectType"
+							value="#{form.trajectType}"
+							required="true">
+							<f:selectItem itemValue=""
+								itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectTypes(form.controleOpdrachtType))}" />
+							<a:ajax event="change"
+								render="detailSearchPanel"
+								execute="@this" />
+						</h:selectOneMenu>
+					</d:field>
+					<j:renderPanel id="detailSearchPanel"
+							rendered="#{form.trajectType != null}">
+						<d:field for="trajectNaam" label="Traject naam"
+								rendered="true"
+								required="#{form.trajectType.contains('Route')}">
+							<h:selectOneMenu id="trajectNaam"
+									value="#{form.trajectNaam}" rendered="true"
+									required="#{form.trajectType.contains('Route')}">
+									<f:selectItem itemValue="" itemLabel="" />
+									<f:selectItems
+										value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+							</h:selectOneMenu>
+						</d:field>
+						<br />
+						<j:commandButton id="selectSegment"
+								rendered="#{form.trajectType.contains('Segment')}"
+								image="#{resource['core/images/actions/24x24/select.png']}"
+								styleClass="component-toolbar-button"
+								value="Selecteer segment op kaart"
+								title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+								submit="false">
+								<j:activateControl for="viewer" event="click"
+									control="selectBox">
+									<f:param name="layerId" value="#{trajectType}" />
+								</j:activateControl>
+						</j:commandButton>
+						<d:buttons>
+							<j:commandButton value="Zoeken"
+									image="#{resource['core/images/actions/12x12/search.png']}"
+									type="button" action="#{form.searchTraject()}"
+									execute="searchTrajectPanel"
+									render="map">
+							</j:commandButton>
+						</d:buttons>
+					</j:renderPanel>
+				</d:fields>
+			</r:panel> 
+				<br/>
+				<r:panel id="controleOpdrachtPanel">
+					<d:buttons>
+						<j:commandButton value="Maak bewegwijzeringsverslag"
+							image="#{resource['core/images/actions/12x12/search.png']}"
+							type="button" action="#{form.createBewegwijzeringVerslag()}"
+							execute="@this"
+							render="bewegwijzering">
+						</j:commandButton>
+					</d:buttons>
+					<!-- BEWEGWIJZERING TABEL -->
+					<j:renderPanel id="bewegwijzering"
+						rendered="true" height="100">
+						<p:dataTable id="borden"
+							value="#{form.bewegwijzering}" mode="RESULT"
+							var="bord"
+							styleClass="model-table #{cc.attrs.contentClass}"
+							paginator="true" rows="5" paginatorPosition="bottom" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+							emptyMessage="Geen resultaten gevonden">
+							<f:facet name="header">
+								<div>Bewegwijzering</div>
+							</f:facet>
+							<p:column >
+								<f:facet name="header">
+								<div>BordID</div>
+								</f:facet>
+								<h:outputText value="#{d:modelObject(bord).getId()}" />
+							</p:column>
+							<p:column filterBy="#{bord.volg}" filterMatchMode="exact">
+								<f:facet name="header">
+								<div>Volgnr</div>
+								</f:facet>
+								<d:propertyValue id="bordVolgColumn"
+									modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
+									value="#{bord.volg }" mode="VIEW" />
+							</p:column>
+							<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact">
+								<f:facet name="header">
+									<div>Pijl</div>
+								</f:facet>
+								<d:propertyValue id="imageCodeColumn"
+									modelProperty="#{d:modelClass('Bord').getProperty('imageCode')}"
+									value="#{bord.imageCode }" mode="VIEW" />
+							</p:column>
+							<p:column filterBy="#{bord.straatnaam}" filterMatchMode="contains">
+								<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('Bord').getProperty('straatnaam')}" />
+								</f:facet>
+								<d:propertyValue id="straatnaamColumn"
+									modelProperty="#{d:modelClass('Bord').getProperty('straatnaam')}"
+									value="#{bord.straatnaam }" mode="VIEW" />
+							</p:column>
+							<p:column filterBy="#{bord.paalConst}" filterMatchMode="contains">
+								<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('Bord').getProperty('paalConst')}" />
+								</f:facet>
+								<d:propertyValue id="paalConstColumn"
+									modelProperty="#{d:modelClass('Bord').getProperty('paalConst')}"
+									value="#{bord.paalConst }" mode="VIEW" />
+							</p:column>
+						</p:dataTable>
+					</j:renderPanel>
+					<br/>
+					<d:fields>
+						<d:field label="Periode" for="periode">
+							<d:propertyValue id="periode"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('periode')}"
+								value="#{form.object.periode}" mode="EDIT" />
+						</d:field>
+						<d:field label="Peter/Meter" for="peterMeter">
+							<d:propertyValue id="peterMeter"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
+								value="#{form.object.peterMeter}" mode="EDIT" />
+						</d:field>
+						<d:field label="Datum controle" for="datumTeControleren">
+							<d:propertyValue id="datumTeControleren"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTeControleren')}"
+								value="#{form.object.datumTeControleren}" mode="EDIT" />
+						</d:field>
+						<d:field label="Medewerker" for="medewerker">
+							<d:propertyValue id="medewerker"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}"
+								value="#{form.object.medewerker}" mode="EDIT" />
+						</d:field>
+						<d:field label="Commentaar" for="commentaar">
+							<d:propertyValue id="commentaar"
+								modelProperty="#{d:modelClass('ControleOpdracht').getProperty('commentaar')}"
+								value="#{form.object.commentaar}" mode="EDIT" />
+						</d:field>
+
+					</d:fields>
+			</r:panel></td>
+			<!-- MINI MAP -->
+			<td width="50%" valign="top">
+			<r:panel id="map">
+				<div style="height: 500px">
+					<m:mapViewer id="viewer"
+						configuration="#{form.configuration}">
+						<j:controllerListener name="selectedFeatures"
+							listener="#{form.onSelectFeatures}" />
+						<j:controllerListener name="unselectedFeatures"
+							listener="#{form.onUnselectFeatures}" />
+						<j:controllerListener name="addedFeature"
+							listener="#{form.onUpdateFeatures}" />
+						<j:controllerListener name="updatedFeature"
+							listener="#{form.onUpdateFeatures}" />
+						<j:controllerListener name="deletedFeature"
+							listener="#{form.onDeleteFeatures}" />
+					</m:mapViewer>
+				</div>
+			</r:panel></td>
+		</tr>
+	</table>
+	<d:buttons>
+		<j:commandButton value="#{messages['page.create.create.button']}"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button"
+			action="#{form.save()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('createPopup2')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			action="#{form.cancel()}"
+			execute="@this"
+			oncomplete="conscientia.widget(#{r:element('createPopup2')}).hide();" />
+	</d:buttons>
+</u:composition>

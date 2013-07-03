@@ -1,0 +1,86 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	
+	<j:commandButton
+		rendered="true"
+		value="Toon op kaart"
+		image="#{resource['core/images/actions/12x12/apply.png']}"
+		type="button"
+		action="#{form.showOpdrachtMapData(form.object.traject)}">
+	</j:commandButton>
+	<table width="100%">
+			<tr>
+			<td width="50%" valign="top">	
+				<a:outputPanel>	
+					<u:decorate template="/resources/osyris/includes/bewegwijzering.xhtml">
+						<u:param name="form" value="#{form}" />
+					</u:decorate>
+				</a:outputPanel>
+	<br/>
+	<r:panel id="controleOpdrachtInfo" header="Praktische Info">
+	<d:object mode="VIEW" modelClass="#{form.modelClass}"
+		value="#{form.object}">
+	</d:object>
+	</r:panel>
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
+	<d:buttons>
+	<j:commandButton
+			rendered="#{form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN' }"
+			value="Bewerken"
+			image="#{resource['core/images/actions/12x12/edit.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('controleerPopup')}).show();" />
+		<j:commandButton
+			rendered="#{identity.inGroup('PeterMeter','CUSTOM') and form.object.status == 'UIT_TE_VOEREN' }"
+			value="Rapporteren"
+			image="#{resource['core/images/actions/12x12/edit.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
+		<j:commandButton
+			rendered="#{form.object.status == 'GERAPPORTEERD' }"
+			value="Valideren"
+			image="#{resource['core/images/actions/12x12/edit.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
+		<j:commandButton 
+			rendered="#{form.object.status == 'TE_CONTROLEREN' }"
+			value="Verzenden"
+			image="#{resource['core/images/actions/12x12/next.png']}"
+			type="button"
+			action="#{form.verzendenControleOpdracht()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+		<j:commandButton 
+			value="Printen"
+			image="#{resource['core/images/actions/12x12/print.png']}"
+			type="button" />
+		<j:commandButton 
+			rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
+			value="Opnieuw te controleren"
+			image="#{resource['core/images/actions/12x12/reload.png']}"
+			type="button"
+			action="#{form.reopenControleOpdracht()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

@@ -8,150 +8,167 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
-	
 	<a:outputPanel id="problemenOverzichtPanel">
-	
-<!-- BORD PROBLEMEN OVERZICHTSTABEL -->
-	<p:dataTable id="bordProblemen"
-		value="#{form.getBordProblemen()}" mode="RESULT"
-		var="bordProbleem"
-		styleClass="model-table #{cc.attrs.contentClass}"
-		paginator="true" rows="5" paginatorPosition="bottom" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-		emptyMessage="Geen resultaten gevonden">
-		
-		<f:facet name="header">
-			<div>Bordproblemen</div>
-		</f:facet>
-		<p:column style="width:2%">
-			<j:commandButton
+		<p:dataTable id="bordProblemen"
+			value="#{form.bordProblemen}"
+			mode="RESULT"
+			var="bordProbleem"
+			styleClass="model-table #{cc.attrs.contentClass}"
+			paginator="true"
+			rows="5"
+			paginatorPosition="bottom"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="Geen resultaten gevonden">
+			<f:facet name="header">
+				<div>Bordproblemen</div>
+			</f:facet>
+			<p:column style="width:2%">
+				<j:commandButton
 					src="#{resource['core/images/actions/16x16/zoom.png']}"
 					type="image"
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToBordProbleem(bordProbleem)}" />
-   		</p:column>
-   		<p:column>
+	   		</p:column>
+	   		<p:column>
+				<f:facet name="header">
+				<div>Bord</div>
+				</f:facet>
+					<h:outputText value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Type</div>
+				</f:facet>
+				<d:propertyValue id="typeColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+					value="#{bordProbleem.type}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Commentaar</div>
+				</f:facet>
+				<d:propertyValue id="commentaarColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+					value="#{bordProbleem.commentaar}"
+					mode="VIEW" />
+			</p:column>
+			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
+				<f:facet name="header">
+				<div>Status</div>
+				</f:facet>
+				<d:propertyValue id="statusColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+					value="#{bordProbleem.status}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<j:commandButton
+					rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
+					image="#{resource['core/images/actions/16x16/edit.png']}"
+					type="image"
+					title="#{messages['page.actions.view.label']}">
+					<j:renderListener target="#{r:clientId('editProbleemPanel')}"
+						rendered="true"
+						execute="@this" />
+					<f:setPropertyActionListener
+						target="#{form.selectedProbleem}"
+						value="#{bordProbleem}" />
+				</j:commandButton>
+			</p:column>
+	   	</p:dataTable>
+	   	
+	   	<br/>
+  		
+	   	<p:dataTable id="AndereProblemen"
+			value="#{form.getAndereProblemen()}"
+			mode="RESULT"
+			var="anderProbleem"
+			styleClass="model-table #{cc.attrs.contentClass}"
+			paginator="true"
+			rows="5"
+			paginatorPosition="bottom"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="Geen resultaten gevonden">
 			<f:facet name="header">
-			<div>Bord</div>
+				<div>Andere problemen</div>
 			</f:facet>
-				<h:outputText value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-			<div>Type</div>
-			</f:facet>
-			<d:propertyValue id="typeColumn"
-				modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
-				value="#{bordProbleem.type}" mode="VIEW" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-			<div>Commentaar</div>
-			</f:facet>
-			<d:propertyValue id="commentaarColumn"
-				modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-				value="#{bordProbleem.commentaar}" mode="VIEW" />
-		</p:column>
-		<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
-			<f:facet name="header">
-			<div>Status</div>
-			</f:facet>
-			<d:propertyValue id="statusColumn"
-				modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
-				value="#{bordProbleem.status}" mode="VIEW" />
-		</p:column>
-		<p:column>
-			<j:commandButton
-				rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
-				image="#{resource['core/images/actions/16x16/edit.png']}"
-				type="image" title="#{messages['page.actions.view.label']}">
-				<j:renderListener target="#{r:clientId('editProbleemPanel')}"
-					rendered="true" execute="@this" />
-				<f:setPropertyActionListener
-					target="#{form.selectedProbleem}"
-					value="#{bordProbleem}" />
-			</j:commandButton>
-		</p:column>
-   		</p:dataTable>
-   		<br/>
-   		
-<!-- ANDERE PROBLEMEN OVERZICHTSTABEL -->   		
-   		<p:dataTable id="AndereProblemen"
-		value="#{form.getAndereProblemen()}" mode="RESULT"
-		var="anderProbleem"
-		styleClass="model-table #{cc.attrs.contentClass}"
-		paginator="true" rows="5" paginatorPosition="bottom" paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-		emptyMessage="Geen resultaten gevonden">
-		
-		<f:facet name="header">
-			<div>Andere problemen</div>
-		</f:facet>
-		<p:column style="width:2%">
-			<j:commandButton
+			<p:column style="width:2%">
+				<j:commandButton
 					src="#{resource['core/images/actions/16x16/zoom.png']}"
 					type="image"
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToAnderProbleem(anderProbleem)}" />
-   		</p:column>
-   		<p:column>
-			<f:facet name="header">
-			<div>Categorie</div>
-			</f:facet>
-			<d:propertyValue id="categorieColumn"
-				modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
-				value="#{anderProbleem.categorie}" mode="VIEW" />
-		</p:column>
-		<p:column>
-			<f:facet name="header">
-			<div>Commentaar</div>
-			</f:facet>
-			<d:propertyValue id="commentaarColumn"
-				modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-				value="#{anderProbleem.commentaar}" mode="VIEW" />
-		</p:column>
-		<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
-			<f:facet name="header">
-			<div>Status</div>
-			</f:facet>
-			<d:propertyValue id="statusColumn"
-				modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
-				value="#{anderProbleem.status}" mode="VIEW" />
-		</p:column>
-		<p:column>
-			<j:commandButton
-				rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
-				image="#{resource['core/images/actions/16x16/edit.png']}"
-				type="image" title="#{messages['page.actions.view.label']}">
-				<j:renderListener target="#{r:clientId('editProbleemPanel')}"
-					rendered="true" execute="@this" />
-				<f:setPropertyActionListener
-					target="#{form.selectedProbleem}"
-					value="#{anderProbleem}" />
-			</j:commandButton>
-		</p:column>
+	   		</p:column>
+	   		<p:column>
+				<f:facet name="header">
+				<div>Categorie</div>
+				</f:facet>
+				<d:propertyValue id="categorieColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+					value="#{anderProbleem.categorie}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Commentaar</div>
+				</f:facet>
+				<d:propertyValue id="commentaarColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+					value="#{anderProbleem.commentaar}"
+					mode="VIEW" />
+			</p:column>
+			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
+				<f:facet name="header">
+				<div>Status</div>
+				</f:facet>
+				<d:propertyValue id="statusColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+					value="#{anderProbleem.status}" mode="VIEW" />
+			</p:column>
+			<p:column>
+				<j:commandButton
+					rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
+					image="#{resource['core/images/actions/16x16/edit.png']}"
+					type="image"
+					title="#{messages['page.actions.view.label']}">
+					<j:renderListener target="#{r:clientId('editProbleemPanel')}"
+						rendered="true" execute="@this" />
+					<f:setPropertyActionListener
+						target="#{form.selectedProbleem}"
+						value="#{anderProbleem}" />
+				</j:commandButton>
+			</p:column>
    		</p:dataTable>
 
-<!-- EDIT BORD PROBLEEM PANEL -->
    		<j:renderPanel id="editProbleemPanel" rendered="false">
 			<d:popupPanel header="Valideren Probleem"
 				icon="#{resources['core/images/actions/16x16/edit.png']}"
-				show="true" modal="true" width="600">
+				show="true"
+				modal="true"
+				width="600">
 				<d:fields>
 					<a:outputPanel rendered="#{form.hasBordInfo}">
 					<d:field label="Bordvolgnummer">
-						<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }" mode="VIEW" />
+						<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
+							mode="VIEW" />
 					</d:field>
 					<d:field label="Straatnaam">
-						<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }" mode="VIEW" />
+						<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
+							mode="VIEW" />
 					</d:field>
 					</a:outputPanel>
 				</d:fields>
-				<d:object mode="EDIT" modelClass="#{d:modelClass('Probleem')}"
+				<d:object mode="EDIT"
+					modelClass="#{d:modelClass('Probleem')}"
 					value="#{form.selectedProbleem}">
 				</d:object>
 				<d:buttons>
 					<j:commandButton value="#{messages['form.general.save.button']}"
 						image="#{resource['core/images/actions/12x12/save.png']}"
-						type="button" action="#{form.validateProbleem()}" render="problemenOverzichtPanel">
+						type="button"
+						action="#{form.validateProbleem()}"
+						render="problemenOverzichtPanel">
 						<j:renderListener rendered="false" />
 						<f:setPropertyActionListener
 							target="#{form.selectedProbleem}"
@@ -160,12 +177,12 @@
 					<j:commandButton value="#{messages['form.general.cancel.button']}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}" execute="@this">
+						action="#{form.cancel()}"
+						execute="@this">
 						<j:renderListener rendered="false" />
 					</j:commandButton>
 				</d:buttons>
 			</d:popupPanel>
 		</j:renderPanel>
-		
 	</a:outputPanel>
 </u:composition>

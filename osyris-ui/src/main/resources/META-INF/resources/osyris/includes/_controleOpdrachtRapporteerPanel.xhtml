@@ -1,0 +1,148 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	<j:commandButton rendered="true"
+			value="Toon op kaart"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button"
+			action="#{form.showOpdrachtMapData(form.object.traject)}"
+			execute="@this" />
+	<br/>
+	<table width="100%">
+			<tr>
+			<td width="50%" valign="top">
+	<r:panel id="ProblemenPanel" header="Problemen">	
+	<j:renderPanel id="problemPanel">
+	Kies type probleem:<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
+		<f:selectItem itemValue="" itemLabel="" />
+		<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+		<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+		<a:ajax
+			event="change"
+			render="probleemPanel"
+			listener="#{form.createProbleem()}"
+			execute="@this" />
+	</h:selectOneMenu>
+	<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
+		<d:object mode="EDIT"
+				value="#{form.probleem}" />		
+		<j:commandButton
+			id="selectFeatures"
+			rendered="#{form.probleemType == 'bord'}"
+			image="#{resource['core/images/actions/24x24/select.png']}"
+			styleClass="component-toolbar-button"
+			value="Selecteer bord op kaart"
+			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+			submit="false">
+			<j:activateControl
+				for="viewer"
+				event="click"
+				control="selectBox" />
+		</j:commandButton>
+		<j:commandButton
+			id="drawPoint"
+			rendered="#{form.probleemType == 'ander'}"
+			image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+			styleClass="component-toolbar-button"
+			value="Duid probleem aan op kaart">
+			<j:activateControl
+				for="viewer"
+				event="click"
+				control="drawPoint" />
+		</j:commandButton>
+		<br/>
+		<j:commandButton
+			id="selectSegment"
+			rendered="#{form.object.trajectType.contains('netwerk')}"
+			image="#{resource['core/images/actions/24x24/select.png']}"
+			styleClass="component-toolbar-button"
+			value="Selecteer segment op kaart"
+			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+			submit="false">
+			<j:activateControl
+				for="viewer"
+				event="click"
+				control="selectBox" >
+			</j:activateControl>
+		</j:commandButton>
+		<br/>
+<!-- 					<j:commandButton -->
+<!-- 						id="drawLine" -->
+<!-- 						rendered="#{form.probleemType == 'ander' and form.object.trajectType.contains('route')}" -->
+<!-- 						image="#{resource['core/images/actions/24x24/drawLine.png']}" -->
+<!-- 						styleClass="component-toolbar-button" -->
+<!-- 						value="Duid omleiding aan op de kaart"> -->
+<!-- 						<j:activateControl -->
+<!-- 							for="viewer" -->
+<!-- 							event="click" -->
+<!-- 							control="drawLine" /> -->
+<!-- 					</j:commandButton> -->
+		
+	<d:buttons>
+		<j:commandButton value="Probleem toevoegen" rendered="true"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button"
+			action="#{form.addProbleem()}" render="problemPanel">
+		</j:commandButton>
+	</d:buttons>
+	</j:renderPanel>
+	<br/>
+	
+	<!-- Probleem tabellen -->
+	<u:decorate
+		template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
+		<u:param name="form" value="#{form}" />
+	</u:decorate>
+	
+   	</j:renderPanel>
+   	</r:panel>
+   	<br/>
+   	<r:panel>
+  		<d:fields>
+   		<d:field label="Datum Uitvoering" for="datumUitvoering">	 
+		<d:propertyValue id="datumUitvoering" 
+				modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumUitTeVoeren')}" 
+				value="#{form.object.datumUitTeVoeren}" 
+				mode="EDIT" />
+			</d:field>
+	</d:fields>
+	</r:panel>
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+					<j:controllerListener name="selectedFeatures"
+						listener="#{form.onSelectFeatures}" />
+					<j:controllerListener name="addedFeature"
+						listener="#{form.onUpdateFeatures}" />
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
+	<d:buttons>
+		<j:commandButton value="#{messages['form.general.save.button']}"
+			image="#{resource['core/images/actions/12x12/save.png']}"
+			type="button"
+			action="#{form.save()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
+		<j:commandButton value="Verzenden"
+			image="#{resource['core/images/actions/12x12/next.png']}"
+			type="button"
+			action="#{form.rapporterenControleOpdracht()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

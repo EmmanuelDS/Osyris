@@ -1,0 +1,43 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<table width="100%">
+		<tr>
+			<td width="40%" valign="top">
+				<d:object mode="VIEW"
+					modelClass="#{form.modelClass}"
+					value="#{form.object}">
+				</d:object>
+			</td>
+			<td width="60%" valign="top">
+				<r:panel>
+					<div style="height: 500px">
+						<m:mapViewer id="viewer"
+							configuration="#{form.configuration}"/>
+					</div>
+				</r:panel>
+			</td>
+		</tr>
+	</table>
+	<d:buttons>
+		<j:commandButton
+			rendered="#{form.isCanEdit(form.object) and form.object.status == 'GEMELD'}"
+			value="Valideren"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button"
+			title="#{messages['page.actions.edit.label']}"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('editPopup')}).show();" />
+		<j:commandButton value="#{messages['form.general.close.button']}"
+			image="#{resource['core/images/actions/12x12/close.png']}"
+			type="button"
+			submit="false"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

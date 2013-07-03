@@ -1,7 +1,7 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -19,6 +19,8 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
+import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.specto.api.configuration.MapConfiguration;
@@ -30,10 +32,11 @@ import be.gim.specto.ui.component.MapViewer;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
+import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Traject;
 
-import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -156,7 +159,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	}
 
 	/**
-	 * Basis Map Configuratie
+	 * Map Configuratie
 	 * 
 	 * @return
 	 * @throws IOException
@@ -173,71 +176,69 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			MapConfiguration configuration = mapFactory
 					.getConfiguration(context);
 
-			mapFactory.createGeometryLayer(configuration.getContext(),
-					"geometry", null, Point.class, null, true, "single", null,
-					null);
+			context = configuration.getContext();
 
-			return configuration;
-		}
-		return null;
-	}
+			Melding melding = getObject();
 
-	/**
-	 * 
-	 * @param melding
-	 */
-	public void showMeldingMapData(Melding melding) {
-		MapViewer viewer = getViewer();
-		MapContext context = viewer.getConfiguration().getContext();
-		FeatureMapLayer layer = null;
-		String layerId = null;
-		try {
 			// Get traject
-			Traject t = (Traject) modelRepository.loadObject(melding
+			Traject traject = (Traject) modelRepository.loadObject(melding
 					.getTraject());
 
 			// Load layer depending on traject type
-			layerId = Character.toLowerCase(t.getModelClass().getName()
-					.charAt(0))
-					+ t.getModelClass().getName().substring(1);
-			layer = (FeatureMapLayer) context.getLayer(layerId);
-			layer.setHidden(false);
-			layer.setFilter(FilterUtils.equal("naam", t.getNaam()));
-			context.setBoundingBox(viewer.getContentExtent(layer));
-
-			// Get borden voor bordproblemen
-			if (object.getProbleem() instanceof BordProbleem) {
-				Bord b = (Bord) modelRepository
-						.loadObject(((BordProbleem) object.getProbleem())
-								.getBord());
-
-				layerId = Character.toLowerCase(b.getModelClass().getName()
-						.charAt(0))
-						+ b.getModelClass().getName().substring(1);
-				layer = (FeatureMapLayer) context.getLayer(layerId);
-				layer.setHidden(false);
-				layer.setFilter(FilterUtils.equal("naam", b.getNaam()));
-				List<String> ids = new ArrayList<String>();
-				ids.add(b.getId().toString());
-				layer.setSelection(ids);
+			FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
+							.getName()));
+			if (trajectLayer !=null) {
+				trajectLayer.setHidden(false);
+				trajectLayer
+						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
 			}
 
-			// Get anderProbleem
-			if (object.getProbleem() instanceof AnderProbleem) {
-				AnderProbleem p = (AnderProbleem) object.getProbleem();
-				GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) context
-						.getLayer("geometry");
-				List<Geometry> list = new ArrayList<Geometry>();
-				list.add(p.getGeom());
-				geomLayer.setGeometries(list);
+			Probleem probleem = object.getProbleem();
+
+			if (probleem instanceof BordProbleem) {
+				// Bord Probleem
+				Bord bord = (Bord) modelRepository
+						.loadObject(((BordProbleem) probleem).getBord());
+
+				FeatureMapLayer probleemLayer = (FeatureMapLayer) context
+						.getLayer(LabelUtils.lowerCamelCase(bord
+								.getModelClass().getName()));
+				if (probleemLayer != null) {
+					probleemLayer.setHidden(false);
+					probleemLayer.setFilter(FilterUtils.equal("naam",
+							bord.getNaam()));
+	
+					probleemLayer.setSelection(Collections.singletonList(bord
+							.getId().toString()));
+	
+					Envelope envelope = GeometryUtils.getEnvelope(bord.getGeom());
+					GeometryUtils.expandEnvelope(envelope, 0.1,
+							context.getMaxBoundingBox());
+					context.setBoundingBox(envelope);
+				}
+			} else if (probleem instanceof AnderProbleem) {
+				// Ander Probleem
+				AnderProbleem anderProbleem = (AnderProbleem) probleem;
+
+				GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory.createGeometryLayer(configuration.getContext(),
+						"geometry", null, Point.class, null, true, "single", null,
+						null);
 				geomLayer.setHidden(false);
-				context.setBoundingBox(viewer.getFeatureExtent(geomLayer,
-						FilterUtils.contains(p.getGeom())));
-			}
-			viewer.updateContext(null);
 
-		} catch (IOException e) {
-			LOG.error("Can load object", e);
+				geomLayer.setGeometries(Collections.singletonList(anderProbleem
+						.getGeom()));
+
+				Envelope envelope = GeometryUtils.getEnvelope(anderProbleem
+						.getGeom());
+				GeometryUtils.expandEnvelope(envelope, 0.1,
+						context.getMaxBoundingBox());
+				context.setBoundingBox(envelope);
+			}
+
+			return configuration;
 		}
+
+		return null;
 	}
 }

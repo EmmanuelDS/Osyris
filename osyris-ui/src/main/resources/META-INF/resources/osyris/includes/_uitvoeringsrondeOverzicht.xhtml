@@ -8,9 +8,7 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:q="http://specto.gim.be/search">
 
-	<div>
-		<h2>Overzicht Uitvoeringsrondes</h2>
-	</div>
+	<h2>Overzicht Uitvoeringsrondes</h2>
 
 	<j:layout style="height: 400px">
 		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
@@ -36,80 +34,59 @@
 						type="button"
 						actionListener="#{uitvoeringsrondeOverzichtFormBase.search()}"
 						render="objects" />
+					<j:commandButton
+						rendered="#{uitvoeringsrondeOverzichtFormBase.canCreate}"
+						value="#{messages['page.actions.create.label']}"
+						image="#{resource['core/images/actions/12x12/create.png']}"
+						type="button"
+						action="#{uitvoeringsrondeOverzichtFormBase.create()}"
+						oncomplete="conscientia.widget(#{r:element('createPopup')}).show();" />
+					<d:fileDownload
+						fileName="#{uitvoeringsrondeOverzichtFormBase.fileName}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/download.png']}"
+						content="#{uitvoeringsrondeOverzichtFormBase.report()}"
+						value="#{messages['page.actions.report.label']}" />
 				</d:buttons>
 			</div>
 		</j:layoutPane>
 		<j:layoutPane>
-			<div class="ui-layout-content">
-				<a:outputPanel id="result">
-					<d:objects id="objects"
-						value="#{uitvoeringsrondeOverzichtFormBase.results}"
-						modelClass="#{uitvoeringsrondeOverzichtFormBase.modelClass}"
-						mode="RESULT" level="SHORT">
-						<f:facet name="left">
-							<a:outputPanel rendered="true" styleClass="model-table-actions">
-								<h:panelGrid columns="3">
-									<j:commandButton
-										rendered="#{uitvoeringsrondeOverzichtFormBase.isCanView(object)}"
-										image="#{resource['core/images/actions/16x16/view.png']}"
-										type="image" title="#{messages['page.actions.view.label']}">
-										<j:renderListener target="#{r:clientId('viewPanel')}"
-											rendered="true" execute="@this" />
-										<f:setPropertyActionListener
-											target="#{uitvoeringsrondeOverzichtFormBase.object}"
-											value="#{object}" />
-									</j:commandButton>
-									<j:commandButton
-										rendered="#{uitvoeringsrondeOverzichtFormBase.isCanEdit(object)}"
-										image="#{resource['core/images/actions/16x16/edit.png']}"
-										type="image" title="#{messages['page.actions.edit.label']}">
-										<j:renderListener target="#{r:clientId('editPanel')}"
-											rendered="true" execute="@this" />
-										<f:setPropertyActionListener
-											target="#{uitvoeringsrondeOverzichtFormBase.object}"
-											value="#{object}" />
-									</j:commandButton>
-									<j:commandButton
-										rendered="#{uitvoeringsrondeOverzichtFormBase.isCanDelete(object)}"
-										image="#{resource['core/images/actions/16x16/delete.png']}"
-										type="image" title="#{messages['page.actions.delete.label']}">
-										<j:renderListener target="#{r:clientId('deletePanel')}"
-											rendered="true" execute="@this" />
-										<f:setPropertyActionListener
-											target="#{uitvoeringsrondeOverzichtFormBase.object}"
-											value="#{object}" />
-									</j:commandButton>
-								</h:panelGrid>
-							</a:outputPanel>
-						</f:facet>
-					</d:objects>
-				</a:outputPanel>
+			<a:outputPanel id="result">
+				<d:objects id="objects"
+					value="#{uitvoeringsrondeOverzichtFormBase.results}"
+					modelClass="#{uitvoeringsrondeOverzichtFormBase.modelClass}"
+					mode="RESULT" level="SHORT">
+					<f:facet name="left">
+						<a:outputPanel rendered="true" styleClass="model-table-actions">
+							<j:commandButton
+								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanView(object)}"
+								image="#{resource['core/images/actions/16x16/view.png']}"
+								type="image"
+								title="#{messages['page.actions.view.label']}"
+								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{uitvoeringsrondeOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanDelete(object)}"
+								image="#{resource['core/images/actions/16x16/delete.png']}"
+								type="image"
+								title="#{messages['page.actions.delete.label']}"
+								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{uitvoeringsrondeOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+						</a:outputPanel>
+					</f:facet>
+				</d:objects>
+			</a:outputPanel>
 
-				<a:outputPanel>
-					<d:buttons>
-						<j:commandButton
-							rendered="#{uitvoeringsrondeOverzichtFormBase.canCreate}"
-							value="#{messages['page.actions.create.label']}"
-							image="#{resource['core/images/actions/12x12/create.png']}"
-							type="button"
-							action="#{uitvoeringsrondeOverzichtFormBase.create()}">
-							<j:renderListener target="createPanel" rendered="true"
-								execute="@this" />
-						</j:commandButton>
-						<d:fileDownload
-							fileName="#{uitvoeringsrondeOverzichtFormBase.fileName}"
-							type="button"
-							image="#{resource['core/images/actions/12x12/download.png']}"
-							content="#{uitvoeringsrondeOverzichtFormBase.report()}"
-							value="#{messages['page.actions.report.label']}" />
-					</d:buttons>
-				</a:outputPanel>
-
-				<u:decorate template="/resources/core/includes/managePanels.xhtml">
-					<u:param name="form" value="#{uitvoeringsrondeOverzichtFormBase}" />
-					<u:param name="render" value="#{r:clientId('result')}" />
-				</u:decorate>
-			</div>
+			<u:decorate template="/resources/core/includes/managePanels.xhtml">
+				<u:param name="form" value="#{uitvoeringsrondeOverzichtFormBase}" />
+				<u:param name="render" value="#{r:clientId('result')}" />
+			</u:decorate>
 		</j:layoutPane>
 	</j:layout>
 </u:composition>

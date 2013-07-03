@@ -1,0 +1,77 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	
+	<j:commandButton
+		rendered="true"
+		value="Toon op kaart"
+		image="#{resource['core/images/actions/12x12/apply.png']}"
+		type="button"
+		action="#{form.showOpdrachtMapData(form.object.traject)}"
+		execute="@this" />
+	<br />
+	<table width="100%">
+		<tr>
+		<td width="50%" valign="top">
+		<!-- Probleem tabellen -->
+		<u:decorate
+			template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+		<br/>
+		<r:panel id="infoPanel" header="Info">
+		<d:fields>
+			<d:displayLabel
+					property="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" />
+			<d:field>
+			<d:propertyValue id="peterMeter" 
+					modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" 
+					value="#{form.object.peterMeter}" 
+					mode="VIEW" />
+			</d:field>
+			<d:displayLabel
+					property="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" />
+			<d:field>
+			<d:propertyValue id="datumGerapporteerd" 
+					modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" 
+					value="#{form.object.datumGerapporteerd}" 
+					mode="VIEW" />
+			</d:field>
+		</d:fields>
+		</r:panel>
+
+		</td>
+		<td width="50%" valign="top">
+			<r:panel>
+				<div style="height: 500px">
+					<m:mapViewer id="viewer"
+						configuration="#{form.configuration}">
+					</m:mapViewer>
+				</div>
+			</r:panel>
+		</td>
+		</tr>
+	</table>
+	<d:buttons>	
+		<j:commandButton value="#{messages['form.general.save.button']}"
+			image="#{resource['core/images/actions/12x12/delete.png']}"
+			type="button"
+			action="#{form.save}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('valideerPopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			action="#{form.cancel()}"
+			execute="@this"
+			oncomplete="conscientia.widget(#{r:element('valideerPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

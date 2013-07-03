@@ -9,16 +9,15 @@
 	xmlns:cc="http://java.sun.com/jsf/composite">
 	<r:panel>
 		<div>
-			<b>U bent momenteel toegewezen aan: </b>
+			<b>U bent momenteel toegewezen aan</b>
 		</div>
 		<br />
-		<c:forEach
-			items="#{trajectToewijzingBean.getTrajectToewijzingen(username)}"
+		<j:repeat
+			value="#{trajectToewijzingBean.getTrajectToewijzingen(username)}"
 			var="toewijzing">
 			<div>#{toewijzing}</div>
-		</c:forEach>
+		</j:repeat>
 		<br />
-		<div>Deze informatie is louter informatief, bekijk uw
-			controleopdrachten voor concrete richtlijnen.</div>
+		<div>Deze informatie is louter informatief, bekijk uw controleopdrachten voor concrete richtlijnen.</div>
 	</r:panel>
 </div>

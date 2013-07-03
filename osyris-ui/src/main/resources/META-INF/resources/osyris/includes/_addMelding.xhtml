@@ -16,7 +16,7 @@
 	
 	<r:panel id="searchTrajectPanel" header="Zoek traject">
 		<d:fields>
-		<d:field for="trajectType" label="Traject type" required="true">
+			<d:field for="trajectType" label="Traject type" required="true">
 				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" required="true">
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
@@ -38,18 +38,18 @@
 				</h:selectOneMenu>
 			</d:field>
 			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectType != null}">
-			<d:field for="trajectNaam" label="Traject naam" rendered="true" required="#{form.trajectType.contains('Route')}">
-				<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true" required="#{form.trajectType.contains('Route')}">
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
-				</h:selectOneMenu>
-			</d:field>
-			<d:field for="knooppuntNummer" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
-				<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
-				</h:selectOneMenu>
-			</d:field>
+				<d:field for="trajectNaam" label="Traject naam" rendered="true" required="#{form.trajectType.contains('Route')}">
+					<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true" required="#{form.trajectType.contains('Route')}">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+					</h:selectOneMenu>
+				</d:field>
+				<d:field for="knooppuntNummer" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
+					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
+					</h:selectOneMenu>
+				</d:field>
 			</j:renderPanel>
 		</d:fields>
 		<d:buttons>
@@ -64,52 +64,53 @@
 	</r:panel>
 	
 	<r:panel id="gegevensPanel" header="Uw gegevens">
-				<d:fields>
-				<d:field label="Voornaam" for="voornaam">	 
-					<d:propertyValue id="voornaam" 
- 						modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
- 						value="#{form.melding.voornaam}" 
- 						mode="EDIT" />
- 				</d:field>
- 				<d:field label="Naam" for="naam">	 
-					<d:propertyValue id="naam" 
- 						modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
- 						value="#{form.melding.naam}" 
- 						mode="EDIT" />
- 				</d:field>
- 				<d:field label="Telefoon" for="telefoon">	 
-					<d:propertyValue id="telefoon" 
- 						modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
- 						value="#{form.melding.telefoon}" 
- 						mode="EDIT" />
- 				</d:field>
- 				<d:field label="Email" for="email" required="true">
- 				<d:propertyValue id="email" required="true"
- 				 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
- 						value="#{form.melding.email}"
- 						mode="EDIT" />
- 				</d:field>
-				<d:field label="Datum vastgesteld" for="datumVastelling">	 
-					<d:propertyValue id="datumVaststelling" 
- 						modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
- 						value="#{form.melding.datumVaststelling}" 
- 						mode="EDIT" />
- 				</d:field> 
- 			</d:fields>
+		<d:fields>
+			<d:field label="Voornaam" for="voornaam">	 
+				<d:propertyValue id="voornaam" 
+						modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
+						value="#{form.melding.voornaam}" 
+						mode="EDIT" />
+				</d:field>
+				<d:field label="Naam" for="naam">	 
+				<d:propertyValue id="naam" 
+						modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
+						value="#{form.melding.naam}" 
+						mode="EDIT" />
+				</d:field>
+				<d:field label="Telefoon" for="telefoon">	 
+				<d:propertyValue id="telefoon" 
+						modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
+						value="#{form.melding.telefoon}" 
+						mode="EDIT" />
+				</d:field>
+				<d:field label="Email" for="email" required="true">
+				<d:propertyValue id="email" required="true"
+				 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
+						value="#{form.melding.email}"
+						mode="EDIT" />
+				</d:field>
+			<d:field label="Datum vastgesteld" for="datumVastelling">	 
+				<d:propertyValue id="datumVaststelling" 
+						modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
+						value="#{form.melding.datumVaststelling}" 
+						mode="EDIT" />
+				</d:field> 
+			</d:fields>
 	</r:panel>
 	
 	<r:panel header="Probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
-				Kies het type probleem: <h:selectOneMenu id="probleemType" value="#{form.probleemType}">
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
-					<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
-					<a:ajax
-						event="change"
-						render="probleemPanel"
-						listener="#{form.createProbleem()}"
-						execute="@this" />
-				</h:selectOneMenu>
+		<h:outputText value="Kies het type probleem" />
+		<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
+			<f:selectItem itemValue="" itemLabel="" />
+			<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+			<a:ajax
+				event="change"
+				render="probleemPanel"
+				listener="#{form.createProbleem()}"
+				execute="@this" />
+		</h:selectOneMenu>
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 			<d:object mode="EDIT"
 					value="#{form.melding.probleem}" />		
@@ -151,8 +152,8 @@
 					event="click"
 					control="selectBox" >
 					<f:param
-							name="layerId"
-							value="#{trajectType}" />
+						name="layerId"
+						value="#{trajectType}" />
 				</j:activateControl>
 			</j:commandButton>
 			<d:buttons>
