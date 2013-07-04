@@ -4,13 +4,13 @@
 	xmlns:f="http://java.sun.com/jsf/core"
 	xmlns:a="http://richfaces.org/a4j"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:r="http://richfaces.org/rich"
+	xmlns:p="http://primefaces.org/ui"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:j="http://conscientia.org/jsf">
-	<r:tabPanel switchType="ajax"
+	<p:tabView dynamic="true"
 		styleClass="model-propertyGroups"
 		contentClass="model-propertyGroup">
-		<r:tab header="Gebruikersgegevens">
+		<p:tab header="Gebruikersgegevens">
 			<a:outputPanel>
 				<d:fieldList>
 					<d:field label="#{messages['page.login.username.label']}">
@@ -25,12 +25,12 @@
 					mode="EDIT"
 					level="SHORT" />
 			</a:outputPanel>
-		</r:tab>
-		<r:tab header="Peter/Meter Profiel">
+		</p:tab>
+		<p:tab header="Peter/Meter Profiel">
 			<d:aspect id="peterMeterProfile"
 				value="#{form.object.getAspect('PeterMeterProfiel', modelRepository, true)}"
 				mode="EDIT"
 				level="SHORT" />
-		</r:tab>
-	</r:tabPanel>
+		</p:tab>
+	</p:tabView>
 </u:composition>

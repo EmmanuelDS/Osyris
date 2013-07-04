@@ -4,18 +4,17 @@
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:r="http://richfaces.org/rich"
 	xmlns:a="http://richfaces.org/a4j"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:cc="http://java.sun.com/jsf/composite">
-	<cc:interface componentType="org.conscientia.ui.ModelObject" />
+	<cc:interface componentType="org.conscientia.ui.ModelUser" />
 	<cc:implementation>
 		<j:bind var="c" />
-		<r:tabPanel switchType="ajax"
+		<p:tabView dynamic="true"
 			styleClass="model-propertyGroups"
 			contentClass="model-propertyGroup">
-			<r:tab header="#{messages['page.user.profile']}">
+			<p:tab title="#{messages['page.user.profile']}">
 			<div class="#{cc.attrs.contentClass}">
 			
 			<div style="float: right">
@@ -47,53 +46,52 @@
 				</u:decorate>
 			</div>
 		</div>
-		</r:tab>
+		</p:tab>
 		
-		<r:tab header="Peter/Meter"
+		<p:tab title="Peter/Meter"
 				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or
 							 identity.inGroup('Medewerker','CUSTOM') or 
 							 identity.inGroup('PeterMeter','CUSTOM') or
-							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter')}">
+							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(c.attrs.value.username).contains('PeterMeter')}">
 				<a:outputPanel>
 					<d:aspect id="peterMeterProfile"
-						value="#{cc.attrs.value.getAspect('PeterMeterProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter'))}"
-						mode="#{cc.attrs.mode}"
-						level="#{cc.attrs.level}"/>
+						value="#{c.attrs.value.getAspect('PeterMeterProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter'))}"
+						mode="#{c.attrs.mode}"
+						level="#{c.attrs.level}"/>
 				</a:outputPanel>
 				
-				<a:outputPanel rendered="#{userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter')}">    
+				<a:outputPanel rendered="#{userRepository.listGroupnames(c.attrs.value.username).contains('PeterMeter')}">    
 					<u:decorate template="/resources/osyris/includes/_toegewezenTrajecten.xhtml" >
 					<u:param name="username"
-							value="#{cc.attrs.value.username}" />
+							value="#{c.attrs.value.username}" />
 				</u:decorate>
 				</a:outputPanel>
 				
-			</r:tab>
+			</p:tab>
 			
-			<r:tab header="Bedrijf"
+			<p:tab title="Bedrijf"
 				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or 
 							 identity.inGroup('Uitvoerder','CUSTOM') or 
-							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder')}">
+							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(c.attrs.value.username).contains('Uitvoerder')}">
 				<a:outputPanel>
 					<d:aspect id="uitvoerderProfile"
-						value="#{cc.attrs.value.getAspect('UitvoerderProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder'))}"
-						mode="#{cc.attrs.mode}"
-						level="#{cc.attrs.level}"/>
+						value="#{c.attrs.value.getAspect('UitvoerderProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder'))}"
+						mode="#{c.attrs.mode}"
+						level="#{c.attrs.level}"/>
 				</a:outputPanel>
-			</r:tab>
+			</p:tab>
 			
-			<r:tab header="Trajectverantwoordelijkheid"
+			<p:tab title="Trajectverantwoordelijkheid"
 				rendered="#{(identity.inGroup('Routedokter', 'CUSTOM') or 
 							 identity.inGroup('Medewerker','CUSTOM') or 
-							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker')}">
+							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(c.attrs.value.username).contains('Medewerker')}">
 				<a:outputPanel>
 					<d:aspect id="medewerkerProfile"
-						value="#{cc.attrs.value.getAspect('MedewerkerProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker'))}"
-						mode="#{cc.attrs.mode}"
-						level="#{cc.attrs.level}"/>
+						value="#{c.attrs.value.getAspect('MedewerkerProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker'))}"
+						mode="#{c.attrs.mode}"
+						level="#{c.attrs.level}"/>
 				</a:outputPanel>
-			</r:tab>	
-		</r:tabPanel>			
-		
+			</p:tab>	
+		</p:tabView>			
 	</cc:implementation>
 </div>
