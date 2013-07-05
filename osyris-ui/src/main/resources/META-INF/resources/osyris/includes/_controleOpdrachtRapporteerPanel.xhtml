@@ -31,9 +31,16 @@
 			listener="#{form.createProbleem()}"
 			execute="@this" />
 	</h:selectOneMenu>
+	<br/>
 	<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
 		<d:object mode="EDIT"
-				value="#{form.probleem}" />		
+				value="#{form.probleem}" />	
+		<d:field label="Commentaar" for="commentaar" required="true">
+				<d:propertyValue id="commentaar" required="true"
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{form.probleem.commentaar}"
+						mode="EDIT" />
+		</d:field>		
 		<j:commandButton
 			id="selectFeatures"
 			rendered="#{form.probleemType == 'bord'}"
@@ -107,10 +114,10 @@
    	<br/>
    	<r:panel>
   		<d:fields>
-   		<d:field label="Datum Uitvoering" for="datumUitvoering">	 
-		<d:propertyValue id="datumUitvoering" 
-				modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumUitTeVoeren')}" 
-				value="#{form.object.datumUitTeVoeren}" 
+   		<d:field label="Datum terreinbezoek" for="datumTerreinBezoek">	 
+		<d:propertyValue id="datumTerreinBezoek" 
+				modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTerreinBezoek')}" 
+				value="#{form.object.datumTerreinBezoek}" 
 				mode="EDIT" />
 			</d:field>
 	</d:fields>

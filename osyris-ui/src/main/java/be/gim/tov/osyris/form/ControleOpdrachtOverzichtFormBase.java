@@ -328,8 +328,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 					.getConfiguration(context);
 
 			mapFactory.createGeometryLayer(configuration.getContext(),
-					GEOMETRY_LAYER_NAME, null, Point.class, null, true, "single", null,
-					null);
+					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+					"single", null, null);
 
 			return configuration;
 		}
@@ -551,12 +551,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void verzendenControleOpdracht() {
 		if (object != null) {
 			object.setStatus(ControleOpdrachtStatus.UIT_TE_VOEREN);
+			object.setDatumUitTeVoeren(new Date());
 			try {
 				modelRepository.saveObject(object);
 				clear();
 				search();
 				// send confirmatie mail naar peterMeter
 				// sendConfirmationMail();
+				messages.info("Controleopdracht verzonden.");
 			} catch (IOException e) {
 				LOG.error("Can not save object.", e);
 			} catch (Exception e) {
@@ -577,6 +579,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(object);
 				clear();
 				search();
+				messages.info("Controleopdracht gerapporteerd.");
 			} catch (IOException e) {
 				LOG.error("Can not save object.", e);
 			} catch (Exception e) {
@@ -683,7 +686,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 						object.getTrajectType() + "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
+				} else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(Collections.EMPTY_LIST);
@@ -707,7 +711,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 				if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
+				} else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(false);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));

@@ -9,6 +9,7 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
@@ -43,7 +44,6 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
 	private ResourceIdentifier regio;
 
-	// @Edit(type = "trajectType")
 	@Label("Trajecttype")
 	@Description("Trajecttype")
 	@Type(value = ModelPropertyType.ENUM)
@@ -53,7 +53,8 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@Label("Trajectnaam")
 	@Description("Trajectnaam")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
+	@ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
+	@Parents({ "regio", "trajectType" })
 	private String trajectNaam;
 
 	@Label("Periode")

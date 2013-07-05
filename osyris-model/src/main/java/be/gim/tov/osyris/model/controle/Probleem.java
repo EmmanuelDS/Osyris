@@ -11,7 +11,6 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
-import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
@@ -44,8 +43,9 @@ public abstract class Probleem extends AbstractModelObject implements
 	// @ModelClassName("File")
 	// private ResourceKey foto;
 
-	@Required
+	// @Required
 	@NotSearchable
+	@NotEditable
 	@Label("Commentaar")
 	@Description("Commentaar")
 	@Type(value = ModelPropertyType.TEXT)

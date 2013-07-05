@@ -113,7 +113,13 @@
 		</h:selectOneMenu>
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 			<d:object mode="EDIT"
-					value="#{form.melding.probleem}" />		
+					value="#{form.melding.probleem}" />	
+			<d:field label="Commentaar" for="commentaar" required="true">
+				<d:propertyValue id="commentaar" required="true"
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{form.melding.probleem.commentaar}"
+						mode="EDIT" />
+			</d:field>	
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"

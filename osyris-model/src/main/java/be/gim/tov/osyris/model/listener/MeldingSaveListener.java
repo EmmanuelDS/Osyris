@@ -20,10 +20,10 @@ import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
-import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
@@ -44,6 +44,9 @@ public class MeldingSaveListener {
 
 	@Inject
 	private UserRepository userRepository;
+
+	@Inject
+	private OsyrisModelFunctions osyrisModelFunctions;
 
 	@Inject
 	protected Messages messages;
@@ -129,7 +132,8 @@ public class MeldingSaveListener {
 			werkOpdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
 			werkOpdracht.setMedewerker(melding.getMedewerker());
 			werkOpdracht.setProbleem(melding.getProbleem());
-			werkOpdracht.setUitvoerder(zoekUitvoerder(melding.getTraject()));
+			werkOpdracht.setUitvoerder(osyrisModelFunctions
+					.zoekUitvoerder(melding.getTraject()));
 			modelRepository.saveObject(werkOpdracht);
 			messages.info("Nieuwe werkopdracht aangemaakt.");
 		} catch (IOException e) {
@@ -143,19 +147,19 @@ public class MeldingSaveListener {
 		}
 	}
 
-	/**
-	 * 
-	 * @param traject
-	 * @return
-	 */
-	private ResourceName zoekUitvoerder(ResourceIdentifier traject) {
-		try {
-			Traject t = (Traject) modelRepository.loadObject(traject);
-			Regio regio = (Regio) modelRepository.loadObject(t.getRegio());
-			return (ResourceName) regio.getUitvoerder();
-		} catch (IOException e) {
-			LOG.error("Can not load Traject.", e);
-		}
-		return null;
-	}
+	// /**
+	// *
+	// * @param traject
+	// * @return
+	// */
+	// private ResourceName zoekUitvoerder(ResourceIdentifier traject) {
+	// try {
+	// Traject t = (Traject) modelRepository.loadObject(traject);
+	// Regio regio = (Regio) modelRepository.loadObject(t.getRegio());
+	// return (ResourceName) regio.getUitvoerder();
+	// } catch (IOException e) {
+	// LOG.error("Can not load Traject.", e);
+	// }
+	// return null;
+	// }
 }

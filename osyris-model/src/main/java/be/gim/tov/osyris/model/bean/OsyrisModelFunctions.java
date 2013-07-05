@@ -17,19 +17,24 @@ import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.group.Group;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.repository.ModelRepository;
+import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.functions.ModelFunctions;
+import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 
 /**
  * 
@@ -185,8 +190,9 @@ public class OsyrisModelFunctions {
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
 					"group", groupName));
 
-			if (group != null)
+			if (group != null) {
 				return group.getMembers();
+			}
 		} catch (IOException e) {
 			LOG.error("Can not lookup users for group '" + groupName + "'.", e);
 		}
@@ -223,12 +229,12 @@ public class OsyrisModelFunctions {
 	public List<Object[]> getRegiosOostVlaanderen() {
 
 		List<Object[]> regios = new ArrayList<Object[]>();
-		Object[] code1 = { "Regio@1", "Leiestreek" };
-		Object[] code2 = { "Regio@2", "Meetjesland" };
-		Object[] code3 = { "Regio@3", "Vlaamse Ardennen" };
-		Object[] code4 = { "Regio@4", "Waasland" };
-		Object[] code5 = { "Regio@5", "Scheldeland" };
-		Object[] code6 = { "Regio@9", "Zeeuws-Vlaanderen" };
+		Object[] code1 = { new ResourceKey("Regio@1"), "Leiestreek" };
+		Object[] code2 = { new ResourceKey("Regio@2"), "Meetjesland" };
+		Object[] code3 = { new ResourceKey("Regio@3"), "Vlaamse Ardennen" };
+		Object[] code4 = { new ResourceKey("Regio@4"), "Waasland" };
+		Object[] code5 = { new ResourceKey("Regio@5"), "Scheldeland" };
+		Object[] code6 = { new ResourceKey("Regio@9"), "Zeeuws-Vlaanderen" };
 
 		regios.add(code1);
 		regios.add(code2);
@@ -316,7 +322,6 @@ public class OsyrisModelFunctions {
 		dates.add(controleOpdracht.getDatumUitTeVoeren());
 		dates.add(controleOpdracht.getDatumGerapporteerd());
 		dates.add(controleOpdracht.getDatumGevalideerd());
-		dates.add(controleOpdracht.getDatumUitgesteld());
 		dates.removeAll(Collections.singleton(null));
 		if (dates.size() > 0) {
 			Date mostRecent = Collections.max(dates);
@@ -358,6 +363,7 @@ public class OsyrisModelFunctions {
 		return (String) cacheProducer.getCache("trajectRegioCache",
 				new Transformer() {
 
+					@Override
 					public Object transform(Object key) {
 
 						try {
@@ -380,10 +386,11 @@ public class OsyrisModelFunctions {
 	 */
 	public String getTrajectType(ResourceIdentifier trajectId) {
 		ModelClass modelClass = modelRepository.getObjectClass(trajectId);
-		if (modelClass != null)
+		if (modelClass != null) {
 			return modelClass.getLabel().toString();
-		else
+		} else {
 			return null;
+		}
 	}
 
 	/**
@@ -428,6 +435,30 @@ public class OsyrisModelFunctions {
 			}
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * 
+	 * @param traject
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public ResourceName zoekUitvoerder(ResourceIdentifier traject) {
+		try {
+			Traject t = (Traject) modelRepository.loadObject(traject);
+			Regio regio = (Regio) modelRepository.loadObject(t.getRegio());
+			ResourceIdentifier identifier = regio.getUitvoerder();
+			DefaultQuery query = new DefaultQuery("UitvoerderProfiel");
+			query.addFilter(FilterUtils.equal("bedrijf", identifier));
+			List<UitvoerderProfiel> profiel = (List<UitvoerderProfiel>) modelRepository
+					.searchObjects(query, false, false);
+			User uitvoerder = (User) modelRepository.loadObject(profiel.get(0)
+					.getFor());
+			return modelRepository.getResourceName(uitvoerder);
+		} catch (IOException e) {
+			LOG.error("Can not load Traject.", e);
 		}
 		return null;
 	}

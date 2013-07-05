@@ -39,6 +39,7 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Controleopdracht")
 @SubClassPersistence(UNION)
 @Edit(type = "controleOpdracht")
 @Permissions({
@@ -102,18 +103,18 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 
 	@NotSearchable
 	@NotEditable
-	@Label("Datum uitgesteld")
-	@Description("Datum uitgesteld")
+	@Label("Datum uit te voeren")
+	@Description("Datum uit te voeren")
 	@Type(ModelPropertyType.DATE)
-	private Date datumUitgesteld;
+	private Date datumUitTeVoeren;
 
 	@NotSearchable
 	@NotEditable
 	@EditableInGroup({ "PeterMeter" })
-	@Label("Datum uitvoering")
-	@Description("Datum uitvoering")
+	@Label("Datum terreinbezoek")
+	@Description("Datum terreinbezoek")
 	@Type(ModelPropertyType.DATE)
-	private Date datumUitTeVoeren;
+	private Date datumTerreinBezoek;
 
 	@NotSearchable
 	@NotEditable
@@ -200,20 +201,20 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 		this.datumTeControleren = datumTeControleren;
 	}
 
-	public Date getDatumUitgesteld() {
-		return datumUitgesteld;
-	}
-
-	public void setDatumUitgesteld(Date datumUitgesteld) {
-		this.datumUitgesteld = datumUitgesteld;
-	}
-
 	public Date getDatumUitTeVoeren() {
 		return datumUitTeVoeren;
 	}
 
 	public void setDatumUitTeVoeren(Date datumUitTeVoeren) {
 		this.datumUitTeVoeren = datumUitTeVoeren;
+	}
+
+	public Date getDatumTerreinBezoek() {
+		return datumTerreinBezoek;
+	}
+
+	public void setDatumTerreinBezoek(Date datumTerreinBezoek) {
+		this.datumTerreinBezoek = datumTerreinBezoek;
 	}
 
 	public ResourceIdentifier getTraject() {

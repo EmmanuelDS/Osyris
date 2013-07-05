@@ -18,7 +18,9 @@
 			rows="5"
 			paginatorPosition="bottom"
 			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			emptyMessage="Geen resultaten gevonden">
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+			<j:bindAttribute var="bordProbleem"
+						name="rowData" />
 			<f:facet name="header">
 				<div>Bordproblemen</div>
 			</f:facet>
@@ -67,10 +69,8 @@
 					rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
 					image="#{resource['core/images/actions/16x16/edit.png']}"
 					type="image"
-					title="#{messages['page.actions.view.label']}">
-					<j:renderListener target="#{r:clientId('editProbleemPanel')}"
-						rendered="true"
-						execute="@this" />
+					title="#{messages['page.actions.view.label']}"
+					oncomplete="conscientia.widget(#{r:element('editProbleemPopup')}).show();">
 					<f:setPropertyActionListener
 						target="#{form.selectedProbleem}"
 						value="#{bordProbleem}" />
@@ -89,7 +89,9 @@
 			rows="5"
 			paginatorPosition="bottom"
 			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-			emptyMessage="Geen resultaten gevonden">
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+			<j:bindAttribute var="anderProbleem"
+						name="rowData" />
 			<f:facet name="header">
 				<div>Andere problemen</div>
 			</f:facet>
@@ -131,9 +133,8 @@
 					rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
 					image="#{resource['core/images/actions/16x16/edit.png']}"
 					type="image"
-					title="#{messages['page.actions.view.label']}">
-					<j:renderListener target="#{r:clientId('editProbleemPanel')}"
-						rendered="true" execute="@this" />
+					title="#{messages['page.actions.view.label']}"
+					oncomplete="conscientia.widget(#{r:element('editProbleemPopup')}).show();">
 					<f:setPropertyActionListener
 						target="#{form.selectedProbleem}"
 						value="#{anderProbleem}" />
@@ -141,48 +142,21 @@
 			</p:column>
    		</p:dataTable>
 
-   		<j:renderPanel id="editProbleemPanel" rendered="false">
-			<d:popupPanel header="Valideren Probleem"
-				icon="#{resources['core/images/actions/16x16/edit.png']}"
-				show="true"
-				modal="true"
-				width="600">
-				<d:fields>
-					<a:outputPanel rendered="#{form.hasBordInfo}">
-					<d:field label="Bordvolgnummer">
-						<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
-							mode="VIEW" />
-					</d:field>
-					<d:field label="Straatnaam">
-						<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
-							mode="VIEW" />
-					</d:field>
-					</a:outputPanel>
-				</d:fields>
-				<d:object mode="EDIT"
-					modelClass="#{d:modelClass('Probleem')}"
-					value="#{form.selectedProbleem}">
-				</d:object>
-				<d:buttons>
-					<j:commandButton value="#{messages['form.general.save.button']}"
-						image="#{resource['core/images/actions/12x12/save.png']}"
-						type="button"
-						action="#{form.validateProbleem()}"
-						render="problemenOverzichtPanel">
-						<j:renderListener rendered="false" />
-						<f:setPropertyActionListener
-							target="#{form.selectedProbleem}"
-							value="#{form.selectedProbleem}" />
-					</j:commandButton>
-					<j:commandButton value="#{messages['form.general.cancel.button']}"
-						type="button"
-						image="#{resource['core/images/actions/12x12/cancel.png']}"
-						action="#{form.cancel()}"
-						execute="@this">
-						<j:renderListener rendered="false" />
-					</j:commandButton>
-				</d:buttons>
-			</d:popupPanel>
-		</j:renderPanel>
+<!-- 		<p:dialog id="editProbleemPopup"  -->
+<!-- 				header="Valideren Probleem" -->
+<!-- 				icon="#{resources['core/images/actions/16x16/edit.png']}" -->
+<!-- 				show="true" -->
+<!-- 				modal="true" -->
+<!-- 				width="600" -->
+<!-- 				resizable="false" -->
+<!-- 				onShow="#{r:component('valideerProbleemInclude')}.show();" -->
+<!-- 				onHide="#{r:component('valideerProbleemInclude')}.hide();"> -->
+<!-- 			<j:relocate /> -->
+<!-- 			<j:lazyInclude id="valideerProbleemInclude" -->
+<!-- 				src="/resources/osyris/includes/_probleemValideerPanel.xhtml"> -->
+<!-- 				<f:param name="form" value="#{form}" /> -->
+<!-- 				<f:param name="render" value="#{r:clientId('problemenOverzichtPanel')}" /> -->
+<!-- 			</j:lazyInclude> -->
+<!-- 		</p:dialog>	 -->
 	</a:outputPanel>
 </u:composition>

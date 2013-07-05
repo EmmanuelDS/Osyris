@@ -27,17 +27,22 @@ public class PropertyProbleemEditableBean {
 			return false;
 		}
 
+		// Field commentaar controlled manually
+		if (property.getName().equals("commentaar")) {
+			return false;
+		}
+
 		boolean editable = false;
 		// Fields not editable in certain groups, unless if problem is new.
 		if (!property.getName().equals("status")) {
 			if (identity.inGroup("Medewerker", "CUSTOM")
 					|| identity.inGroup("Routedokter", "CUSTOM")
 					|| identity.inGroup("admin", "CUSTOM")) {
-				if (object.get("commentaar") == null
-						|| StringUtils.isEmpty((String) object
-								.get("commentaar"))) {
-					editable = true;
-				}
+				// if (object.get("commentaar") == null
+				// || StringUtils.isEmpty((String) object
+				// .get("commentaar"))) {
+				// editable = false;
+				// }
 			} else {
 				editable = true;
 			}
