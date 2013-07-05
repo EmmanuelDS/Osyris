@@ -45,7 +45,9 @@ import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.utils.AlphanumericSorting;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -89,6 +91,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected String probleemType;
 	protected Probleem probleem;
 	protected Probleem selectedProbleem;
+	protected Envelope envelope = null;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -310,7 +313,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Basis Map Configuratie
+	 * Map Configuratie
 	 * 
 	 * @return
 	 * @throws IOException
@@ -344,16 +347,24 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void createBewegwijzeringVerslag() {
 
 		try {
-			// Routes
-			QueryBuilder builder = new QueryBuilder("Bord");
-			builder.addFilter(FilterUtils.equal("naam", trajectNaam));
-			// TODO: volgnummers voor netwerkborden moeten nog toegevoegd worden
-			// in DB
-			// TODO: volgnummers zijn geen numerieke velden
-			// builder.orderBy(new
-			// DefaultQueryOrderBy(FilterUtils.property("volg")));
-			bewegwijzering = (List<Bord>) modelRepository.searchObjects(
-					builder.build(), true, true);
+			// Routes filteren op trajectNaam
+			if (trajectType.contains("Route")) {
+
+				QueryBuilder builder = new QueryBuilder("Bord");
+				builder.addFilter(FilterUtils.equal("naam", trajectNaam));
+				// TODO: sorteren op sequentie
+				// builder.orderBy(new
+				// DefaultQueryOrderBy(FilterUtils.property("sequentie")));
+				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
+						builder.build(), true, true);
+				Collections.sort(bewegwijzering, new AlphanumericSorting());
+			}
+
+			// TODO: voor lussen zoeken naar segmenten in de lus en de borden
+			// gekoppeld aan deze segmenten filteren
+			else if (trajectType.contains("lus")) {
+
+			}
 		} catch (IOException e) {
 			LOG.error("Can not search objects.", e);
 			bewegwijzering = null;
@@ -367,23 +378,37 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@SuppressWarnings("unchecked")
 	public List<Bord> createBewegwijzering(ResourceIdentifier trajectId) {
 
+		List<Bord> result = new ArrayList<Bord>();
+
 		try {
-			// Routes
 			Traject t = (Traject) modelRepository.loadObject(trajectId);
 			if (t == null) {
-				return null;
+				result = Collections.emptyList();
 			}
-			QueryBuilder builder = new QueryBuilder("Bord");
-			builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
-			// TODO: volgnummers voor netwerkborden moeten nog toegevoegd worden
-			// in DB
-			// TODO: volgnummers zijn geen numerieke velden
-			return (List<Bord>) modelRepository.searchObjects(builder.build(),
-					true, true);
+			if (t instanceof Route) {
+				// Routes filteren op trajectNaam
+				QueryBuilder builder = new QueryBuilder("Bord");
+				builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
+				// TODO: volgnummers voor netwerkborden moeten nog toegevoegd
+				// worden
+				// in DB
+				// TODO: sorteren op sequentie
+				result = (List<Bord>) modelRepository.searchObjects(
+						builder.build(), true, true);
+				Collections.sort(result, new AlphanumericSorting());
+			}
+
+			// TODO: voor lussen zoeken naar segmenten in de lus en de borden
+			// gekoppeld aan deze segmenten filteren
+			else {
+				result = Collections.emptyList();
+			}
+
 		} catch (IOException e) {
 			LOG.error("Can not search objects.", e);
-			return null;
+			result = Collections.emptyList();
 		}
+		return result;
 	}
 
 	/**
@@ -395,9 +420,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
+		envelope = viewer.getContentExtent();
+		bewegwijzering = Collections.emptyList();
 
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
 			layer.setFilter(null);
+			layer.setHidden(true);
 			// Traject
 			if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 				// Netwerk
@@ -407,6 +435,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				// Route
 				else {
 					searchRouteLayer(layer, viewer);
+					envelope = viewer.getContentExtent(layer);
 				}
 			}
 			// RouteBord
@@ -415,7 +444,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 		}
 
-		context.setBoundingBox(viewer.getContentExtent());
+		context.setBoundingBox(envelope);
 		viewer.updateContext(null);
 	}
 

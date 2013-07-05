@@ -25,7 +25,7 @@
 								value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectTypes(form.controleOpdrachtType))}" />
 							<a:ajax event="change"
 								render="detailSearchPanel"
-								execute="@this" />
+								execute="searchTrajectPanel" />
 						</h:selectOneMenu>
 					</d:field>
 					<j:renderPanel id="detailSearchPanel"
@@ -59,7 +59,7 @@
 									image="#{resource['core/images/actions/12x12/search.png']}"
 									type="button" action="#{form.searchTraject()}"
 									execute="searchTrajectPanel"
-									render="map">
+									render="borden">
 							</j:commandButton>
 						</d:buttons>
 					</j:renderPanel>
@@ -71,7 +71,6 @@
 						<j:commandButton value="Maak bewegwijzeringsverslag"
 							image="#{resource['core/images/actions/12x12/search.png']}"
 							type="button" action="#{form.createBewegwijzeringVerslag()}"
-							execute="@this"
 							render="bewegwijzering">
 						</j:commandButton>
 					</d:buttons>

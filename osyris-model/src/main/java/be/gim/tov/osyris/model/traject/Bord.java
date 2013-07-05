@@ -42,6 +42,24 @@ public abstract class Bord extends AbstractModelObject implements
 	@Edit(type = "suggestions")
 	private String naam;
 
+	@NotSearchable
+	@Label("Volgnummer")
+	@Description("Volgnummer")
+	private String volg;
+
+	@NotSearchable
+	@NotEditable
+	@NotViewable
+	@Label("SequentieNr")
+	@Description("SequentieNr")
+	private Long sequentie;
+
+	@Label("Actief")
+	@Description("Actief")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.enkeleRichting}")
+	private String actief;
+
 	@Label("Straatnaam")
 	@Description("Straatnaam")
 	@Edit(type = "suggestions")
@@ -129,6 +147,30 @@ public abstract class Bord extends AbstractModelObject implements
 
 	public void setNaam(String naam) {
 		this.naam = naam;
+	}
+
+	public String getVolg() {
+		return volg;
+	}
+
+	public void setVolg(String volg) {
+		this.volg = volg;
+	}
+
+	public Long getSequentie() {
+		return sequentie;
+	}
+
+	public void setSequentie(Long sequentie) {
+		this.sequentie = sequentie;
+	}
+
+	public String getActief() {
+		return actief;
+	}
+
+	public void setActief(String actief) {
+		this.actief = actief;
 	}
 
 	public String getStraatnaam() {

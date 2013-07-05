@@ -25,11 +25,6 @@ public class RouteBord extends Bord {
 
 	// VARIABLES
 	@NotSearchable
-	@Label("Volgnummer")
-	@Description("Volgnummer")
-	private String volg;
-
-	@NotSearchable
 	@Label("Afbeeldingscode")
 	@Description("Afbeeldingscode")
 	@Type(value = ModelPropertyType.ENUM)
@@ -45,14 +40,6 @@ public class RouteBord extends Bord {
 	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS
-	public String getVolg() {
-		return volg;
-	}
-
-	public void setVolg(String volg) {
-		this.volg = volg;
-	}
-
 	public String getImageCode() {
 		return imageCode;
 	}
