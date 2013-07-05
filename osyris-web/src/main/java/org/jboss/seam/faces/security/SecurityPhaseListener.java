@@ -31,7 +31,6 @@ import javax.faces.application.NavigationHandler;
 import javax.faces.component.UIViewRoot;
 import javax.faces.context.FacesContext;
 import javax.faces.event.PhaseEvent;
-import javax.faces.event.PhaseId;
 import javax.inject.Inject;
 
 import org.jboss.seam.faces.event.PhaseIdType;
@@ -305,6 +304,9 @@ public class SecurityPhaseListener {
      * @param viewRoot
      */
     private void redirectToLoginPage(FacesContext context, UIViewRoot viewRoot) {
+		// CORRECTION: Bail out if response is already being rendered
+		if (context.getExternalContext().isResponseCommitted())
+			return;
         Map<String, Object> sessionMap = context.getExternalContext().getSessionMap();
         preLoginEvent.fire(new PreLoginEvent(context, sessionMap));
         LoginView loginView = viewConfigStore.getAnnotationData(viewRoot.getViewId(), LoginView.class);
@@ -328,6 +330,9 @@ public class SecurityPhaseListener {
      * @param viewRoot
      */
     private void redirectToAccessDeniedView(FacesContext context, UIViewRoot viewRoot) {
+		// CORRECTION: Bail out if response is already being rendered
+		if (context.getExternalContext().isResponseCommitted())
+			return;
         // CORRECTION: Do not restrict in render response phase
         AccessDeniedView accessDeniedView = viewConfigStore.getAnnotationData(viewRoot.getViewId(), AccessDeniedView.class);
         if (accessDeniedView == null || accessDeniedView.value() == null || accessDeniedView.value().isEmpty()) {
