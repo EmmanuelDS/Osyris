@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
 import java.util.Date;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -11,17 +12,29 @@ import org.conscientia.api.model.annotation.Listener;
 import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
+import org.conscientia.core.search.DefaultQuery;
 import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
+import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
+import be.gim.tov.osyris.model.controle.NetwerkAnderProbleem;
+import be.gim.tov.osyris.model.controle.NetwerkBordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
+import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkLus;
+import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.Route;
+import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -97,12 +110,42 @@ public class ControleOpdrachtSaveListener {
 									(ResourceName) ResourceName
 											.fromString(modelClassName));
 					werkOpdracht.setDatumTeControleren(new Date());
+					werkOpdracht.setInRonde("0");
 					werkOpdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
 					werkOpdracht
 							.setMedewerker(controleOpdracht.getMedewerker());
 					werkOpdracht.setProbleem(probleem);
-					werkOpdracht.setUitvoerder(osyrisModelFunctions
-							.zoekUitvoerder(controleOpdracht.getTraject()));
+					werkOpdracht.setTraject(controleOpdracht.getTraject());
+
+					// Voor routes uitvoerder zoeken via RegioID van de route
+					Traject traject = (Traject) modelRepository
+							.loadObject(controleOpdracht.getTraject());
+					if (traject instanceof Route) {
+						werkOpdracht.setUitvoerder(osyrisModelFunctions
+								.zoekUitvoerder(traject.getRegio()));
+					}
+
+					// Voor netwerk uitvoerder zoeken via RegioID van het
+					// NetwerkBord indien bordprobleem
+					if (traject instanceof NetwerkLus
+							&& probleem instanceof NetwerkBordProbleem) {
+						Bord b = (Bord) modelRepository
+								.loadObject(((NetwerkBordProbleem) probleem)
+										.getBord());
+						werkOpdracht.setUitvoerder(osyrisModelFunctions
+								.zoekUitvoerder(b.getRegio()));
+					}
+
+					// Voor netwerk uitvoerder zoeken via geom anderprobleem en
+					// zoeken naar intersect met een bepaalde regio?
+					if (traject instanceof NetwerkLus
+							&& probleem instanceof NetwerkAnderProbleem) {
+						werkOpdracht
+								.setUitvoerder(osyrisModelFunctions
+										.zoekUitvoerder(searchRegioForProbleem(((NetwerkAnderProbleem) probleem)
+												.getGeom())));
+
+					}
 					modelRepository.saveObject(werkOpdracht);
 					messages.info("Nieuwe werkopdracht aangemaakt.");
 				} catch (IOException e) {
@@ -116,5 +159,28 @@ public class ControleOpdrachtSaveListener {
 				}
 			}
 		}
+	}
+
+	/**
+	 * Zoekt de regio waarmee het aangeduide probleem een intersectie heeft.
+	 * 
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	private ResourceIdentifier searchRegioForProbleem(Geometry geometry) {
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", geometry));
+			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
+					query, true, true);
+			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+			return modelRepository.getResourceIdentifier(regio);
+
+		} catch (IOException e) {
+			LOG.error("Can not search regios.", e);
+		}
+		return null;
 	}
 }

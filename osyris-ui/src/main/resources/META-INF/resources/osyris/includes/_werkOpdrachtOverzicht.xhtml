@@ -6,17 +6,57 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:j="http://conscientia.org/jsf"
-	xmlns:q="http://specto.gim.be/search">
-
+	xmlns:q="http://specto.gim.be/search"
+	xmlns:p="http://primefaces.org/ui">
 	<h2>Overzicht Werkopdrachten</h2>
 
 	<j:layout style="height: 400px">
-		<j:layoutPane region="west"
-			size="350"
-			minSize="200"
-			resizable="true"
+	<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
+				<d:fields>
+					<d:field for="trajectType" label="Traject type">
+						<h:selectOneMenu id="trajectType"
+							value="#{werkOpdrachtOverzichtFormBase.trajectType}">
+							<f:selectItem itemValue="" itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+							<a:ajax event="change" render="detailSearchPanel" execute="@this" />
+						</h:selectOneMenu>
+					</d:field>
+					<d:field for="regio" label="Regio">
+						<h:selectOneMenu id="regio"
+							value="#{werkOpdrachtOverzichtFormBase.regio}">
+							<f:converter
+								converterId="be.gim.commons.ResourceIdentifierConverter" />
+							<f:selectItem itemValue="" itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+							<a:ajax event="change" render="trajectNaam" execute="@this" />
+						</h:selectOneMenu>
+					</d:field>
+					<j:renderPanel id="detailSearchPanel"
+						rendered="#{werkOpdrachtOverzichtFormBase.trajectType.contains('Route')}">
+						<d:field for="trajectNaam" label="Traject naam">
+							<h:selectOneMenu id="trajectNaam"
+								value="#{werkOpdrachtOverzichtFormBase.trajectNaam}">
+								<f:selectItem itemValue="" itemLabel="" />
+								<f:selectItems
+									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(werkOpdrachtOverzichtFormBase.regio, werkOpdrachtOverzichtFormBase.trajectType))}" />
+							</h:selectOneMenu>
+						</d:field>
+					</j:renderPanel>
+				</d:fields>
+				<d:fields>
+					<d:field for="gemeente" label="Gemeente">
+						<h:selectOneMenu id="gemeente"
+							value="#{werkOpdrachtOverzichtFormBase.gemeente}">
+							<f:selectItem itemValue="" itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.gemeentes)}" />
+						</h:selectOneMenu>
+					</d:field>
+				</d:fields>
 				<q:query value="#{werkOpdrachtOverzichtFormBase.query}"
 					modelClassName="#{werkOpdrachtOverzichtFormBase.modelClass.name}">
 					<c:if test="#{werkOpdrachtOverzichtFormBase.index}">
@@ -30,6 +70,26 @@
 					<d:object mode="SEARCH"
 						modelClass="#{werkOpdrachtOverzichtFormBase.modelClass}" />
 				</q:query>
+				<d:fields>
+					<b><h:outputText value="Datum laatste statuswijziging">
+					</h:outputText></b>
+					<d:field for="vanDatum">
+						<div>Van:</div>
+						<r:calendar id="vanDatum"
+							value="#{werkOpdrachtOverzichtFormBase.vanDatum}"
+							inputStyle="width:60px"
+    						datePattern="dd/MM/yyyy">
+						</r:calendar>
+					</d:field>
+					<d:field for="totDatum">
+						<div>Tot:</div>
+						<r:calendar id="totDatum"
+							value="#{werkOpdrachtOverzichtFormBase.totDatum}"
+							inputStyle="width:60px"
+    						datePattern="dd/MM/yyyy">
+						</r:calendar>
+					</d:field>
+				</d:fields>
 				<d:buttons>
 					<j:commandButton rendered="true"
 						value="#{messages['page.general.button.search']}"
@@ -37,15 +97,7 @@
 						type="button"
 						actionListener="#{werkOpdrachtOverzichtFormBase.search()}"
 						render="objects" />
-					<j:commandButton
-						rendered="#{werkOpdrachtOverzichtFormBase.canCreate}"
-						value="#{messages['page.actions.create.label']}"
-						image="#{resource['core/images/actions/12x12/create.png']}"
-						type="button"
-						action="#{werkOpdrachtOverzichtFormBase.create()}"
-						oncomplete="conscientia.widget(#{r:element('createPopup')}).show();" />
-					<d:fileDownload
-						fileName="#{werkOpdrachtOverzichtFormBase.fileName}"
+					<d:fileDownload fileName="#{werkOpdrachtOverzichtFormBase.fileName}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/download.png']}"
 						content="#{werkOpdrachtOverzichtFormBase.report()}"
@@ -53,40 +105,176 @@
 				</d:buttons>
 			</div>
 		</j:layoutPane>
+		
 		<j:layoutPane>
-			<a:outputPanel id="result">
-				<d:objects id="objects"
+		<a:outputPanel id="result">
+				<p:dataTable id="objects"
 					value="#{werkOpdrachtOverzichtFormBase.results}"
-					modelClass="#{werkOpdrachtOverzichtFormBase.modelClass}"
-					mode="RESULT" level="SHORT">
-					<f:facet name="right">
-						<a:outputPanel rendered="true" styleClass="model-table-actions">
+					lazy="true"
+					var="werkOpdracht"
+					style="width: 100%;"
+					styleClass="model-table"
+					paginator="true"
+					rows="20"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="10,20,30,40,50"
+					scrollable="true"
+					resizableColumns="true"
+					tableStyle="min-width: 850px"
+					emptyMessage="#{messages['ui.dataTable.empty']}"
+					rowKey="#{d:modelObject(werkOpdracht).getId()}" 
+					selection="#{werkOpdrachtOverzichtFormBase.selectedOpdrachten}">
+					<j:layoutContent />
+					<j:bindAttribute var="werkOpdracht"
+						name="rowData" />
+					<p:column selectionMode="multiple" style="width:5%" />
+					<p:column label="Acties">
+						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton
-								rendered="#{werkOpdrachtOverzichtFormBase.isCanView(object)}"
+								rendered="#{werkOpdrachtOverzichtFormBase.isCanView(werkOpdracht)}"
 								image="#{resource['core/images/actions/16x16/view.png']}"
 								type="image"
 								title="#{messages['page.actions.view.label']}"
 								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
 								<f:setPropertyActionListener
 									target="#{werkOpdrachtOverzichtFormBase.object}"
-									value="#{object}" />
+									value="#{werkOpdracht}" />
 							</j:commandButton>
 							<j:commandButton
-								rendered="#{werkOpdrachtOverzichtFormBase.isCanDelete(object)}"
+								rendered="#{werkOpdrachtOverzichtFormBase.isCanDelete(werkOpdracht)}"
 								image="#{resource['core/images/actions/16x16/delete.png']}"
 								type="image"
 								title="#{messages['page.actions.delete.label']}"
 								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
 								<f:setPropertyActionListener
 									target="#{werkOpdrachtOverzichtFormBase.object}"
-									value="#{object}" />
+									value="#{werkOpdracht}" />
 							</j:commandButton>
 						</a:outputPanel>
-					</f:facet>
-				</d:objects>
+					</p:column>
+					 <p:column label="id">
+						<f:facet name="header">
+						<div>Identificatie</div>
+						</f:facet>
+						<div>#{d:modelObject(werkOpdracht).getId()}</div>
+					</p:column>
+					<p:column label="InRonde">
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}" />
+						</f:facet>
+						<d:propertyValue id="inRondeColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}"
+							value="#{werkOpdracht.inRonde }" mode="VIEW" />
+					</p:column>
+					<p:column label="TrajectType">
+						<f:facet name="header">
+						<d:displayLabel
+							property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
+						</f:facet>
+						<d:propertyValue id="trajectTypeColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}"
+							value="#{werkOpdracht.trajectType }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Traject"
+						sortBy="#{werkOpdracht.traject }">
+						<f:facet name="header">
+							<div>Routenaam</div>
+						</f:facet>
+						<d:propertyValue id="trajectColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
+							value="#{werkOpdracht.traject }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Regio">
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('regio')}" />
+						</f:facet>
+						<d:propertyValue id="regioColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regio')}"
+							value="#{werkOpdracht.regio }" mode="VIEW" />
+					</p:column>
+					<p:column label="Gemeente">
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}" />
+						</f:facet>
+						<d:propertyValue id="gemeenteColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}"
+							value="#{werkOpdracht.gemeente }" mode="VIEW" />
+					</p:column>
+					<p:column label="Uitvoerder">
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
+						</f:facet>
+						<d:propertyValue id="uitvoerderColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+							value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
+					</p:column>
+					<p:column label="Handelingen">
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}" />
+						</f:facet>
+						<d:propertyValue id="handelingColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+							value="#{werkOpdracht.handelingen }" mode="VIEW" />
+					</p:column>
+					<p:column label="Medewerker" sortBy="#{werkOpdracht.medewerker }">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
+						</f:facet>
+						<d:propertyValue id="medewerkerColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+							value="#{werkOpdracht.medewerker }"
+							mode="VIEW" />
+					</p:column>				
+					<p:column label="Status" sortBy="#{werkOpdracht.status }">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('status')}" />
+						</f:facet>
+						<d:propertyValue id="statusColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+							value="#{werkOpdracht.status }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Validatie" sortBy="#{werkOpdracht.validatie }">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('validatie')}" />
+						</f:facet>
+						<d:propertyValue id="validatieColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('validatie')}"
+							value="#{werkOpdracht.validatie }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Datum">
+						<f:facet name="header">
+							<div>Datum</div>
+						</f:facet>
+						<d:propertyValue id="datumLaatsteWijzigingColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLaatsteWijziging')}"
+							value="#{werkOpdracht.datumLaatsteWijziging }"
+							mode="VIEW" /> 
+					</p:column>
+				</p:dataTable>
 			</a:outputPanel>
+			<d:buttons>
+				<j:commandButton rendered="#{identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')}"
+						value="Maak uitvoeringsronde"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{werkOpdrachtOverzichtFormBase.createUitvoeringsronde}" 
+						render="#{r:clientId('result')}"/>
+			</d:buttons>
 
-			<u:decorate template="/resources/core/includes/managePanels.xhtml">
+			<u:decorate
+				template="/resources/osyris/includes/werkOpdrachtPanels.xhtml">
 				<u:param name="form" value="#{werkOpdrachtOverzichtFormBase}" />
 				<u:param name="render" value="#{r:clientId('result')}" />
 			</u:decorate>

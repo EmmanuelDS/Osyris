@@ -13,6 +13,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -26,6 +27,7 @@ import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Label("Uitvoeringsronde")
 @Permissions({
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
@@ -53,6 +55,12 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitvoering;
+
+	@Required
+	@NotSearchable
+	@Label("Afgelegde afstand")
+	@Description("Afgelegde afstand")
+	private int afstand;
 
 	@NotSearchable
 	@Label("Werkopdrachten")
@@ -83,5 +91,13 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 
 	public void setOpdrachten(List<ResourceIdentifier> opdrachten) {
 		this.opdrachten = opdrachten;
+	}
+
+	public int getAfstand() {
+		return afstand;
+	}
+
+	public void setAfstand(int afstand) {
+		this.afstand = afstand;
 	}
 }

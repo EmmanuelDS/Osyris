@@ -128,12 +128,19 @@ public class MeldingSaveListener {
 							modelRepository.getModelClass(modelClassName),
 							(ResourceName) ResourceName
 									.fromString(modelClassName));
+			werkOpdracht.setInRonde("0");
 			werkOpdracht.setDatumTeControleren(new Date());
 			werkOpdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
 			werkOpdracht.setMedewerker(melding.getMedewerker());
 			werkOpdracht.setProbleem(melding.getProbleem());
+			werkOpdracht.setTraject(melding.getTraject());
+
+			Traject traject = (Traject) modelRepository.loadObject(melding
+					.getTraject());
+
 			werkOpdracht.setUitvoerder(osyrisModelFunctions
-					.zoekUitvoerder(melding.getTraject()));
+					.zoekUitvoerder(traject.getRegio()));
+
 			modelRepository.saveObject(werkOpdracht);
 			messages.info("Nieuwe werkopdracht aangemaakt.");
 		} catch (IOException e) {
@@ -146,20 +153,4 @@ public class MeldingSaveListener {
 			LOG.error("Can not access WerkOpdracht.", e);
 		}
 	}
-
-	// /**
-	// *
-	// * @param traject
-	// * @return
-	// */
-	// private ResourceName zoekUitvoerder(ResourceIdentifier traject) {
-	// try {
-	// Traject t = (Traject) modelRepository.loadObject(traject);
-	// Regio regio = (Regio) modelRepository.loadObject(t.getRegio());
-	// return (ResourceName) regio.getUitvoerder();
-	// } catch (IOException e) {
-	// LOG.error("Can not load Traject.", e);
-	// }
-	// return null;
-	// }
 }

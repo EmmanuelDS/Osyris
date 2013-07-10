@@ -25,16 +25,22 @@ import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.controle.AnderProbleem;
+import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.controle.Melding;
+import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Gemeente;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
+import be.gim.tov.osyris.model.werk.WerkOpdracht;
 
 /**
  * 
@@ -73,14 +79,14 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
-	public List<Object[]> getEnkeleRichting() {
-		List<Object[]> enkeleRichting = new ArrayList<Object[]>();
-		Object[] statusTrue = { "1", "Ja" };
-		Object[] statusFalse = { "0", "Nee" };
+	public List<Object[]> getCanonicalBoolean() {
+		List<Object[]> booleans = new ArrayList<Object[]>();
+		Object[] boolTrue = { "1", "Ja" };
+		Object[] boolFalse = { "0", "Nee" };
 
-		enkeleRichting.add(statusTrue);
-		enkeleRichting.add(statusFalse);
-		return enkeleRichting;
+		booleans.add(boolTrue);
+		booleans.add(boolFalse);
+		return booleans;
 	}
 
 	/**
@@ -353,6 +359,30 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Zoekt de meest recente datum van een statuswijziging voor wat betreft een
+	 * Werkopdracht
+	 * 
+	 * @param werkopdracht
+	 * @return
+	 */
+	public Date getDatumLaatsteWijziging(WerkOpdracht werkOpdracht) {
+		List<Date> dates = new ArrayList<Date>();
+		dates.add(werkOpdracht.getDatumTeControleren());
+		dates.add(werkOpdracht.getDatumUitTeVoeren());
+		dates.add(werkOpdracht.getDatumGerapporteerd());
+		dates.add(werkOpdracht.getDatumGevalideerd());
+		dates.add(werkOpdracht.getDatumGerapporteerd());
+		dates.add(werkOpdracht.getDatumGeannuleerd());
+		dates.removeAll(Collections.singleton(null));
+		if (dates.size() > 0) {
+			Date mostRecent = Collections.max(dates);
+			return mostRecent;
+		} else {
+			return null;
+		}
+	}
+
+	/**
 	 * Zoekt de regionaam van een traject om te tonen in het overzichtsformulier
 	 * 
 	 * @param trajectId
@@ -385,12 +415,8 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public String getTrajectType(ResourceIdentifier trajectId) {
-		ModelClass modelClass = modelRepository.getObjectClass(trajectId);
-		if (modelClass != null) {
-			return modelClass.getLabel().toString();
-		} else {
-			return null;
-		}
+		return LabelUtils.upperLowerSpaced(modelRepository.getObjectClassName(
+				trajectId).toLowerCase());
 	}
 
 	/**
@@ -404,6 +430,49 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Zoekt de gemeente waar het probleem van de werkopdracht zich bevindt.
+	 * 
+	 * @param probleem
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public String getWerkOpdrachtGemeente(Probleem probleem) {
+
+		return (String) cacheProducer.getCache("WerkOpdrachtGemeenteCache",
+				new Transformer() {
+
+					@Override
+					public Object transform(Object probleem) {
+
+						try {
+							if (probleem instanceof BordProbleem) {
+								Bord bord = (Bord) modelRepository
+										.loadObject(((BordProbleem) probleem)
+												.getBord());
+								return bord.getGemeente();
+							}
+
+							else if (probleem instanceof AnderProbleem) {
+								DefaultQuery query = new DefaultQuery();
+								query.setModelClassName("Gemeente");
+								query.addFilter(FilterUtils.intersects("geom",
+										((AnderProbleem) probleem).getGeom()));
+								List<Gemeente> gemeentes = (List<Gemeente>) modelRepository
+										.searchObjects(query, true, true);
+								Gemeente gemeente = (Gemeente) modelRepository
+										.getUniqueResult(gemeentes);
+								return gemeente.getNaam();
+							}
+
+						} catch (IOException e) {
+							LOG.error("Can not load traject.", e);
+						}
+						return null;
+					}
+				}).get(probleem);
+	}
+
+	/**
 	 * Zoekt het Bordvolgnummer aan de hand van de resourceIdentifier
 	 * 
 	 * @param BordId
@@ -414,6 +483,24 @@ public class OsyrisModelFunctions {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 			if (bord instanceof RouteBord) {
 				return ((RouteBord) bord).getVolg();
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Zoekt de Bord straatnaam aan de hand van de resourceIdentifier
+	 * 
+	 * @param BordId
+	 * @return
+	 */
+	public String getBordStraat(ResourceIdentifier BordId) {
+		try {
+			Bord bord = (Bord) modelRepository.loadObject(BordId);
+			if (bord instanceof RouteBord) {
+				return ((RouteBord) bord).getStraatnaam();
 			}
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
@@ -440,15 +527,15 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Zoekt de uitvoerder aan de hand van de regioID
 	 * 
-	 * @param traject
+	 * @param regio
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public ResourceName zoekUitvoerder(ResourceIdentifier traject) {
+	public ResourceName zoekUitvoerder(ResourceIdentifier regioID) {
 		try {
-			Traject t = (Traject) modelRepository.loadObject(traject);
-			Regio regio = (Regio) modelRepository.loadObject(t.getRegio());
+			Regio regio = (Regio) modelRepository.loadObject(regioID);
 			ResourceIdentifier identifier = regio.getUitvoerder();
 			DefaultQuery query = new DefaultQuery("UitvoerderProfiel");
 			query.addFilter(FilterUtils.equal("bedrijf", identifier));
@@ -459,6 +546,26 @@ public class OsyrisModelFunctions {
 			return modelRepository.getResourceName(uitvoerder);
 		} catch (IOException e) {
 			LOG.error("Can not load Traject.", e);
+		}
+		return null;
+	}
+
+	public List<Object[]> getWerkOpdrachten() {
+		try {
+			List<Object[]> opdrachten = new ArrayList<Object[]>();
+			QueryBuilder builder = new QueryBuilder("WerkOpdracht");
+			builder.results(FilterUtils.properties("id"));
+			List<Long> list = (List<Long>) modelRepository.searchObjects(
+					builder.build(), true, true);
+			for (Long id : list) {
+				Object[] object = {
+						new ResourceKey("WerkOpdracht", id.toString()),
+						id.toString() };
+				opdrachten.add(object);
+			}
+			return opdrachten;
+		} catch (IOException e) {
+			LOG.error("Can not search WerkOpdracht ids.", e);
 		}
 		return null;
 	}

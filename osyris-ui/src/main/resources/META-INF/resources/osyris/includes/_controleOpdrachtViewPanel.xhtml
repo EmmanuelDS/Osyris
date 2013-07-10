@@ -9,22 +9,24 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
-	
-	<j:commandButton
-		rendered="true"
-		value="Toon op kaart"
-		image="#{resource['core/images/actions/12x12/apply.png']}"
-		type="button"
-		action="#{form.showOpdrachtMapData(form.object.traject)}">
-	</j:commandButton>
+	<br/>
 	<table width="100%">
-			<tr>
-			<td width="50%" valign="top">	
+			<tr valign="top">
+			<td style="width:550px;">	
 				<a:outputPanel>	
 					<u:decorate template="/resources/osyris/includes/bewegwijzering.xhtml">
 						<u:param name="form" value="#{form}" />
 					</u:decorate>
 				</a:outputPanel>
+	<br/>
+	
+	<!-- Probleem tabellen -->
+	<a:outputPanel rendered="#{form.object.status == 'GEVALIDEERD'}">
+	<u:decorate
+		template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
+		<u:param name="form" value="#{form}" />
+	</u:decorate>
+	</a:outputPanel>
 	<br/>
 	<r:panel id="controleOpdrachtInfo" header="Praktische Info">
 	<d:object mode="VIEW" modelClass="#{form.modelClass}"
@@ -32,7 +34,7 @@
 	</d:object>
 	</r:panel>
 	</td>
-	<td width="50%" valign="top">
+	<td width="50%">
 		<r:panel>
 			<div style="height: 500px">
 				<m:mapViewer id="viewer"
@@ -73,7 +75,8 @@
 		<j:commandButton 
 			value="Printen"
 			image="#{resource['core/images/actions/12x12/print.png']}"
-			type="button" />
+			type="button"
+			onclick="conscientia.widget(#{r:element('createPdfPopup')}).show();" />
 		<j:commandButton 
 			rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
 			value="Opnieuw te controleren"

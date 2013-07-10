@@ -3,24 +3,32 @@ package be.gim.tov.osyris.model.werk;
 import java.util.Date;
 import java.util.List;
 
+import javax.persistence.Transient;
+
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
+import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.Probleem;
-import be.gim.tov.osyris.model.werk.status.BeoordelingStatus;
+import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
 /**
@@ -47,70 +55,12 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 public class WerkOpdracht extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@Label("Status")
-	@Description("Status")
-	private WerkopdrachtStatus status;
-
-	@Label("Beoordeling")
-	@Description("Beoordeling")
-	private BeoordelingStatus beoordeling;
-
-	@NotSearchable
-	@Label("Omschrijving opdracht")
-	@Description("Omschrijving opdracht")
-	private String omschrijvingOpdracht;
-
-	@NotSearchable
-	@Label("Commentaar medewerker")
-	@Description("Commentaar medewerker")
-	private String commentaarMedewerker;
-
-	@NotSearchable
-	@Label("Omschrijving uitvoering")
-	@Description("Omschrijving uitvoering")
-	private String omschrijvingUitvoering;
-
-	@NotSearchable
-	@Label("Commentaar uitvoerder")
-	@Description("Commentaar uitvoerder")
-	private String commentaarUitvoerder;
-
-	@NotSearchable
-	@Label("Foto")
-	@Description("Foto")
-	private String foto;
-
-	@Label("Datum geannuleerd")
-	@Description("Datum geannuleerd")
-	@Type(ModelPropertyType.TIMESTAMP)
-	private Date datumGeannuleerd;
-
-	@Label("Datum gerapporteerd")
-	@Description("Datum gerapporteerd")
-	@Type(ModelPropertyType.TIMESTAMP)
-	private Date datumGerapporteerd;
-
-	@Label("Datum gevalideerd")
-	@Description("Datum gevalideerd")
-	@Type(ModelPropertyType.TIMESTAMP)
-	private Date datumGevalideerd;
-
-	@Label("Datum te controleren")
-	@Description("Datum te controleren")
-	@Type(ModelPropertyType.TIMESTAMP)
-	private Date datumTeControleren;
-
-	@Label("Datum uit te voeren")
-	@Description("Datum uit te voeren")
-	@Type(ModelPropertyType.TIMESTAMP)
-	private Date datumUitTeVoeren;
-
-	@Label("Medewerker")
-	@Description("Medewerker")
-	@ModelClassName("User")
-	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
-	private ResourceIdentifier medewerker;
+	@NotEditable
+	@Label("In ronde")
+	@Description("in ronde")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
+	private String inRonde;
 
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
@@ -119,21 +69,119 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Uitvoerder')}")
 	private ResourceIdentifier uitvoerder;
 
+	@Label("Handelingen")
+	@Description("Handelingen")
+	@Edit(type = "table")
+	@View(type = "table")
+	private List<WerkHandeling> handelingen;
+
+	@Label("Medewerker")
+	@Description("Medewerker")
+	@ModelClassName("User")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	private ResourceIdentifier medewerker;
+
+	@NotEditable
+	@Label("Status")
+	@Description("Status")
+	private WerkopdrachtStatus status;
+
+	@Label("Validatie")
+	@Description("Validatie")
+	private ValidatieStatus validatie;
+
+	@NotSearchable
+	@Label("Omschrijving opdracht")
+	@Description("Omschrijving opdracht")
+	@Type(value = ModelPropertyType.TEXT)
+	private String omschrijvingOpdracht;
+
+	@NotSearchable
+	@Label("Commentaar medewerker")
+	@Description("Commentaar medewerker")
+	@Type(value = ModelPropertyType.TEXT)
+	private String commentaarMedewerker;
+
+	@NotSearchable
+	@Label("Omschrijving uitvoering")
+	@Description("Omschrijving uitvoering")
+	@Type(value = ModelPropertyType.TEXT)
+	private String omschrijvingUitvoering;
+
+	@NotSearchable
+	@Label("Commentaar uitvoerder")
+	@Description("Commentaar uitvoerder")
+	@Type(value = ModelPropertyType.TEXT)
+	private String commentaarUitvoerder;
+
+	@NotSearchable
+	@Label("Foto")
+	@Description("Foto")
+	private String foto;
+
+	@NotSearchable
+	@NotEditable
+	@Label("Datum geannuleerd")
+	@Description("Datum geannuleerd")
+	@Type(ModelPropertyType.TIMESTAMP)
+	private Date datumGeannuleerd;
+
+	@NotSearchable
+	@NotEditable
+	@Label("Datum gerapporteerd")
+	@Description("Datum gerapporteerd")
+	@Type(ModelPropertyType.TIMESTAMP)
+	private Date datumGerapporteerd;
+
+	@NotSearchable
+	@NotEditable
+	@Label("Datum gevalideerd")
+	@Description("Datum gevalideerd")
+	@Type(ModelPropertyType.TIMESTAMP)
+	private Date datumGevalideerd;
+
+	@NotSearchable
+	@NotEditable
+	@Label("Datum te controleren")
+	@Description("Datum te controleren")
+	@Type(ModelPropertyType.TIMESTAMP)
+	private Date datumTeControleren;
+
+	@NotSearchable
+	@NotEditable
+	@Label("Datum uit te voeren")
+	@Description("Datum uit te voeren")
+	@Type(ModelPropertyType.TIMESTAMP)
+	private Date datumUitTeVoeren;
+
 	@NotSearchable
 	@Label("Probleem")
 	@Description("Probleem")
 	private Probleem probleem;
 
 	@NotSearchable
+	@NotEditable
+	@NotViewable
+	@Label("Traject")
+	@Description("Traject")
+	@ModelClassName("Traject")
+	private ResourceIdentifier traject;
+
+	@NotSearchable
 	@Label("Gebruikt materiaal")
 	@Description("Gebruikt materiaal")
 	private GebruiktMateriaal gebruiktMateriaal;
 
-	@Label("Handelingen")
-	@Description("Handelingen")
-	private List<WerkHandeling> handelingen;
-
 	// GETTERS AND SETTERS
+	public String getInRonde() {
+		return inRonde;
+	}
+
+	public void setInRonde(String inRonde) {
+		this.inRonde = inRonde;
+	}
+
 	public WerkopdrachtStatus getStatus() {
 		return status;
 	}
@@ -142,12 +190,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.status = status;
 	}
 
-	public BeoordelingStatus getBeoordeling() {
-		return beoordeling;
+	public ValidatieStatus getValidatie() {
+		return validatie;
 	}
 
-	public void setBeoordeling(BeoordelingStatus beoordeling) {
-		this.beoordeling = beoordeling;
+	public void setValidatie(ValidatieStatus validatie) {
+		this.validatie = validatie;
 	}
 
 	public String getOmschrijvingOpdracht() {
@@ -254,6 +302,14 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.probleem = probleem;
 	}
 
+	public ResourceIdentifier getTraject() {
+		return traject;
+	}
+
+	public void setTraject(ResourceIdentifier traject) {
+		this.traject = traject;
+	}
+
 	public GebruiktMateriaal getGebruiktMateriaal() {
 		return gebruiktMateriaal;
 	}
@@ -268,5 +324,45 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setHandelingen(List<WerkHandeling> handelingen) {
 		this.handelingen = handelingen;
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("Datum laatste statuswijziging")
+	public Date getDatumLaatsteWijziging() {
+		return Beans.getReference(OsyrisModelFunctions.class)
+				.getDatumLaatsteWijziging(this);
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("TrajectType")
+	public String getTrajectType() {
+		return Beans.getReference(OsyrisModelFunctions.class).getTrajectType(
+				this.traject);
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("Regio")
+	public String getRegio() {
+		return Beans.getReference(OsyrisModelFunctions.class).getTrajectRegio(
+				this.traject);
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("Gemeente")
+	public String getGemeente() {
+		return Beans.getReference(OsyrisModelFunctions.class)
+				.getWerkOpdrachtGemeente(this.probleem);
 	}
 }

@@ -57,7 +57,7 @@ public abstract class Bord extends AbstractModelObject implements
 	@Label("Actief")
 	@Description("Actief")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.enkeleRichting}")
+	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
 	private String actief;
 
 	@Label("Straatnaam")

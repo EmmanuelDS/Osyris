@@ -1,5 +1,7 @@
 package be.gim.tov.osyris.form;
 
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -12,15 +14,25 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
@@ -31,8 +43,11 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
+import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
@@ -64,6 +79,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 
+	public static final String CO_PDF_XSL = "META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
+
 	private static final long serialVersionUID = -86881009141250710L;
 
 	private static final Log LOG = LogFactory
@@ -92,6 +109,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Probleem probleem;
 	protected Probleem selectedProbleem;
 	protected Envelope envelope = null;
+	protected String pdfType;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -175,6 +193,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	public void setSelectedProbleem(Probleem selectedProbleem) {
 		this.selectedProbleem = selectedProbleem;
+	}
+
+	public String getPdfType() {
+		return pdfType;
+	}
+
+	public void setPdfType(String pdfType) {
+		this.pdfType = pdfType;
 	}
 
 	// METHODS
@@ -313,6 +339,40 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
+	 * Map configuratie bij het aanmaken van een ControleOpdracht.
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public MapConfiguration getSearchConfiguration() throws IOException,
+			InstantiationException, IllegalAccessException {
+		MapContext context = (MapContext) modelRepository
+				.loadObject(new ResourceKey("Form@12"));
+
+		if (context != null) {
+			MapConfiguration configuration = mapFactory
+					.getConfiguration(context);
+
+			// Reset layers
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.setSelection(Collections.EMPTY_LIST);
+			}
+
+			mapFactory.createGeometryLayer(configuration.getContext(),
+					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+					"single", null, null);
+			context.setBoundingBox(context.getMaxBoundingBox());
+			configuration.setContext(context);
+			return configuration;
+		}
+		return null;
+	}
+
+	/**
 	 * Map Configuratie
 	 * 
 	 * @return
@@ -334,6 +394,78 @@ public class ControleOpdrachtOverzichtFormBase extends
 					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
 					"single", null, null);
 
+			// Reset context
+			configuration.setContext(context);
+
+			// Reset layers
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.setSelection(Collections.EMPTY_LIST);
+			}
+
+			List<String> bordSelection = new ArrayList<String>();
+			List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+
+			GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
+					.createGeometryLayer(configuration.getContext(),
+							"geometry", null, Point.class, null, true,
+							"single", null, null);
+
+			// Get traject
+			Traject traject = (Traject) modelRepository.loadObject(object
+					.getTraject());
+
+			// Load layer depending on traject type
+			FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
+							.getName()));
+
+			if (trajectLayer != null) {
+				trajectLayer.setHidden(false);
+				trajectLayer.setFilter(FilterUtils.equal("naam",
+						traject.getNaam()));
+
+				Envelope envelope = GeometryUtils
+						.getEnvelope(traject.getGeom());
+				GeometryUtils.expandEnvelope(envelope, 0.1,
+						context.getMaxBoundingBox());
+				context.setBoundingBox(envelope);
+			}
+
+			// BordLayer
+			FeatureMapLayer bordLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+							.lowerCamelCase(traject.getModelClass().getName()
+									+ "Bord")));
+
+			if (bordLayer != null) {
+				bordLayer.setHidden(false);
+				bordLayer
+						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+			}
+			// Problemen
+			for (Probleem probleem : object.getProblemen()) {
+
+				if (probleem instanceof BordProbleem) {
+					// Bord Probleem
+					Bord bord = (Bord) modelRepository
+							.loadObject(((BordProbleem) probleem).getBord());
+					bordSelection.add(bord.getId().toString());
+
+				} else if (probleem instanceof AnderProbleem) {
+					// Ander Probleem
+					AnderProbleem anderProbleem = (AnderProbleem) probleem;
+					anderProbleemGeoms.add(anderProbleem.getGeom());
+				}
+			}
+
+			bordLayer.setSelection(bordSelection);
+			geomLayer.setGeometries(anderProbleemGeoms);
+
+			if (!anderProbleemGeoms.isEmpty()) {
+				geomLayer.setHidden(false);
+			}
 			return configuration;
 		}
 		return null;
@@ -563,6 +695,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void reopenControleOpdracht() {
 		if (object != null) {
 			object.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
+			object.setDatumTeControleren(new Date());
 			try {
 				modelRepository.saveObject(object);
 				clear();
@@ -702,10 +835,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		// Bordprobleem
 		if ("bord".equals(probleemType)) {
-			if (object.getTrajectType().contains("route")) {
+			if (object.getTrajectType().contains(
+					LabelUtils.upperSpaced("route"))) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
-			} else if (object.getTrajectType().contains("netwerk")) {
+			} else if (object.getTrajectType().contains(
+					LabelUtils.upperSpaced("Netwerk"))) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkBordProbleem", null);
 			}
@@ -728,10 +863,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 		// Ander probleem
 		else if ("ander".equals(probleemType)) {
-			if (object.getTrajectType().contains("route")) {
+			if (object.getTrajectType().contains(
+					LabelUtils.upperSpaced("route"))) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
-			} else if (trajectType.contains("netwerk")) {
+			} else if (trajectType.contains(LabelUtils.upperSpaced("netwerk"))) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkAnderProbleem", null);
 			}
@@ -882,5 +1018,44 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 		}
 		return false;
+	}
+
+	public Content printControleOpdracht() throws Exception {
+
+		if (pdfType.equals("1")) {
+			messages.error("Selecteer een type PDF.");
+		}
+		// Map<String, Object> variables = new HashMap<String, Object>();
+		// variables.put("title", "Test");
+		// variables.put("abstract", "test");
+		// variables.put("map", true);
+		// variables.put("legend", false);
+		// variables.put("features", false);
+		// variables.put("orientation", "portrait");
+		// variables.put("size", 2);
+		// variables.put("fileName", getViewer().getContext().getTitle() +
+		// ".pdf");
+		// variables.put("landscape", "landscape".equals("portrait"));
+		// variables.put("portrait", "portrait".equals("portrait"));
+		// variables.put("pageSize", 2);
+		// variables.put("extent", getViewer().getContentExtent());
+		//
+		//
+		// MapPDFBuilder builder = Beans.getReference(MapPDFBuilder.class);
+		// byte[] result = builder.transform(xslt, getViewer(), variables);
+		// return new ByteArrayContent("application/pdf", result);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+				FopFactory.newInstance().newFOUserAgent(), out);
+
+		Source xslt = new StreamSource(new File(CO_PDF_XSL));
+		Transformer transformer = TransformerFactory.newInstance()
+				.newTransformer(xslt);
+		Result res = new SAXResult(fop.getDefaultHandler());
+
+		transformer.transform(xslt, res);
+
+		return new ByteArrayContent("application/pdf", out.toByteArray());
 	}
 }

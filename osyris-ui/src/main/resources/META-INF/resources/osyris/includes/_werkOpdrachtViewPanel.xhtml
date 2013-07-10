@@ -1,0 +1,124 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<h2>Werkopdracht #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	<br/>
+	<table width="100%">
+	<tr valign="top">
+	<td>
+	<r:panel id="werkOpdrachtInfo">
+	<d:fields>
+		<d:field for="status" label="Status">
+			<d:propertyValue id="status"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+					value="#{form.object.status}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="datumUitvoering" label="Datum uitvoering">
+			<d:propertyValue id="datumUitvoering"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitvoering')}"
+					value="#{form.object.datumUitvoering}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="medewerker" label="Medewerker">
+			<d:propertyValue id="medewerker"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+					value="#{form.object.medewerker}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="uitvoerder" label="Uitvoerder">
+			<d:propertyValue id="uitvoerder"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+					value="#{form.object.uitvoerder}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<!-- Probleem tabel -->
+		<u:decorate
+			template="/resources/osyris/includes/_werkOpdrachtProbleemTable.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+	<br/>
+	<r:panel id="handelingenPanel">
+	<d:fields>
+		<d:field for="handelingen" label="Handelingen">
+			<d:propertyValue id="handelingen"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+					value="#{form.object.handelingen}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<r:panel id="CommentaarTOVPanel">
+	<d:fields>
+		<d:field for="commentaarMedewerker" label="Commentaar TOV">
+			<d:propertyValue id="commentaarMedewerker"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+					value="#{form.object.commentaarMedewerker}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="CommentaarUitvoerderPanel">
+	<d:fields>
+		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
+			<d:propertyValue id="commentaarUitvoerder"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
+					value="#{form.object.commentaarUitvoerder}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
+	<d:buttons>
+	<j:commandButton
+			rendered="#{form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN' }"
+			value="Bewerken"
+			image="#{resource['core/images/actions/12x12/edit.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('controleerPopup')}).show();" />
+		<j:commandButton 
+			rendered="#{form.object.status == 'TE_CONTROLEREN' }"
+			value="Verzenden"
+			image="#{resource['core/images/actions/12x12/next.png']}"
+			type="button"
+			action="#{form.verzendenWerkeOpdracht()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+		<j:commandButton 
+			value="Printen"
+			image="#{resource['core/images/actions/12x12/print.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('createPdfPopup')}).show();" />
+			<j:commandButton 
+			rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
+			value="Opnieuw te controleren"
+			image="#{resource['core/images/actions/12x12/reload.png']}"
+			type="button"
+			action="#{form.reopenWerkOpdracht()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

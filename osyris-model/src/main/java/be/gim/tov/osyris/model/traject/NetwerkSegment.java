@@ -24,7 +24,7 @@ public abstract class NetwerkSegment extends Traject {
 	@Label("Enkele richting")
 	@Description("Enkele richting")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.enkeleRichting}")
+	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
 	private String enkeleRichting;
 
 	@Label("Van knooppunt")

@@ -9,12 +9,6 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
-	<j:commandButton rendered="true"
-			value="Toon op kaart"
-			image="#{resource['core/images/actions/12x12/apply.png']}"
-			type="button"
-			action="#{form.showOpdrachtMapData(form.object.traject)}"
-			execute="@this" />
 	<br/>
 	<table width="100%">
 			<tr>

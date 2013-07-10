@@ -142,4 +142,20 @@
 			</j:lazyInclude>
 		</p:dialog>	
 		
+	<p:dialog id="createPdfPopup" 
+				header="Printen #{form.modelClass.label}"
+				icon="#{resources['core/images/actions/16x16/print.png']}"
+				show="true"
+				modal="true"
+				width="600"
+				resizable="false"
+				onShow="#{r:component('controleOpdrachtPdfInclude')}.show();"
+				onHide="#{r:component('controleOpdrachtPdfInclude')}.hide();">
+			<j:relocate />
+			<j:lazyInclude id="controleOpdrachtPdfInclude"
+				src="/resources/osyris/includes/_controleOpdrachtPdf.xhtml">
+				<f:param name="form" value="#{form}" />
+			</j:lazyInclude>
+		</p:dialog>	
+		
 </u:composition>

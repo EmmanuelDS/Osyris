@@ -9,7 +9,10 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
-	
+	<br/>
+	<table width="100%">
+	<tr valign="top">
+	<td>
 	<a:outputPanel>	
 		<u:decorate template="/resources/osyris/includes/bewegwijzering.xhtml">
 			<u:param name="form" value="#{form}" />
@@ -48,6 +51,18 @@
 				mode="EDIT" />
 			</d:field>
 	</d:fields>
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
 	<d:buttons>
 		<j:commandButton value="#{messages['form.general.save.button']}"
 			image="#{resource['core/images/actions/12x12/save.png']}"
