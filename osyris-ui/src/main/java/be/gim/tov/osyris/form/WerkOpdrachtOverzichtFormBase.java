@@ -22,6 +22,7 @@ import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.jboss.seam.international.status.Messages;
+import org.quartz.xml.ValidationException;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
@@ -161,8 +162,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 		return (MapViewer) ComponentUtils.findComponent("viewer");
 	}
 
-	public boolean isBordProbleem() {
-		if (object.getProbleem() instanceof BordProbleem) {
+	public boolean isBordProbleem(Probleem probleem) {
+		if (probleem instanceof BordProbleem) {
 			return true;
 		} else {
 			return false;
@@ -179,10 +180,20 @@ public class WerkOpdrachtOverzichtFormBase extends
 		try {
 			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
-						.getResourceKey(userRepository.loadUser(identity
+						.getResourceName(userRepository.loadUser(identity
+								.getUser().getId()))));
+				query.addFilter(FilterUtils.equal("status",
+						WerkopdrachtStatus.UIT_TE_VOEREN));
+				return query;
+			}
+
+			if (identity.inGroup("Medewerker", "CUSTOM")) {
+				query.addFilter(FilterUtils.equal("medewerker", modelRepository
+						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
 				return query;
 			}
+
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
 		}
@@ -345,28 +356,35 @@ public class WerkOpdrachtOverzichtFormBase extends
 	/**
 	 * Verzenden van een werkopdracht
 	 * 
+	 * @throws ValidationException
+	 * 
 	 */
 	public void verzendenWerkOpdracht() {
 		if (object != null) {
-			object.setStatus(WerkopdrachtStatus.UIT_TE_VOEREN);
-			object.setDatumUitTeVoeren(new Date());
-			try {
-				modelRepository.saveObject(object);
-				clear();
-				search();
-				// send confirmatie mail naar peterMeter
-				// sendConfirmationMail();
-				messages.info("WerkOpdracht verzonden.");
-			} catch (IOException e) {
-				LOG.error("Can not save object.", e);
-			} catch (Exception e) {
-				LOG.error("Can not send email", e);
+			if (object.getHandelingen().isEmpty()
+					|| object.getHandelingen() == null) {
+				messages.error("Gelieve minstens 1 handeling toe te voegen alvorens de werkopdracht te verzenden.");
+			} else {
+				object.setStatus(WerkopdrachtStatus.UIT_TE_VOEREN);
+				object.setDatumUitTeVoeren(new Date());
+				try {
+					modelRepository.saveObject(object);
+					clear();
+					search();
+					// send confirmatie mail naar Uitvoerder
+					// sendConfirmationMail();
+					messages.info("Werkopdracht succesvol verzonden.");
+				} catch (IOException e) {
+					LOG.error("Can not save object.", e);
+				} catch (Exception e) {
+					LOG.error("Can not send email", e);
+				}
 			}
 		}
 	}
 
 	/**
-	 * Annuleren van een werkopdracht naar de betrokken uitvoerder
+	 * Annuleren van een werkopdracht
 	 * 
 	 */
 	public void annuleerWerkOpdracht() {
@@ -446,6 +464,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 			Uitvoeringsronde ronde = (Uitvoeringsronde) modelRepository
 					.createObject("Uitvoeringsronde", null);
 			ronde.setStatus(UitvoeringsrondeStatus.AANGEMAAKT);
+
+			// Minstens 1 werkopdracht moet geselecteerd zijn
+			if (Arrays.asList(selectedOpdrachten).size() < 1) {
+				throw new IOException();
+			}
 			// Set opdrachten
 			List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>();
 			for (WerkOpdracht werkOpdracht : Arrays.asList(selectedOpdrachten)) {
@@ -454,23 +477,52 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			ronde.setOpdrachten(ids);
 			for (WerkOpdracht werkOpdracht : Arrays.asList(selectedOpdrachten)) {
-				// Set opdrachten flagged inRonde true
+				// Opdrachten mogen nog niet aan een ronde toegewezen zijn
 				if (werkOpdracht.getInRonde().equals("1")) {
 					throw new IOException();
 				}
+				// Set opdrachten flagged inRonde true
 				werkOpdracht.setInRonde("1");
+				ronde.setUitvoerder(werkOpdracht.getUitvoerder());
 				modelRepository.saveObject(ronde);
 				modelRepository.saveObject(werkOpdracht);
 			}
 			selectedOpdrachten = null;
-			messages.info("Uitvoeringsronde is succesvol aangemaakt.");
+			messages.info("Uitvoeringsronde succesvol aangemaakt.");
 		} catch (InstantiationException e) {
 			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
 			LOG.error("Illegal access at creation model object.", e);
 		} catch (IOException e) {
 			LOG.error("Can not save Uitvoeringsronde.", e);
-			messages.error("De selectie bevat werkopdrachten die reeds aan een uitvoeringsronde zijn toegekend.");
+			messages.error("Gelieve minstens 1 werkopdracht te selecteren die nog niet aan een ronde is toegevoegd.");
+		}
+	}
+
+	@Override
+	public void save() {
+
+		try {
+			modelRepository.saveObject(object);
+			messages.info("Werkopdracht succesvol bewaard.");
+			clear();
+			search();
+		} catch (IOException e) {
+			LOG.error("Can not save model object.", e);
+		}
+	}
+
+	/**
+	 * Bepaalt of een groep rijen in de dataTable kan selecteren.
+	 * 
+	 * @return
+	 */
+	public boolean canSelectRows() {
+		if (identity.inGroup("Uitvoerder", "CUSTOM")
+				|| identity.inGroup("admin", "CUSTOM")) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 }

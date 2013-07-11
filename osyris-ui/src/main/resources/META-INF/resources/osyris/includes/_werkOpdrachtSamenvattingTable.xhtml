@@ -1,0 +1,81 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui">
+	
+	<r:panel id="werkOpdrachtSamenvattingPanel">
+		<p:dataTable id="samenvatting"
+			value="#{form.getWerkOpdrachtenInUitvoeringsronde(form.object)}"
+			mode="RESULT"
+			var="werkOpdracht"
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+			<j:bindAttribute var="werkOpdracht"
+						name="rowData" />
+			<f:facet name="header">
+				<div>Samenvatting ronde</div>
+			</f:facet>
+			<p:column style="width:2%">
+				<j:commandButton
+					value="Zoom naar Probleem"
+					src="#{resource['core/images/actions/16x16/zoom.png']}"
+					type="image"
+					title="Zoomen naar probleem"
+					action="#{form.zoomToProbleem(werkOpdracht.probleem)}" />
+	   		</p:column>
+	   		<p:column label="Acties">
+				<a:outputPanel styleClass="model-table-actions">
+					<j:commandButton
+						rendered="#{form.isCanView(werkOpdracht)}"
+						image="#{resource['core/images/actions/16x16/edit.png']}"
+						type="image"
+						title="Werkopdracht rapporteren"
+						oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).show(); conscientia.widget(#{r:element('rapporteerPopup')}).hide();">
+						<f:setPropertyActionListener
+							target="#{form.selectedWerkOpdracht}"
+							value="#{werkOpdracht}" />
+					</j:commandButton>
+				</a:outputPanel>
+			</p:column>
+	   		<p:column label="id">
+						<f:facet name="header">
+						<div>Identificatie</div>
+						</f:facet>
+						<div>#{d:modelObject(werkOpdracht).getId()}</div>
+			</p:column>
+			<p:column label="TrajectType">
+				<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
+				</f:facet>
+				<d:propertyValue id="trajectTypeColumn"
+					modelProperty="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}"
+					value="#{werkOpdracht.trajectType }"
+					mode="VIEW" />
+			</p:column>
+			<p:column label="Traject">
+				<f:facet name="header">
+					<div>Routenaam</div>
+				</f:facet>
+				<d:propertyValue id="trajectColumn"
+					modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
+					value="#{werkOpdracht.traject }"
+					mode="VIEW" />
+			</p:column>
+			<p:column label="Status">
+				<f:facet name="header">
+				<div>Status</div>
+				</f:facet>
+				<d:propertyValue id="statusColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+					value="#{werkOpdracht.status}"
+					mode="VIEW" />
+			</p:column>
+	   	</p:dataTable>
+	</r:panel>
+</u:composition>

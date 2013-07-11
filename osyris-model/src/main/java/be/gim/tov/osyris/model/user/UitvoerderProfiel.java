@@ -9,6 +9,7 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
+import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
@@ -38,6 +39,7 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 
 	// VARIABLES
 	@NotViewable
+	@NotSearchable
 	@NotEditable
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")

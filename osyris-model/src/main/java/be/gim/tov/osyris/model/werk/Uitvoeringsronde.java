@@ -10,7 +10,9 @@ import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Required;
@@ -56,11 +58,24 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitvoering;
 
+	@NotSearchable
+	@Label("Omschrijving ronde")
+	@Description("Omschrijving ronde")
+	@Type(value = ModelPropertyType.TEXT)
+	private String omschrijving;
+
 	@Required
 	@NotSearchable
 	@Label("Afgelegde afstand")
 	@Description("Afgelegde afstand")
 	private int afstand;
+
+	@NotSearchable
+	@NotEditable
+	@NotViewable
+	@Label("Uitvoerder")
+	@Description("Uitvoerder")
+	private ResourceIdentifier uitvoerder;
 
 	@NotSearchable
 	@Label("Werkopdrachten")
@@ -83,6 +98,22 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 
 	public void setDatumUitvoering(Date datumUitvoering) {
 		this.datumUitvoering = datumUitvoering;
+	}
+
+	public String getOmschrijving() {
+		return omschrijving;
+	}
+
+	public void setOmschrijving(String omschrijving) {
+		this.omschrijving = omschrijving;
+	}
+
+	public ResourceIdentifier getUitvoerder() {
+		return uitvoerder;
+	}
+
+	public void setUitvoerder(ResourceIdentifier uitvoerder) {
+		this.uitvoerder = uitvoerder;
 	}
 
 	public List<ResourceIdentifier> getOpdrachten() {

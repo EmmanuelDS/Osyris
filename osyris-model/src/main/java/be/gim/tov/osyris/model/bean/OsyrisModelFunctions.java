@@ -39,6 +39,7 @@ import be.gim.tov.osyris.model.traject.Gemeente;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 
@@ -568,5 +569,29 @@ public class OsyrisModelFunctions {
 			LOG.error("Can not search WerkOpdracht ids.", e);
 		}
 		return null;
+	}
+
+	/**
+	 * Zoekt de naam van de uitvoerder aan de hand van de ResourceIdentifier
+	 * 
+	 * @param id
+	 */
+	public String getUitvoerderNaam(ResourceIdentifier id) {
+		String naam = null;
+		try {
+			User user = (User) modelRepository.loadObject(id);
+			UitvoerderProfiel profiel = (UitvoerderProfiel) user.getAspect(
+					"UitvoerderProfiel", modelRepository, true);
+			UitvoerderBedrijf bedrijf = (UitvoerderBedrijf) modelRepository
+					.loadObject(profiel.getBedrijf());
+			naam = bedrijf.getNaam();
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate aspect.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Illegal access at object.", e);
+		}
+		return naam;
 	}
 }

@@ -58,6 +58,7 @@
 		</d:field>
 	</d:fields>
 	</r:panel>
+	<br/>
 	<r:panel id="CommentaarTOVPanel">
 	<d:fields>
 		<d:field for="commentaarMedewerker" label="Commentaar TOV">
@@ -104,9 +105,15 @@
 			value="Verzenden"
 			image="#{resource['core/images/actions/12x12/next.png']}"
 			type="button"
-			action="#{form.verzendenWerkeOpdracht()}"
-			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+			action="#{form.verzendenWerkOpdracht()}"
+			render="#{render}" 
+			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();"/>
+		<j:commandButton
+			rendered="#{form.object.status == 'GERAPPORTEERD' }"
+			value="Valideren"
+			image="#{resource['core/images/actions/12x12/edit.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
 		<j:commandButton 
 			value="Printen"
 			image="#{resource['core/images/actions/12x12/print.png']}"

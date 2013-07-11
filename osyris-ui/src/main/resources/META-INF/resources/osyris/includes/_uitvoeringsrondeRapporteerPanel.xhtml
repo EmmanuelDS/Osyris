@@ -1,0 +1,79 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<h2>Uitvoeringsronde #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getUitvoerderNaam(form.object.uitvoerder)}</h2>
+	<br/>
+	<table width="100%">
+			<tr>
+			<td width="50%" valign="top">
+	<r:panel>
+  		<d:fields>
+   		<d:field label="Datum uitvoering" for="datumUitvoering">	 
+		<d:propertyValue id="datumUitvoering" 
+				modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}" 
+				value="#{form.object.datumUitvoering}" 
+				mode="EDIT" />
+			</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<!-- WerkOpdracht Samenvatting Table -->
+	<u:decorate
+				template="/resources/osyris/includes/_werkOpdrachtSamenvattingTable.xhtml">
+				<u:param name="form" value="#{form}" />
+	</u:decorate>
+	<br/>
+	<r:panel>
+  		<d:fields>
+   		<d:field label="Omschrijving uitvoeringsronde" for="omschrijving">	 
+		<d:propertyValue id="omschrijving" 
+				modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('omschrijving')}" 
+				value="#{form.object.omschrijving}" 
+				mode="EDIT" />
+			</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel>
+  		<d:fields>
+   		<d:field label="Totaal aantal km" for="afstand">	 
+		<d:propertyValue id="afstand" 
+				modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('afstand')}" 
+				value="#{form.object.afstand}" 
+				mode="EDIT" />
+			</d:field>
+	</d:fields>
+	</r:panel>
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+					<j:controllerListener name="selectedFeatures"
+						listener="#{form.onSelectFeatures}" />
+					<j:controllerListener name="addedFeature"
+						listener="#{form.onUpdateFeatures}" />
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
+	
+	<d:buttons>
+			<j:commandButton
+			rendered="#{identity.inGroup('Uitvoerder','CUSTOM') and form.object.status == 'AANGEMAAKT' }"
+			value="Uitvoeringsronde rapporteren"
+			image="#{resource['core/images/actions/12x12/next.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
+	</d:buttons>
+</u:composition>

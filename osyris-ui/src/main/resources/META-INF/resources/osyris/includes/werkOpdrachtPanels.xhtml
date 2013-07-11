@@ -43,6 +43,23 @@
 		</j:lazyInclude>
 	</p:dialog>
 	
+	<p:dialog id="rapporteerPopup"
+		header="Rapporteren #{form.modelClass.label}"
+		icon="#{resources['core/images/actions/16x16/edit.png']}"
+		modal="true"
+		resizable="false"
+		width="1100"
+		height="700"
+		onShow="#{r:component('rapporteerInclude')}.show();"
+		onHide="#{r:component('rapporteerInclude')}.hide();">
+		<j:relocate />
+		<j:lazyInclude id="rapporteerInclude"
+			src="/resources/osyris/includes/_werkOpdrachtRapporteerPanel.xhtml">
+			<f:param name="form" value="#{form}" />
+			<f:param name="render" value="#{render}" />
+		</j:lazyInclude>
+	</p:dialog>
+	
 	<p:dialog id="deletePopup"
 		header="#{messages['page.delete.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/delete.png']}"

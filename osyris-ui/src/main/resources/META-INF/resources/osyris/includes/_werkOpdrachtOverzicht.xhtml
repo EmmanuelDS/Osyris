@@ -9,7 +9,6 @@
 	xmlns:q="http://specto.gim.be/search"
 	xmlns:p="http://primefaces.org/ui">
 	<h2>Overzicht Werkopdrachten</h2>
-
 	<j:layout style="height: 400px">
 	<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
@@ -127,7 +126,7 @@
 					<j:layoutContent />
 					<j:bindAttribute var="werkOpdracht"
 						name="rowData" />
-					<p:column selectionMode="multiple" style="width:5%" />
+					<p:column selectionMode="multiple" style="width:5%" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" />
 					<p:column label="Acties">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton

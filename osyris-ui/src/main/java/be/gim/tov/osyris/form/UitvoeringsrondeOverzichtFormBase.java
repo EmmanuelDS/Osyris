@@ -12,15 +12,26 @@ import javax.inject.Named;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
+import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.jsf.component.ComponentUtils;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
+import be.gim.specto.api.configuration.MapConfiguration;
+import be.gim.specto.api.context.FeatureMapLayer;
+import be.gim.specto.api.context.MapContext;
+import be.gim.specto.core.context.MapFactory;
+import be.gim.specto.ui.component.MapViewer;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * 
@@ -42,6 +53,12 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	// VARIABLES
 	@Inject
 	protected UserRepository userRepository;
+	@Inject
+	protected MapFactory mapFactory;
+	@Inject
+	protected Preferences preferences;
+	@Inject
+	protected MailSender mailSender;
 
 	protected ResourceIdentifier regio;
 	protected String trajectType;
@@ -49,6 +66,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected ResourceIdentifier werkOpdracht;
 	protected ResourceIdentifier uitvoerder;
 	protected ResourceIdentifier medewerker;
+	protected WerkOpdracht selectedWerkOpdracht;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -99,6 +117,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		this.medewerker = medewerker;
 	}
 
+	public WerkOpdracht getSelectedWerkOpdracht() {
+		return selectedWerkOpdracht;
+	}
+
+	public void setSelectedWerkOpdracht(WerkOpdracht selectedWerkOpdracht) {
+		this.selectedWerkOpdracht = selectedWerkOpdracht;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -115,14 +141,27 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		return modelRepository.getModelClass(getName());
 	}
 
+	public MapViewer getViewer() {
+		return (MapViewer) ComponentUtils.findComponent("viewer");
+	}
+
 	@Override
 	public Query getQuery() {
 		if (query == null) {
 			query = getDefaultQuery();
 		}
+		try {
+			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
+				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
+						.getResourceName(userRepository.loadUser(identity
+								.getUser().getId()))));
+			}
 
-		if (werkOpdracht != null) {
-			query.addFilter(FilterUtils.equal("opdrachten", werkOpdracht));
+			if (werkOpdracht != null) {
+				query.addFilter(FilterUtils.equal("opdrachten", werkOpdracht));
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load user.", e);
 		}
 		return query;
 	}
@@ -227,6 +266,65 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			search();
 		} catch (IOException e) {
 			LOG.error("Can not delete model object.", e);
+		}
+	}
+
+	/**
+	 * Map Configuratie
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public MapConfiguration getConfiguration() throws IOException,
+			InstantiationException, IllegalAccessException {
+
+		MapContext context = (MapContext) modelRepository
+				.loadObject(new ResourceKey("Form@12"));
+
+		if (context != null) {
+			MapConfiguration configuration = mapFactory
+					.getConfiguration(context);
+
+			mapFactory.createGeometryLayer(configuration.getContext(),
+					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+					"single", null, null);
+
+			// Reset context
+			configuration.setContext(context);
+
+			// Reset layers
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.setSelection(Collections.EMPTY_LIST);
+			}
+
+			// TODO: De problemen van alle werkopdrachten tonen op de kaart
+			return configuration;
+		}
+		return null;
+	}
+
+	/**
+	 * Verwijderen van een werkopdracht uit een uitvoeringsronde.
+	 * 
+	 * @param ronde
+	 * @param opdracht
+	 */
+	public void removeFromUitvoeringsronde() {
+		// Verwijder werkopdracht uit ronde
+		object.getOpdrachten().remove(
+				modelRepository.getResourceIdentifier(selectedWerkOpdracht));
+		// Set flag inRonde false
+		selectedWerkOpdracht.setInRonde("0");
+		try {
+			// Save opdracht en ronde
+			modelRepository.saveObject(object);
+			modelRepository.saveObject(selectedWerkOpdracht);
+		} catch (IOException e) {
+			LOG.error("Can not save object.", e);
 		}
 	}
 }

@@ -8,7 +8,7 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
-	<r:panel id="bordProbleemPanel" rendered="#{form.isBordProbleem()}">
+	<r:panel id="bordProbleemPanel" rendered="#{form.isBordProbleem(form.object.probleem)}">
 		<p:dataTable id="bordProbleem"
 			value="#{form.object.probleem}"
 			mode="RESULT"
@@ -69,7 +69,7 @@
 			</p:column>
 	   	</p:dataTable>
 	</r:panel>
-	<r:panel id="AnderProbleemPanel" rendered="#{!form.isBordProbleem()}" >
+	<r:panel id="AnderProbleemPanel" rendered="#{!form.isBordProbleem(form.object.probleem)}" >
 	<p:dataTable id="AnderProbleem"
 			value="#{form.object.probleem}"
 			mode="RESULT"
@@ -117,5 +117,4 @@
 			</p:column>
    		</p:dataTable>
    		</r:panel>
-	<br/>
 	</u:composition>

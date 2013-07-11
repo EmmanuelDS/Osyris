@@ -136,7 +136,7 @@
 								image="#{resource['core/images/actions/16x16/view.png']}"
 								type="image"
 								title="#{messages['page.actions.view.label']}"
-								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+								oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).show();">
 								<f:setPropertyActionListener
 									target="#{uitvoeringsrondeOverzichtFormBase.object}"
 									value="#{uitvoeringsronde}" />
@@ -177,66 +177,83 @@
 							modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}"
 							value="#{uitvoeringsronde.datumUitvoering }" mode="VIEW" />
 					</p:column>	
-							<p:rowExpansion label="Werkopdrachten">
-							<p:dataTable id="werkOpdrachten"
-								value="#{uitvoeringsrondeOverzichtFormBase.getWerkOpdrachtenInUitvoeringsronde(uitvoeringsronde)}"
-								var="werkOpdracht">
-								<f:facet name="header">  
-            						<d:displayLabel property="#{d:modelClass('Uitvoeringsronde').getProperty('opdrachten')}" />
-       							</f:facet>
-								 <p:column label="id">
-									<f:facet name="header">
-									<div>Identificatie</div>
-									</f:facet>
-									<div>#{d:modelObject(werkOpdracht).getId()}</div>
-								</p:column>
-       							<p:column label="TrajectType">
-									<f:facet name="header">
-									<d:displayLabel
-											property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
-									</f:facet>
-									<d:propertyValue id="trajectTypeColumn"
-										modelProperty="#{d:modelClass('WerkOpdrachte').getProperty('trajectType')}"
-										value="#{werkOpdracht.trajectType }" mode="VIEW" />
-								</p:column>
-								<p:column label="Traject">
-									<f:facet name="header">
-									<d:displayLabel
-											property="#{d:modelClass('WerkOpdracht').getProperty('traject')}" />
-									</f:facet>
-									<d:propertyValue id="trajectColumn"
-										modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
-										value="#{werkOpdracht.traject }" mode="VIEW" />
-								</p:column>
-								<p:column label="Regio">
-									<f:facet name="header">
-									<d:displayLabel
-											property="#{d:modelClass('WerkOpdracht').getProperty('regio')}" />
-									</f:facet>
-									<d:propertyValue id="regioColumn"
-										modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regio')}"
-										value="#{werkOpdracht.regio }" mode="VIEW" />
-								</p:column>
-								<p:column label="Uitvoerder">
+						<p:rowExpansion label="Werkopdrachten">
+						<p:dataTable id="werkOpdrachten"
+							value="#{uitvoeringsrondeOverzichtFormBase.getWerkOpdrachtenInUitvoeringsronde(uitvoeringsronde)}"
+							var="werkOpdracht">
+							<f:facet name="header">  
+           						<d:displayLabel property="#{d:modelClass('Uitvoeringsronde').getProperty('opdrachten')}" />
+      							</f:facet>
+	       					<p:column label="Acties">
+							<a:outputPanel styleClass="model-table-actions">
+								<j:commandButton
+									rendered="#{identity.inGroup('Uitvoerder','CUSTOM') || identity.inGroup('admin','CUSTOM')}"
+									image="#{resource['core/images/actions/16x16/delete.png']}"
+									type="image"
+									title="Werkopdracht verwijderen uit ronde"
+									onclick="conscientia.widget(#{r:element('removeFromRondePopup')}).show();">
+									<f:setPropertyActionListener
+										target="#{uitvoeringsrondeOverzichtFormBase.object}"
+										value="#{uitvoeringsronde}" />
+									<f:setPropertyActionListener
+										target="#{uitvoeringsrondeOverzichtFormBase.selectedWerkOpdracht}"
+										value="#{werkOpdracht}" />
+								</j:commandButton>
+							</a:outputPanel>
+							</p:column>
+							<p:column label="id">
+								<f:facet name="header">
+								<div>Identificatie</div>
+								</f:facet>
+								<div>#{d:modelObject(werkOpdracht).getId()}</div>
+							</p:column>
+      							<p:column label="TrajectType">
 								<f:facet name="header">
 								<d:displayLabel
-										property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
+										property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
 								</f:facet>
-								<d:propertyValue id="uitvoerderColumn"
-									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
-									value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
-								</p:column>
-								<p:column label="Medewerker">
-									<f:facet name="header">
-										<d:displayLabel
-											property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
-									</f:facet>
-									<d:propertyValue id="medewerkerColumn"
-										modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
-										value="#{werkOpdracht.medewerker }"
-										mode="VIEW" />
-								</p:column>				
-							</p:dataTable>
+								<d:propertyValue id="trajectTypeColumn"
+									modelProperty="#{d:modelClass('WerkOpdrachte').getProperty('trajectType')}"
+									value="#{werkOpdracht.trajectType }" mode="VIEW" />
+							</p:column>
+							<p:column label="Traject">
+								<f:facet name="header">
+								<d:displayLabel
+										property="#{d:modelClass('WerkOpdracht').getProperty('traject')}" />
+								</f:facet>
+								<d:propertyValue id="trajectColumn"
+									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
+									value="#{werkOpdracht.traject }" mode="VIEW" />
+							</p:column>
+							<p:column label="Regio">
+								<f:facet name="header">
+								<d:displayLabel
+										property="#{d:modelClass('WerkOpdracht').getProperty('regio')}" />
+								</f:facet>
+								<d:propertyValue id="regioColumn"
+									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regio')}"
+									value="#{werkOpdracht.regio }" mode="VIEW" />
+							</p:column>
+							<p:column label="Uitvoerder">
+							<f:facet name="header">
+							<d:displayLabel
+									property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
+							</f:facet>
+							<d:propertyValue id="uitvoerderColumn"
+								modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+								value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
+							</p:column>
+							<p:column label="Medewerker">
+								<f:facet name="header">
+									<d:displayLabel
+										property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
+								</f:facet>
+								<d:propertyValue id="medewerkerColumn"
+									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+									value="#{werkOpdracht.medewerker }"
+									mode="VIEW" />
+							</p:column>				
+						</p:dataTable>
 					</p:rowExpansion>	
 					<p:column label="Werkopdrachten">
 						<f:facet name="header">
