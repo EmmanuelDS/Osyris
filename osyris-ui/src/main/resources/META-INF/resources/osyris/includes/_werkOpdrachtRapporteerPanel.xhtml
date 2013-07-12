@@ -8,5 +8,85 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
-	<h2>#{form.selectedWerkOpdracht}</h2>
+	<h2>Werkopdracht #{d:modelObject(form.selectedWerkOpdracht).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.selectedWerkOpdracht.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.selectedWerkOpdracht.traject)}) - #{osyrisModelFunctions.getTrajectType(form.selectedWerkOpdracht.traject)}</h2>
+	<br/>
+	<table width="100%">
+	<tr valign="top">
+	<td>
+	<r:panel id="probleemPanel">
+	<d:fields>
+		<d:field for="probleem" label="Probleem">
+			<d:propertyValue id="probleem"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('probleem')}"
+					value="#{form.selectedWerkOpdracht.probleem}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="handelingenPanel">
+	<d:fields>
+		<d:field for="handelingen" label="Handelingen">
+			<d:propertyValue id="handelingen"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+					value="#{form.selectedWerkOpdracht.handelingen}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="commentaarPanel">
+	<d:fields>
+		<d:field for="commentaar" label="Commentaar uitvoerder">
+			<d:propertyValue id="commentaar"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
+					value="#{form.selectedWerkOpdracht.commentaarUitvoerder}"
+					mode="EDIT" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="gebruiktMateriaalPanel">
+	<d:fields>
+		<d:field for="gebruiktMateriaal" label="Gebruikt materiaal">
+			<d:propertyValue id="gebruiktMateriaal"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('gebruiktMateriaal')}"
+					value="#{form.selectedWerkOpdracht.gebruiktMateriaal}"
+					mode="EDIT" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="fotoPanel">
+	<d:fields>
+		<d:field for="foto" label="Foto">
+		</d:field>
+	</d:fields>
+	</r:panel>
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
+	<d:buttons>	
+		<j:commandButton value="#{messages['form.general.save.button']}"
+			image="#{resource['core/images/actions/12x12/save.png']}"
+			type="button"
+			action="#{form.rapporteerWerkOpdrachtInRonde()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			action="#{form.cancel()}"
+			execute="@this"
+			oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide();" />
+	</d:buttons>
 </u:composition>

@@ -38,7 +38,7 @@ public class TrajectSaveListener {
 			traject.setPeterMeter3(null);
 		}
 
-		// Automatically set lengte traject in km
+		// Set lengte traject in km
 		if (traject.getGeom() != null
 				&& traject.getGeom() instanceof LineString) {
 			Geometry g = traject.getGeom();

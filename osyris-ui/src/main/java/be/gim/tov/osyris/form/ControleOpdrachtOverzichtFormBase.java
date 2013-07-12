@@ -33,6 +33,7 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
+import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
@@ -41,7 +42,9 @@ import org.geotools.feature.FeatureIterator;
 import org.jboss.seam.international.status.Messages;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
@@ -54,12 +57,16 @@ import be.gim.specto.api.context.MapContext;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
+import be.gim.tov.osyris.model.controle.NetwerkControleOpdracht;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.controle.RouteControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
@@ -78,6 +85,9 @@ import com.vividsolutions.jts.geom.Point;
 public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
+	private static final String PERIODE_LENTE = "1";
+	private static final String PERIODE_ZOMER = "2";
+	private static final String PERIODE_HERFST = "3";
 
 	public static final String CO_PDF_XSL = "META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
 
@@ -1018,6 +1028,111 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 		}
 		return false;
+	}
+
+	/**
+	 * Automatisch aanmaken van controleOpdrachten voor de toegewezen
+	 * PetersMeters aan een traject.
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public void createControleOpdrachten() {
+		try {
+			int counter = 0;
+			// Filter trajecten waar een PeterMeter is aan toegekend.
+			Filter filter = FilterUtils.or(
+					FilterUtils.notEqual("peterMeter1", null),
+					FilterUtils.notEqual("peterMeter2", null),
+					FilterUtils.notEqual("peterMeter3", null));
+
+			DefaultQuery routeQuery = new DefaultQuery();
+			routeQuery.setModelClassName("Route");
+			routeQuery.addFilter(filter);
+			List<Traject> routes = (List<Traject>) modelRepository
+					.searchObjects(routeQuery, true, true, true);
+
+			DefaultQuery lusQuery = new DefaultQuery();
+			lusQuery.addFilter(filter);
+			lusQuery.setModelClassName("NetwerkLus");
+			List<Traject> lussen = (List<Traject>) modelRepository
+					.searchObjects(lusQuery, true, true, true);
+
+			List<Traject> trajecten = new ArrayList<Traject>();
+			trajecten.addAll(routes);
+			trajecten.addAll(lussen);
+
+			// Voor Routes en NetwerkLussen trajecttypes wordt voor elke periode
+			// waar een peterMeter is
+			// toegekend een controleOpdracht aangemaakt
+			for (Traject traject : trajecten) {
+				if (traject instanceof Route || traject instanceof NetwerkLus) {
+					if (traject.getPeterMeter1() != null) {
+						ControleOpdracht opdrachtlente = buildControleOpdracht(
+								traject, PERIODE_LENTE);
+						modelRepository.saveObject(opdrachtlente);
+						counter++;
+					} else if (traject.getPeterMeter2() != null) {
+						ControleOpdracht opdrachtZomer = buildControleOpdracht(
+								traject, PERIODE_ZOMER);
+						modelRepository.saveObject(opdrachtZomer);
+						counter++;
+					} else if (traject.getPeterMeter3() != null) {
+						ControleOpdracht opdrachtHerfst = buildControleOpdracht(
+								traject, PERIODE_HERFST);
+						modelRepository.saveObject(opdrachtHerfst);
+						counter++;
+					}
+				}
+			}
+			search();
+			messages.info("Automatisch aanmaken controleopdrachten succesvol uitgevoerd.");
+			messages.info("Er zijn " + counter
+					+ " nieuwe controleopdrachten aangemaakt.");
+		} catch (IOException e) {
+			LOG.error("Can not search Trajecten.", e);
+			messages.info("Automatisch aanmaken controleopdrachten niet gelukt: "
+					+ e.getMessage());
+		}
+	}
+
+	/**
+	 * Opbouwen ControleOpdracht aan de hand van een Traject en periode.
+	 * 
+	 * @param traject
+	 * @param periode
+	 * @return
+	 */
+	public ControleOpdracht buildControleOpdracht(Traject traject,
+			String periode) {
+		try {
+			ControleOpdracht opdracht = null;
+
+			// Aanmaken type controleOpdracht aan de hand van het type Traject
+			if (traject instanceof Route) {
+				opdracht = (RouteControleOpdracht) modelRepository
+						.createObject("RouteControleOpdracht", null);
+			} else if (traject instanceof NetwerkLus) {
+				opdracht = (NetwerkControleOpdracht) modelRepository
+						.createObject("NetwerkControleOpdracht", null);
+			}
+			// Set properties
+			opdracht.setDatumTeControleren(new Date());
+			opdracht.setPeriode(periode);
+			opdracht.setMedewerker(Beans.getReference(
+					OsyrisModelFunctions.class).zoekVerantwoordelijke(
+					modelRepository.getResourceIdentifier(traject)));
+			opdracht.setPeterMeter(traject.getPeterMeter1());
+			opdracht.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
+			opdracht.setTraject(modelRepository.getResourceIdentifier(traject));
+
+			return opdracht;
+
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate ControleOpdracht.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Illegal access at object.", e);
+		}
+		return null;
 	}
 
 	public Content printControleOpdracht() throws Exception {

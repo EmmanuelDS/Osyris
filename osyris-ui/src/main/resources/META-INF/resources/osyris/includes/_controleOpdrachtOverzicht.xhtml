@@ -101,6 +101,15 @@
 						value="#{messages['page.actions.report.label']}" />
 				</d:buttons>
 			</div>
+			<r:panel id="automatischeControleOpdrachtPanel" rendered="#{identity.inGroup('admin','CUSTOM')}">
+				<div>Maak automatisch controleopdrachten aan voor routes en lussen:</div>
+				<br />
+				<j:commandButton rendered="true" value="Voer algoritme uit"
+					image="#{resource['core/images/actions/12x12/apply.png']}"
+					type="button"
+					action="#{controleOpdrachtOverzichtFormBase.createControleOpdrachten()}"
+					render="objects" />
+			</r:panel>
 		</j:layoutPane>
 		<j:layoutPane>
 			<a:outputPanel id="result">

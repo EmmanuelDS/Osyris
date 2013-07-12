@@ -3,6 +3,7 @@ package be.gim.tov.osyris.form;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -19,18 +20,30 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
+import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
 import be.gim.specto.core.context.MapFactory;
+import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.controle.AnderProbleem;
+import be.gim.tov.osyris.model.controle.BordProbleem;
+import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
+import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
+import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -59,6 +72,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
+	@Inject
+	protected Messages messages;
 
 	protected ResourceIdentifier regio;
 	protected String trajectType;
@@ -259,6 +274,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			// Set WerkOpdrachten inRonde flag to false
 			for (WerkOpdracht opdracht : getWerkOpdrachtenInUitvoeringsronde(object)) {
 				opdracht.setInRonde("0");
+				// Save WerkOpdracht
+				modelRepository.saveObject(opdracht);
 			}
 			// Delete Uitvoeringsronde
 			modelRepository.deleteObject(object);
@@ -301,7 +318,70 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				layer.setSelection(Collections.EMPTY_LIST);
 			}
 
-			// TODO: De problemen van alle werkopdrachten tonen op de kaart
+			// Toon en zoom naar bordprobleem of ander probleem van de
+			// geselecteerde WerkOpdracht
+			if (selectedWerkOpdracht != null) {
+
+				List<String> bordSelection = new ArrayList<String>();
+				List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+
+				// Get traject
+				Traject traject = (Traject) modelRepository
+						.loadObject(selectedWerkOpdracht.getTraject());
+
+				// Load layer depending on traject type
+				FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+						.getLayer(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName()));
+
+				if (trajectLayer != null) {
+					trajectLayer.setHidden(false);
+					trajectLayer.setFilter(FilterUtils.equal("naam",
+							traject.getNaam()));
+				}
+
+				// BordLayer
+				FeatureMapLayer bordLayer = (FeatureMapLayer) context
+						.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+								.lowerCamelCase(traject.getModelClass()
+										.getName() + "Bord")));
+
+				if (bordLayer != null) {
+					bordLayer.setHidden(false);
+					bordLayer.setFilter(FilterUtils.equal("naam",
+							traject.getNaam()));
+				}
+				// Probleem
+				if (selectedWerkOpdracht.getProbleem() instanceof BordProbleem) {
+					// Bord Probleem
+					Bord bord = (Bord) modelRepository
+							.loadObject(((BordProbleem) selectedWerkOpdracht
+									.getProbleem()).getBord());
+					bordSelection.add(bord.getId().toString());
+					bordLayer.setSelection(bordSelection);
+					Envelope envelope = GeometryUtils.getEnvelope(bord
+							.getGeom());
+					GeometryUtils.expandEnvelope(envelope, 0.1,
+							context.getMaxBoundingBox());
+					context.setBoundingBox(envelope);
+
+				} else if (selectedWerkOpdracht.getProbleem() instanceof AnderProbleem) {
+					// Ander Probleem
+					GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
+							.createGeometryLayer(configuration.getContext(),
+									"geometry", null, Point.class, null, true,
+									"single", null, null);
+					AnderProbleem anderProbleem = (AnderProbleem) selectedWerkOpdracht
+							.getProbleem();
+					anderProbleemGeoms.add(anderProbleem.getGeom());
+					geomLayer.setGeometries(anderProbleemGeoms);
+					Envelope envelope = GeometryUtils.getEnvelope(anderProbleem
+							.getGeom());
+					GeometryUtils.expandEnvelope(envelope, 0.1,
+							context.getMaxBoundingBox());
+					context.setBoundingBox(envelope);
+				}
+			}
 			return configuration;
 		}
 		return null;
@@ -326,5 +406,61 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		} catch (IOException e) {
 			LOG.error("Can not save object.", e);
 		}
+	}
+
+	/**
+	 * Rapporteren van een WerkOpdracht in een Uitvoeringsronde.
+	 * 
+	 */
+	public void rapporteerWerkOpdrachtInRonde() {
+		try {
+			selectedWerkOpdracht.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
+			selectedWerkOpdracht.setDatumGerapporteerd(new Date());
+			modelRepository.saveObject(selectedWerkOpdracht);
+		} catch (IOException e) {
+			LOG.error("Can not save werkopdracht.", e);
+		}
+	}
+
+	/**
+	 * Rapporteren van een Uitvoeringsronde waarin alle WerkOpdrachten
+	 * gerapporteerd zijn.
+	 * 
+	 */
+	public void rapporteerUitvoeringsRonde() {
+		try {
+
+			if (checkWerkOpdrachtenGerapporteerd()) {
+				object.setStatus(UitvoeringsrondeStatus.UITGEVOERD);
+				modelRepository.saveObject(object);
+				messages.info("Uitvoeringsronde succesvol bewaard.");
+			} else {
+				messages.error("Uitvoeringsronde niet bewaard: De uitvoeringsronde bevat nog niet-gerapporteerde werkopdrachten.");
+			}
+		} catch (IOException e) {
+			LOG.error("Can not save Uitvoeringsronde.", e);
+		}
+	}
+
+	/**
+	 * Check of alle Werkopdrachten de status gerapporteerd hebben.
+	 * 
+	 * @return
+	 */
+	private boolean checkWerkOpdrachtenGerapporteerd() {
+		boolean isGerapporteerd = true;
+		try {
+			for (ResourceIdentifier id : object.getOpdrachten()) {
+				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+						.loadObject(id);
+				if (!opdracht.getStatus().equals(
+						WerkopdrachtStatus.GERAPPORTEERD)) {
+					isGerapporteerd = false;
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load WerkOpdracht.", e);
+		}
+		return isGerapporteerd;
 	}
 }

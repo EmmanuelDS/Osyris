@@ -10,9 +10,6 @@
 	xmlns:m="http://specto.gim.be/map">
 	<h2>Uitvoeringsronde #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getUitvoerderNaam(form.object.uitvoerder)}</h2>
 	<br/>
-	<table width="100%">
-			<tr>
-			<td width="50%" valign="top">
 	<r:panel>
   		<d:fields>
    		<d:field label="Datum uitvoering" for="datumUitvoering">	 
@@ -43,37 +40,23 @@
 	<br/>
 	<r:panel>
   		<d:fields>
-   		<d:field label="Totaal aantal km" for="afstand">	 
-		<d:propertyValue id="afstand" 
+   		<d:field label="Totaal aantal km" for="afstand" required="true">	 
+		<d:propertyValue id="afstand"
+				required="true" 
 				modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('afstand')}" 
 				value="#{form.object.afstand}" 
 				mode="EDIT" />
 			</d:field>
 	</d:fields>
 	</r:panel>
-	</td>
-	<td width="50%" valign="top">
-		<r:panel>
-			<div style="height: 500px">
-				<m:mapViewer id="viewer"
-					configuration="#{form.configuration}">
-					<j:controllerListener name="selectedFeatures"
-						listener="#{form.onSelectFeatures}" />
-					<j:controllerListener name="addedFeature"
-						listener="#{form.onUpdateFeatures}" />
-				</m:mapViewer>
-			</div>
-		</r:panel>
-	</td>
-	</tr>
-	</table>
-	
 	<d:buttons>
 			<j:commandButton
 			rendered="#{identity.inGroup('Uitvoerder','CUSTOM') and form.object.status == 'AANGEMAAKT' }"
 			value="Uitvoeringsronde rapporteren"
 			image="#{resource['core/images/actions/12x12/next.png']}"
 			type="button"
-			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
+			action="#{form.rapporteerUitvoeringsRonde()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
 	</d:buttons>
 </u:composition>

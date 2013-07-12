@@ -18,6 +18,7 @@ import org.conscientia.api.group.Group;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
+import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.functions.ModelFunctions;
 import org.conscientia.core.search.DefaultQuery;
@@ -39,9 +40,12 @@ import be.gim.tov.osyris.model.traject.Gemeente;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+
+import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -63,6 +67,7 @@ public class OsyrisModelFunctions {
 	protected CacheProducer cacheProducer;
 
 	/**
+	 * Get waarden status StockMateriaal.
 	 * 
 	 * @return
 	 */
@@ -77,6 +82,7 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Get canonieke waardes Ja Nee.
 	 * 
 	 * @return
 	 */
@@ -91,6 +97,7 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Get imageCodes
 	 * 
 	 * @return
 	 */
@@ -188,9 +195,11 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Retrieve all users in a certain group.
+	 * Zoeken gebruikers in een bepaalde groep.
+	 * 
+	 * @param groupName
+	 * @return
 	 */
-	@SuppressWarnings("unchecked")
 	public List<ResourceName> getUsersInGroup(String groupName) {
 
 		try {
@@ -216,20 +225,59 @@ public class OsyrisModelFunctions {
 	public List<? extends ResourceIdentifier> getSuggestions(String groupName) {
 
 		List<ResourceName> users = getUsersInGroup(groupName);
-
-		List<ResourceIdentifier> suggestions = new ArrayList<ResourceIdentifier>(
-				users.size() + 1);
+		List<ResourceIdentifier> suggestions = new ArrayList<ResourceIdentifier>();
 		suggestions.addAll(users);
-
-		if (groupName.equals("PeterMeter")) {
-			suggestions.add(new ResourceName(GEEN_PETER_METER));
-		}
-
 		return suggestions;
 	}
 
 	/**
-	 * Gets regios OVL
+	 * Get suggestielijst voor PetersMeters.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getPeterMeterSuggestions() {
+
+		return (List<Object[]>) cacheProducer.getCache(
+				"PeterMeterSuggestionCache", new Transformer() {
+
+					@Override
+					public Object transform(Object key) {
+						List<Object[]> suggestions = new ArrayList<Object[]>();
+						try {
+							Object[] geenPeterMeter = { GEEN_PETER_METER,
+									GEEN_PETER_METER };
+
+							List<ResourceName> users = getUsersInGroup("PeterMeter");
+							for (ResourceName user : users) {
+								User peterMeter = (User) modelRepository
+										.loadObject(user);
+								UserProfile profiel = (UserProfile) peterMeter
+										.getAspect("UserProfile",
+												modelRepository, true);
+								Object[] object = {
+										user,
+										profiel.getFirstName() + " "
+												+ profiel.getLastName() };
+								suggestions.add(object);
+							}
+							suggestions.add(geenPeterMeter);
+
+						} catch (IOException e) {
+							LOG.error("Can not load user.", e);
+						} catch (InstantiationException e) {
+							LOG.error("Can not instantiate UserProfile.", e);
+						} catch (IllegalAccessException e) {
+							LOG.error("Illegal access at UserProfile.", e);
+						}
+						return suggestions;
+
+					}
+				}).get(null);
+	}
+
+	/**
+	 * Get regios Oost Vlaanderen
 	 * 
 	 * @return
 	 */
@@ -551,6 +599,7 @@ public class OsyrisModelFunctions {
 		return null;
 	}
 
+	@SuppressWarnings("unchecked")
 	public List<Object[]> getWerkOpdrachten() {
 		try {
 			List<Object[]> opdrachten = new ArrayList<Object[]>();
@@ -593,5 +642,70 @@ public class OsyrisModelFunctions {
 			LOG.error("Illegal access at object.", e);
 		}
 		return naam;
+	}
+
+	/**
+	 * Zoekt de regio waarmee het aangeduide probleem een intersectie heeft.
+	 * 
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public ResourceIdentifier searchRegioForProbleem(Geometry geometry) {
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", geometry));
+			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
+					query, true, true);
+			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+			return modelRepository.getResourceIdentifier(regio);
+
+		} catch (IOException e) {
+			LOG.error("Can not search regios.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Zoekt verantwoordelijke medewerker voor een bepaald traject aan de hand
+	 * van het MedewerkerProfiel.
+	 * 
+	 * @param traject
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public ResourceName zoekVerantwoordelijke(ResourceIdentifier traject) {
+		try {
+			Traject t = (Traject) modelRepository.loadObject(traject);
+			List<User> users = new ArrayList<User>();
+			List<User> medewerkers = new ArrayList<User>();
+			users = (List<User>) modelRepository.searchObjects(
+					new DefaultQuery("User"), true, true);
+			for (User user : users) {
+				if (userRepository.listGroupnames(user).contains("Medewerker")) {
+					medewerkers.add(user);
+				}
+			}
+
+			for (User u : medewerkers) {
+				MedewerkerProfiel profiel = (MedewerkerProfiel) u.getAspect(
+						"MedewerkerProfiel", modelRepository, true);
+				if (profiel != null) {
+					for (String trajectType : profiel.getTrajectType()) {
+						if (trajectType.equals(t.getModelClass().getName())) {
+							return modelRepository.getResourceName(u);
+						}
+					}
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate object.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Can not access object.", e);
+		}
+		return null;
 	}
 }

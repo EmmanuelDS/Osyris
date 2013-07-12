@@ -92,22 +92,10 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	private ValidatieStatus validatie;
 
 	@NotSearchable
-	@Label("Omschrijving opdracht")
-	@Description("Omschrijving opdracht")
-	@Type(value = ModelPropertyType.TEXT)
-	private String omschrijvingOpdracht;
-
-	@NotSearchable
 	@Label("Commentaar medewerker")
 	@Description("Commentaar medewerker")
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaarMedewerker;
-
-	@NotSearchable
-	@Label("Omschrijving uitvoering")
-	@Description("Omschrijving uitvoering")
-	@Type(value = ModelPropertyType.TEXT)
-	private String omschrijvingUitvoering;
 
 	@NotSearchable
 	@Label("Commentaar uitvoerder")
@@ -156,6 +144,13 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	private Date datumUitTeVoeren;
 
 	@NotSearchable
+	@NotEditable
+	@Label("Datum later uit te voeren")
+	@Description("Datum later uit te voeren")
+	@Type(ModelPropertyType.TIMESTAMP)
+	private Date datumLaterUitTeVoeren;
+
+	@NotSearchable
 	@Label("Probleem")
 	@Description("Probleem")
 	private Probleem probleem;
@@ -169,9 +164,9 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	private ResourceIdentifier traject;
 
 	@NotSearchable
-	@Label("Gebruikt materiaal")
-	@Description("Gebruikt materiaal")
-	private GebruiktMateriaal gebruiktMateriaal;
+	@Label("Gebruikte materialen")
+	@Description("Gebruikte materialen")
+	private List<GebruiktMateriaal> materialen;
 
 	// GETTERS AND SETTERS
 	public String getInRonde() {
@@ -198,28 +193,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.validatie = validatie;
 	}
 
-	public String getOmschrijvingOpdracht() {
-		return omschrijvingOpdracht;
-	}
-
-	public void setOmschrijvingOpdracht(String omschrijvingOpdracht) {
-		this.omschrijvingOpdracht = omschrijvingOpdracht;
-	}
-
 	public String getCommentaarMedewerker() {
 		return commentaarMedewerker;
 	}
 
 	public void setCommentaarMedewerker(String commentaarMedewerker) {
 		this.commentaarMedewerker = commentaarMedewerker;
-	}
-
-	public String getOmschrijvingUitvoering() {
-		return omschrijvingUitvoering;
-	}
-
-	public void setOmschrijvingUitvoering(String omschrijvingUitvoering) {
-		this.omschrijvingUitvoering = omschrijvingUitvoering;
 	}
 
 	public String getCommentaarUitvoerder() {
@@ -278,6 +257,14 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.datumUitTeVoeren = datumUitTeVoeren;
 	}
 
+	public Date getDatumLaterUitTeVoeren() {
+		return datumLaterUitTeVoeren;
+	}
+
+	public void setDatumLaterUitTeVoeren(Date datumLaterUitTeVoeren) {
+		this.datumLaterUitTeVoeren = datumLaterUitTeVoeren;
+	}
+
 	public ResourceIdentifier getMedewerker() {
 		return medewerker;
 	}
@@ -310,12 +297,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.traject = traject;
 	}
 
-	public GebruiktMateriaal getGebruiktMateriaal() {
-		return gebruiktMateriaal;
+	public List<GebruiktMateriaal> getMaterialen() {
+		return materialen;
 	}
 
-	public void setGebruiktMateriaal(GebruiktMateriaal gebruiktMateriaal) {
-		this.gebruiktMateriaal = gebruiktMateriaal;
+	public void setMaterialen(List<GebruiktMateriaal> materialen) {
+		this.materialen = materialen;
 	}
 
 	public List<WerkHandeling> getHandelingen() {

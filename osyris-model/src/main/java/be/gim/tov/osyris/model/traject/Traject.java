@@ -88,7 +88,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@Description("Peter/Meter Lente")
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
 	@Search(type = "menu:equals")
 	private ResourceIdentifier peterMeter1;
 
@@ -97,7 +97,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@Description("Peter/Meter Zomer")
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
 	private ResourceIdentifier peterMeter2;
 
 	@NotSearchable
@@ -105,7 +105,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@Description("Peter/Meter Herfst")
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS

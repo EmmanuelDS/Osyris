@@ -501,7 +501,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	@Override
 	public void save() {
-
 		try {
 			modelRepository.saveObject(object);
 			messages.info("Werkopdracht succesvol bewaard.");

@@ -126,6 +126,9 @@
 					<j:layoutContent />
 					<j:bindAttribute var="werkOpdracht"
 						name="rowData" />
+					<p:column style="width:5%">
+						<p:rowToggler />
+					</p:column>
 					<p:column selectionMode="multiple" style="width:5%" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" />
 					<p:column label="Acties">
 						<a:outputPanel styleClass="model-table-actions">
@@ -213,15 +216,6 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
 							value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
 					</p:column>
-					<p:column label="Handelingen">
-						<f:facet name="header">
-						<d:displayLabel
-								property="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}" />
-						</f:facet>
-						<d:propertyValue id="handelingColumn"
-							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
-							value="#{werkOpdracht.handelingen }" mode="VIEW" />
-					</p:column>
 					<p:column label="Medewerker" sortBy="#{werkOpdracht.medewerker }">
 						<f:facet name="header">
 							<d:displayLabel
@@ -261,6 +255,18 @@
 							value="#{werkOpdracht.datumLaatsteWijziging }"
 							mode="VIEW" /> 
 					</p:column>
+					<p:rowExpansion label="Handelingen">
+						<h:panelGrid id="display" columns="1" style="width:400px;">
+							<f:facet name="header">
+								<d:displayLabel
+									property="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}" />
+							</f:facet>
+							<d:propertyValue id="handelingenColumn"
+								modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+								value="#{werkOpdracht.handelingen}"
+								mode="VIEW" />
+						</h:panelGrid>
+					</p:rowExpansion>
 				</p:dataTable>
 			</a:outputPanel>
 			<d:buttons>

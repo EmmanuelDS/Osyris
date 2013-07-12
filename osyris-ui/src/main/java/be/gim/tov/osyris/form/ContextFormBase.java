@@ -40,6 +40,8 @@ public class ContextFormBase {
 	}
 
 	/**
+	 * Setten mapviewer waar bepaalde lagen voor een bepaalde groep niet
+	 * editeerbaar zijn.
 	 * 
 	 * @param viewer
 	 */

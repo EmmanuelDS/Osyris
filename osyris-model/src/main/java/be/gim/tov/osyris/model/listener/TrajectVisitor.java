@@ -5,6 +5,11 @@ import org.opengis.filter.PropertyIsEqualTo;
 
 import be.gim.commons.filter.FilterUtils;
 
+/**
+ * 
+ * @author kristof
+ * 
+ */
 public class TrajectVisitor extends DuplicatingFilterVisitor {
 
 	private static final String GEEN_PETER_METER = "Geen PeterMeter toegewezen";

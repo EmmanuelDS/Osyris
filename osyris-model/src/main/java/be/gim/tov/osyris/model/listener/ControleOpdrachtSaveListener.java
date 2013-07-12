@@ -2,7 +2,6 @@ package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
 import java.util.Date;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -12,12 +11,9 @@ import org.conscientia.api.model.annotation.Listener;
 import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
-import org.conscientia.core.search.DefaultQuery;
 import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
-import be.gim.commons.filter.FilterUtils;
-import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
@@ -28,13 +24,10 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
-import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
-
-import com.vividsolutions.jts.geom.Geometry;
 
 /**
  * 
@@ -141,8 +134,8 @@ public class ControleOpdrachtSaveListener {
 					if (traject instanceof NetwerkLus
 							&& probleem instanceof NetwerkAnderProbleem) {
 						werkOpdracht
-								.setUitvoerder(osyrisModelFunctions
-										.zoekUitvoerder(searchRegioForProbleem(((NetwerkAnderProbleem) probleem)
+								.setUitvoerder(osyrisModelFunctions.zoekUitvoerder(osyrisModelFunctions
+										.searchRegioForProbleem(((NetwerkAnderProbleem) probleem)
 												.getGeom())));
 
 					}
@@ -159,28 +152,5 @@ public class ControleOpdrachtSaveListener {
 				}
 			}
 		}
-	}
-
-	/**
-	 * Zoekt de regio waarmee het aangeduide probleem een intersectie heeft.
-	 * 
-	 * @param geometry
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private ResourceIdentifier searchRegioForProbleem(Geometry geometry) {
-		try {
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName("Regio");
-			query.addFilter(FilterUtils.intersects("geom", geometry));
-			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
-					query, true, true);
-			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
-			return modelRepository.getResourceIdentifier(regio);
-
-		} catch (IOException e) {
-			LOG.error("Can not search regios.", e);
-		}
-		return null;
 	}
 }

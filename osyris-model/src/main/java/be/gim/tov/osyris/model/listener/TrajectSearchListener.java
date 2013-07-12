@@ -10,6 +10,11 @@ import org.conscientia.api.model.event.SearchModelEvent;
 import org.conscientia.api.search.Query;
 import org.opengis.filter.Filter;
 
+/**
+ * 
+ * @author kristof
+ * 
+ */
 @Listener(rules = { @Rule(_for = "Traject", type = "search"),
 		@Rule(_for = "Traject", type = "count") })
 public class TrajectSearchListener {

@@ -177,7 +177,7 @@
 							modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}"
 							value="#{uitvoeringsronde.datumUitvoering }" mode="VIEW" />
 					</p:column>	
-						<p:rowExpansion label="Werkopdrachten">
+					<p:rowExpansion label="Werkopdrachten">
 						<p:dataTable id="werkOpdrachten"
 							value="#{uitvoeringsrondeOverzichtFormBase.getWerkOpdrachtenInUitvoeringsronde(uitvoeringsronde)}"
 							var="werkOpdracht">

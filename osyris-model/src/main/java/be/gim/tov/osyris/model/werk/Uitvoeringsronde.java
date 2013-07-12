@@ -15,7 +15,6 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
-import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -64,7 +63,6 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.TEXT)
 	private String omschrijving;
 
-	@Required
 	@NotSearchable
 	@Label("Afgelegde afstand")
 	@Description("Afgelegde afstand")
