@@ -10,16 +10,16 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 	<c:choose>
-		<c:when test="#{form.object.status != 'GERAPPORTEERD' || form.object.status != 'GEVALIDEERD'}">
+		<c:when test="#{form.object.status == 'GERAPPORTEERD' or form.object.status == 'GEVALIDEERD'}">
 			<u:decorate
-				template="/resources/osyris/includes/_werkOpdrachtViewPanel1.xhtml">
+				template="/resources/osyris/includes/_werkOpdrachtViewPanel2.xhtml">
 				<u:param name="form" value="#{form}" />
 				<u:param name="render" value="#{render}" />
 			</u:decorate>
 		</c:when>
 		<c:otherwise>
 			<u:decorate
-				template="/resources/osyris/includes/_werkOpdrachtViewPanel2.xhtml">
+				template="/resources/osyris/includes/_werkOpdrachtViewPanel1.xhtml">
 				<u:param name="form" value="#{form}" />
 				<u:param name="render" value="#{render}" />
 			</u:decorate>

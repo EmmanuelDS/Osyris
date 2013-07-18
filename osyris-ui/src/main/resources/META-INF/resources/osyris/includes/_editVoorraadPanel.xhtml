@@ -1,0 +1,111 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui">
+	<br/>
+	<r:panel id="stockMateriaalPanel" header="Detail stockMateriaal">
+		<d:fields>
+			<d:field label="Magazijn" for="magazijn">
+			 	<d:propertyValue id="magazijn" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('magazijn')}" 
+				value="#{form.object.magazijn}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Categorie" for="categorie">
+			 	<d:propertyValue id="categorie" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}" 
+				value="#{form.object.categorie}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Subcategorie" for="subCategorie">
+			 	<d:propertyValue id="subCategorie" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}" 
+				value="#{form.object.subCategorie}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Type" for="type">
+			 	<d:propertyValue id="type" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}" 
+				value="#{form.object.type}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Naam" for="naam">
+			 	<d:propertyValue id="naam" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}" 
+				value="#{form.object.naam}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Nummer" for="nummer">
+			 	<d:propertyValue id="nummer" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}" 
+				value="#{form.object.nummer}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="inStock" for="inStock">
+			 	<d:propertyValue id="inStock" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('inStock')}" 
+				value="#{form.object.inStock}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Minimum" for="min">
+			 	<d:propertyValue id="min" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('min')}" 
+				value="#{form.object.min}" 
+				mode="VIEW" />
+			</d:field>
+			<d:field label="Maximum" for="max">
+			 	<d:propertyValue id="max" 
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('max')}" 
+				value="#{form.object.max}" 
+				mode="VIEW" />
+			</d:field>
+			</d:fields>
+		</r:panel>
+		<br/>
+		<r:panel id="editPanel" >
+			<d:fields>
+					<d:field for="keuzeAanpassing" label="Aanpassing">
+						<h:selectOneMenu id="keuzeAanpassing"
+							value="#{form.keuzeAanpassing}">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItem itemValue="plus" itemLabel="Toevoegen in stock" />
+						<f:selectItem itemValue="min" itemLabel="Verwijderen uit stock" />
+						<f:selectItem itemValue="direct" itemLabel="Aantal in stock manueel wijzigen" />
+							<a:ajax event="change" render="inStockPanel" execute="@this" />
+						</h:selectOneMenu>
+					</d:field>
+			</d:fields>
+		
+			<j:renderPanel id="inStockPanel" rendered="#{form.keuzeAanpassing != null}">
+			<d:fields>
+				<d:field label="Hoeveelheid" for="hoeveelheid">
+					<h:inputText value="#{form.hoeveelheid}"/>
+				</d:field>
+			</d:fields>
+			</j:renderPanel>
+			<d:fields>
+			<d:field for="teBestellen" label="Besteld">
+						<h:selectOneMenu id="teBestellen"
+							value="#{form.object.teBestellen}">
+							<f:selectItem itemValue="" itemLabel="" />
+							<f:selectItems
+								value="#{modelUtils.selectItems(osyrisModelFunctions.stockMateriaalStates)}" />
+						</h:selectOneMenu>
+					</d:field>
+			</d:fields>
+	</r:panel>
+	<d:buttons>
+		<j:commandButton value="#{messages['form.general.save.button']}"
+			image="#{resource['core/images/actions/12x12/save.png']}"
+			type="button"
+			action="#{form.save()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('editVoorraadPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

@@ -14,5 +14,11 @@
 			<artifactId>specto-model-base</artifactId>
 			<version>${specto.version}</version>
 		</dependency>
+		
+		<dependency>
+		  <groupId>org.quartz-scheduler</groupId>
+		  <artifactId>quartz</artifactId>
+		  <version>${quartz.version}</version>
+		</dependency>
 	</dependencies>
 </project>

@@ -23,7 +23,7 @@
 	   		<p:column label="Acties">
 				<a:outputPanel styleClass="model-table-actions">
 					<j:commandButton
-						rendered="#{form.isCanView(werkOpdracht)}"
+						rendered="#{form.isCanView(werkOpdracht) and form.object.status == 'AANGEMAAKT'}"
 						image="#{resource['core/images/actions/16x16/edit.png']}"
 						type="image"
 						title="Rapporteren werkopdracht"

@@ -20,6 +20,7 @@ import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.jboss.seam.international.status.Messages;
 import org.quartz.xml.ValidationException;
@@ -40,9 +41,11 @@ import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
+import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -84,6 +87,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected Date totDatum;
 	protected String gemeente;
 	protected WerkOpdracht[] selectedOpdrachten;
+	protected ValidatieStatus validatieStatus;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -140,6 +144,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	public void setSelectedOpdrachten(WerkOpdracht[] selectedOpdrachten) {
 		this.selectedOpdrachten = selectedOpdrachten;
+	}
+
+	public ValidatieStatus getValidatieStatus() {
+		return validatieStatus;
+	}
+
+	public void setValidatieStatus(ValidatieStatus validatieStatus) {
+		this.validatieStatus = validatieStatus;
 	}
 
 	// METHODS
@@ -522,6 +534,128 @@ public class WerkOpdrachtOverzichtFormBase extends
 			return true;
 		} else {
 			return false;
+		}
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void delete() {
+		try {
+			// Check of probleem al bestaat in andere opdracht
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName(getModelClass().getName());
+			query.setFilter(FilterUtils.equal("probleem", object.getProbleem()));
+			List<WerkOpdracht> result = (List<WerkOpdracht>) modelRepository
+					.searchObjects(query, true, true, true);
+
+			// Indien nee delete probleem en WerkOpdracht
+			if (result == null || result.isEmpty()) {
+				modelRepository.deleteObject(object.getProbleem());
+				modelRepository.deleteObject(object);
+			} else {
+				// Indien ja
+				// Set probleem null en delete WerkOpdracht
+				object.setProbleem(null);
+				modelRepository.saveObject(object);
+				modelRepository.deleteObject(object);
+			}
+			clear();
+			search();
+		} catch (IOException e) {
+			LOG.error("Can not delete model object.", e);
+		}
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Uitvoeringsronde getUitvoeringsronde() {
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Uitvoeringsronde");
+			query.setFilter(FilterUtils.equal("opdrachten",
+					modelRepository.getResourceIdentifier(object)));
+			List<Uitvoeringsronde> result = (List<Uitvoeringsronde>) modelRepository
+					.searchObjects(query, true, true, true);
+			return (Uitvoeringsronde) modelRepository.getUniqueResult(result);
+		} catch (IOException e) {
+			LOG.error("Can not search Uitvoeringsronde.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Valideren van een WerkOpdracht. Bij het valideren van een WerkOpdracht
+	 * wordt ook het StockMateriaal afgeboekt.
+	 * 
+	 */
+	public void valideerWerkOpdracht() {
+		try {
+			// Set status en datum GEVALIDEERD
+			object.setStatus(WerkopdrachtStatus.GEVALIDEERD);
+			object.setDatumGevalideerd(new Date());
+
+			// Afboeken stock voor elk gebruikt materiaal
+			if (!object.getMaterialen().isEmpty()
+					|| object.getMaterialen() != null) {
+
+				for (GebruiktMateriaal materiaal : object.getMaterialen()) {
+					int inStockUpdated = materiaal.getStockMateriaal()
+							.getInStock() - materiaal.getAantal();
+					materiaal.getStockMateriaal().setInStock(inStockUpdated);
+					// Save
+					modelRepository.saveObject(materiaal.getStockMateriaal());
+				}
+			}
+
+			modelRepository.saveObject(object);
+			messages.info("Werkopdracht succesvol gevalideerd.");
+
+			// OPNIEUW UIT TE VOEREN = nieuwe WerkOpdracht
+			if (validatieStatus.equals(ValidatieStatus.OPNIEUW_UITVOEREN)) {
+				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+						.createObject(getModelClass().getName(), null);
+				opdracht.setMedewerker(object.getMedewerker());
+				opdracht.setProbleem(object.getProbleem());
+				opdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
+				opdracht.setTraject(object.getTraject());
+				opdracht.setUitvoerder(object.getUitvoerder());
+				opdracht.setInRonde("0");
+				opdracht.setDatumTeControleren(new Date());
+				opdracht.setValidatie(validatieStatus);
+				modelRepository.saveObject(opdracht);
+				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Te controleren'");
+
+			}
+			// LATER OPNIEUW UITVOEREN VANAF = status UITGESTELD en nieuwe
+			// werkOpdracht met status UITGESTELD en set datum laterUitTeVoeren
+			else if (validatieStatus
+					.equals(ValidatieStatus.LATER_OPNIEUW_UITVOEREN_VANAF)) {
+
+				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+						.createObject(getModelClass().getName(), null);
+				opdracht.setMedewerker(object.getMedewerker());
+				opdracht.setProbleem(object.getProbleem());
+				opdracht.setStatus(WerkopdrachtStatus.UITGESTELD);
+				opdracht.setTraject(object.getTraject());
+				opdracht.setUitvoerder(object.getUitvoerder());
+				opdracht.setInRonde("0");
+				opdracht.setDatumLaterUitTeVoeren(new Date());
+				opdracht.setValidatie(validatieStatus);
+				modelRepository.saveObject(opdracht);
+				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Uitgesteld.' De werkopdracht zal status 'Te controleren' verkrijgen op de gespecifieerde datum.");
+			}
+			// TODO: Uitgestelde WO automatisch op te controlen op
+			// laterUitTeVoerenDatum
+			search();
+		} catch (IOException e) {
+			LOG.error("Can not save WerkOpdracht.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate WerkOpdracht.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("illegal access at WerkOpdracht.", e);
 		}
 	}
 }

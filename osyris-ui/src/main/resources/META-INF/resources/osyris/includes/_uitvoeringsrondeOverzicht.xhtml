@@ -135,7 +135,17 @@
 								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanView(uitvoeringsronde)}"
 								image="#{resource['core/images/actions/16x16/view.png']}"
 								type="image"
-								title="#{messages['page.actions.view.label']}"
+								title="#{messages['page.actions.view.label']} uitvoeringsronde"
+								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{uitvoeringsrondeOverzichtFormBase.object}"
+									value="#{uitvoeringsronde}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{(uitvoeringsrondeOverzichtFormBase.isCanEdit(uitvoeringsronde) and uitvoeringsronde.status == 'AANGEMAAKT') and (identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')) }"
+								image="#{resource['core/images/actions/16x16/edit.png']}"
+								type="image"
+								title="Rapporteren uitvoeringsronde"
 								oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).show();">
 								<f:setPropertyActionListener
 									target="#{uitvoeringsrondeOverzichtFormBase.object}"
@@ -145,7 +155,7 @@
 								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanDelete(uitvoeringsronde)}"
 								image="#{resource['core/images/actions/16x16/delete.png']}"
 								type="image"
-								title="#{messages['page.actions.delete.label']}"
+								title="#{messages['page.actions.delete.label']} uitvoeringsronde"
 								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
 								<f:setPropertyActionListener
 									target="#{uitvoeringsrondeOverzichtFormBase.object}"

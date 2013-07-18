@@ -48,6 +48,7 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	@NotEditable
 	@Label("Status")
 	@Description("Status")
 	private UitvoeringsrondeStatus status;

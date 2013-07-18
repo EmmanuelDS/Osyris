@@ -1,0 +1,89 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui">
+		<p:dataTable id="stockMaterialen"
+			value="#{form.selectedWerkOpdracht.materialen}"
+			mode="RESULT"
+			var="gebruiktMateriaal"
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+			<j:bindAttribute var="gebruiktMateriaal"
+						name="rowData" />
+			<f:facet name="header">
+				<div>Overzicht gebruikte materialen</div>
+			</f:facet>
+			<p:column>
+				<a:outputPanel styleClass="model-table-actions">
+					<j:commandButton
+							image="#{resource['core/images/actions/16x16/delete.png']}"
+							type="image"
+							title="Gebruikt materiaal verwijderen uit werkopdracht"
+							onclick="conscientia.widget(#{r:element('removeMateriaalPopup')}).show();">
+							<f:setPropertyActionListener
+								target="#{form.selectedMateriaal}"
+								value="#{gebruiktMateriaal}" />
+							</j:commandButton>
+				</a:outputPanel>
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Categorie</div>
+				</f:facet>
+				<d:propertyValue id="categorieColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
+					value="#{gebruiktMateriaal.stockMateriaal.categorie}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Subcategorie</div>
+				</f:facet>
+				<d:propertyValue id="subCategorieColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
+					value="#{gebruiktMateriaal.stockMateriaal.subCategorie}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>type</div>
+				</f:facet>
+				<d:propertyValue id="typeColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
+					value="#{gebruiktMateriaal.stockMateriaal.type}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Naam</div>
+				</f:facet>
+				<d:propertyValue id="naamColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
+					value="#{gebruiktMateriaal.stockMateriaal.naam}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>nummer</div>
+				</f:facet>
+				<d:propertyValue id="nummerColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
+					value="#{gebruiktMateriaal.stockMateriaal.nummer}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<div>Aantal</div>
+				</f:facet>
+				<d:propertyValue id="aantalColumn"
+					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"
+					value="#{gebruiktMateriaal.aantal}"
+					mode="VIEW" />
+			</p:column>
+	   	</p:dataTable>
+</u:composition>

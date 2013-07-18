@@ -73,8 +73,18 @@
 								rendered="#{stockMateriaalOverzichtFormBase.isCanEdit(object)}"
 								image="#{resource['core/images/actions/16x16/edit.png']}"
 								type="image"
-								title="#{messages['page.actions.edit.label']}"
+								title="Aanpassen stockmateriaal"
 								oncomplete="conscientia.widget(#{r:element('editPopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{stockMateriaalOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{stockMateriaalOverzichtFormBase.isCanEdit(object)}"
+								image="#{resource['core/images/actions/16x16/reload.png']}"
+								type="image"
+								title="Aanpassen voorraad"
+								oncomplete="conscientia.widget(#{r:element('editVoorraadPopup')}).show();">
 								<f:setPropertyActionListener
 									target="#{stockMateriaalOverzichtFormBase.object}"
 									value="#{object}" />
@@ -100,6 +110,12 @@
 				<u:param name="form" value="#{stockMateriaalOverzichtFormBase}" />
 				<u:param name="render" value="#{r:clientId('result')}" />
 			</u:decorate>
+			
+			<u:decorate template="/resources/osyris/includes/stockMateriaalPanels.xhtml">
+				<u:param name="form" value="#{stockMateriaalOverzichtFormBase}" />
+				<u:param name="render" value="#{r:clientId('result')}" />
+			</u:decorate>
+			
 		</j:layoutPane>
 	</j:layout>
 </u:composition>

@@ -47,14 +47,19 @@
 	</r:panel>
 	<br/>
 	<r:panel id="gebruiktMateriaalPanel">
-	<d:fields>
-		<d:field for="gebruiktMateriaal" label="Gebruikt materiaal">
-			<d:propertyValue id="gebruiktMateriaal"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('gebruiktMateriaal')}"
-					value="#{form.selectedWerkOpdracht.gebruiktMateriaal}"
-					mode="EDIT" />
-		</d:field>
-	</d:fields>
+		<u:decorate
+			template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+		<d:fields>
+			<d:buttons>
+				<j:commandButton value="Zoeken en toevoegen stockmateriaal"
+					title="Materiaal toevoegen"
+					image="#{resource['core/images/actions/16x16/add.png']}"
+					type="image"
+					onclick="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).show();" />
+			</d:buttons>
+		</d:fields>
 	</r:panel>
 	<br/>
 	<r:panel id="fotoPanel">

@@ -24,6 +24,7 @@ import org.conscientia.core.functions.ModelFunctions;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
+import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.label.LabelUtils;
@@ -44,6 +45,7 @@ import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -65,6 +67,8 @@ public class OsyrisModelFunctions {
 	protected UserRepository userRepository;
 	@Inject
 	protected CacheProducer cacheProducer;
+	@Inject
+	protected Identity identity;
 
 	/**
 	 * Get waarden status StockMateriaal.
@@ -707,5 +711,167 @@ public class OsyrisModelFunctions {
 			LOG.error("Can not access object.", e);
 		}
 		return null;
+	}
+
+	/**
+	 * Validaties voor WerkOpdrachten.
+	 * 
+	 * @return
+	 */
+	public List<Object[]> getWerkOpdrachtValidatie() {
+		List<Object[]> validaties = new ArrayList<Object[]>();
+		Object[] code1 = { ValidatieStatus.OPNIEUW_UITVOEREN,
+				"Opnieuw uitvoeren" };
+		Object[] code2 = { ValidatieStatus.NIET_OPNIEUW_UITVOEREN,
+				"Niet opnieuw uitvoeren" };
+		Object[] code3 = { ValidatieStatus.LATER_OPNIEUW_UITVOEREN_VANAF,
+				"Later opnieuw uitvoeren vanaf..." };
+		Object[] code4 = { ValidatieStatus.FOUT_GERAPPORTEERD,
+				"Fout gerapporteerd" };
+		Object[] code5 = { ValidatieStatus.OK_VOOR_FACTURATIE,
+				"OK voor facturatie" };
+
+		validaties.add(code1);
+		validaties.add(code2);
+		validaties.add(code3);
+		validaties.add(code4);
+		validaties.add(code5);
+		return validaties;
+	}
+
+	/**
+	 * Zoeken subcategorie aan de hand van de parent categorie.
+	 * 
+	 * @param categorie
+	 * @return
+	 * @throws IOException
+	 */
+	public List<?> getStockSubCategories(String categorie) throws IOException {
+		if (categorie != null && !categorie.isEmpty()) {
+			QueryBuilder builder = new QueryBuilder("StockMateriaal");
+			builder.filter(FilterUtils.equal("categorie", categorie));
+			builder.results(FilterUtils.properties("subCategorie"));
+			builder.groupBy(FilterUtils.properties("subCategorie"));
+
+			return modelRepository.searchObjects(builder.build(), true, true,
+					true);
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
+	/**
+	 * Zoeken van van StockMateriaal types aan de hand van de opgegeven
+	 * categorie en subcategorie
+	 * 
+	 * @param categorie
+	 * @param subCategorie
+	 * @return
+	 * @throws IOException
+	 */
+	public List<?> getStockTypes(String categorie, String subCategorie)
+			throws IOException {
+		if (categorie == null) {
+			return Collections.emptyList();
+		}
+
+		if (subCategorie != null && !subCategorie.isEmpty()) {
+			QueryBuilder builder = new QueryBuilder("StockMateriaal");
+			if (categorie != null) {
+				builder.filter(FilterUtils.equal("categorie", categorie));
+			}
+			builder.filter(FilterUtils.equal("subCategorie", subCategorie));
+			builder.results(FilterUtils.properties("type"));
+			builder.groupBy(FilterUtils.properties("type"));
+
+			return modelRepository.searchObjects(builder.build(), true, true,
+					true);
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
+	/**
+	 * Zoeken van StockMateriaalNamen aan de hand van de opegegven categorie,
+	 * subcategorie en type.
+	 * 
+	 * @param categorie
+	 * @param subCategorie
+	 * @param type
+	 * @return
+	 * @throws IOException
+	 */
+	public List<?> getStockMateriaalNamen(String categorie,
+			String subCategorie, String type) throws IOException {
+
+		if (categorie == null) {
+			return Collections.emptyList();
+		}
+
+		if (subCategorie != null && !subCategorie.isEmpty()) {
+			QueryBuilder builder = new QueryBuilder("StockMateriaal");
+			if (type != null) {
+				builder.filter(FilterUtils.equal("type", type));
+			}
+			if (categorie != null) {
+				builder.filter(FilterUtils.equal("categorie", categorie));
+			}
+			builder.filter(FilterUtils.equal("subCategorie", subCategorie));
+			builder.results(FilterUtils.properties("naam"));
+			builder.groupBy(FilterUtils.properties("naam"));
+
+			return modelRepository.searchObjects(builder.build(), false, false);
+
+		} else {
+			return Collections.emptyList();
+		}
+	}
+
+	/**
+	 * Filteren van de beschikbare Regios voor de ingelogde uitvoerder.
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getRegiosUitvoerder() {
+
+		List<Object[]> uitvoerderRegios = new ArrayList<Object[]>();
+		try {
+			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
+				User user = (User) modelRepository.loadObject(new ResourceName(
+						"User", identity.getUser().getKey()));
+
+				UitvoerderProfiel profiel = (UitvoerderProfiel) modelRepository
+						.getAspect(modelRepository
+								.getModelClass("UitvoerderProfiel"), user, true);
+
+				QueryBuilder builder = new QueryBuilder("Regio");
+				builder.addFilter(FilterUtils.equal("uitvoerder",
+						profiel.getBedrijf()));
+				builder.results(FilterUtils.properties("naam"));
+				builder.groupBy(FilterUtils.properties("naam"));
+				List<String> regios = (List<String>) modelRepository
+						.searchObjects(builder.build(), true, true, true);
+
+				for (String regio : regios) {
+					Object[] object = { new ResourceKey("Regio", regio), regio };
+					uitvoerderRegios.add(object);
+				}
+			}
+
+			else {
+				uitvoerderRegios = getRegiosOostVlaanderen();
+			}
+		} catch (IOException e) {
+			LOG.error("Can not search Regio.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate User.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Illegal access at object.", e);
+		}
+		return uitvoerderRegios;
 	}
 }

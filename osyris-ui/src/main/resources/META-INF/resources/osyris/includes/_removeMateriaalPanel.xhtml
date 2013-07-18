@@ -1,0 +1,29 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	
+	<h3><h:outputText value="Bent u zeker dat u het gebruikte materiaal uit de werkopdracht wilt verwijderen?"/></h3>
+	<br/>
+	<d:object 
+		value="#{form.selectedMateriaal}" 
+			mode="VIEW" />
+	
+	<d:buttons>
+		<j:commandButton value="#{messages['form.general.delete.button']}"
+				image="#{resource['core/images/actions/12x12/delete.png']}"
+				type="button" 
+				action="#{form.removeMateriaalFromWerkOpdracht()}"
+				render="#{r:clientId('gebruiktMateriaalPanel')}"
+				oncomplete="conscientia.widget(#{r:element('removeMateriaalPopup')}).hide();" />
+			<j:commandButton value="#{messages['form.general.cancel.button']}"
+				type="button"
+				image="#{resource['core/images/actions/12x12/cancel.png']}"
+				onclick="conscientia.widget(#{r:element('removeMateriaalPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

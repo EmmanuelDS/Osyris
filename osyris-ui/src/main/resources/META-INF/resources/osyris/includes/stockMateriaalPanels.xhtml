@@ -1,0 +1,29 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dialog id="editVoorraadPopup"
+		header="Aanpassen voorraad"
+		icon="#{resources['core/images/actions/16x16/edit.png']}"
+		modal="true"
+		resizable="false"
+		width="600"
+		height="400"
+		onShow="#{r:component('editVoorraadInclude')}.show();"
+		onHide="#{r:component('editVoorraadInclude')}.hide();">
+		<j:relocate />
+		<j:lazyInclude id="editVoorraadInclude"
+			src="/resources/osyris/includes/_editVoorraadPanel.xhtml">
+			<f:param name="form" value="#{form}" />
+			<f:param name="render" value="#{render}" />
+		</j:lazyInclude>
+	</p:dialog>
+	
+</u:composition>

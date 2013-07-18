@@ -37,6 +37,7 @@ import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
@@ -82,6 +83,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected ResourceIdentifier uitvoerder;
 	protected ResourceIdentifier medewerker;
 	protected WerkOpdracht selectedWerkOpdracht;
+	protected GebruiktMateriaal selectedMateriaal;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -138,6 +140,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public void setSelectedWerkOpdracht(WerkOpdracht selectedWerkOpdracht) {
 		this.selectedWerkOpdracht = selectedWerkOpdracht;
+	}
+
+	public GebruiktMateriaal getSelectedMateriaal() {
+		return selectedMateriaal;
+	}
+
+	public void setSelectedMateriaal(GebruiktMateriaal selectedMateriaal) {
+		this.selectedMateriaal = selectedMateriaal;
 	}
 
 	// METHODS
@@ -462,5 +472,20 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			LOG.error("Can not load WerkOpdracht.", e);
 		}
 		return isGerapporteerd;
+	}
+
+	/**
+	 * Verwijderen van een GebruiktMateriaal uit een WerkOpdracht.
+	 * 
+	 * @param opdracht
+	 * @param materiaal
+	 */
+	public void removeMateriaalFromWerkOpdracht() {
+		try {
+			selectedWerkOpdracht.getMaterialen().remove(selectedMateriaal);
+			modelRepository.saveObject(selectedWerkOpdracht);
+		} catch (IOException e) {
+			LOG.error("Can not ssave object.", e);
+		}
 	}
 }

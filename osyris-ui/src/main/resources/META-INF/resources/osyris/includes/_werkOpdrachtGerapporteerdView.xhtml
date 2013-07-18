@@ -1,0 +1,70 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	
+	<r:panel id="uitvoeringsrondePanel">
+	<d:fields>
+		<d:field for="uitvoeringsrondeId" label="Uitvoeringsronde">
+			<h:outputText value= "#{d:modelObject(form.uitvoeringsronde).getId()}" />
+		</d:field>
+		<d:field for="uitvoeringsrondeDatum" label="Uitgevoerd op">
+			<d:propertyValue id="uitvoeringsrondeDatum"
+			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}"
+					value="#{form.uitvoeringsronde.datumUitvoering}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="uitvoeringsronde" label="Uitgevoerd door">
+			<d:propertyValue id="uitvoerder"
+			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('uitvoerder')}"
+					value="#{form.uitvoeringsronde.uitvoerder}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="uitvoeringsrondeAfstand" label="Totaal aantal km">
+			<d:propertyValue id="uitvoeringsrondeAfstand"
+			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('afstand')}"
+					value="#{form.uitvoeringsronde.afstand}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="handelingenPanel">
+	<d:fields>
+		<d:field for="handelingen" label="Handelingen">
+			<d:propertyValue id="handelingen"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+					value="#{form.object.handelingen}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="materialenPanel">
+	<d:fields>
+		<d:field for="materialen" label="Gebruikte materialen">
+			<d:propertyValue id="materialen"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('materialen')}"
+					value="#{form.object.materialen}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="fotoPanel">
+	<d:fields>
+		<d:field for="foto" label="Foto's">
+			<d:propertyValue id="foto"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
+					value="#{form.object.foto}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+</u:composition>

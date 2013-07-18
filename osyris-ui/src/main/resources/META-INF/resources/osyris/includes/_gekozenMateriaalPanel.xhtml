@@ -1,0 +1,80 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:q="http://specto.gim.be/search"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	
+	<r:panel id="materiaalPanel" header="Detail stockmateriaal">
+	<d:fields>
+		<d:field for="magazijn" label="Magazijn">
+			<d:propertyValue id="magazijn"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('magazijn')}"
+					value="#{stockMateriaalOverzichtFormBase.object.magazijn}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="categorie" label="Categorie">
+			<d:propertyValue id="categorie"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
+					value="#{stockMateriaalOverzichtFormBase.object.categorie}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="subCategorie" label="Subcategorie">
+			<d:propertyValue id="subCategorie"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
+					value="#{stockMateriaalOverzichtFormBase.object.subCategorie}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="type" label="type">
+			<d:propertyValue id="type"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
+					value="#{stockMateriaalOverzichtFormBase.object.type}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="materiaalNaam" label="Naam">
+			<d:propertyValue id="materiaalNaam"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
+					value="#{stockMateriaalOverzichtFormBase.object.naam}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="nummer" label="Nummer">
+			<d:propertyValue id="nummer"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
+					value="#{stockMateriaalOverzichtFormBase.object.nummer}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="inStock" label="In stock">
+			<d:propertyValue id="inStock"
+			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('inStock')}"
+					value="#{stockMateriaalOverzichtFormBase.object.inStock}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<r:panel id="aantalGebruiktPanel">
+	<d:fields>
+		<d:field for="aantalGebruikt" label="Aantal gebruikt">
+			<d:propertyValue id="aantalGebruikt"
+			 		modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"
+					value="#{stockMateriaalOverzichtFormBase.aantalGebruikt}"
+					mode="EDIT" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<d:buttons>
+		<j:commandButton
+				image="#{resource['core/images/actions/16x16/view.png']}"
+				value="Materiaal toevoegen aan Werkopdracht"
+				type="button"
+				title="#{messages['page.actions.view.label']}"
+				render="#{r:clientId('gebruiktMateriaalPanel')}"
+				action="#{stockMateriaalOverzichtFormBase.createGebruiktMateriaal(form.selectedWerkOpdracht)}"
+				oncomplete="conscientia.widget(#{r:element('gekozenMateriaalPopup')}).hide(); conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).show();" />
+	</d:buttons>
+</u:composition>

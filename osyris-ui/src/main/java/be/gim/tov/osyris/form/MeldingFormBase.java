@@ -329,6 +329,9 @@ public class MeldingFormBase implements Serializable {
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 
+		if (getMelding().getProbleem() != null) {
+			modelRepository.evictObject(getMelding().getProbleem());
+		}
 		Probleem probleem = null;
 		if ("bord".equals(probleemType)) {
 			if (trajectType.endsWith("Route")) {
@@ -339,7 +342,7 @@ public class MeldingFormBase implements Serializable {
 						"NetwerkBordProbleem", null);
 			}
 
-			// Itereren over de lagen en de correctie lagen selecteerbaar zetten
+			// Itereren over de lagen en de correcte lagen selecteerbaar zetten
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 				layer.setSelection(null);
 				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {

@@ -1,0 +1,102 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:q="http://specto.gim.be/search"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	
+	 <style>
+    .rich-panel-header {
+        color:#0054BD;
+    }
+    .panel {
+        vertical-align:top;
+    }
+    .top {
+        width:200px;height:100px;
+    }
+
+    .head2 {
+        background-image : url();
+        background-color : #4C9600;
+        height:18px;
+        text-align:center;
+        vertical-align:middle;
+        color:#CFF;
+        padding:4px 0;
+    }
+    
+    .body3 {
+        height:100px;
+        overflow:auto;
+    }
+    </style>
+    
+	<h2>Kies het gebruikte materiaal</h2>
+	<h:panelGrid columns="2" style="width:100%">
+	<r:panel>
+<!-- 	<j:layout style="height: 400px"> -->
+<!-- 		<j:layoutPane region="west" size="350" minSize="200" resizable="false" -->
+<!-- 			slidable="true"> -->
+<!-- 			<div class="ui-layout-content"> -->
+				<q:query value="#{stockMateriaalOverzichtFormBase.query}"
+					modelClassName="#{stockMateriaalOverzichtFormBase.modelClass.name}">
+					<c:if test="#{stockMateriaalOverzichtFormBase.index}">
+						<d:field for="term"
+							label="#{messages['page.search.query.term.title']}">
+							<q:phrase id="termFilter" value="#{searchForm.term}">
+								<h:inputText value="#{searchForm.term}" />
+							</q:phrase>
+						</d:field>
+					</c:if>
+					<d:object mode="SEARCH"
+						modelClass="#{stockMateriaalOverzichtFormBase.modelClass}" />
+				</q:query>
+				<d:buttons>
+					<j:commandButton rendered="true"
+						value="#{messages['page.general.button.search']}"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{stockMateriaalOverzichtFormBase.search()}"
+						render="objects" />
+						<j:commandButton value="Terug naar werkopdracht"
+							title="Terugkeren naar de te rapporteren werkopdracht"
+							type="button"
+							image="#{resource['core/images/actions/12x12/cancel.png']}"
+							onclick="conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).hide(); conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).show(); "/>
+				</d:buttons>
+<!-- 			</div> -->
+<!-- 		</j:layoutPane> -->
+		</r:panel>
+		<r:panel>
+				<d:objects id="objects"
+					value="#{stockMateriaalOverzichtFormBase.results}"
+					modelClass="#{stockMateriaalOverzichtFormBase.modelClass}"
+					mode="RESULT" level="SHORT">
+					<f:facet name="left">
+						<a:outputPanel rendered="true"
+							styleClass="model-table-actions">
+							<j:commandButton
+								rendered="#{stockMateriaalOverzichtFormBase.isCanView(object)}"
+								image="#{resource['core/images/actions/16x16/add.png']}"
+								type="image"
+								title="Materiaal toevoegen"
+								oncomplete="conscientia.widget(#{r:element('gekozenMateriaalPopup')}).show(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).hide(); ">
+								<f:setPropertyActionListener
+									target="#{stockMateriaalOverzichtFormBase.object}"
+									value="#{object}" />
+							</j:commandButton>
+						</a:outputPanel>
+					</f:facet>
+				</d:objects>
+				<j:layoutContent
+					selector="*[id='#{j:clientId('objects', 'table')}']" />	
+		</r:panel>
+		</h:panelGrid>
+</u:composition>

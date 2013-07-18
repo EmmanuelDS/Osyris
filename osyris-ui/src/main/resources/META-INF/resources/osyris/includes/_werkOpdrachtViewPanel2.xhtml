@@ -8,6 +8,36 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
-	<h2>Werkopdracht #{d:modelObject(form.object).getId()} - </h2>
-	TEST PANEL 2
+	<h2>Werkopdracht #{d:modelObject(form.object).getId()} (uitvoeringsronde #{d:modelObject(form.uitvoeringsronde).getId()})</h2>
+	
+	<br/>
+	<table width="100%">
+	<tr valign="top">
+	<td>
+	<u:decorate
+				template="/resources/osyris/includes/_werkOpdrachtGerapporteerdView.xhtml">
+				<u:param name="form" value="#{form}" />
+				<u:param name="render" value="#{render}" />
+			</u:decorate>
+	<br/>
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
+	<d:buttons>
+		<j:commandButton
+			rendered="#{form.object.status == 'GERAPPORTEERD' }"
+			value="Valideren"
+			image="#{resource['core/images/actions/12x12/edit.png']}"
+			type="button"
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
+	</d:buttons> 
 </u:composition>
