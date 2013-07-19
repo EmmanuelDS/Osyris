@@ -39,10 +39,11 @@ import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.jboss.seam.international.status.Messages;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.NoSuchAuthorityCodeException;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
@@ -68,6 +69,7 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.Route;
+import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
 
@@ -99,8 +101,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 	// VARIABLES
 	@Inject
 	protected UserRepository userRepository;
-	@Inject
-	protected Messages messages;
 	@Inject
 	protected MapFactory mapFactory;
 	@Inject
@@ -280,8 +280,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 								.getModelClass("NetwerkControleOpdracht"), null);
 			}
 		} catch (InstantiationException e) {
+			messages.error("Fout bij het aanmaken van controleopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
+			messages.error("Fout bij het aanmaken van controleopdracht: "
+					+ e.getMessage());
 			LOG.error("Illegal access at creation model object.", e);
 		}
 	}
@@ -334,10 +338,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 			if (object.getTraject() != null) {
 				modelRepository.saveObject(object);
+				messages.info("Controleopdracht succesvol bewaard.");
 				clear();
 				search();
 			}
 		} catch (IOException e) {
+			messages.error("Fout bij het bewaren van controleopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not save model object.", e);
 		}
 	}
@@ -355,9 +362,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @throws IOException
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
+	 * @throws FactoryException
+	 * @throws NoSuchAuthorityCodeException
 	 */
-	public MapConfiguration getSearchConfiguration() throws IOException,
-			InstantiationException, IllegalAccessException {
+	public MapConfiguration getSearchConfiguration() throws Exception {
 		MapContext context = (MapContext) modelRepository
 				.loadObject(new ResourceKey("Form@12"));
 
@@ -375,6 +383,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			mapFactory.createGeometryLayer(configuration.getContext(),
 					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
 					"single", null, null);
+
 			context.setBoundingBox(context.getMaxBoundingBox());
 			configuration.setContext(context);
 			return configuration;
@@ -444,16 +453,33 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 
 			// BordLayer
-			FeatureMapLayer bordLayer = (FeatureMapLayer) context
-					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
-							.lowerCamelCase(traject.getModelClass().getName()
-									+ "Bord")));
+			FeatureMapLayer bordLayer = null;
+			// ROUTES
+			if (traject instanceof Route) {
+				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName() + "Bord")));
 
-			if (bordLayer != null) {
-				bordLayer.setHidden(false);
-				bordLayer
-						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+				// Filteren Routeborden op BordNaam
+				if (bordLayer != null) {
+					bordLayer.setHidden(false);
+					bordLayer.setFilter(FilterUtils.equal("naam",
+							traject.getNaam()));
+				}
+
 			}
+			// LUSSEN
+			else if (traject instanceof NetwerkLus) {
+				bordLayer = (FeatureMapLayer) context
+						.getLayer("fietsNetwerkBord");
+				// Filteren NetwerkBorden op segmenten van de Lus
+				if (bordLayer != null) {
+					bordLayer.setHidden(false);
+					bordLayer.setFilter(FilterUtils.in("segmenten",
+							((NetwerkLus) traject).getSegmenten()));
+				}
+			}
+
 			// Problemen
 			for (Probleem probleem : object.getProblemen()) {
 
@@ -482,7 +508,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Maakt het bewegwijzeringsverslag voor het gekozen traject.
+	 * Maakt het bewegwijzeringsverslag voor het gezochte traject.
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
@@ -491,10 +517,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			// Routes filteren op trajectNaam
 			if (trajectType.contains("Route")) {
-
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", trajectNaam));
-				// TODO: sorteren op sequentie
+				// TODO: sorteren op sequentie, voorlopig nog met AlphaNumeric
+				// Sorting algoritme
 				// builder.orderBy(new
 				// DefaultQueryOrderBy(FilterUtils.property("sequentie")));
 				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
@@ -504,10 +530,30 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// TODO: voor lussen zoeken naar segmenten in de lus en de borden
 			// gekoppeld aan deze segmenten filteren
-			else if (trajectType.contains("lus")) {
+			else if (trajectType.contains("Lus")) {
+				QueryBuilder builder = new QueryBuilder("NetwerkBord");
+
+				MapViewer viewer = getViewer();
+				MapContext context = viewer.getConfiguration().getContext();
+
+				for (FeatureMapLayer layer : context.getFeatureLayers()) {
+					if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+						searchTrajectId(layer);
+					}
+				}
+				NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
+						.getTraject());
+				builder.addFilter(FilterUtils.in("segmenten",
+						lus.getSegmenten()));
+				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
+						builder.build(), true, true);
+				Collections.sort(bewegwijzering, new AlphanumericSorting());
 
 			}
 		} catch (IOException e) {
+			messages.error("Fout bij het aanmaken van bewegwijzeringsverslag: "
+					+ e.getMessage());
 			LOG.error("Can not search objects.", e);
 			bewegwijzering = null;
 		}
@@ -542,11 +588,20 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// TODO: voor lussen zoeken naar segmenten in de lus en de borden
 			// gekoppeld aan deze segmenten filteren
-			else {
+			else if (t instanceof NetwerkLus) {
+				QueryBuilder builder = new QueryBuilder("NetwerkBord");
+				builder.addFilter(FilterUtils.in("segmenten",
+						((NetwerkLus) t).getSegmenten()));
+				result = (List<Bord>) modelRepository.searchObjects(
+						builder.build(), true, true);
+				Collections.sort(result, new AlphanumericSorting());
+			} else {
 				result = Collections.emptyList();
 			}
 
 		} catch (IOException e) {
+			messages.error("Fout bij het ophalen van bewegwijzeringsverslag voor traject: "
+					+ e.getMessage());
 			LOG.error("Can not search objects.", e);
 			result = Collections.emptyList();
 		}
@@ -584,13 +639,47 @@ public class ControleOpdrachtOverzichtFormBase extends
 			else if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
 				searchRouteLayer(layer, viewer);
 			}
-		}
+			// NetwerkBord
+			else if (layer.getLayerId().equalsIgnoreCase(
+					trajectType.replace("Lus", "") + "Bord")) {
+				layer.setHidden(false);
+				searchNetwerkBordLayer(layer);
+			}
 
-		context.setBoundingBox(envelope);
-		viewer.updateContext(null);
+			context.setBoundingBox(envelope);
+			viewer.updateContext(null);
+		}
 	}
 
 	/**
+	 * Zoekoperaties op de NetwerkBord lagen.
+	 * 
+	 * @param layer
+	 */
+	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+		layer.setFilter(null);
+		layer.setHidden(false);
+		try {
+			MapViewer viewer = getViewer();
+			MapContext context = viewer.getConfiguration().getContext();
+
+			for (FeatureMapLayer mapLayer : context.getFeatureLayers()) {
+				if (mapLayer.getLayerId().equalsIgnoreCase(trajectType)) {
+					mapLayer.setFilter(FilterUtils.equal("naam", trajectNaam));
+					searchTrajectId(mapLayer);
+				}
+			}
+
+			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
+					.getTraject());
+			layer.setFilter(FilterUtils.in("segmenten", lus.getSegmenten()));
+		} catch (IOException e) {
+			LOG.error("Can not load NetwerkLus.", e);
+		}
+	}
+
+	/**
+	 * Zoekoperaties op de Netwerk lagen.
 	 * 
 	 * @param layer
 	 * @param viewer
@@ -605,6 +694,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
+	 * Zoekoperaties op de Route lagen.
 	 * 
 	 * @param layer
 	 * @param viewer
@@ -690,9 +780,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 			object.setStatus(ControleOpdrachtStatus.GEANNULEERD);
 			try {
 				modelRepository.saveObject(object);
+				messages.info("Controleopdracht succesvol geannuleerd.");
 				clear();
 				search();
 			} catch (IOException e) {
+				messages.error("Fout bij het annuleren van controleopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			}
 		}
@@ -708,9 +801,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 			object.setDatumTeControleren(new Date());
 			try {
 				modelRepository.saveObject(object);
+				messages.info("Controleopdracht succesvol heropend. De controleopdracht staat opnieuw in status 'Te controleren'.");
 				clear();
 				search();
 			} catch (IOException e) {
+				messages.error("Fout bij het heropenen van controleopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			}
 		}
@@ -730,10 +826,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 				search();
 				// send confirmatie mail naar peterMeter
 				// sendConfirmationMail();
-				messages.info("Controleopdracht verzonden.");
+				messages.info("Controleopdracht succesvol verzonden.");
 			} catch (IOException e) {
+				messages.error("Fout bij het verzenden van controleopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			} catch (Exception e) {
+				messages.error("Fout bij het verzenden van controleopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not send email", e);
 			}
 		}
@@ -751,10 +851,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(object);
 				clear();
 				search();
-				messages.info("Controleopdracht gerapporteerd.");
+				messages.info("Controleopdracht succesvol gerapporteerd.");
 			} catch (IOException e) {
+				messages.error("Fout bij het rapporteren van controleopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			} catch (Exception e) {
+				messages.error("Fout bij het rapporteren van controleopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not send email", e);
 			}
 		}
@@ -782,6 +886,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.getAspect("UserProfile").get("email").toString()),
 				"/META-INF/resources/core/mails/confirmControleOpdracht.fmt",
 				variables);
+		messages.info("Er is een email verzonden naar de betrokken PeterMeter");
 	}
 
 	/**
@@ -845,12 +950,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		// Bordprobleem
 		if ("bord".equals(probleemType)) {
-			if (object.getTrajectType().contains(
-					LabelUtils.upperSpaced("route"))) {
+			if (object.getTrajectType().contains("route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
-			} else if (object.getTrajectType().contains(
-					LabelUtils.upperSpaced("Netwerk"))) {
+			} else if (object.getTrajectType().contains("lus")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkBordProbleem", null);
 			}
@@ -873,11 +976,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 		// Ander probleem
 		else if ("ander".equals(probleemType)) {
-			if (object.getTrajectType().contains(
-					LabelUtils.upperSpaced("route"))) {
+			if (object.getTrajectType().contains("route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
-			} else if (trajectType.contains(LabelUtils.upperSpaced("netwerk"))) {
+			} else if (trajectType.contains("lus")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkAnderProbleem", null);
 			}
@@ -1016,21 +1118,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * 
-	 * @return
-	 */
-	public boolean hasBordInfo() {
-		if (selectedProbleem != null) {
-			if (selectedProbleem instanceof BordProbleem) {
-				return true;
-			} else {
-				return false;
-			}
-		}
-		return false;
-	}
-
-	/**
 	 * Automatisch aanmaken van controleOpdrachten voor de toegewezen
 	 * PetersMeters aan een traject.
 	 * 
@@ -1085,13 +1172,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 				}
 			}
 			search();
-			messages.info("Automatisch aanmaken controleopdrachten succesvol uitgevoerd.");
+			messages.info("Automatisch aanmaken van controleopdrachten succesvol uitgevoerd.");
 			messages.info("Er zijn " + counter
 					+ " nieuwe controleopdrachten aangemaakt.");
 		} catch (IOException e) {
-			LOG.error("Can not search Trajecten.", e);
 			messages.info("Automatisch aanmaken controleopdrachten niet gelukt: "
 					+ e.getMessage());
+			LOG.error("Can not search Trajecten.", e);
 		}
 	}
 
@@ -1172,5 +1259,54 @@ public class ControleOpdrachtOverzichtFormBase extends
 		transformer.transform(xslt, res);
 
 		return new ByteArrayContent("application/pdf", out.toByteArray());
+	}
+
+	/**
+	 * Checken of het opgegeven Probleem een BordProbleem is.
+	 * 
+	 * @param probleem
+	 * @return
+	 */
+	public boolean isBordProbleem(Probleem probleem) {
+		if (probleem != null) {
+			if (probleem instanceof BordProbleem) {
+				return true;
+			} else {
+				return false;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Checken of het opgegeven Bord een RouteBord is.
+	 * 
+	 * @param bord
+	 * @return
+	 */
+	public boolean isRouteBord(Bord bord) {
+		if (bord instanceof RouteBord) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Verwijderen van een Probleem.
+	 * 
+	 * @param probleem
+	 */
+	public void deleteProbleem(Probleem probleem) {
+		try {
+			object.getProblemen().remove(probleem);
+			modelRepository.saveObject(object);
+			modelRepository.evictObject(probleem);
+			messages.info("Probleem succesvol verwijderd.");
+		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van probleem: "
+					+ e.getMessage());
+			LOG.error("Can not delete Probleem from ControleOpdracht.", e);
+		}
 	}
 }

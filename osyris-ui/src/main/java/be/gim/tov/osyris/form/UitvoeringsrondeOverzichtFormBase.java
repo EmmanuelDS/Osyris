@@ -20,7 +20,6 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.jsf.component.ComponentUtils;
-import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
@@ -73,8 +72,6 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
-	@Inject
-	protected Messages messages;
 
 	protected ResourceIdentifier regio;
 	protected String trajectType;
@@ -221,7 +218,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	}
 
 	/**
-	 * Temporary Experimental search helper method
+	 * Zoeken tot welke UitvoeringsRonde een opgegeven WerkOpdracht behoort.
+	 * Temporary Experimental search helper method.
 	 * 
 	 * @param id
 	 * @param list
@@ -257,7 +255,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	}
 
 	/**
-	 * Zoekt alle werkopdrachten in een uitvoeringsronde.
+	 * Zoeken van alle WerkOpdrachten in een UitvoeringsRonde.
 	 * 
 	 * @return
 	 */
@@ -289,9 +287,12 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			}
 			// Delete Uitvoeringsronde
 			modelRepository.deleteObject(object);
+			messages.info("Uitvoeringsronde succesvol verwijderd. De bijbehorende werkopdrachten behoren niet meer toe aan een uitvoeringsronde.");
 			clear();
 			search();
 		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van een uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Can not delete model object.", e);
 		}
 	}
@@ -413,7 +414,10 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			// Save opdracht en ronde
 			modelRepository.saveObject(object);
 			modelRepository.saveObject(selectedWerkOpdracht);
+			messages.info("Werkopdracht succesvol verwijderd uit uitvoeringsronde.");
 		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van de werkopdracht uit de uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Can not save object.", e);
 		}
 	}
@@ -427,7 +431,10 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			selectedWerkOpdracht.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
 			selectedWerkOpdracht.setDatumGerapporteerd(new Date());
 			modelRepository.saveObject(selectedWerkOpdracht);
+			messages.info("Werkopdracht in uitvoeringsronde succesvol gerapporteerd.");
 		} catch (IOException e) {
+			messages.error("Fout bij het rapporteren van de werkopdracht in uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Can not save werkopdracht.", e);
 		}
 	}
@@ -443,11 +450,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			if (checkWerkOpdrachtenGerapporteerd()) {
 				object.setStatus(UitvoeringsrondeStatus.UITGEVOERD);
 				modelRepository.saveObject(object);
-				messages.info("Uitvoeringsronde succesvol bewaard.");
+				messages.info("Uitvoeringsronde succesvol gerapporteerd.");
 			} else {
-				messages.error("Uitvoeringsronde niet bewaard: De uitvoeringsronde bevat nog niet-gerapporteerde werkopdrachten.");
+				messages.error("Uitvoeringsronde niet gerapporteerd: De uitvoeringsronde bevat nog niet-gerapporteerde werkopdrachten.");
 			}
 		} catch (IOException e) {
+			messages.error("fout bij het rapporteren van uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Can not save Uitvoeringsronde.", e);
 		}
 	}
@@ -484,7 +493,10 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		try {
 			selectedWerkOpdracht.getMaterialen().remove(selectedMateriaal);
 			modelRepository.saveObject(selectedWerkOpdracht);
+			messages.info("Materiaal succesvol verwijderd uit werkopdracht.");
 		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van materiaal uit werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not ssave object.", e);
 		}
 	}

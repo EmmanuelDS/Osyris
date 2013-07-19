@@ -164,12 +164,14 @@ public class OsyrisModelFunctions {
 			}
 		}
 
+		// Voor NetwerkControleOpdrachten werkt men met NetwerkLussen
 		if (controleOpdrachtType != null
 				&& controleOpdrachtType.contains("netwerk")) {
-			Collection<ModelClass> subClassesNetwerk = Collections.emptyList();
-			subClassesNetwerk = modelRepository.getModelClass("NetwerkSegment")
+			Collection<ModelClass> subClassesNetwerkLus = Collections
+					.emptyList();
+			subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 					.getSubClasses();
-			for (ModelClass modelClass : subClassesNetwerk) {
+			for (ModelClass modelClass : subClassesNetwerkLus) {
 				Object[] object = { modelClass.getName(), modelClass.getLabel() };
 				trajectTypes.add(object);
 			}

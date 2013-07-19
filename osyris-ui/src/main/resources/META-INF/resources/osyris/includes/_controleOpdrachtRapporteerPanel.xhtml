@@ -60,21 +60,21 @@
 				control="drawPoint" />
 		</j:commandButton>
 		<br/>
-		<j:commandButton
-			id="selectSegment"
-			rendered="#{form.object.trajectType.contains('netwerk')}"
-			image="#{resource['core/images/actions/24x24/select.png']}"
-			styleClass="component-toolbar-button"
-			value="Selecteer segment op kaart"
-			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-			submit="false">
-			<j:activateControl
-				for="viewer"
-				event="click"
-				control="selectBox" >
-			</j:activateControl>
-		</j:commandButton>
-		<br/>
+<!-- 		<j:commandButton -->
+<!-- 			id="selectSegment" -->
+<!-- 			rendered="#{form.object.trajectType.contains('netwerk')}" -->
+<!-- 			image="#{resource['core/images/actions/24x24/select.png']}" -->
+<!-- 			styleClass="component-toolbar-button" -->
+<!-- 			value="Selecteer segment op kaart" -->
+<!-- 			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
+<!-- 			submit="false"> -->
+<!-- 			<j:activateControl -->
+<!-- 				for="viewer" -->
+<!-- 				event="click" -->
+<!-- 				control="selectBox" > -->
+<!-- 			</j:activateControl> -->
+<!-- 		</j:commandButton> -->
+<!-- 		<br/> -->
 <!-- 					<j:commandButton -->
 <!-- 						id="drawLine" -->
 <!-- 						rendered="#{form.probleemType == 'ander' and form.object.trajectType.contains('route')}" -->
@@ -137,7 +137,7 @@
 			image="#{resource['core/images/actions/12x12/save.png']}"
 			type="button"
 			action="#{form.save()}"
-			render="#{render}"
+			render="#{r:clientId('problemenOverzichtPanel')}"
 			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
 		<j:commandButton value="Verzenden"
 			image="#{resource['core/images/actions/12x12/next.png']}"

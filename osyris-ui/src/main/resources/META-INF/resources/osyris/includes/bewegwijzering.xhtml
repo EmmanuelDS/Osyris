@@ -9,6 +9,8 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:q="http://specto.gim.be/search"
 	xmlns:p="http://primefaces.org/ui">
+	
+	<r:panel>
 	<p:dataTable id="verslag"
 		value="#{form.createBewegwijzering(form.object.traject)}"
 		mode="RESULT" 
@@ -42,6 +44,12 @@
 				modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
 				value="#{bord.volg }" mode="VIEW" />
 		</p:column>
+		<p:column rendered="#{!form.isRouteBord(bord)}">
+			<f:facet name="header">
+				<div>Pijlen</div>
+			</f:facet>
+			<h:outputText value="#{bord.kp1ImageCode } - #{bord.kp2ImageCode } - #{bord.kp3ImageCode }"/>
+		</p:column>
 		<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact">
 			<f:facet name="header">
 				<div>Pijl</div>
@@ -50,7 +58,7 @@
 				modelProperty="#{d:modelClass('Bord').getProperty('imageCode')}"
 				value="#{bord.imageCode }" mode="VIEW" />
 		</p:column>
-		<p:column filterBy="#{bord.straatnaam}" filterMatchMode="contains">
+		<p:column filterBy="#{bord.straatnaam}" filterMatchMode="contains" rendered="#{form.isRouteBord(bord)}">
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('Bord').getProperty('straatnaam')}" />
@@ -69,4 +77,5 @@
 				value="#{bord.paalConst }" mode="VIEW" />
 		</p:column>
 	</p:dataTable>
+	</r:panel>
 </u:composition>

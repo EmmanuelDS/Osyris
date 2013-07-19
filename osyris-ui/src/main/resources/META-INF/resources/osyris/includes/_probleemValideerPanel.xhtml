@@ -7,17 +7,37 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf">	
-	<div>
+	<r:panel>
 	<d:fields>
-		<a:outputPanel rendered="#{form.hasBordInfo()}">
-		<d:field label="Bordvolgnummer">
-			<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
-				mode="VIEW" />
-		</d:field>
-		<d:field label="Straatnaam">
-			<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
-				mode="VIEW" />
-		</d:field>
+		<a:outputPanel rendered="#{form.isBordProbleem(form.selectedProbleem)}">
+			<d:field label="Type probleem" for="type">
+						<d:propertyValue id="type"
+							modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+							value="#{form.selectedProbleem.type}" mode="VIEW" />
+			</d:field>
+			<d:field label="Bordvolgnummer">
+				<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
+					mode="VIEW" />
+			</d:field>
+			<d:field label="Straatnaam">
+				<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
+					mode="VIEW" />
+			</d:field>
+		</a:outputPanel>
+		<a:outputPanel rendered="#{!form.isBordProbleem(form.selectedProbleem)}">
+			<d:field label="Categorie probleem" for="categorie">
+						<d:propertyValue id="categorie"
+							modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+							value="#{form.selectedProbleem.categorie}" mode="VIEW" />
+			</d:field>
+			<d:field label="Bordvolgnummer">
+				<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
+					mode="VIEW" />
+			</d:field>
+			<d:field label="Straatnaam">
+				<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
+					mode="VIEW" />
+			</d:field>
 		</a:outputPanel>
 	</d:fields>
 	<d:object mode="EDIT"
@@ -41,6 +61,5 @@
 			onclick="conscientia.widget(#{r:element('editProbleemPopup')}).hide();">
 		</j:commandButton>
 	</d:buttons>
-	</div>
-	
-	</u:composition>
+	</r:panel>
+</u:composition>

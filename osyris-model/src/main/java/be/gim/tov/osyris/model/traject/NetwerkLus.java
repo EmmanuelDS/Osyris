@@ -9,7 +9,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 
-import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceIdentifier;
 
 /**
  * 
@@ -29,8 +29,8 @@ public abstract class NetwerkLus extends Traject {
 	@NotSearchable
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
-	@ModelClassName("NetwerkSegment")
-	private List<ResourceKey> segmenten;
+	@ModelClassName("Traject")
+	private List<ResourceIdentifier> segmenten;
 
 	// GETTERS AND SETTERS
 	public boolean isActief() {
@@ -41,11 +41,11 @@ public abstract class NetwerkLus extends Traject {
 		this.actief = actief;
 	}
 
-	public List<ResourceKey> getSegmenten() {
+	public List<ResourceIdentifier> getSegmenten() {
 		return segmenten;
 	}
 
-	public void setSegmenten(List<ResourceKey> segmenten) {
+	public void setSegmenten(List<ResourceIdentifier> segmenten) {
 		this.segmenten = segmenten;
 	}
 }

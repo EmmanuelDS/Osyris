@@ -94,12 +94,14 @@ public class MeldingSaveListener {
 					.zoekUitvoerder(traject.getRegio()));
 
 			modelRepository.saveObject(werkOpdracht);
-			messages.info("Nieuwe werkopdracht aangemaakt.");
+			messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
 		} catch (IOException e) {
-			messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
+			messages.error("Fout bij het bewaren van een nieuwe werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not save WerkOpdracht", e);
 		} catch (InstantiationException e) {
-			messages.error("Fout bij het aanmaken van een nieuwe werkopdracht.");
+			messages.error("Fout bij het aanmaken van een nieuwe werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not create WerkOpdracht.", e);
 		} catch (IllegalAccessException e) {
 			LOG.error("Can not access WerkOpdracht.", e);

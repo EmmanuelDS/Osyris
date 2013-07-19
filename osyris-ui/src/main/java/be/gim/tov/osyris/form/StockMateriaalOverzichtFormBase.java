@@ -125,15 +125,22 @@ public class StockMateriaalOverzichtFormBase extends
 
 			// GebruiktMateriaal saven
 			modelRepository.saveObject(opdracht);
+			messages.info("Materiaal succesvol toegevoegd.");
 
 			// reset aantal gebruikt
 			setAantalGebruikt(0);
 			search();
 		} catch (InstantiationException e) {
+			messages.error("Fout bij het toevoegen van stockmateriaal: "
+					+ e.getMessage());
 			LOG.error("Can not instantiate GebruiktMateriaal.", e);
 		} catch (IllegalAccessException e) {
+			messages.error("Fout bij het toevoegen van stockmateriaal: "
+					+ e.getMessage());
 			LOG.error("Illegal access at object.", e);
 		} catch (IOException e) {
+			messages.error("Fout bij het toevoegen van stockmateriaal: "
+					+ e.getMessage());
 			LOG.error("Can not save object.", e);
 		}
 	}
@@ -151,9 +158,12 @@ public class StockMateriaalOverzichtFormBase extends
 				}
 			}
 			modelRepository.saveObject(object);
+			messages.info("Stockmateriaal succesvol bewaard.");
 			clear();
 			search();
 		} catch (IOException e) {
+			messages.error("Fout bij het bewaren van stockmateriaal: "
+					+ e.getMessage());
 			LOG.error("Can not save model object.", e);
 		}
 	}
@@ -169,7 +179,7 @@ public class StockMateriaalOverzichtFormBase extends
 	public void search() {
 		try {
 			results = (List<StockMateriaal>) modelRepository.searchObjects(
-					getQuery(), true, true);
+					getQuery(), false, false);
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;

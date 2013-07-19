@@ -7,6 +7,7 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf">
+	
 	<p:dialog id="viewPopup"
 		header="#{messages['page.view.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/view.png']}"
@@ -23,16 +24,18 @@
 		</j:lazyInclude>
 	</p:dialog>
 	
-	<p:dialog id="editPopup"
-		header="#{messages['page.edit.title']} #{form.modelClass.label}"
+	<p:dialog id="valideerPopup"
+		header="Valideren #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
+		width="1100"
+		height="700"
 		resizable="false"
-		onShow="#{r:component('editInclude')}.show();"
-		onHide="#{r:component('editInclude')}.hide();">
+		onShow="#{r:component('valideerInclude')}.show();"
+		onHide="#{r:component('valideerInclude')}.hide();">
 		<j:relocate />
-		<j:lazyInclude id="editInclude"
-			src="/resources/core/includes/_editPanel.xhtml">
+		<j:lazyInclude id="valideerInclude"
+			src="/resources/osyris/includes/_meldingValideerPanel.xhtml">
 			<f:param name="form" value="#{form}" />
 			<f:param name="render" value="#{render}" />
 		</j:lazyInclude>

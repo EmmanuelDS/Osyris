@@ -1,0 +1,27 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	
+	<p:outputPanel id="pdfTypePanel"> 
+	<p:selectOneRadio id="pdftype" value="#{form.pdfType}">
+        <f:selectItem itemLabel="Kaart met bewegwijzeringsverslag" itemValue="1" />
+        <f:selectItem itemLabel="Kaart met bewegwijzeringsverslag + individuele bordfiches" itemValue="2" />
+    </p:selectOneRadio>
+    <br />
+    <d:buttons>
+		<d:fileDownload fileName="#{exportPDF.fileName}"
+					type="button"
+					image="#{resource['core/images/actions/12x12/print.png']}"
+					contentType="application/pdf"
+					content="#{form.printControleOpdracht()}"
+					value="Printen"
+					eventsQueue="pdfQueue" />
+	</d:buttons>
+	</p:outputPanel>
+	</u:composition>

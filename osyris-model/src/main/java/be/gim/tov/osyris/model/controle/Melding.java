@@ -64,21 +64,18 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Description("Status")
 	private MeldingStatus status;
 
-	@NotEditable
 	@EditableInStatus("")
 	@NotSearchable
 	@Label("Voornaam")
 	@Description("Voornaam")
 	private String voornaam;
 
-	@NotEditable
 	@EditableInStatus("")
 	@NotSearchable
 	@Label("Naam")
 	@Description("Naam")
 	private String naam;
 
-	@NotEditable
 	@EditableInStatus("")
 	@Required
 	@NotSearchable
@@ -88,7 +85,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
 	private String email;
 
-	@NotEditable
 	@EditableInStatus("")
 	@NotSearchable
 	@Label("Telefoon")
@@ -97,7 +93,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Pattern("(\\+?[\\d]+)?")
 	private String telefoon;
 
-	@NotEditable
 	@Label("Medewerker")
 	@Description("Medewerker")
 	@ModelClassName("User")
@@ -106,7 +101,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	private ResourceIdentifier medewerker;
 
 	@NotSearchable
-	@NotEditable
 	@EditableInStatus("")
 	@Label("Datum vaststelling")
 	@Description("Datum vaststelling")
@@ -127,7 +121,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGevalideerd;
 
-	@NotEditable
 	@EditableInStatus({ "", "GEMELD" })
 	@Required
 	@NotSearchable
@@ -135,7 +128,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Description("Probleem")
 	private Probleem probleem;
 
-	@NotEditable
 	@EditableInStatus({ "GEMELD", "GEVALIDEERD" })
 	@NotSearchable
 	@Label("Commentaar TOV")

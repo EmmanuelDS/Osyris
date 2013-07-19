@@ -79,7 +79,7 @@ public abstract class NetwerkBord extends Bord {
 	@NotSearchable
 	@Label("Netwerksegmenten")
 	@Description("Netwerksegmenten")
-	@ModelClassName("NetwerkSegment")
+	@ModelClassName("Traject")
 	private List<ResourceIdentifier> segmenten;
 
 	@NotSearchable

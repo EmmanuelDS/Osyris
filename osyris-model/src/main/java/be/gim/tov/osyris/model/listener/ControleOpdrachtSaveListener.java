@@ -140,7 +140,7 @@ public class ControleOpdrachtSaveListener {
 
 					}
 					modelRepository.saveObject(werkOpdracht);
-					messages.info("Nieuwe werkopdracht aangemaakt.");
+					messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
 				} catch (IOException e) {
 					messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
 					LOG.error("Can not save WerkOpdracht", e);

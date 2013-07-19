@@ -32,7 +32,6 @@ import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
-import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
@@ -68,8 +67,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
-	@Inject
-	protected Messages messages;
 
 	// METHODS
 	@PostConstruct
@@ -95,6 +92,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		results = getAllPetersMeters();
 	}
 
+	/**
+	 * Bewaren van nieuw aangemaakte PeterMeter.
+	 * 
+	 */
 	@SuppressWarnings("unchecked")
 	public void saveNewPeterMeter() {
 		try {
@@ -164,10 +165,13 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		}
 	}
 
+	/**
+	 * Verwijderen van PeterMeter.
+	 * 
+	 */
 	@Override
 	@SuppressWarnings("unchecked")
 	public void delete() {
-
 		try {
 			Permissions permissions = (Permissions) modelRepository.loadAspect(
 					modelRepository.getModelClass("Permissions"),
@@ -190,14 +194,24 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			if (permissions != null) {
 				modelRepository.deleteAspect(permissions);
 			}
-
+			messages.info("Peter/Meter succesvol verwijderd.");
 			clear();
 			search();
 		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van Peter/Meter: "
+					+ e.getMessage());
 			LOG.error("Can not delete model object.", e);
 		}
 	}
 
+	/**
+	 * Sturen van email naar nieuwe PeterMeter met login credentials.
+	 * 
+	 * @param username
+	 * @param email
+	 * @param password
+	 * @throws Exception
+	 */
 	private void sendCredentailsMail(String username, String email,
 			String password) throws Exception {
 		Map<String, Object> variables = new HashMap<String, Object>();
@@ -214,6 +228,12 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				"/META-INF/resources/core/mails/newPeterMeter.fmt", variables);
 	}
 
+	/**
+	 * Checken of gebruikersnaam reeds bestaat in het systeem.
+	 * 
+	 * @param username
+	 * @return
+	 */
 	private boolean checkUsernameExists(String username) {
 		try {
 			Query query = new DefaultQuery("User");
@@ -228,6 +248,11 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 	}
 
+	/**
+	 * Toevoegen van Gebruiker aan PeterMeter groep.
+	 * 
+	 * @param resourceName
+	 */
 	@SuppressWarnings("unchecked")
 	private void addUserToPeterMeterGroup(ResourceName resourceName) {
 		try {
@@ -245,6 +270,12 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		}
 	}
 
+	/**
+	 * Zetten van de juiste permissies op het PeterMeter document.
+	 * 
+	 * @param name
+	 * @param document
+	 */
 	@SuppressWarnings("rawtypes")
 	private void setDocumentPermissions(ResourceName name, Document document) {
 		try {
@@ -274,6 +305,12 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		}
 	}
 
+	/**
+	 * Ophalen toegelaten permissies.
+	 * 
+	 * @param name
+	 * @return
+	 */
 	private List<Permission> getAllowedPermissions(ResourceName name) {
 		List<Permission> permissions = new ArrayList<Permission>();
 
@@ -291,6 +328,11 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		return permissions;
 	}
 
+	/**
+	 * Ophalen van alle PetersMeters.
+	 * 
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	private List<User> getAllPetersMeters() {
 

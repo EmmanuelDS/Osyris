@@ -28,5 +28,7 @@ public class BordSaveListener {
 			bord.setX(p.getX());
 			bord.setY(p.getY());
 		}
+
+		// TODO: bordVolgorde en BordLabels zetten?
 	}
 }

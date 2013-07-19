@@ -59,15 +59,12 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Periode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
 
-	@NotEditable
-	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Status")
 	@Description("Status")
 	private ControleOpdrachtStatus status;
@@ -94,7 +91,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private Date datumGevalideerd;
 
 	@NotSearchable
-	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Datum te controleren")
 	@Description("Datum te controleren")
@@ -109,7 +105,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private Date datumUitTeVoeren;
 
 	@NotSearchable
-	@NotEditable
 	@EditableInGroup({ "PeterMeter" })
 	@Label("Datum terreinbezoek")
 	@Description("Datum terreinbezoek")
@@ -124,7 +119,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
 
-	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Medewerker")
 	@Description("Medewerker")
@@ -134,7 +128,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
 	private ResourceIdentifier medewerker;
 
-	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Label("Peter/Meter")
 	@Description("Peter/Meter")
@@ -145,7 +138,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter;
 
 	@NotViewable
-	@NotEditable
 	@EditableInGroup({ "PeterMeter" })
 	@Label("Problemen")
 	@Description("Problemen")

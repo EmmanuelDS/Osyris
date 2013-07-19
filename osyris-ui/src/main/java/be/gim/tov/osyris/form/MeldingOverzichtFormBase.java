@@ -188,10 +188,10 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			FeatureMapLayer trajectLayer = (FeatureMapLayer) context
 					.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
 							.getName()));
-			if (trajectLayer !=null) {
+			if (trajectLayer != null) {
 				trajectLayer.setHidden(false);
-				trajectLayer
-						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+				trajectLayer.setFilter(FilterUtils.equal("naam",
+						traject.getNaam()));
 			}
 
 			Probleem probleem = object.getProbleem();
@@ -208,11 +208,12 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 					probleemLayer.setHidden(false);
 					probleemLayer.setFilter(FilterUtils.equal("naam",
 							bord.getNaam()));
-	
+
 					probleemLayer.setSelection(Collections.singletonList(bord
 							.getId().toString()));
-	
-					Envelope envelope = GeometryUtils.getEnvelope(bord.getGeom());
+
+					Envelope envelope = GeometryUtils.getEnvelope(bord
+							.getGeom());
 					GeometryUtils.expandEnvelope(envelope, 0.1,
 							context.getMaxBoundingBox());
 					context.setBoundingBox(envelope);
@@ -221,9 +222,10 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 				// Ander Probleem
 				AnderProbleem anderProbleem = (AnderProbleem) probleem;
 
-				GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory.createGeometryLayer(configuration.getContext(),
-						"geometry", null, Point.class, null, true, "single", null,
-						null);
+				GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
+						.createGeometryLayer(configuration.getContext(),
+								"geometry", null, Point.class, null, true,
+								"single", null, null);
 				geomLayer.setHidden(false);
 
 				geomLayer.setGeometries(Collections.singletonList(anderProbleem
@@ -240,5 +242,33 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 		}
 
 		return null;
+	}
+
+	@Override
+	public void save() {
+		try {
+			modelRepository.saveObject(object);
+			messages.info("Melding succesvol gevalideerd.");
+			clear();
+			search();
+		} catch (IOException e) {
+			messages.error("Fout bij het valideren van de melding: "
+					+ e.getMessage());
+			LOG.error("Can not save model object.", e);
+		}
+	}
+
+	@Override
+	public void delete() {
+		try {
+			modelRepository.deleteObject(object);
+			messages.info("Melding succesvol verwijderd.");
+			clear();
+			search();
+		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van melding: "
+					+ e.getMessage());
+			LOG.error("Can not delete model object.", e);
+		}
 	}
 }

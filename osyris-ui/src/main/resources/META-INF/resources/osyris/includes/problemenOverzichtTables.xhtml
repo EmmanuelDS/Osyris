@@ -8,7 +8,7 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
-	<a:outputPanel id="problemenOverzichtPanel">
+	<r:panel id="problemenOverzichtPanel">
 		<p:dataTable id="bordProblemen"
 			value="#{form.bordProblemen}"
 			mode="RESULT"
@@ -30,6 +30,12 @@
 					type="image"
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToBordProbleem(bordProbleem)}" />
+				<j:commandButton rendered="#{form.object.status == 'UIT_TE_VOEREN'}"
+					src="#{resource['core/images/actions/16x16/delete.png']}"
+					type="image"
+					title="Probleem verwijderen"
+					action="#{form.deleteProbleem(bordProbleem)}" 
+					render="#{r:clientId('problemPanel')}"/>
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
@@ -68,7 +74,7 @@
 				<j:commandButton
 					image="#{resource['core/images/actions/16x16/edit.png']}"
 					type="image"
-					title="#{messages['page.actions.view.label']}"
+					title="Valideren probleem"
 					oncomplete="conscientia.widget(#{r:element('editProbleemPopup')}).show();">
 					<f:setPropertyActionListener
 						target="#{form.selectedProbleem}"
@@ -100,6 +106,12 @@
 					type="image"
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToAnderProbleem(anderProbleem)}" />
+				<j:commandButton rendered="#{form.object.status == 'UIT_TE_VOEREN'}"
+					src="#{resource['core/images/actions/16x16/delete.png']}"
+					type="image"
+					title="Probleem verwijderen"
+					action="#{form.deleteProbleem(anderProbleem)}" 
+					render="#{r:clientId('problemPanel')}"/>
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
@@ -132,7 +144,7 @@
 					rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }"
 					image="#{resource['core/images/actions/16x16/edit.png']}"
 					type="image"
-					title="#{messages['page.actions.view.label']}"
+					title="Valideren Probleem"
 					oncomplete="conscientia.widget(#{r:element('editProbleemPopup')}).show();">
 					<f:setPropertyActionListener
 						target="#{form.selectedProbleem}"
@@ -140,5 +152,5 @@
 				</j:commandButton>
 			</p:column>
    		</p:dataTable>
-	</a:outputPanel>
+	</r:panel>
 </u:composition>

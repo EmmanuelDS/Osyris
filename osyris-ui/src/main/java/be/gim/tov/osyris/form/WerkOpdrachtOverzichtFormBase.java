@@ -22,7 +22,6 @@ import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
-import org.jboss.seam.international.status.Messages;
 import org.quartz.xml.ValidationException;
 
 import be.gim.commons.filter.FilterUtils;
@@ -71,8 +70,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 	// VARIABLES
 	@Inject
 	protected UserRepository userRepository;
-	@Inject
-	protected Messages messages;
 	@Inject
 	protected MapFactory mapFactory;
 	@Inject
@@ -387,8 +384,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 					// sendConfirmationMail();
 					messages.info("Werkopdracht succesvol verzonden.");
 				} catch (IOException e) {
+					messages.error("Fout bij het verzenden van werkopdracht: "
+							+ e.getMessage());
 					LOG.error("Can not save object.", e);
 				} catch (Exception e) {
+					messages.error("Fout bij het verzenden van werkopdracht: "
+							+ e.getMessage());
 					LOG.error("Can not send email", e);
 				}
 			}
@@ -405,9 +406,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 			object.setDatumGeannuleerd(new Date());
 			try {
 				modelRepository.saveObject(object);
+				messages.info("Werkopdracht succesvol geannuleerd.");
 				clear();
 				search();
 			} catch (IOException e) {
+				messages.error("Fout bij het annuleren van werkopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			}
 		}
@@ -425,7 +429,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(object);
 				clear();
 				search();
+				messages.info("Werkopdracht succesvol heropend: de werkopdracht heeft opnieuw status 'Te controleren'.");
 			} catch (IOException e) {
+				messages.error("Fout bij het heropenen van werkopdracht: "
+						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			}
 		}
@@ -502,12 +509,16 @@ public class WerkOpdrachtOverzichtFormBase extends
 			selectedOpdrachten = null;
 			messages.info("Uitvoeringsronde succesvol aangemaakt.");
 		} catch (InstantiationException e) {
+			messages.error("Fout bij het aanmaken van uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Can not instantiate model object.", e);
 		} catch (IllegalAccessException e) {
+			messages.error("Fout bij het aanmaken van uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Illegal access at creation model object.", e);
 		} catch (IOException e) {
-			LOG.error("Can not save Uitvoeringsronde.", e);
 			messages.error("Gelieve minstens 1 werkopdracht te selecteren die nog niet aan een ronde is toegevoegd.");
+			LOG.error("Can not save Uitvoeringsronde.", e);
 		}
 	}
 
@@ -519,6 +530,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 			clear();
 			search();
 		} catch (IOException e) {
+			messages.error("Fout bij het bewaren van werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not save model object.", e);
 		}
 	}
@@ -559,14 +572,18 @@ public class WerkOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(object);
 				modelRepository.deleteObject(object);
 			}
+			messages.info("Werkopdracht succesvol bewaard.");
 			clear();
 			search();
 		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not delete model object.", e);
 		}
 	}
 
 	/**
+	 * Zoeken uitvoeringsronde.
 	 * 
 	 * @return
 	 */
@@ -651,10 +668,16 @@ public class WerkOpdrachtOverzichtFormBase extends
 			// laterUitTeVoerenDatum
 			search();
 		} catch (IOException e) {
+			messages.error("Fout bij het valideren van werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not save WerkOpdracht.", e);
 		} catch (InstantiationException e) {
+			messages.error("Fout bij het valideren van werkopdracht: "
+					+ e.getMessage());
 			LOG.error("Can not instantiate WerkOpdracht.", e);
 		} catch (IllegalAccessException e) {
+			messages.error("Fout bij het valideren van werkopdracht: "
+					+ e.getMessage());
 			LOG.error("illegal access at WerkOpdracht.", e);
 		}
 	}

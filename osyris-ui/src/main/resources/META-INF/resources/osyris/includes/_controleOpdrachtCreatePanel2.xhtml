@@ -42,18 +42,18 @@
 							</h:selectOneMenu>
 						</d:field>
 						<br />
-						<j:commandButton id="selectSegment"
-								rendered="#{form.trajectType.contains('Segment')}"
-								image="#{resource['core/images/actions/24x24/select.png']}"
-								styleClass="component-toolbar-button"
-								value="Selecteer segment op kaart"
-								title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-								submit="false">
-								<j:activateControl for="viewer" event="click"
-									control="selectBox">
-									<f:param name="layerId" value="#{trajectType}" />
-								</j:activateControl>
-						</j:commandButton>
+<!-- 						<j:commandButton id="selectSegment" -->
+<!-- 								rendered="#{form.trajectType.contains('Segment')}" -->
+<!-- 								image="#{resource['core/images/actions/24x24/select.png']}" -->
+<!-- 								styleClass="component-toolbar-button" -->
+<!-- 								value="Selecteer segment op kaart" -->
+<!-- 								title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
+<!-- 								submit="false"> -->
+<!-- 								<j:activateControl for="viewer" event="click" -->
+<!-- 									control="selectBox"> -->
+<!-- 									<f:param name="layerId" value="#{trajectType}" /> -->
+<!-- 								</j:activateControl> -->
+<!-- 						</j:commandButton> -->
 						<d:buttons>
 							<j:commandButton value="Zoeken"
 									image="#{resource['core/images/actions/12x12/search.png']}"
@@ -100,7 +100,13 @@
 									modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
 									value="#{bord.volg }" mode="VIEW" />
 							</p:column>
-							<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact">
+							<p:column rendered="#{!form.isRouteBord(bord)}">
+								<f:facet name="header">
+									<div>Pijlen</div>
+								</f:facet>
+								<h:outputText value="#{bord.kp1ImageCode } - #{bord.kp2ImageCode } - #{bord.kp3ImageCode }"/>
+							</p:column>
+							<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact" rendered="form.isRouteBord(bord)">
 								<f:facet name="header">
 									<div>Pijl</div>
 								</f:facet>

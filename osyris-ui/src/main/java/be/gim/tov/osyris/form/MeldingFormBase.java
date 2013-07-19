@@ -20,12 +20,12 @@ import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.UserProfile;
+import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
-import org.jboss.seam.international.status.Messages;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -63,7 +63,8 @@ import com.vividsolutions.jts.geom.Point;
  */
 @Named
 @ViewScoped
-public class MeldingFormBase implements Serializable {
+public class MeldingFormBase extends AbstractListForm<Melding> implements
+		Serializable {
 	private static final long serialVersionUID = -8052917916776585407L;
 
 	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
@@ -73,8 +74,8 @@ public class MeldingFormBase implements Serializable {
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
-	@Inject
-	protected Messages messages;
+	// @Inject
+	// protected Messages messages;
 	@Inject
 	protected ModelRepository modelRepository;
 	@Inject
@@ -95,6 +96,11 @@ public class MeldingFormBase implements Serializable {
 			object = createMelding();
 		}
 		return object;
+	}
+
+	@Override
+	public String getName() {
+		return "Melding";
 	}
 
 	public void setMelding(Melding melding) {
@@ -418,8 +424,8 @@ public class MeldingFormBase implements Serializable {
 			}
 
 		} catch (IOException e) {
-			LOG.error("Can not save model object.", e);
 			messages.error("Melding niet verzonden:" + e.getMessage());
+			LOG.error("Can not save model object.", e);
 		}
 	}
 
@@ -727,7 +733,6 @@ public class MeldingFormBase implements Serializable {
 	 * Operaties op de NetwerkBord lagen
 	 * 
 	 * @param layer
-	 * @param viewer
 	 */
 	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
 		layer.setFilter(null);
@@ -815,7 +820,7 @@ public class MeldingFormBase implements Serializable {
 		}
 	}
 
-	// FIX ME
+	// FIXME
 	/**
 	 * Reset het routedokter formulier. Enkel het gegevensinfo panel moet na het
 	 * melden van een probleem ingevuld zijn met eerder ingevoerde gegevens.

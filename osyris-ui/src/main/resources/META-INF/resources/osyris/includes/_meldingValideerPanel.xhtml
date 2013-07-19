@@ -13,7 +13,7 @@
 	<table width="100%">
 		<tr>
 			<td width="40%" valign="top">
-					<r:panel id ="meldingPanel" header="Melding">
+			<r:panel id ="meldingPanel" header="Melding">
 				<d:fields>
 					<d:field label="Status" for="status">
 						<d:propertyValue id="status"
@@ -75,6 +75,21 @@
 							modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 							value="#{form.object.probleem.commentaar}" mode="VIEW" />
 					</d:field>
+					<d:field label="Validatie" for="validatieStatus">
+						<d:propertyValue id="validatieStatus"
+							modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+							value="#{form.object.probleem.status}" mode="EDIT" />
+					</d:field>
+				</d:fields>
+			</r:panel>
+			<br/>
+			<r:panel>
+				<d:fields>
+					<d:field label="Commentaar TOV" for="commentaarTOV">
+						<d:propertyValue id="commentaarTOV"
+							modelProperty="#{d:modelClass('Melding').getProperty('commentaar')}"
+							value="#{form.object.commentaar}" mode="EDIT" />
+					</d:field>
 				</d:fields>
 			</r:panel>
 			</td>
@@ -91,15 +106,17 @@
 	<d:buttons>
 		<j:commandButton
 			rendered="#{form.isCanEdit(form.object) and form.object.status == 'GEMELD'}"
-			value="Valideren"
+			value="Opslaan"
 			image="#{resource['core/images/actions/12x12/apply.png']}"
 			type="button"
-			title="#{messages['page.actions.edit.label']}"
-			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
+			title="Bewaren"
+			action="#{form.save()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('valideerPopup')}).hide();" />
 		<j:commandButton value="#{messages['form.general.close.button']}"
 			image="#{resource['core/images/actions/12x12/close.png']}"
 			type="button"
 			submit="false"
-			onclick="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+			onclick="conscientia.widget(#{r:element('valideerPopup')}).hide();" />
 	</d:buttons>
 </u:composition>
