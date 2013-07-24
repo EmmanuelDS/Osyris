@@ -167,5 +167,15 @@
 			<version>1.0.0-SNAPSHOT</version>
 			<type>jar</type>
 		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-layer-tms</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-layer-osm</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
 	</dependencies>
 </project>

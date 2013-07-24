@@ -449,9 +449,10 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 * @return
 	 */
 	public boolean checkMelding(Melding melding) {
+
 		if (object.getProbleem() instanceof AnderProbleem) {
 			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
-				messages.error("Melding niet verzonden: Er is geen punt aangeduid op de kaart.");
+				messages.warn("Melding niet verzonden: gelieve eerst een punt aan te duiden op de kaart.");
 				return false;
 			}
 			// Indien RouteAnderProbleem koppel trajectId aan de melding via de
@@ -470,7 +471,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			// Indien NetwerkAnderProbleem check of segment geselecteerd is
 			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
 				if (object.getTraject() == null) {
-					messages.error("Melding niet verzonden: Er is geen segment geselecteerd.");
+					messages.warn("Melding niet verzonden: gelieve eerst een segment te selecteren.");
 					return false;
 				}
 			}
@@ -480,7 +481,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		if (object.getProbleem() instanceof BordProbleem) {
 			BordProbleem b = (BordProbleem) object.getProbleem();
 			if (b.getBord() == null) {
-				messages.error("Melding niet verzonden: Geen bord geselecteerd.");
+				messages.warn("Melding niet verzonden: gelieve eerst een bord op de kaart te selecteren.");
 				return false;
 			}
 		}
