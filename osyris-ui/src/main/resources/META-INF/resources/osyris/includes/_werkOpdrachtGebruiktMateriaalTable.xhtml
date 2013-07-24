@@ -19,19 +19,6 @@
 				<div>Overzicht gebruikte materialen</div>
 			</f:facet>
 			<p:column>
-				<a:outputPanel styleClass="model-table-actions">
-					<j:commandButton
-							image="#{resource['core/images/actions/16x16/delete.png']}"
-							type="image"
-							title="Gebruikt materiaal verwijderen uit werkopdracht"
-							onclick="conscientia.widget(#{r:element('removeMateriaalPopup')}).show();">
-							<f:setPropertyActionListener
-								target="#{form.selectedMateriaal}"
-								value="#{gebruiktMateriaal}" />
-							</j:commandButton>
-				</a:outputPanel>
-			</p:column>
-			<p:column>
 				<f:facet name="header">
 				<div>Categorie</div>
 				</f:facet>
@@ -85,5 +72,29 @@
 					value="#{gebruiktMateriaal.aantal}"
 					mode="VIEW" />
 			</p:column>
+			<p:column>
+				<a:outputPanel styleClass="model-table-actions">
+					<j:commandButton
+							image="#{resource['core/images/actions/16x16/remove.png']}"
+							type="image"
+							title="Gebruikt materiaal verwijderen uit werkopdracht"
+							onclick="conscientia.widget(#{r:element('removeMateriaalPopup')}).show();">
+							<f:setPropertyActionListener
+								target="#{form.selectedMateriaal}"
+								value="#{gebruiktMateriaal}" />
+							</j:commandButton>
+				</a:outputPanel>
+			</p:column>
+			<f:facet name="footer">
+				<a:outputPanel
+					layout="block"
+					style="text-align: center">
+					<j:commandButton value="Zoeken en toevoegen stockmateriaal"
+					title="Materiaal toevoegen"
+					image="#{resource['core/images/actions/16x16/add.png']}"
+					type="image"
+					onclick="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).show();" />
+				</a:outputPanel>
+			</f:facet>
 	   	</p:dataTable>
 </u:composition>

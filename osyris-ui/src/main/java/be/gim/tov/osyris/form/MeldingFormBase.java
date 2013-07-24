@@ -32,6 +32,7 @@ import org.opengis.filter.Filter;
 
 import be.gim.commons.decoder.api.DecoderException;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
@@ -50,6 +51,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteAnderProbleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
+import be.gim.tov.osyris.model.traject.Provincie;
 import be.gim.tov.osyris.model.traject.RouteBord;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -241,6 +243,17 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 					"geometry", null, Point.class, null, true, "single", null,
 					null);
 
+			// Start configuratie zoomt naar Provincie OVL
+			FeatureMapLayer provincieLayer = (FeatureMapLayer) context
+					.getLayer("provincie");
+			provincieLayer.setHidden(false);
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+			context.setBoundingBox(envelope);
+
+			configuration.setContext(context);
 			return configuration;
 		}
 

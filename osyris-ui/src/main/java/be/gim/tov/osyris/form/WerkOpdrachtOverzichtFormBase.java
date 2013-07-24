@@ -572,7 +572,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(object);
 				modelRepository.deleteObject(object);
 			}
-			messages.info("Werkopdracht succesvol bewaard.");
+			messages.info("Werkopdracht succesvol verwijderd.");
 			clear();
 			search();
 		} catch (IOException e) {
@@ -664,8 +664,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(opdracht);
 				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Uitgesteld.' De werkopdracht zal status 'Te controleren' verkrijgen op de gespecifieerde datum.");
 			}
-			// TODO: Uitgestelde WO automatisch op te controlen op
-			// laterUitTeVoerenDatum
 			search();
 		} catch (IOException e) {
 			messages.error("Fout bij het valideren van werkopdracht: "

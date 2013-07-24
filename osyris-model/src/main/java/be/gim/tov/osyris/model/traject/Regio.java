@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
@@ -33,12 +34,10 @@ public class Regio extends AbstractModelObject implements StorableObject {
 	@LabelProperty
 	private String naam;
 
-	// @Search(type = "text:between")
 	@Label("Oppervlakte")
 	@Description("Oppervlakte")
 	private float oppervlakte;
 
-	// @Search(type = "text:between")
 	@Label("Omtrek")
 	@Description("Omtrek")
 	private float omtrek;
@@ -47,9 +46,9 @@ public class Regio extends AbstractModelObject implements StorableObject {
 	@NotViewable
 	@NotEditable
 	@SrsName("EPSG:31370")
+	@Index
 	private Geometry geom;
 
-	// Changed back to ResourceIdentifier
 	@Label("Uitvoerder")
 	@Description("Uitvoerder")
 	@ModelClassName("UitvoerderBedrijf")

@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
@@ -45,6 +46,7 @@ public class Gemeente extends AbstractModelObject {
 	@NotSearchable
 	@NotEditable
 	@SrsName("EPSG:31370")
+	@Index
 	private Geometry geom;
 
 	// GETTERS AND SETTERS

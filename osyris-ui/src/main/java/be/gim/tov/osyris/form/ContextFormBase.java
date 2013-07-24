@@ -83,7 +83,8 @@ public class ContextFormBase {
 				for (FeatureMapLayer mapLayer : mapLayers) {
 					mapLayer.set("editable", true);
 					if (mapLayer.getLayerId().equals("regio")
-							|| mapLayer.getLayerId().equals("gemeente")) {
+							|| mapLayer.getLayerId().equals("gemeente")
+							|| mapLayer.getLayerId().equals("provincie")) {
 						mapLayer.set("editable", false);
 					}
 				}
