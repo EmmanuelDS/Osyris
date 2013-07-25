@@ -277,7 +277,6 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	@Override
 	public void delete() {
-
 		try {
 			// Set WerkOpdrachten inRonde flag to false
 			for (WerkOpdracht opdracht : getWerkOpdrachtenInUitvoeringsronde(object)) {
@@ -285,13 +284,18 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				// Save WerkOpdracht
 				modelRepository.saveObject(opdracht);
 			}
+
+			// Links verwijderen met ronde
+			object.setOpdrachten(null);
+			modelRepository.saveObject(object);
+
 			// Delete Uitvoeringsronde
 			modelRepository.deleteObject(object);
 			messages.info("Uitvoeringsronde succesvol verwijderd. De bijbehorende werkopdrachten behoren niet meer toe aan een uitvoeringsronde.");
 			clear();
 			search();
 		} catch (IOException e) {
-			messages.error("Fout bij het verwijderen van een uitvoeringsronde: "
+			messages.error("Fout bij het verwijderen van de uitvoeringsronde: "
 					+ e.getMessage());
 			LOG.error("Can not delete model object.", e);
 		}

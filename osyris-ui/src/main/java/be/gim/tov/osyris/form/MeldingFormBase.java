@@ -32,6 +32,7 @@ import org.opengis.filter.Filter;
 
 import be.gim.commons.decoder.api.DecoderException;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
@@ -50,6 +51,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteAnderProbleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
+import be.gim.tov.osyris.model.traject.Provincie;
 import be.gim.tov.osyris.model.traject.RouteBord;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -241,6 +243,17 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 					"geometry", null, Point.class, null, true, "single", null,
 					null);
 
+			// Start configuratie zoomt naar Provincie OVL
+			FeatureMapLayer provincieLayer = (FeatureMapLayer) context
+					.getLayer("provincie");
+			provincieLayer.setHidden(false);
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+			context.setBoundingBox(envelope);
+
+			configuration.setContext(context);
 			return configuration;
 		}
 
@@ -436,9 +449,10 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 * @return
 	 */
 	public boolean checkMelding(Melding melding) {
+
 		if (object.getProbleem() instanceof AnderProbleem) {
 			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
-				messages.error("Melding niet verzonden: Er is geen punt aangeduid op de kaart.");
+				messages.warn("Melding niet verzonden: gelieve eerst een punt aan te duiden op de kaart.");
 				return false;
 			}
 			// Indien RouteAnderProbleem koppel trajectId aan de melding via de
@@ -457,7 +471,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			// Indien NetwerkAnderProbleem check of segment geselecteerd is
 			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
 				if (object.getTraject() == null) {
-					messages.error("Melding niet verzonden: Er is geen segment geselecteerd.");
+					messages.warn("Melding niet verzonden: gelieve eerst een segment te selecteren.");
 					return false;
 				}
 			}
@@ -467,7 +481,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		if (object.getProbleem() instanceof BordProbleem) {
 			BordProbleem b = (BordProbleem) object.getProbleem();
 			if (b.getBord() == null) {
-				messages.error("Melding niet verzonden: Geen bord geselecteerd.");
+				messages.warn("Melding niet verzonden: gelieve eerst een bord op de kaart te selecteren.");
 				return false;
 			}
 		}

@@ -32,7 +32,7 @@
 							rendered="#{form.trajectType != null}">
 						<d:field for="trajectNaam" label="Traject naam"
 								rendered="true"
-								required="#{form.trajectType.contains('Route')}">
+								required="true">
 							<h:selectOneMenu id="trajectNaam"
 									value="#{form.trajectNaam}" rendered="true"
 									required="#{form.trajectType.contains('Route')}">

@@ -167,6 +167,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Label("Gebruikte materialen")
 	@Description("Gebruikte materialen")
 	@Edit(type = "table")
+	@View(type = "table")
 	private List<GebruiktMateriaal> materialen;
 
 	// GETTERS AND SETTERS

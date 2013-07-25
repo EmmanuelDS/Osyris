@@ -344,6 +344,74 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Ophalen Trajectnamen aan de hand van de Bordtype modelklasse voor de
+	 * editeer functie van borden.
+	 * 
+	 * @param modelClass
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<String> getTrajectNamen(ModelClass modelClass,
+			ResourceIdentifier regio) throws IOException {
+
+		List<String> result = new ArrayList<String>();
+
+		if (modelClass != null) {
+			// NetwerkBorden
+			if (modelClass.getSuperClass().getName().equals("NetwerkBord")) {
+				List<String> segmentNamen = new ArrayList<String>();
+				QueryBuilder builder = new QueryBuilder(modelClass.getName()
+						.replace("Bord", "Segment"));
+				if (regio != null) {
+					builder.addFilter(FilterUtils.equal("regio", regio));
+				}
+				builder.results(FilterUtils.properties("naam"));
+				builder.groupBy(FilterUtils.properties("naam"));
+				segmentNamen = (List<String>) modelRepository.searchObjects(
+						builder.build(), true, true);
+
+				List<String> lusNamen = new ArrayList<String>();
+				builder = new QueryBuilder(modelClass.getName().replace("Bord",
+						"Lus"));
+				builder.results(FilterUtils.properties("naam"));
+				builder.groupBy(FilterUtils.properties("naam"));
+				lusNamen = (List<String>) modelRepository.searchObjects(
+						builder.build(), true, true);
+
+				result.addAll(segmentNamen);
+				result.addAll(lusNamen);
+			}
+			// Borden
+			if (modelClass.getSuperClass().getName().equals("RouteBord")) {
+				QueryBuilder builder = new QueryBuilder(modelClass.getName()
+						.replace("Bord", ""));
+				if (regio != null) {
+					builder.addFilter(FilterUtils.equal("regio", regio));
+				}
+				builder.results(FilterUtils.properties("naam"));
+				builder.groupBy(FilterUtils.properties("naam"));
+				result = (List<String>) modelRepository.searchObjects(
+						builder.build(), true, true);
+			}
+		}
+
+		else {
+			QueryBuilder builder = new QueryBuilder("Traject");
+			if (regio != null) {
+				builder.addFilter(FilterUtils.equal("regio", regio));
+			}
+			builder.results(FilterUtils.properties("naam"));
+			builder.groupBy(FilterUtils.properties("naam"));
+			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
+					.property("naam")));
+			result = (List<String>) modelRepository.searchObjects(
+					builder.build(), true, true);
+		}
+		return result;
+	}
+
+	/**
 	 * Gets straatNamen
 	 * 
 	 * @return
@@ -875,5 +943,26 @@ public class OsyrisModelFunctions {
 			LOG.error("Illegal access at object.", e);
 		}
 		return uitvoerderRegios;
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	public List<ResourceIdentifier> getRoutes() {
+		List<ResourceIdentifier> ids = Collections.emptyList();
+
+		try {
+			DefaultQuery query = new DefaultQuery("Route");
+			List<Traject> routes = (List<Traject>) modelRepository
+					.searchObjects(query, false, false);
+
+			for (Traject t : routes) {
+				ids.add(modelRepository.getResourceIdentifier(t));
+			}
+		} catch (IOException e) {
+			LOG.error("Can not search Routes.", e);
+		}
+		return ids;
 	}
 }

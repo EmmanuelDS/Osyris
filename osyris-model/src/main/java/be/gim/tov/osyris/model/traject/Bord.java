@@ -2,6 +2,9 @@ package be.gim.tov.osyris.model.traject;
 
 import static org.conscientia.api.model.SubClassPersistence.UNION;
 
+import javax.persistence.Transient;
+
+import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
@@ -14,6 +17,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
@@ -37,10 +41,30 @@ public abstract class Bord extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	@Label("Regio")
+	@Description("Regio")
+	@ModelClassName("Regio")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
+	private ResourceIdentifier regio;
+
 	@Label("Trajectnaam")
 	@Description("Trajectnaam")
-	@Edit(type = "suggestions")
+	// @Edit(type = "suggestions")
+	// @ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
+	@Parents({ "className", "regio" })
 	private String naam;
+
+	@Label("Gemeente")
+	@Description("Gemeente")
+	// @Edit(type = "suggestions")
+	@Edit(type = "menu")
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.gemeentes}")
+	private String gemeente;
 
 	@NotSearchable
 	@Label("Volgnummer")
@@ -127,26 +151,29 @@ public abstract class Bord extends AbstractModelObject implements
 	@Index
 	private Geometry geom;
 
-	@Label("Regio")
-	@Description("Regio")
-	@ModelClassName("Regio")
-	@Edit(type = "menu")
-	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
-	private ResourceIdentifier regio;
-
-	@Label("Gemeente")
-	@Description("Gemeente")
-	@Edit(type = "suggestions")
-	private String gemeente;
-
 	// GETTERS AND SETTERS
+	public ResourceIdentifier getRegio() {
+		return regio;
+	}
+
+	public void setRegio(ResourceIdentifier regio) {
+		this.regio = regio;
+	}
+
 	public String getNaam() {
 		return naam;
 	}
 
 	public void setNaam(String naam) {
 		this.naam = naam;
+	}
+
+	public String getGemeente() {
+		return gemeente;
+	}
+
+	public void setGemeente(String gemeente) {
+		this.gemeente = gemeente;
 	}
 
 	public String getVolg() {
@@ -261,19 +288,11 @@ public abstract class Bord extends AbstractModelObject implements
 		this.geom = geom;
 	}
 
-	public ResourceIdentifier getRegio() {
-		return regio;
-	}
-
-	public void setRegio(ResourceIdentifier regio) {
-		this.regio = regio;
-	}
-
-	public String getGemeente() {
-		return gemeente;
-	}
-
-	public void setGemeente(String gemeente) {
-		this.gemeente = gemeente;
+	@Transient
+	@NotSearchable
+	@NotEditable
+	@NotViewable
+	public ModelClass getClassName() {
+		return this.getModelClass();
 	}
 }

@@ -51,7 +51,7 @@
 	</r:panel>
 	<d:buttons>
 			<j:commandButton
-			rendered="#{identity.inGroup('Uitvoerder','CUSTOM') and form.object.status == 'AANGEMAAKT' }"
+			rendered="#{(identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin', 'CUSTOM')) and form.object.status == 'AANGEMAAKT' }"
 			value="Bewaren"
 			image="#{resource['core/images/actions/12x12/next.png']}"
 			type="button"

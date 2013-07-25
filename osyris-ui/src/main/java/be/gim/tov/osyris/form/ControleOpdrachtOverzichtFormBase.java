@@ -7,8 +7,10 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -68,6 +70,8 @@ import be.gim.tov.osyris.model.controle.RouteControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
+import be.gim.tov.osyris.model.traject.NetwerkSegment;
+import be.gim.tov.osyris.model.traject.Provincie;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
@@ -384,7 +388,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
 					"single", null, null);
 
-			context.setBoundingBox(context.getMaxBoundingBox());
+			// Start configuratie zoomt naar Provincie OVL
+			FeatureMapLayer provincieLayer = (FeatureMapLayer) context
+					.getLayer("provincie");
+			provincieLayer.setHidden(false);
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+			context.setBoundingBox(envelope);
+
 			configuration.setContext(context);
 			return configuration;
 		}
@@ -470,19 +483,27 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 			// LUSSEN
 			else if (traject instanceof NetwerkLus) {
-				bordLayer = (FeatureMapLayer) context
-						.getLayer("fietsNetwerkBord");
+				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName()
+								.replace("Lus", "Bord"))));
+				FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
+						.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+								.lowerCamelCase(traject.getModelClass()
+										.getName().replace("Lus", "Knooppunt"))));
 				// Filteren NetwerkBorden op segmenten van de Lus
 				if (bordLayer != null) {
 					bordLayer.setHidden(false);
 					bordLayer.setFilter(FilterUtils.in("segmenten",
 							((NetwerkLus) traject).getSegmenten()));
 				}
+				if (knooppuntLayer != null) {
+					searchKnooppuntLayer(knooppuntLayer);
+				}
 			}
 
 			// Problemen
 			for (Probleem probleem : object.getProblemen()) {
-
 				if (probleem instanceof BordProbleem) {
 					// Bord Probleem
 					Bord bord = (Bord) modelRepository
@@ -625,25 +646,24 @@ public class ControleOpdrachtOverzichtFormBase extends
 			layer.setHidden(true);
 			// Traject
 			if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-				// Netwerk
-				if (trajectType.contains("Segment")) {
-					searchNetwerkLayer(layer, viewer);
-				}
-				// Route
-				else {
-					searchRouteLayer(layer, viewer);
-					envelope = viewer.getContentExtent(layer);
-				}
+				// Route of Lussen
+				searchRouteLayer(layer);
+				envelope = viewer.getContentExtent(layer);
 			}
 			// RouteBord
 			else if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
-				searchRouteLayer(layer, viewer);
+				searchRouteLayer(layer);
 			}
 			// NetwerkBord
 			else if (layer.getLayerId().equalsIgnoreCase(
 					trajectType.replace("Lus", "") + "Bord")) {
 				layer.setHidden(false);
 				searchNetwerkBordLayer(layer);
+			}
+			// Knooppunten
+			else if (layer.getLayerId().equalsIgnoreCase(
+					trajectType.replace("Lus", "") + "Knooppunt")) {
+				searchKnooppuntLayer(layer);
 			}
 
 			context.setBoundingBox(envelope);
@@ -699,10 +719,38 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 * @param viewer
 	 */
-	private void searchRouteLayer(FeatureMapLayer layer, MapViewer viewer) {
+	private void searchRouteLayer(FeatureMapLayer layer) {
 		layer.setHidden(false);
 		if (trajectNaam != null) {
 			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		}
+	}
+
+	/**
+	 * 
+	 * @param layer
+	 */
+	private void searchKnooppuntLayer(FeatureMapLayer layer) {
+		layer.setHidden(false);
+		layer.setFilter(null);
+		layer.setSelection(Collections.EMPTY_LIST);
+
+		try {
+			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
+					.getTraject());
+			Set<String> knooppuntFilterIds = new HashSet<String>();
+
+			for (ResourceIdentifier segment : lus.getSegmenten()) {
+				NetwerkSegment seg = (NetwerkSegment) modelRepository
+						.loadObject(segment);
+				knooppuntFilterIds.add(modelRepository
+						.loadObject(seg.getVanKnooppunt()).getId().toString());
+				knooppuntFilterIds.add(modelRepository
+						.loadObject(seg.getNaarKnooppunt()).getId().toString());
+			}
+			layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
 		}
 	}
 
@@ -1307,6 +1355,20 @@ public class ControleOpdrachtOverzichtFormBase extends
 			messages.error("Fout bij het verwijderen van probleem: "
 					+ e.getMessage());
 			LOG.error("Can not delete Probleem from ControleOpdracht.", e);
+		}
+	}
+
+	@Override
+	public void delete() {
+		try {
+			modelRepository.deleteObject(object);
+			messages.info("Controleopdracht succesvol verwijderd.");
+			clear();
+			search();
+		} catch (IOException e) {
+			messages.error("Fout bij het verwijderen van de controleopdracht: "
+					+ e.getMessage());
+			LOG.error("Can not delete model object.", e);
 		}
 	}
 }

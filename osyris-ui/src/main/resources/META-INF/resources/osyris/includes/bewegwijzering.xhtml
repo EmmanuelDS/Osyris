@@ -50,7 +50,7 @@
 			</f:facet>
 			<h:outputText value="#{bord.kp1ImageCode } - #{bord.kp2ImageCode } - #{bord.kp3ImageCode }"/>
 		</p:column>
-		<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact">
+		<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact" rendered="#{form.isRouteBord(bord)}">
 			<f:facet name="header">
 				<div>Pijl</div>
 			</f:facet>

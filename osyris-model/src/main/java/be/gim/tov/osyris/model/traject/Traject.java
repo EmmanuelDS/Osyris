@@ -25,6 +25,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
@@ -56,11 +57,21 @@ public abstract class Traject extends AbstractModelObject implements
 	private static final Log LOG = LogFactory.getLog(Traject.class);
 
 	// VARIABLES
+	@Label("Regio")
+	@Description("Regio")
+	@ModelClassName("Regio")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
+	private ResourceIdentifier regio;
+
 	@LabelProperty
 	@Label("Naam")
 	@Description("Naam")
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
+	// @ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
+	@ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(null, parents[0])}")
+	@Parents({ "regio" })
 	private String naam;
 
 	@NotSearchable
@@ -74,14 +85,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@SrsName("EPSG:31370")
 	@Index
 	private Geometry geom;
-
-	@Label("Regio")
-	@Description("Regio")
-	@ModelClassName("Regio")
-	@Edit(type = "menu")
-	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
-	private ResourceIdentifier regio;
 
 	@NotSearchable
 	@Label("Peter/Meter Lente")
@@ -109,6 +112,14 @@ public abstract class Traject extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
+	public ResourceIdentifier getRegio() {
+		return regio;
+	}
+
+	public void setRegio(ResourceIdentifier regio) {
+		this.regio = regio;
+	}
+
 	public String getNaam() {
 		return naam;
 	}
@@ -131,14 +142,6 @@ public abstract class Traject extends AbstractModelObject implements
 
 	public void setGeom(Geometry geom) {
 		this.geom = geom;
-	}
-
-	public ResourceIdentifier getRegio() {
-		return regio;
-	}
-
-	public void setRegio(ResourceIdentifier regio) {
-		this.regio = regio;
 	}
 
 	public ResourceIdentifier getPeterMeter1() {
