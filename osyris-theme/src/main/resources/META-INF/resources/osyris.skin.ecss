@@ -67,6 +67,17 @@ header, footer, article, section, nav, menu, hgroup {
 	vertical-align: baseline;
 }
 
+.component-map-featureInfo-result .model-field-value {
+	margin-left: 205px;
+}
+
+.component-map-featureInfo-result .model-field-label {
+	display: block;
+	float: left;
+	width: 200px;
+	vertical-align: baseline;
+}
+
 .model-field-value {
 	margin-left: 105px;
 }
