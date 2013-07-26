@@ -26,6 +26,7 @@ import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
@@ -103,10 +104,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaarUitvoerder;
 
+	@Edit(type = "panels")
 	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
-	private String foto;
+	@ModelClassName("File")
+	private ResourceKey foto;
 
 	@NotSearchable
 	@NotEditable
@@ -211,11 +214,11 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.commentaarUitvoerder = commentaarUitvoerder;
 	}
 
-	public String getFoto() {
+	public ResourceKey getFoto() {
 		return foto;
 	}
 
-	public void setFoto(String foto) {
+	public void setFoto(ResourceKey foto) {
 		this.foto = foto;
 	}
 

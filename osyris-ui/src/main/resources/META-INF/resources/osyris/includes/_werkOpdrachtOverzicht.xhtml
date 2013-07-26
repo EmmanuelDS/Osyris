@@ -267,16 +267,20 @@
 								mode="VIEW" />
 						</h:panelGrid>
 					</p:rowExpansion>
-				</p:dataTable>
-			</a:outputPanel>
-			<d:buttons>
-				<j:commandButton rendered="#{identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')}"
+					<f:facet name="footer" rendered="#{identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')}" >
+						<a:outputPanel
+							layout="block"
+							style="text-align: center">
+							<j:commandButton
 						value="Maak uitvoeringsronde"
 						image="#{resource['core/images/actions/12x12/apply.png']}"
 						type="button"
-						actionListener="#{werkOpdrachtOverzichtFormBase.createUitvoeringsronde}" 
+						actionListener="#{werkOpdrachtOverzichtFormBase.createUitvoeringsronde()}" 
 						render="#{r:clientId('result')}"/>
-			</d:buttons>
+						</a:outputPanel>
+					</f:facet>
+				</p:dataTable>
+			</a:outputPanel>
 
 			<u:decorate
 				template="/resources/osyris/includes/werkOpdrachtPanels.xhtml">

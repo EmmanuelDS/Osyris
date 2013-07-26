@@ -239,6 +239,13 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			MapConfiguration configuration = mapFactory
 					.getConfiguration(context);
 
+			// Reset layers
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.setSelection(Collections.EMPTY_LIST);
+			}
+
 			mapFactory.createGeometryLayer(configuration.getContext(),
 					"geometry", null, Point.class, null, true, "single", null,
 					null);

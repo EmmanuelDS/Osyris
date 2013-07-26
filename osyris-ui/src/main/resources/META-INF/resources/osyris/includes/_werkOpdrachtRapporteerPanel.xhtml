@@ -56,6 +56,10 @@
 	<r:panel id="fotoPanel">
 	<d:fields>
 		<d:field for="foto" label="Foto">
+		<d:propertyValue id="foto"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
+					value="#{form.selectedWerkOpdracht.foto}"
+					mode="EDIT" />
 		</d:field>
 	</d:fields>
 	</r:panel>

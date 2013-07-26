@@ -172,10 +172,5 @@
 			<artifactId>specto-layer-tms</artifactId>
 			<version>${specto.version}</version>
 		</dependency>
-		<dependency>
-			<groupId>be.gim.specto</groupId>
-			<artifactId>specto-layer-osm</artifactId>
-			<version>${specto.version}</version>
-		</dependency>
 	</dependencies>
 </project>

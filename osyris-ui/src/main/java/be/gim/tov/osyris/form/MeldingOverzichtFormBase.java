@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -126,6 +127,29 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			query = getDefaultQuery();
 		}
 
+		// Experimental: zoeken op op transient properties Trajectregio
+		// trajectNaam
+		if (regio != null) {
+			Query q = new DefaultQuery("Traject");
+			q.addFilter(FilterUtils.equal("regio", regio));
+			if (trajectNaam != null) {
+				q.addFilter(FilterUtils.equal("naam", trajectNaam));
+			}
+			List<Traject> trajecten;
+			try {
+				trajecten = (List<Traject>) modelRepository.searchObjects(q,
+						false, false);
+				List<ResourceIdentifier> resultIds = new ArrayList<ResourceIdentifier>();
+
+				for (Traject t : trajecten) {
+					resultIds.add(modelRepository.getResourceIdentifier(t));
+				}
+				query.addFilter(FilterUtils.in("traject", resultIds));
+			} catch (IOException e) {
+				LOG.error("Can not find Traject.", e);
+			}
+		}
+
 		if (identity.inGroup("Routedokter", "CUSTOM")) {
 			return query;
 		}
@@ -137,23 +161,6 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			} catch (IOException e) {
 				LOG.error("Can not load user.", e);
 			}
-		}
-
-		// FIXME: Test zoeken naar traject via cascading dropdown boxes
-		Query q = new DefaultQuery("Traject");
-		q.addFilter(FilterUtils.equal("naam", trajectNaam));
-		List<Traject> trajecten;
-		try {
-			trajecten = (List<Traject>) modelRepository.searchObjects(q, true,
-					true);
-
-			if (trajecten.size() == 1) {
-				Traject t = trajecten.get(0);
-				query.addFilter(FilterUtils.equal("traject",
-						modelRepository.getResourceIdentifier(t)));
-			}
-		} catch (IOException e) {
-			LOG.error("Can not find Traject.", e);
 		}
 		return query;
 	}
