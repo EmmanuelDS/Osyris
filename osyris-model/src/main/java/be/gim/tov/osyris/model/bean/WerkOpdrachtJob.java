@@ -43,7 +43,7 @@ public class WerkOpdrachtJob {
 			if (uitgesteldeOpdrachten != null) {
 				for (WerkOpdracht opdracht : uitgesteldeOpdrachten) {
 					try {
-						// TODO Check date in query
+						// Check datums
 						Calendar datumOpdracht = Calendar.getInstance();
 						datumOpdracht.setTime(opdracht
 								.getDatumLaterUitTeVoeren());

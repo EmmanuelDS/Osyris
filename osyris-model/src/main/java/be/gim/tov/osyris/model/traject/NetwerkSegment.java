@@ -3,6 +3,7 @@ package be.gim.tov.osyris.model.traject;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Label;
+import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -38,6 +39,13 @@ public abstract class NetwerkSegment extends Traject {
 	private ResourceIdentifier naarKnooppunt;
 
 	// GETTERS AND SETTERS
+	// Segmenten moeten label id krijgen
+	@Override
+	@LabelProperty
+	public Long getId() {
+		return (Long) super.getId();
+	}
+
 	public String getEnkeleRichting() {
 		return enkeleRichting;
 	}
