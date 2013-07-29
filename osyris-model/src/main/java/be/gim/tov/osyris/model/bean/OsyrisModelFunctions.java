@@ -31,6 +31,7 @@ import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.codes.NetwerkKnooppuntCode;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
@@ -964,5 +965,30 @@ public class OsyrisModelFunctions {
 			LOG.error("Can not search Routes.", e);
 		}
 		return ids;
+	}
+
+	public List<Object[]> getKnooppunten(ResourceIdentifier regio) {
+		List<Object[]> objects = new ArrayList<Object[]>();
+
+		try {
+			QueryBuilder builder = new QueryBuilder("NetwerkKnooppuntCode");
+
+			if (regio != null) {
+				builder.addFilter(FilterUtils.equal("regio", regio));
+			}
+			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
+					.property("nummer")));
+
+			List<NetwerkKnooppuntCode> codes = (List<NetwerkKnooppuntCode>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			for (NetwerkKnooppuntCode code : codes) {
+				Object[] object = { code.getCode(), code.getLabel() };
+				objects.add(object);
+			}
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return objects;
 	}
 }

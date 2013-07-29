@@ -2,11 +2,13 @@ package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
-import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.Parents;
+import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -31,21 +33,26 @@ public abstract class NetwerkSegment extends Traject {
 	@Label("Van knooppunt")
 	@Description("van knooppunt")
 	@ModelClassName("NetwerkKnooppunt")
+	// @Edit(type = "suggestions")
+	// @Search(type = "suggestions:like-wildcard-nocase")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getKnooppunten(parents[0])}")
+	@Parents({ "regio" })
 	private ResourceIdentifier vanKnooppunt;
 
 	@Label("Naar knooppunt")
 	@Description("Naar knooppunt")
 	@ModelClassName("NetwerkKnooppunt")
+	// @Edit(type = "suggestions")
+	// @Search(type = "suggestions:like-wildcard-nocase")
+	@Edit(type = "menu")
+	@Search(type = "menu:equals")
+	@ValuesExpression("#{osyrisModelFunctions.getKnooppunten(parents[0])}")
+	@Parents({ "regio" })
 	private ResourceIdentifier naarKnooppunt;
 
 	// GETTERS AND SETTERS
-	// Segmenten moeten label id krijgen
-	@Override
-	@LabelProperty
-	public Long getId() {
-		return (Long) super.getId();
-	}
-
 	public String getEnkeleRichting() {
 		return enkeleRichting;
 	}

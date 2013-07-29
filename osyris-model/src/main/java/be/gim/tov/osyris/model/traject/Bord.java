@@ -26,6 +26,7 @@ import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.commons.resource.ResourceKey;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -125,12 +126,12 @@ public abstract class Bord extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordConstructieCode')}")
 	private String bordConst;
 
+	@Edit(type = "panels")
 	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
 	@ModelClassName("File")
-	@Edit(type = "panels")
-	private ResourceIdentifier foto;
+	private ResourceKey foto;
 
 	@NotSearchable
 	@NotEditable
@@ -256,11 +257,11 @@ public abstract class Bord extends AbstractModelObject implements
 		this.bordConst = bordConst;
 	}
 
-	public ResourceIdentifier getFoto() {
+	public ResourceKey getFoto() {
 		return foto;
 	}
 
-	public void setFoto(ResourceIdentifier foto) {
+	public void setFoto(ResourceKey foto) {
 		this.foto = foto;
 	}
 

@@ -125,7 +125,6 @@ public class StockMateriaalOverzichtFormBase extends
 
 			// GebruiktMateriaal saven
 			modelRepository.saveObject(opdracht);
-			messages.info("Materiaal succesvol toegevoegd.");
 
 			// reset aantal gebruikt
 			setAantalGebruikt(0);

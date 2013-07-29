@@ -8,14 +8,19 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
+import org.conscientia.core.search.DefaultQuery;
 import org.jboss.seam.security.Identity;
 
+import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceName;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapLayer;
 import be.gim.specto.core.layer.DefaultMapGroup;
 import be.gim.specto.ui.component.UIMapViewer;
+import be.gim.tov.osyris.model.traject.Provincie;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
+
+import com.vividsolutions.jts.geom.Envelope;
 
 /**
  * Deze klasse definieert het gedrag en acties van het Trajecten mapcontext
@@ -89,6 +94,14 @@ public class ContextFormBase {
 					}
 				}
 			}
+
+			// Start configuratie zoomt naar Provincie OVL
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+			viewer.setCurrentExtent(envelope);
+
 		} catch (Exception e) {
 			LOG.error("Can not set MapViewer.", e);
 		}

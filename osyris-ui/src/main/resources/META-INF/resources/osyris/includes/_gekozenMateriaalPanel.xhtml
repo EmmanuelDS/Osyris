@@ -11,7 +11,7 @@
 	xmlns:q="http://specto.gim.be/search"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	
-	<r:panel id="materiaalPanel" header="Detail stockmateriaal">
+	<r:panel id="materiaalPanel">
 	<d:fields>
 		<d:field for="magazijn" label="Magazijn">
 			<d:propertyValue id="magazijn"
@@ -56,8 +56,6 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-	</r:panel>
-	<r:panel id="aantalGebruiktPanel">
 	<d:fields>
 		<d:field for="aantalGebruikt" label="Aantal gebruikt">
 			<d:propertyValue id="aantalGebruikt"
@@ -69,7 +67,6 @@
 	</r:panel>
 	<d:buttons>
 		<j:commandButton
-				image="#{resource['core/images/actions/16x16/view.png']}"
 				value="Materiaal toevoegen aan Werkopdracht"
 				type="button"
 				title="#{messages['page.actions.view.label']}"

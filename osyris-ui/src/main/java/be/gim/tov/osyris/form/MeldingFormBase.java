@@ -76,8 +76,6 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
-	// @Inject
-	// protected Messages messages;
 	@Inject
 	protected ModelRepository modelRepository;
 	@Inject
@@ -287,7 +285,12 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
 			layer.setFilter(null);
 			layer.setHidden(true);
-			if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+			// Provincie altijd zichtbaar
+			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+				layer.setHidden(false);
+			}
+
+			else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 				// Netwerk
 				if (trajectType.contains("Segment")) {
 					searchNetwerkLayer(layer);

@@ -57,6 +57,12 @@ public abstract class Traject extends AbstractModelObject implements
 	private static final Log LOG = LogFactory.getLog(Traject.class);
 
 	// VARIABLES
+	@NotEditable
+	@NotSearchable
+	@Label("Id")
+	@Description("Id")
+	private Long id;
+
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
@@ -112,6 +118,12 @@ public abstract class Traject extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
+	@Override
+	@LabelProperty
+	public Long getId() {
+		return (Long) super.getId();
+	}
+
 	public ResourceIdentifier getRegio() {
 		return regio;
 	}

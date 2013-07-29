@@ -9,8 +9,11 @@ import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.store.ModelStore;
+import org.conscientia.core.search.DefaultQuery;
 
+import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
+import be.gim.tov.osyris.model.traject.Regio;
 
 import com.vividsolutions.jts.geom.Point;
 
@@ -40,6 +43,16 @@ public class NetwerkKnooppuntSaveListener {
 							+ knooppunt.getModelClass().getName()).get(0);
 			Long newId = maxId + 1;
 			knooppunt.setId(newId);
+
+			// set regio en naam
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", knooppunt.getGeom()));
+
+			Regio regio = (Regio) modelRepository.searchObjects(query, false,
+					false).get(0);
+			knooppunt.setRegio(modelRepository.getResourceIdentifier(regio));
+			knooppunt.setNaam(regio.getNaam());
 		}
 
 		// Automatically set X Y coordinates indien niet aanwezig
