@@ -55,7 +55,7 @@
 	
 	<distributionManagement>
 		<site>
-			<id>report site</id>
+			<id>report.gim.be</id>
 			<url>${site.distribution}tov-osyris</url>
 		</site>
 	</distributionManagement>
