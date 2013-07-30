@@ -29,12 +29,10 @@
 	<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
 		<d:object mode="EDIT"
 				value="#{form.probleem}" />	
-		<d:field label="Commentaar" for="commentaar" required="true">
-				<d:propertyValue id="commentaar" required="true"
+				<d:propertyField id="commentaar"
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.probleem.commentaar}"
 						mode="EDIT" />
-		</d:field>		
 		<j:commandButton
 			id="selectFeatures"
 			rendered="#{form.probleemType == 'bord'}"
@@ -60,38 +58,23 @@
 				control="drawPoint" />
 		</j:commandButton>
 		<br/>
-<!-- 		<j:commandButton -->
-<!-- 			id="selectSegment" -->
-<!-- 			rendered="#{form.object.trajectType.contains('netwerk')}" -->
-<!-- 			image="#{resource['core/images/actions/24x24/select.png']}" -->
-<!-- 			styleClass="component-toolbar-button" -->
-<!-- 			value="Selecteer segment op kaart" -->
-<!-- 			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
-<!-- 			submit="false"> -->
-<!-- 			<j:activateControl -->
-<!-- 				for="viewer" -->
-<!-- 				event="click" -->
-<!-- 				control="selectBox" > -->
-<!-- 			</j:activateControl> -->
-<!-- 		</j:commandButton> -->
-<!-- 		<br/> -->
-<!-- 					<j:commandButton -->
-<!-- 						id="drawLine" -->
-<!-- 						rendered="#{form.probleemType == 'ander' and form.object.trajectType.contains('route')}" -->
-<!-- 						image="#{resource['core/images/actions/24x24/drawLine.png']}" -->
-<!-- 						styleClass="component-toolbar-button" -->
-<!-- 						value="Duid omleiding aan op de kaart"> -->
-<!-- 						<j:activateControl -->
-<!-- 							for="viewer" -->
-<!-- 							event="click" -->
-<!-- 							control="drawLine" /> -->
-<!-- 					</j:commandButton> -->
+		<j:commandButton
+			id="drawLineString"
+			rendered="#{form.probleemType == 'ander' }"
+			image="#{resource['core/images/actions/24x24/drawLineString.png']}"
+			styleClass="component-toolbar-button"
+			value="Duid omleiding aan op de kaart">
+			<j:activateControl
+				for="viewer"
+				event="click"
+				control="drawLineString" />
+		</j:commandButton>
 		
 	<d:buttons>
 		<j:commandButton value="Probleem toevoegen" rendered="true"
 			image="#{resource['core/images/actions/12x12/apply.png']}"
 			type="button"
-			action="#{form.addProbleem()}" render="problemPanel">
+			action="#{form.addProbleem()}" render="problemPanel" execute="problemPanel">
 		</j:commandButton>
 	</d:buttons>
 	</j:renderPanel>

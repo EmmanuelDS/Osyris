@@ -76,6 +76,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Description("Naam")
 	private String naam;
 
+	@Required
 	@EditableInStatus("")
 	@NotSearchable
 	@Label("Email")

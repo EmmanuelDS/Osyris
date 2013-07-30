@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -462,10 +461,6 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 */
 	public boolean checkMelding(Melding melding) {
 
-		if (FacesContext.getCurrentInstance().isValidationFailed()) {
-			messages.warn("Email en commentaar zijn verplicht in te vullen velden.");
-			return false;
-		}
 		if (object.getProbleem() instanceof AnderProbleem) {
 			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
 				messages.warn("Melding niet verzonden: gelieve eerst een punt aan te duiden op de kaart.");
@@ -603,8 +598,10 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		if (ids.size() > 0) {
 			GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
 					.getLayer("geometry");
-			((AnderProbleem) object.getProbleem()).setGeom(layer
-					.getGeometries().iterator().next());
+			if (object.getProbleem() instanceof AnderProbleem) {
+				((AnderProbleem) object.getProbleem()).setGeom(layer
+						.getGeometries().iterator().next());
+			}
 		}
 	}
 
