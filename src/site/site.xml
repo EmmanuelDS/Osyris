@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="${project.name}">
+	<skin>
+		<groupId>org.apache.maven.skins</groupId>
+		<artifactId>maven-fluido-skin</artifactId>
+	</skin>
+	<bannerLeft>
+		<name>GIM</name>
+		<src>http://report.gim.be/images/gim.gif</src>
+		<href>http://www.gim.be/</href>
+	</bannerLeft>
+	<bannerRight>
+		<src>http://report.gim.be/images/geocms.jpg</src>
+	</bannerRight>
+	<version position="right"/>
+	<publishDate position="right" />
+	<body>
+		<breadcrumbs>
+			<item name="${project.name}" href="index.html" />
+		</breadcrumbs>
+
+		<links>
+			<item name="Peritia" href="../peritia/index.html" />
+			<item name="Conscientia" href="../conscientia/index.html" />
+			<item name="Specto" href="../specto/index.html" />
+		</links>
+
+		<menu name="${project.name}">
+			<item name="Introduction" href="index.html" />
+		</menu>
+		
+		<menu name="Documentation" ref="reports" inherit="top"/>
+		
+		<menu ref="modules" inherit="top"/>
+	</body>
+</project>

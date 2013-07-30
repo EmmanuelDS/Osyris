@@ -56,9 +56,14 @@
 	<distributionManagement>
 		<site>
 			<id>report site</id>
-			<url>${site.distribution}osyris</url>
+			<url>${site.distribution}tov-osyris</url>
 		</site>
 	</distributionManagement>
+	
+	<scm>
+		<url>scm:git:git@git.gim.be:tov-osyris/osyris.git</url>
+		<developerConnection>scm:git:git@git.gim.be:tov-osyris/osyris.git</developerConnection>
+	</scm>
 
 	<inceptionYear>2013</inceptionYear>
 	<developers>
