@@ -157,5 +157,21 @@
 				<f:param name="form" value="#{form}" />
 			</j:lazyInclude>
 		</p:dialog>	
+	
+	<p:dialog id="removeProbleemPopup" 
+				header="Verwijderen probleem"
+				icon="#{resources['core/images/actions/16x16/print.png']}"
+				show="true"
+				modal="true"
+				width="600"
+				resizable="false"
+				onShow="#{r:component('removeProbleemInclude')}.show();"
+				onHide="#{r:component('removeProbleemInclude')}.hide();">
+			<j:relocate />
+			<j:lazyInclude id="removeProbleemInclude"
+				src="/resources/osyris/includes/_removeProbleemPanel.xhtml">
+				<f:param name="form" value="#{form}" />
+			</j:lazyInclude>
+		</p:dialog>
 		
 </u:composition>

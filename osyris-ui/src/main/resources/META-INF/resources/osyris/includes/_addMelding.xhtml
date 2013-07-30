@@ -65,37 +65,27 @@
 	
 	<r:panel id="gegevensPanel" header="Uw gegevens">
 		<d:fields>
-			<d:field label="Voornaam" for="voornaam">	 
-				<d:propertyValue id="voornaam" 
-						modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
-						value="#{form.melding.voornaam}" 
-						mode="EDIT" />
-				</d:field>
-				<d:field label="Naam" for="naam">	 
-				<d:propertyValue id="naam" 
-						modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
-						value="#{form.melding.naam}" 
-						mode="EDIT" />
-				</d:field>
-				<d:field label="Telefoon" for="telefoon">	 
-				<d:propertyValue id="telefoon" 
-						modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
-						value="#{form.melding.telefoon}" 
-						mode="EDIT" />
-				</d:field>
-				<d:field label="Email" for="email" required="true">
-				<d:propertyValue id="email" required="true"
-				 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
-						value="#{form.melding.email}"
-						mode="EDIT" />
-				</d:field>
-			<d:field label="Datum vastgesteld" for="datumVastelling">	 
-				<d:propertyValue id="datumVaststelling" 
-						modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
-						value="#{form.melding.datumVaststelling}" 
-						mode="EDIT" />
-				</d:field> 
-			</d:fields>
+			<d:propertyField id="voornaam" 
+					modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
+					value="#{form.melding.voornaam}" 
+					mode="EDIT" />
+			<d:propertyField id="naam" 
+					modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
+					value="#{form.melding.naam}" 
+					mode="EDIT" />
+			<d:propertyField id="telefoon" 
+					modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
+					value="#{form.melding.telefoon}" 
+					mode="EDIT" />
+			<d:propertyField id="email"
+			 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
+					value="#{form.melding.email}"
+					mode="EDIT" />
+			<d:propertyField id="datumVaststelling" 
+					modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
+					value="#{form.melding.datumVaststelling}" 
+					mode="EDIT" />
+		</d:fields>
 	</r:panel>
 	
 	<r:panel header="Probleem">
@@ -114,12 +104,10 @@
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 			<d:object mode="EDIT"
 					value="#{form.melding.probleem}" />	
-			<d:field label="Commentaar" for="commentaar" required="true">
-				<d:propertyValue id="commentaar" required="true"
+				<d:propertyField id="commentaar" 
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.melding.probleem.commentaar}"
 						mode="EDIT" />
-			</d:field>	
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"
@@ -167,7 +155,7 @@
 				image="#{resource['core/images/actions/12x12/apply.png']}"
 				type="button"
 				action="#{form.saveMelding()}"
-				execute="@form">
+				render="searchTrajectPanel, gegevensPanel, problemPanel, viewer">
 			</j:commandButton>
 		</d:buttons>
 		</j:renderPanel>

@@ -11,6 +11,7 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
@@ -36,6 +37,7 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Description("Status")
 	private ProbleemStatus status;
 
+	@Required
 	@NotSearchable
 	@Label("Commentaar")
 	@Description("Commentaar")

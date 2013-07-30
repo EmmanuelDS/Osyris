@@ -9,6 +9,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.annotation.Listener;
 import org.conscientia.api.model.annotation.Schedule;
@@ -24,20 +25,20 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 @Listener(schedules = @Schedule("0 0 1 * * ?"))
 // @Listener(schedules = @Schedule("0 * * * * ?"))
 public class WerkOpdrachtJob {
+
 	private static final org.apache.commons.logging.Log LOG = LogFactory
 			.getLog(WerkOpdrachtJob.class);
 
 	@Inject
 	protected ModelRepository modelRepository;
-
 	@Inject
-	private BoundSessionContext sessionContext;
+	protected BoundSessionContext sessionContext;
 
 	public void processEvent(ModelEvent event) {
 
 		try {
 
-			// Manueel session starten anders exception dat sessionscoped
+			// Manueel session starten anders exception: no active context for
 			// context niet bestaat
 			Map<String, Object> myMap = new HashMap<String, Object>();
 			sessionContext.associate(myMap);
@@ -64,12 +65,13 @@ public class WerkOpdrachtJob {
 						Calendar datumVandaag = Calendar.getInstance();
 						datumVandaag.setTime(new Date());
 
-						if (datumOpdracht.getTimeInMillis() <= datumVandaag
-								.getTimeInMillis()) {
+						if (datumOpdracht.getTimeInMillis() < datumVandaag
+								.getTimeInMillis()
+								|| DateUtils.isSameDay(datumOpdracht,
+										datumVandaag)) {
 
 							opdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
 							opdracht.setDatumTeControleren(new Date());
-
 							modelRepository.saveObject(opdracht);
 						}
 

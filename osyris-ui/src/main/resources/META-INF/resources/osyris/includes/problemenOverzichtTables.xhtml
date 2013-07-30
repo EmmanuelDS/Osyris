@@ -34,8 +34,11 @@
 					src="#{resource['core/images/actions/16x16/delete.png']}"
 					type="image"
 					title="Probleem verwijderen"
-					action="#{form.deleteProbleem(bordProbleem)}" 
-					render="#{r:clientId('problemPanel')}"/>
+					oncomplete="conscientia.widget(#{r:element('removeProbleemPopup')}).show();">
+							<f:setPropertyActionListener
+								target="#{form.selectedProbleem}"
+								value="#{bordProbleem}" />
+							</j:commandButton>
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
@@ -110,8 +113,11 @@
 					src="#{resource['core/images/actions/16x16/delete.png']}"
 					type="image"
 					title="Probleem verwijderen"
-					action="#{form.deleteProbleem(anderProbleem)}" 
-					render="#{r:clientId('problemPanel')}"/>
+					oncomplete="conscientia.widget(#{r:element('removeProbleemPopup')}).show();">
+							<f:setPropertyActionListener
+								target="#{form.selectedProbleem}"
+								value="#{anderProbleem}" />
+							</j:commandButton>
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
