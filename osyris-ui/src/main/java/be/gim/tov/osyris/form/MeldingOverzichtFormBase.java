@@ -185,6 +185,19 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 
 			context = configuration.getContext();
 
+			// Reset layers
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.set("selectable", false);
+				layer.setSelection(Collections.EMPTY_LIST);
+
+				// Provincie altijd zichtbaar
+				if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+					layer.setHidden(false);
+				}
+			}
+
 			Melding melding = getObject();
 
 			// Get traject
@@ -240,14 +253,12 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 
 				Envelope envelope = GeometryUtils.getEnvelope(anderProbleem
 						.getGeom());
-				GeometryUtils.expandEnvelope(envelope, 0.1,
+				GeometryUtils.expandEnvelope(envelope, 0.05,
 						context.getMaxBoundingBox());
 				context.setBoundingBox(envelope);
 			}
-
 			return configuration;
 		}
-
 		return null;
 	}
 

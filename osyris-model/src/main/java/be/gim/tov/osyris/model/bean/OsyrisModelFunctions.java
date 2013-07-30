@@ -947,6 +947,7 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Ophalen ResourceIdentifiers van Routes
 	 * 
 	 * @return
 	 */
@@ -967,6 +968,12 @@ public class OsyrisModelFunctions {
 		return ids;
 	}
 
+	/**
+	 * Zoeken van NetwerkKnooppuntCodes
+	 * 
+	 * @param regio
+	 * @return
+	 */
 	public List<Object[]> getKnooppunten(ResourceIdentifier regio) {
 		List<Object[]> objects = new ArrayList<Object[]>();
 

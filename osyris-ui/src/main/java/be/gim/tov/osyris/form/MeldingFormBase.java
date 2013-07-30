@@ -9,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -30,7 +31,6 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
-import be.gim.commons.decoder.api.DecoderException;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceIdentifier;
@@ -285,6 +285,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
 			layer.setFilter(null);
 			layer.setHidden(true);
+			layer.set("selectable", false);
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 				layer.setHidden(false);
@@ -374,6 +375,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			// Itereren over de lagen en de correcte lagen selecteerbaar zetten
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 				layer.setSelection(null);
+				layer.set("selectable", false);
 				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
 					layer.set("selectable", true);
 					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
@@ -460,6 +462,10 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 */
 	public boolean checkMelding(Melding melding) {
 
+		if (FacesContext.getCurrentInstance().isValidationFailed()) {
+			messages.warn("Email en commentaar zijn verplicht in te vullen velden.");
+			return false;
+		}
 		if (object.getProbleem() instanceof AnderProbleem) {
 			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
 				messages.warn("Melding niet verzonden: gelieve eerst een punt aan te duiden op de kaart.");
@@ -844,31 +850,45 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		}
 	}
 
-	// FIXME
 	/**
 	 * Reset het routedokter formulier. Enkel het gegevensinfo panel moet na het
 	 * melden van een probleem ingevuld zijn met eerder ingevoerde gegevens.
+	 * 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws IOException
 	 */
 	public void reset() {
+
 		setTrajectType(null);
 		setRegio(null);
 		setTrajectNaam(null);
-		// String email = object.getEmail();
+
+		// Te onthouden waarden
+		String voornaam = object.getVoornaam();
+		String naam = object.getNaam();
+		String email = object.getEmail();
+		String tel = object.getTelefoon();
 
 		object = null;
 		object = createMelding();
 		getMelding().setProbleem(null);
 
-		// object.setEmail(email);
+		// Invullen te onthouden waarden
+		object.setVoornaam(voornaam);
+		object.setNaam(naam);
+		object.setTelefoon(tel);
+		object.setEmail(email);
 
 		// Reset map
-		MapViewer viewer = getViewer();
 		try {
-			viewer.resetMapContext();
-		} catch (DecoderException e) {
-			e.printStackTrace();
+			getConfiguration();
 		} catch (IOException e) {
-			LOG.error("Can not reset map.", e);
+			LOG.error("Can not open MapConfiguration.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate MapConfiguration.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Illegal access at MapConfiguration.", e);
 		}
 	}
 }
