@@ -12,9 +12,6 @@ import org.conscientia.api.store.ModelStore;
 
 import be.gim.tov.osyris.model.traject.Traject;
 
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
-
 /**
  * 
  * @author kristof
@@ -59,10 +56,8 @@ public class TrajectSaveListener {
 		}
 
 		// Set lengte traject in km
-		if (traject.getGeom() != null
-				&& traject.getGeom() instanceof LineString) {
-			Geometry g = traject.getGeom();
-			traject.setLengte((float) g.getLength() / 1000);
+		if (traject.getGeom() != null) {
+			traject.setLengte((float) (traject.getGeom().getLength() / 1000.0));
 		}
 	}
 }
