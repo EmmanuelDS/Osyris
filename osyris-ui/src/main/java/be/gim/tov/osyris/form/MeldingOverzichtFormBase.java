@@ -289,4 +289,32 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			LOG.error("Can not delete model object.", e);
 		}
 	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public void search() {
+		try {
+			List<Melding> list = (List<Melding>) modelRepository.searchObjects(
+					getQuery(), true, true, true);
+			List<Melding> filteredList = new ArrayList<Melding>();
+
+			// Kan dit op een betere manier gebeuren?
+			if (vanDatum != null && totDatum != null) {
+				for (Melding melding : list) {
+					if (melding.getDatumLaatsteWijziging().before(totDatum)
+							&& melding.getDatumLaatsteWijziging().after(
+									vanDatum)) {
+						filteredList.add(melding);
+					}
+				}
+				results = filteredList;
+			} else {
+				results = (List<Melding>) modelRepository.searchObjects(
+						getQuery(), true, true);
+			}
+		} catch (IOException e) {
+			LOG.error("Can not get search results.", e);
+			results = null;
+		}
+	}
 }

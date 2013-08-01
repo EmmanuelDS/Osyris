@@ -437,8 +437,8 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			// Save Melding
 			if (checkMelding(object)) {
 				modelRepository.saveObject(getMelding());
-				messages.info("Melding sucessvol verzonden naar TOV.");
 
+				messages.info("Melding sucessvol verzonden naar TOV.");
 				// Email bevestiging sturen naar melder en medewerker
 				// sendConfirmationMail(object);
 				messages.info("Er is een bevestigingsmail gestuurd naar "
@@ -857,6 +857,37 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 */
 	public void reset() {
 
+		/*
+		 * // TODO: werken met cookies FacesContext context =
+		 * FacesContext.getCurrentInstance();
+		 * 
+		 * // Get cookies Cookie cookies[] = ((HttpServletRequest)
+		 * context.getExternalContext() .getRequest()).getCookies();
+		 * 
+		 * boolean newbie = true; Cookie userCookie = null; // Search for cookie
+		 * if (cookies != null) { for (int i = 0; i < cookies.length; i++) {
+		 * Cookie c = cookies[i]; if
+		 * ((c.getName().equals("routedokterUserData"))) { userCookie = c;
+		 * newbie = false; break; } } }
+		 * 
+		 * if (newbie) { // Add cookie for newbie users userCookie = new
+		 * Cookie("routedokter", "email=" + object.getEmail() + ";voornaam=" +
+		 * object.getVoornaam() + ";naam=" + object.getNaam() + ";tel=" +
+		 * object.getTelefoon()); userCookie.setMaxAge(60 * 60 * 24 * 365);
+		 * ((HttpServletResponse) context.getExternalContext().getResponse())
+		 * .addCookie(userCookie); }
+		 * 
+		 * // Reset form try { context.getExternalContext().redirect(
+		 * "/geocms/web/view/form:MeldingForm"); } catch (IOException e) {
+		 * LOG.error("Can not redirect to MeldingForm.", e); } // Parse data
+		 * from cookie String[] namesValues = userCookie.getValue().split(";");
+		 * 
+		 * object = null; object = createMelding();
+		 * getMelding().setProbleem(null);
+		 * 
+		 * String[] test = namesValues[0].split("="); object.setEmail(test[1]);
+		 */
+
 		setTrajectType(null);
 		setRegio(null);
 		setTrajectNaam(null);
@@ -879,13 +910,42 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 
 		// Reset map
 		try {
-			getConfiguration();
+			resetMap();
 		} catch (IOException e) {
-			LOG.error("Can not open MapConfiguration.", e);
-		} catch (InstantiationException e) {
-			LOG.error("Can not instantiate MapConfiguration.", e);
-		} catch (IllegalAccessException e) {
-			LOG.error("Illegal access at MapConfiguration.", e);
+			LOG.error("Can not reset MapViewer.", e);
 		}
+	}
+
+	/**
+	 * Resetten map na verzenden melding.
+	 * 
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public void resetMap() throws IOException {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+		envelope = viewer.getContentExtent();
+
+		// Alle lagen uitzetten
+		for (FeatureMapLayer layer : context.getFeatureLayers()) {
+
+			layer.setHidden(true);
+			layer.setFilter(null);
+			layer.set("selectable", false);
+			layer.setSelection(Collections.EMPTY_LIST);
+			// Provincie altijd zichtbaar
+			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+				layer.setHidden(false);
+
+				Provincie provincie = (Provincie) modelRepository
+						.getUniqueResult(modelRepository.searchObjects(
+								new DefaultQuery("Provincie"), true, true));
+				envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+			}
+		}
+		context.setBoundingBox(envelope);
+		viewer.updateContext(null);
 	}
 }

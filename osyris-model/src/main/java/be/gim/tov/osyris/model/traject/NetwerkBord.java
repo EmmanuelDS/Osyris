@@ -4,10 +4,12 @@ import java.util.List;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.annotation.Description;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
@@ -57,41 +59,49 @@ public abstract class NetwerkBord extends Bord {
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp3ImageCode;
 
+	@NotEditable
 	@Label("KnooppuntNr 0")
 	@Description("Knooppuntnummer 0")
 	private Integer kpnr0;
 
+	@NotEditable
 	@Label("KnooppuntNr 1")
 	@Description("Knooppuntnummer 1")
 	private Integer kpnr1;
 
+	@NotEditable
 	@Label("KnooppuntNr 2")
 	@Description("Knooppuntnummer 2")
 	private Integer kpnr2;
 
+	@NotEditable
 	@Label("KnooppuntNr 3")
 	@Description("Knooppuntnummer 3")
 	private Integer kpnr3;
 
 	@NotSearchable
+	@Edit(type = "suggestions")
 	@Label("Knooppunt 0")
 	@Description("Netwerkknooppunt 0")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid0;
 
 	@NotSearchable
+	@Edit(type = "suggestions")
 	@Label("Knooppunt 1")
 	@Description("Netwerkknooppunt 1")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid1;
 
 	@NotSearchable
+	@Edit(type = "suggestions")
 	@Label("Knooppunt 2")
 	@Description("Netwerkknooppunt 2")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid2;
 
 	@NotSearchable
+	@Edit(type = "suggestions")
 	@Label("Knooppunt 3")
 	@Description("Netwerkknooppunt 3")
 	@ModelClassName("NetwerkKnooppunt")

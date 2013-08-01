@@ -69,6 +69,15 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	private Geometry geom;
 
 	// GETTERS AND SETTERS
+	@Override
+	@NotEditable
+	@NotSearchable
+	@Label("Knooppunt id")
+	@Description("Knooppunt id")
+	public Long getId() {
+		return (Long) super.getId();
+	}
+
 	public int getNummer() {
 		return nummer;
 	}
