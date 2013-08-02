@@ -59,6 +59,7 @@
 				level="#{cc.attrs.level}"
 				simple="#{cc.attrs.simple}" />	
 			
+			<br/>
 			<a:outputPanel rendered="#{userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter')}">	
 				<u:decorate template="/resources/osyris/includes/_toegewezenTrajecten.xhtml" >
 					<u:param name="username"

@@ -10,6 +10,7 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -67,6 +68,17 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
+
+	protected boolean validationFailed;
+
+	// GETTERS AND SETTERS
+	public boolean isValidationFailed() {
+		return validationFailed;
+	}
+
+	public void setValidationFailed(boolean validationFailed) {
+		this.validationFailed = validationFailed;
+	}
 
 	// METHODS
 	@PostConstruct
@@ -140,22 +152,23 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				setDocumentPermissions(name, document);
 
 				// Assign to group
-				ResourceName resourceName = new ResourceName("object",
+				ResourceName resourceName = new ResourceName(User.USER_SPACE,
 						object.getUsername());
 				addUserToPeterMeterGroup(resourceName);
 
 				// Send mail
-
 				sendCredentailsMail(
 						object.getUsername(),
 						object.getAspect("UserProfile").get("email").toString(),
 						password);
 
+				setValidationFailed(false);
 				clear();
 				search();
 
 			} else {
-				messages.error("Gebruikersnaam bestaat al.");
+				setValidationFailed(true);
+				messages.error("Gebruikersnaam bestaat al. Gelieve een andere gebruikersnaam te kiezen.");
 			}
 		} catch (IOException e) {
 			LOG.error("Can not save model object.", e);
@@ -258,9 +271,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		try {
 			Query query = new DefaultQuery("Group");
 			query.addFilter(FilterUtils.equal("groupname", "PeterMeter"));
-			List<Group> groups;
-			groups = (List<Group>) modelRepository.searchObjects(query, true,
-					true);
+			List<Group> groups = new ArrayList<Group>();
+			groups = (List<Group>) modelRepository.searchObjects(query, false,
+					false);
 			Group group = (Group) ModelRepository.getUniqueResult(groups);
 			group.getMembers().add(resourceName);
 			modelRepository.saveObject(group);
@@ -448,5 +461,23 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			LOG.error("Can not load object.", e);
 		}
 		return peterMeter1;
+	}
+
+	/**
+	 * Editeren van een PeterMeter redirecten naar het User edit form.
+	 * 
+	 */
+	public void redirectToEdit() {
+		try {
+			FacesContext
+					.getCurrentInstance()
+					.getExternalContext()
+					.redirect(
+							"/geocms/web/edit/"
+									+ modelRepository.getResourceName(object)
+											.toString());
+		} catch (IOException e) {
+			LOG.error("Can not redirect to User edit form.", e);
+		}
 	}
 }

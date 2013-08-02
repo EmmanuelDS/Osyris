@@ -15,7 +15,7 @@
 			styleClass="model-propertyGroups"
 			contentClass="model-propertyGroup">
 			<p:tab title="#{messages['page.user.profile']}">
-			<div class="#{cc.attrs.contentClass}">
+			<div class="#{c.attrs.contentClass}">
 			
 			<div style="float: right">
 				<j:commandButton value="#{messages['page.user.password.title']}"
@@ -55,11 +55,11 @@
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(c.attrs.value.username).contains('PeterMeter')}">
 				<a:outputPanel>
 					<d:aspect id="peterMeterProfile"
-						value="#{c.attrs.value.getAspect('PeterMeterProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('PeterMeter'))}"
+						value="#{c.attrs.value.getAspect('PeterMeterProfiel', modelRepository, userRepository.listGroupnames(c.attrs.value.username).contains('PeterMeter'))}"
 						mode="#{c.attrs.mode}"
 						level="#{c.attrs.level}"/>
 				</a:outputPanel>
-				
+				<br/>
 				<a:outputPanel rendered="#{userRepository.listGroupnames(c.attrs.value.username).contains('PeterMeter')}">    
 					<u:decorate template="/resources/osyris/includes/_toegewezenTrajecten.xhtml" >
 					<u:param name="username"
@@ -75,7 +75,7 @@
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(c.attrs.value.username).contains('Uitvoerder')}">
 				<a:outputPanel>
 					<d:aspect id="uitvoerderProfile"
-						value="#{c.attrs.value.getAspect('UitvoerderProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Uitvoerder'))}"
+						value="#{c.attrs.value.getAspect('UitvoerderProfiel', modelRepository, userRepository.listGroupnames(c.attrs.value.username).contains('Uitvoerder'))}"
 						mode="#{c.attrs.mode}"
 						level="#{c.attrs.level}"/>
 				</a:outputPanel>
@@ -87,7 +87,7 @@
 							 identity.inGroup('admin','CUSTOM')) and userRepository.listGroupnames(c.attrs.value.username).contains('Medewerker')}">
 				<a:outputPanel>
 					<d:aspect id="medewerkerProfile"
-						value="#{c.attrs.value.getAspect('MedewerkerProfiel', modelRepository, userRepository.listGroupnames(cc.attrs.value.username).contains('Medewerker'))}"
+						value="#{c.attrs.value.getAspect('MedewerkerProfiel', modelRepository, userRepository.listGroupnames(c.attrs.value.username).contains('Medewerker'))}"
 						mode="#{c.attrs.mode}"
 						level="#{c.attrs.level}"/>
 				</a:outputPanel>
