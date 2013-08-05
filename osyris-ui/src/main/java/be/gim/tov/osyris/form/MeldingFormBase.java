@@ -9,8 +9,10 @@ import java.util.List;
 import java.util.Map;
 
 import javax.faces.bean.ViewScoped;
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.servlet.http.Cookie;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -20,12 +22,12 @@ import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.UserProfile;
-import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
+import org.jboss.seam.international.status.Messages;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
@@ -64,11 +66,17 @@ import com.vividsolutions.jts.geom.Point;
  */
 @Named
 @ViewScoped
-public class MeldingFormBase extends AbstractListForm<Melding> implements
-		Serializable {
+public class MeldingFormBase implements Serializable {
+
 	private static final long serialVersionUID = -8052917916776585407L;
 
 	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
+
+	private static final Integer MAX_COOKIE_AGE = new Integer(30 * 24 * 60 * 60);
+
+	private static final String COOKIE_NAME = "routedokter-token";
+
+	private static final String VALUE_SEPERATOR = ";";
 
 	// VARIABLES
 	@Inject
@@ -79,6 +87,8 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	protected ModelRepository modelRepository;
 	@Inject
 	protected MapFactory mapFactory;
+	@Inject
+	protected Messages messages;
 
 	protected Melding object;
 	protected ResourceIdentifier regio;
@@ -97,7 +107,6 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		return object;
 	}
 
-	@Override
 	public String getName() {
 		return "Melding";
 	}
@@ -409,11 +418,10 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			}
 
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-					layer.set("selectable", true);
-					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				if (layer.getLayerId().equalsIgnoreCase("geometry")) {
 					layer.setHidden(false);
+					layer.set("selectable", true);
+					layer.set("editable", true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
 				} else {
@@ -568,7 +576,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		MapContext context = viewer.getConfiguration().getContext();
 
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
-			layer.setSelection(null);
+			layer.setSelection(new ArrayList<String>(1));
 		}
 
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
@@ -626,6 +634,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 * @param layer
 	 */
 	public void searchTrajectId(FeatureMapLayer layer) {
+
 		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
 					.getFeature(layer, getViewer().getContext().getSrsName(),
@@ -746,6 +755,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 * @param viewer
 	 */
 	private void searchRouteBordLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		layer.setSelection(Collections.EMPTY_LIST);
 		if (regio != null && trajectNaam == null) {
@@ -765,6 +775,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		layer.setFilter(null);
 		layer.setHidden(false);
 		layer.setFilter(FilterUtils.equal("regio", regio));
+
 		// Filter met de borden die verbonden zijn met het opgegeven
 		// knooppuntNr
 		Filter knooppuntFilter = FilterUtils.or(
@@ -831,7 +842,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 				filter = FilterUtils.equal("nummer", knooppuntNummer);
 				layer.setFilter(filter);
 			}
-			// Set Selectie enkel als specifiel knooppuntNr is opgegeven
+			// Set Selectie enkel als specifiek knooppuntNr is opgegeven
 			layer.set("selectable", true);
 			List<String> ids = new ArrayList<String>();
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
@@ -857,36 +868,31 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 	 */
 	public void reset() {
 
-		/*
-		 * // TODO: werken met cookies FacesContext context =
-		 * FacesContext.getCurrentInstance();
-		 * 
-		 * // Get cookies Cookie cookies[] = ((HttpServletRequest)
-		 * context.getExternalContext() .getRequest()).getCookies();
-		 * 
-		 * boolean newbie = true; Cookie userCookie = null; // Search for cookie
-		 * if (cookies != null) { for (int i = 0; i < cookies.length; i++) {
-		 * Cookie c = cookies[i]; if
-		 * ((c.getName().equals("routedokterUserData"))) { userCookie = c;
-		 * newbie = false; break; } } }
-		 * 
-		 * if (newbie) { // Add cookie for newbie users userCookie = new
-		 * Cookie("routedokter", "email=" + object.getEmail() + ";voornaam=" +
-		 * object.getVoornaam() + ";naam=" + object.getNaam() + ";tel=" +
-		 * object.getTelefoon()); userCookie.setMaxAge(60 * 60 * 24 * 365);
-		 * ((HttpServletResponse) context.getExternalContext().getResponse())
-		 * .addCookie(userCookie); }
-		 * 
-		 * // Reset form try { context.getExternalContext().redirect(
-		 * "/geocms/web/view/form:MeldingForm"); } catch (IOException e) {
-		 * LOG.error("Can not redirect to MeldingForm.", e); } // Parse data
-		 * from cookie String[] namesValues = userCookie.getValue().split(";");
-		 * 
-		 * object = null; object = createMelding();
-		 * getMelding().setProbleem(null);
-		 * 
-		 * String[] test = namesValues[0].split("="); object.setEmail(test[1]);
-		 */
+		// TODO: werken met cookies
+		boolean newbie = true;
+		Cookie userCookie = null;
+
+		// Check if cookie exists
+		// if (getRoutedokterCookie() != null) {
+		// newbie = false;
+		// }
+
+		// Add cookie
+		// else {
+		// addRoutedokterCookie();
+		// }
+
+		// Reload form
+		// try {
+		// userCookie = getRoutedokterCookie();
+		// FacesContext.getCurrentInstance().getExternalContext()
+		// .redirect("/geocms/web/view/form:MeldingForm");
+		//
+		// getMelding().setVoornaam(userCookie.getValue().split(":")[1]);
+		//
+		// } catch (IOException e1) {
+		// LOG.error("Can not redirect to MeldingForm.", e1);
+		// }
 
 		setTrajectType(null);
 		setRegio(null);
@@ -935,6 +941,7 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 			layer.setFilter(null);
 			layer.set("selectable", false);
 			layer.setSelection(Collections.EMPTY_LIST);
+
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 				layer.setHidden(false);
@@ -947,5 +954,53 @@ public class MeldingFormBase extends AbstractListForm<Melding> implements
 		}
 		context.setBoundingBox(envelope);
 		viewer.updateContext(null);
+	}
+
+	/**
+	 * 
+	 */
+	private void addRoutedokterCookie() {
+
+		StringBuilder value = new StringBuilder();
+		value.append("email:" + object.getEmail());
+
+		if (object.getVoornaam() != null
+				|| !StringUtils.isEmpty(object.getVoornaam())) {
+			value.append(VALUE_SEPERATOR + "voornaam:" + object.getVoornaam());
+		}
+
+		if (object.getNaam() != null || !StringUtils.isEmpty(object.getNaam())) {
+			value.append(VALUE_SEPERATOR + "naam:" + object.getNaam());
+		}
+
+		if (object.getTelefoon() != null
+				|| !StringUtils.isEmpty(object.getTelefoon())) {
+			value.append(VALUE_SEPERATOR + "tel:" + object.getTelefoon());
+		}
+
+		Map<String, Object> properties = new HashMap<String, Object>();
+		properties.put("maxAge", MAX_COOKIE_AGE);
+		properties.put("domain", FacesContext.getCurrentInstance()
+				.getExternalContext().getRequestServerName());
+		properties.put("path", FacesContext.getCurrentInstance()
+				.getExternalContext().getRequestContextPath());
+
+		FacesContext.getCurrentInstance().getExternalContext()
+				.addResponseCookie(COOKIE_NAME, value.toString(), properties);
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	private Cookie getRoutedokterCookie() {
+		FacesContext context = FacesContext.getCurrentInstance();
+		if (context != null) {
+			Map<String, Object> requestCookieMap = context.getExternalContext()
+					.getRequestCookieMap();
+			return (Cookie) requestCookieMap.get(COOKIE_NAME);
+		} else {
+			return null;
+		}
 	}
 }

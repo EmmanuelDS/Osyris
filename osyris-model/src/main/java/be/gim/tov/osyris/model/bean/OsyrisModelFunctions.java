@@ -752,23 +752,30 @@ public class OsyrisModelFunctions {
 	public ResourceName zoekVerantwoordelijke(ResourceIdentifier traject) {
 		try {
 			Traject t = (Traject) modelRepository.loadObject(traject);
-			List<User> users = new ArrayList<User>();
-			List<User> medewerkers = new ArrayList<User>();
-			users = (List<User>) modelRepository.searchObjects(
-					new DefaultQuery("User"), true, true);
-			for (User user : users) {
-				if (userRepository.listGroupnames(user).contains("Medewerker")) {
-					medewerkers.add(user);
-				}
-			}
 
-			for (User u : medewerkers) {
-				MedewerkerProfiel profiel = (MedewerkerProfiel) u.getAspect(
-						"MedewerkerProfiel", modelRepository, true);
+			// Group medewerkers opzoeken
+			DefaultQuery query = new DefaultQuery("Group");
+			query.addFilter(FilterUtils.equal("groupname", "Medewerker"));
+			List<Group> groups = new ArrayList<Group>();
+			groups = (List<Group>) modelRepository.searchObjects(query, false,
+					false);
+			Group group = (Group) ModelRepository.getUniqueResult(groups);
+
+			// Users uit medewerker group halen
+			for (ResourceName name : group.getMembers()) {
+				DefaultQuery q = new DefaultQuery("User");
+				q.addFilter(FilterUtils.equal("username", name.getNamePart()));
+				User medewerker = (User) modelRepository.searchObjects(q,
+						false, false).get(0);
+
+				// Check welke Medewerker verantwoordelijk is voor het gekozen
+				// trajectType
+				MedewerkerProfiel profiel = (MedewerkerProfiel) medewerker
+						.getAspect("MedewerkerProfiel", modelRepository, true);
 				if (profiel != null) {
 					for (String trajectType : profiel.getTrajectType()) {
 						if (trajectType.equals(t.getModelClass().getName())) {
-							return modelRepository.getResourceName(u);
+							return name;
 						}
 					}
 				}
