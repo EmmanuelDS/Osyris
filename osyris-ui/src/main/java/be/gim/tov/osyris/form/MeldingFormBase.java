@@ -245,6 +245,9 @@ public class MeldingFormBase implements Serializable {
 			MapConfiguration configuration = mapFactory
 					.getConfiguration(context);
 
+			// Retrieve context instance from configuration.
+			context = configuration.getContext();
+
 			// Reset layers
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 				layer.setFilter(null);
@@ -252,9 +255,9 @@ public class MeldingFormBase implements Serializable {
 				layer.setSelection(Collections.EMPTY_LIST);
 			}
 
-			mapFactory.createGeometryLayer(configuration.getContext(),
-					"geometry", null, Point.class, null, true, "single", null,
-					null);
+			// Add edit layer to context
+			mapFactory.createGeometryLayer(context, "geometry", null,
+					Point.class, null, true, "single", null, null);
 
 			// Start configuratie zoomt naar Provincie OVL
 			FeatureMapLayer provincieLayer = (FeatureMapLayer) context
@@ -266,7 +269,6 @@ public class MeldingFormBase implements Serializable {
 			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
 			context.setBoundingBox(envelope);
 
-			configuration.setContext(context);
 			return configuration;
 		}
 
@@ -287,7 +289,7 @@ public class MeldingFormBase implements Serializable {
 		envelope = viewer.getContentExtent();
 
 		getMelding().setProbleem(null);
-		probleemType = StringUtils.EMPTY;
+		probleemType = "";
 
 		// Itereren over de lagen en de correcte operaties uitvoeren
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
@@ -382,7 +384,6 @@ public class MeldingFormBase implements Serializable {
 
 			// Itereren over de lagen en de correcte lagen selecteerbaar zetten
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				layer.setSelection(null);
 				layer.set("selectable", false);
 				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
 					layer.set("selectable", true);
@@ -392,9 +393,7 @@ public class MeldingFormBase implements Serializable {
 						trajectType.replace("Segment", "") + "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
-				}
-
-				else if (layer.getLayerId().contains("Knooppunt")) {
+				} else if (layer.getLayerId().contains("Knooppunt")) {
 					layer.set("selectable", false);
 					layer.setSelection(Collections.EMPTY_LIST);
 				}

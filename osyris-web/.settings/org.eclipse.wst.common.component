@@ -5,6 +5,30 @@
         <wb-resource deploy-path="/" source-path="/src/main/webapp" tag="defaultRootSource"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/resources"/>
         <wb-resource deploy-path="/WEB-INF/classes" source-path="/src/main/java"/>
+        <dependent-module archiveName="specto-api-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-api/specto-api">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-layer-base-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-layer-base/specto-layer-base">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-layer-wms-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-layer-wms/specto-layer-wms">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-layer-wfs-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-layer-wfs/specto-layer-wfs">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-layer-model-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-layer-model/specto-layer-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-ui-map-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-ui-map/specto-ui-map">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-ui-openlayers-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-ui-openlayers/specto-ui-openlayers">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-ui-model-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-ui-model/specto-ui-model">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
         <dependent-module archiveName="osyris-model-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/osyris-model/osyris-model">
             <dependency-type>uses</dependency-type>
         </dependent-module>
@@ -12,6 +36,9 @@
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <dependent-module archiveName="osyris-ui-1.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/osyris-ui/osyris-ui">
+            <dependency-type>uses</dependency-type>
+        </dependent-module>
+        <dependent-module archiveName="specto-layer-tms-2.0.0-SNAPSHOT.jar" deploy-path="/WEB-INF/lib" handle="module:/resource/specto-layer-tms/specto-layer-tms">
             <dependency-type>uses</dependency-type>
         </dependent-module>
         <property name="java-output-path" value="/osyris-web/target/classes"/>
