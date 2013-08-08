@@ -100,7 +100,7 @@ public class ContextFormBase {
 					.getUniqueResult(modelRepository.searchObjects(
 							new DefaultQuery("Provincie"), false, false));
 			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
-			viewer.updateCurrentExtent(envelope);
+			// viewer.updateCurrentExtent(envelope);
 
 		} catch (Exception e) {
 			LOG.error("Can not set MapViewer.", e);
