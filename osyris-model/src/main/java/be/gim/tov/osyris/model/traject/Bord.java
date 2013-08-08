@@ -41,6 +41,12 @@ public abstract class Bord extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	@NotEditable
+	@NotSearchable
+	@Label("Bord id")
+	@Description("Bord id")
+	private Long id;
+
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
@@ -66,7 +72,6 @@ public abstract class Bord extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.gemeentes}")
 	private String gemeente;
 
-	@NotSearchable
 	@Label("Volgnummer")
 	@Description("Volgnummer")
 	private String volg;
@@ -152,6 +157,11 @@ public abstract class Bord extends AbstractModelObject implements
 	private Geometry geom;
 
 	// GETTERS AND SETTERS
+	@Override
+	public Long getId() {
+		return (Long) super.getId();
+	}
+
 	public ResourceIdentifier getRegio() {
 		return regio;
 	}

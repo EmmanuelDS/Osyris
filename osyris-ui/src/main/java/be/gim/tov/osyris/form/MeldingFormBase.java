@@ -76,7 +76,7 @@ public class MeldingFormBase implements Serializable {
 
 	private static final String COOKIE_NAME = "routedokter-token";
 
-	private static final String VALUE_SEPERATOR = ";";
+	private static final String COOKIE_VALUE_SEPERATOR = ";";
 
 	// VARIABLES
 	@Inject
@@ -352,7 +352,7 @@ public class MeldingFormBase implements Serializable {
 			}
 		}
 
-		context.setBoundingBox(envelope);
+		viewer.updateCurrentExtent(envelope);
 		viewer.updateContext(null);
 	}
 
@@ -602,9 +602,17 @@ public class MeldingFormBase implements Serializable {
 		MapContext context = viewer.getConfiguration().getContext();
 
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
-		if (ids.size() > 0) {
-			GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
-					.getLayer("geometry");
+
+		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
+				.getLayer("geometry");
+
+		// Slechts 1 punt mag ingegeven worden
+		if (layer.getGeometries().size() > 1) {
+			layer.getGeometries().remove(0);
+		}
+
+		// Precies 1 punt koppelen aan een Anderprobleem
+		if (layer.getGeometries().size() == 1) {
 			if (object.getProbleem() instanceof AnderProbleem) {
 				((AnderProbleem) object.getProbleem()).setGeom(layer
 						.getGeometries().iterator().next());
@@ -663,7 +671,9 @@ public class MeldingFormBase implements Serializable {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<ResourceIdentifier> getKnooppuntIds() {
+
 		List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>();
+
 		try {
 			DefaultQuery query = new DefaultQuery();
 			if (trajectType.contains("Fiets")) {
@@ -671,6 +681,7 @@ public class MeldingFormBase implements Serializable {
 			} else if (trajectType.contains("Wandel")) {
 				query.setModelClassName("FietsNetwerkKnooppunt");
 			}
+
 			query.setFilter(FilterUtils.equal("nummer", knooppuntNummer));
 			List<ModelObject> knooppunten = (List<ModelObject>) modelRepository
 					.searchObjects(query, true, true);
@@ -691,27 +702,33 @@ public class MeldingFormBase implements Serializable {
 	 * @param viewer
 	 */
 	private void searchNetwerkLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		layer.set("selectable", false);
 		layer.setSelection(Collections.EMPTY_LIST);
 		Filter filter = null;
 
 		if (regio != null && trajectNaam == null && knooppuntNummer == 0) {
+
 			filter = FilterUtils.equal("regio", regio);
 			envelope = getViewer().getFeatureExtent(layer, filter);
+
 			List<String> ids = new ArrayList<String>();
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
 					.getFeature(layer, getViewer().getContext().getSrsName(),
 							getViewer().getContext().getBoundingBox(), null,
 							filter, null, null);
 			FeatureIterator<SimpleFeature> iterator = features.features();
+
 			while (iterator.hasNext()) {
 				ids.add(iterator.next().getID());
 			}
+
 			layer.setSelection(ids);
 		}
 
 		else if (trajectNaam != null) {
+
 			filter = FilterUtils.equal("naam", trajectNaam);
 			layer.set("selectable", true);
 
@@ -730,6 +747,10 @@ public class MeldingFormBase implements Serializable {
 				envelope = getViewer().getFeatureExtent(layer, filter);
 			}
 		}
+		// Heel de provincie tonen indien geen filters ingesteld
+		if (filter == null) {
+			envelope = getEnvelopeProvincie();
+		}
 	}
 
 	/**
@@ -739,7 +760,9 @@ public class MeldingFormBase implements Serializable {
 	 * @param viewer
 	 */
 	private void searchRouteLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
+
 		if (regio != null && trajectNaam == null) {
 			layer.setFilter(FilterUtils.equal("regio", regio));
 		} else if (trajectNaam != null) {
@@ -757,11 +780,13 @@ public class MeldingFormBase implements Serializable {
 
 		layer.setHidden(false);
 		layer.setSelection(Collections.EMPTY_LIST);
+
 		if (regio != null && trajectNaam == null) {
 			layer.setFilter(FilterUtils.equal("regio", regio));
 		} else if (trajectNaam != null) {
 			layer.setFilter(FilterUtils.like("naam", trajectNaam));
 		}
+
 		layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 	}
 
@@ -771,9 +796,9 @@ public class MeldingFormBase implements Serializable {
 	 * @param layer
 	 */
 	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+
 		layer.setFilter(null);
 		layer.setHidden(false);
-		layer.setFilter(FilterUtils.equal("regio", regio));
 
 		// Filter met de borden die verbonden zijn met het opgegeven
 		// knooppuntNr
@@ -783,20 +808,26 @@ public class MeldingFormBase implements Serializable {
 				FilterUtils.equal("kpnr2", knooppuntNummer),
 				FilterUtils.equal("kpnr3", knooppuntNummer));
 
-		// Default filter
-		layer.setFilter(knooppuntFilter);
-
 		Filter filter = null;
 		if (regio != null) {
-			filter = FilterUtils.and(FilterUtils.equal("regio", regio),
-					knooppuntFilter);
-			layer.setFilter(filter);
+			if (knooppuntNummer == 0) {
+				filter = FilterUtils.and(FilterUtils.equal("regio", regio));
+			} else {
+				filter = FilterUtils.and(FilterUtils.equal("regio", regio),
+						knooppuntFilter);
+			}
 		}
 		if (trajectNaam != null) {
-			filter = FilterUtils.and(FilterUtils.equal("naam", trajectNaam),
-					knooppuntFilter);
-			layer.setFilter(filter);
+			if (knooppuntNummer == 0) {
+				filter = FilterUtils
+						.and(FilterUtils.equal("naam", trajectNaam),
+								knooppuntFilter);
+			} else {
+				filter = FilterUtils
+						.and(FilterUtils.equal("naam", trajectNaam));
+			}
 		}
+		layer.setFilter(filter);
 	}
 
 	/**
@@ -806,6 +837,7 @@ public class MeldingFormBase implements Serializable {
 	 * @param viewer
 	 */
 	private void searchKnooppuntLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		layer.setFilter(null);
 		layer.setSelection(Collections.EMPTY_LIST);
@@ -868,8 +900,8 @@ public class MeldingFormBase implements Serializable {
 	public void reset() {
 
 		// TODO: werken met cookies
-		boolean newbie = true;
-		Cookie userCookie = null;
+		// boolean newbie = true;
+		// Cookie userCookie = null;
 
 		// Check if cookie exists
 		// if (getRoutedokterCookie() != null) {
@@ -944,11 +976,7 @@ public class MeldingFormBase implements Serializable {
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 				layer.setHidden(false);
-
-				Provincie provincie = (Provincie) modelRepository
-						.getUniqueResult(modelRepository.searchObjects(
-								new DefaultQuery("Provincie"), true, true));
-				envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+				envelope = getEnvelopeProvincie();
 			}
 		}
 		context.setBoundingBox(envelope);
@@ -956,6 +984,7 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
+	 * Toevoegen van cookie voor Routedokter met info melder.
 	 * 
 	 */
 	private void addRoutedokterCookie() {
@@ -965,16 +994,17 @@ public class MeldingFormBase implements Serializable {
 
 		if (object.getVoornaam() != null
 				|| !StringUtils.isEmpty(object.getVoornaam())) {
-			value.append(VALUE_SEPERATOR + "voornaam:" + object.getVoornaam());
+			value.append(COOKIE_VALUE_SEPERATOR + "voornaam:"
+					+ object.getVoornaam());
 		}
 
 		if (object.getNaam() != null || !StringUtils.isEmpty(object.getNaam())) {
-			value.append(VALUE_SEPERATOR + "naam:" + object.getNaam());
+			value.append(COOKIE_VALUE_SEPERATOR + "naam:" + object.getNaam());
 		}
 
 		if (object.getTelefoon() != null
 				|| !StringUtils.isEmpty(object.getTelefoon())) {
-			value.append(VALUE_SEPERATOR + "tel:" + object.getTelefoon());
+			value.append(COOKIE_VALUE_SEPERATOR + "tel:" + object.getTelefoon());
 		}
 
 		Map<String, Object> properties = new HashMap<String, Object>();
@@ -989,10 +1019,12 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
+	 * Ophalen cookie routedokter.
 	 * 
 	 * @return
 	 */
 	private Cookie getRoutedokterCookie() {
+
 		FacesContext context = FacesContext.getCurrentInstance();
 		if (context != null) {
 			Map<String, Object> requestCookieMap = context.getExternalContext()
@@ -1001,5 +1033,28 @@ public class MeldingFormBase implements Serializable {
 		} else {
 			return null;
 		}
+	}
+
+	/**
+	 * Ophalen envelope voor provincie OVL.
+	 * 
+	 * @param viewer
+	 * @return
+	 */
+	@SuppressWarnings("static-access")
+	public Envelope getEnvelopeProvincie() {
+
+		try {
+			FeatureMapLayer provincieLayer = (FeatureMapLayer) getViewer()
+					.getConfiguration().getContext().getLayer("provincie");
+			provincieLayer.setHidden(false);
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+			return GeometryUtils.getEnvelope(provincie.getGeom());
+		} catch (IOException e) {
+			LOG.error("Can not search Provincie.", e);
+		}
+		return null;
 	}
 }

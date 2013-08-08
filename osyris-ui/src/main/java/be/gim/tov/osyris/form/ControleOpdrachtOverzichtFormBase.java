@@ -381,6 +381,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 			MapConfiguration configuration = mapFactory
 					.getConfiguration(context);
 
+			// Retrieve context instance from configuration.
+			context = configuration.getContext();
+
 			// Reset layers
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 				layer.setFilter(null);
@@ -388,11 +391,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				layer.setSelection(Collections.EMPTY_LIST);
 			}
 
-			mapFactory.createGeometryLayer(configuration.getContext(),
-					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
-					"single", null, null);
-
-			// Start configuratie zoomt naar Provincie OVL
+			// Startconfiguratie zoomt naar Provincie OVL
 			FeatureMapLayer provincieLayer = (FeatureMapLayer) context
 					.getLayer("provincie");
 			provincieLayer.setHidden(false);
@@ -402,7 +401,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
 			context.setBoundingBox(envelope);
 
-			configuration.setContext(context);
 			return configuration;
 		}
 		return null;
@@ -426,16 +424,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 			MapConfiguration configuration = mapFactory
 					.getConfiguration(context);
 
-			mapFactory.createGeometryLayer(configuration.getContext(),
-					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
-					"single", null, null);
-
-			mapFactory.createGeometryLayer(configuration.getContext(),
-					GEOMETRY_LAYER_LINE_NAME, null, LineString.class, null,
-					true, "single", null, null);
-
-			// Reset context
-			configuration.setContext(context);
+			// Retrieve context instance from configuration.
+			context = configuration.getContext();
 
 			// Reset layers
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
@@ -451,11 +441,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 
 			List<String> bordSelection = new ArrayList<String>();
-			List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+			List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
+			List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
 
 			GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
 					.createGeometryLayer(configuration.getContext(),
-							"geometry", null, Point.class, null, true,
+							GEOMETRY_LAYER_NAME, null, Point.class, null, true,
 							"single", null, null);
 
 			GeometryListFeatureMapLayer geomLineLayer = (GeometryListFeatureMapLayer) mapFactory
@@ -534,15 +525,27 @@ public class ControleOpdrachtOverzichtFormBase extends
 				} else if (probleem instanceof AnderProbleem) {
 					// Ander Probleem
 					AnderProbleem anderProbleem = (AnderProbleem) probleem;
-					anderProbleemGeoms.add(anderProbleem.getGeom());
+
+					if (anderProbleem.getGeom() instanceof Point) {
+						anderProbleemPointGeoms.add(anderProbleem.getGeom());
+					}
+
+					if (anderProbleem.getGeom() instanceof LineString) {
+						anderProbleemLineGeoms.add(anderProbleem.getGeom());
+					}
 				}
 			}
 
 			bordLayer.setSelection(bordSelection);
-			geomLayer.setGeometries(anderProbleemGeoms);
+			geomLayer.setGeometries(anderProbleemPointGeoms);
+			geomLineLayer.setGeometries(anderProbleemLineGeoms);
 
-			if (!anderProbleemGeoms.isEmpty()) {
+			if (!anderProbleemPointGeoms.isEmpty()) {
 				geomLayer.setHidden(false);
+			}
+
+			if (!anderProbleemLineGeoms.isEmpty()) {
+				geomLineLayer.setHidden(false);
 			}
 			return configuration;
 		}
@@ -689,7 +692,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				searchKnooppuntLayer(layer);
 			}
 
-			context.setBoundingBox(envelope);
+			viewer.updateCurrentExtent(envelope);
 			viewer.updateContext(null);
 		}
 	}
@@ -1028,7 +1031,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkBordProbleem", null);
 			}
-			// Itereren over de lagen en de correctie lagen selecteerbaar zetten
+			// Itereren over de lagen en de correcte lagen selecteerbaar zetten
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 				if (layer.getLayerId().equalsIgnoreCase(
 						object.getTrajectType() + "Bord")
@@ -1038,7 +1041,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
 				} else if (layer.getLayerId().equalsIgnoreCase(
-						GEOMETRY_LAYER_NAME)) {
+						GEOMETRY_LAYER_NAME)
+						|| layer.getLayerId().equalsIgnoreCase(
+								GEOMETRY_LAYER_LINE_NAME)) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(Collections.EMPTY_LIST);
@@ -1059,19 +1064,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-					layer.set("selectable", true);
-					layer.setSelection(new ArrayList<String>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase(
-						GEOMETRY_LAYER_NAME)) {
+				if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)
+						|| layer.getLayerId().equalsIgnoreCase(
+								GEOMETRY_LAYER_LINE_NAME)) {
 					layer.setHidden(false);
-					layer.set("editable", true);
-					((GeometryListFeatureMapLayer) layer)
-							.setGeometries(new ArrayList<Geometry>(1));
-				} else if (layer.getLayerId().equalsIgnoreCase(
-						GEOMETRY_LAYER_LINE_NAME)) {
-					layer.setHidden(false);
-					layer.set("editable", true);
+					// layer.set("editable", true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
 				} else {
@@ -1102,7 +1099,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			MapViewer viewer = getViewer();
 			MapContext context = viewer.getConfiguration().getContext();
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				layer.setSelection(null);
+				layer.setSelection(new ArrayList<String>(1));
 			}
 			viewer.updateContext(null);
 		}
@@ -1149,11 +1146,33 @@ public class ControleOpdrachtOverzichtFormBase extends
 		MapContext context = viewer.getConfiguration().getContext();
 
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
-		if (ids.size() > 0) {
-			GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
-					.getLayer(GEOMETRY_LAYER_NAME);
+
+		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_NAME);
+
+		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_LINE_NAME);
+
+		// Slechts 1 punt mag ingegeven worden
+		if (pointLayer.getGeometries().size() > 1) {
+			pointLayer.getGeometries().remove(0);
+		}
+
+		if (pointLayer.getGeometries().size() == 1) {
 			if (probleem instanceof AnderProbleem) {
-				((AnderProbleem) probleem).setGeom(layer.getGeometries()
+				((AnderProbleem) probleem).setGeom(pointLayer.getGeometries()
+						.iterator().next());
+			}
+		}
+
+		// Slechts 1 lijn mag ingegeven worden
+		if (lineLayer.getGeometries().size() > 1) {
+			lineLayer.getGeometries().remove(0);
+		}
+
+		if (lineLayer.getGeometries().size() == 1) {
+			if (probleem instanceof AnderProbleem) {
+				((AnderProbleem) probleem).setGeom(lineLayer.getGeometries()
 						.iterator().next());
 			}
 		}
@@ -1167,11 +1186,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void zoomToBordProbleem(BordProbleem bordProbleem) {
 		MapViewer viewer = getViewer();
 		Envelope envelope;
+
 		try {
 			envelope = new Envelope(
 					((Bord) modelRepository.loadObject(bordProbleem.getBord()))
 							.getGeom().getCoordinate());
 			viewer.updateCurrentExtent(envelope);
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
@@ -1183,11 +1204,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param bordProbleem
 	 */
 	public void zoomToAnderProbleem(AnderProbleem anderProbleem) {
+
 		MapViewer viewer = getViewer();
 		Envelope envelope;
+
 		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) viewer
 				.getConfiguration().getContext().getLayer(GEOMETRY_LAYER_NAME);
 		layer.setHidden(false);
+
 		if (anderProbleem.getGeom() instanceof Point) {
 			envelope = new Envelope(anderProbleem.getGeom().getCoordinate());
 			viewer.updateCurrentExtent(envelope);
@@ -1388,12 +1412,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public void deleteProbleem(Probleem probleem) {
 		try {
+
 			object.getProblemen().remove(probleem);
 			modelRepository.saveObject(object);
 			modelRepository.evictObject(probleem);
+
 			// Updaten kaart
 			getConfiguration();
 			messages.info("Probleem succesvol verwijderd.");
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van probleem: "
 					+ e.getMessage());

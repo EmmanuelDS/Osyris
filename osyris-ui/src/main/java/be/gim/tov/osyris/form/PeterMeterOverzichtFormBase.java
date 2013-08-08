@@ -2,7 +2,6 @@ package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -34,14 +33,11 @@ import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.security.Identity;
+import org.opengis.filter.Filter;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.localization.DefaultInternationalString;
-import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
-import be.gim.tov.osyris.model.traject.Traject;
-import be.gim.tov.osyris.model.user.PeterMeterProfiel;
-import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
 
 /**
  * 
@@ -248,6 +244,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * @return
 	 */
 	private boolean checkUsernameExists(String username) {
+
 		try {
 			Query query = new DefaultQuery("User");
 			query.addFilter(FilterUtils.equal("username", username));
@@ -268,6 +265,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 */
 	@SuppressWarnings("unchecked")
 	private void addUserToPeterMeterGroup(ResourceName resourceName) {
+
 		try {
 			Query query = new DefaultQuery("Group");
 			query.addFilter(FilterUtils.equal("groupname", "PeterMeter"));
@@ -291,6 +289,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 */
 	@SuppressWarnings("rawtypes")
 	private void setDocumentPermissions(ResourceName name, Document document) {
+
 		try {
 
 			Permissions permissions = (Permissions) modelRepository.loadAspect(
@@ -309,6 +308,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 			// Save permissions
 			modelRepository.saveAspect(permissions);
+
 		} catch (IOException e) {
 			LOG.error("Can not load aspect.", e);
 		} catch (InstantiationException e) {
@@ -325,6 +325,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * @return
 	 */
 	private List<Permission> getAllowedPermissions(ResourceName name) {
+
 		List<Permission> permissions = new ArrayList<Permission>();
 
 		permissions.add(new DefaultPermission(name, "view", true));
@@ -350,117 +351,27 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	private List<User> getAllPetersMeters() {
 
 		try {
-			List<User> petersMeters = new ArrayList<User>();
-			List<User> users = (List<User>) modelRepository.searchObjects(
-					getQuery(), true, true, true);
-			for (User user : users) {
-				if (userRepository.listGroupnames(user).contains("PeterMeter")) {
-					petersMeters.add(user);
-				}
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			DefaultQuery q = new DefaultQuery("User");
+			List<Filter> filters = new ArrayList<Filter>();
+
+			for (ResourceName name : group.getMembers()) {
+				Filter filter = FilterUtils.equal("username",
+						name.getNamePart());
+				filters.add(filter);
 			}
+			// Ophalen Users binnen de groep PeterMeter
+			q.addFilter(FilterUtils.or(filters));
+			List<User> petersMeters = (List<User>) modelRepository
+					.searchObjects(q, false, false);
 
 			return petersMeters;
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			return null;
 		}
-	}
-
-	/**
-	 * Toekennen van Peters en Meters aan Trajecten, voorlopig enkel voor
-	 * PetersMeters met 1 specifieke voorkeur
-	 * 
-	 * TODO: toekenning in geval van meerdere voorkeuren TODO: toekenning aan
-	 * lussen
-	 * 
-	 */
-	@SuppressWarnings("unchecked")
-	public void kenPetersMetersToe() {
-
-		DefaultQuery query = new DefaultQuery();
-		query.setModelClassName("Traject");
-		try {
-			List<User> petersMeters = getAllPetersMeters();
-
-			for (User peterMeter : petersMeters) {
-				PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
-						.getAspect("PeterMeterProfiel");
-				ResourceName resourceName = modelRepository
-						.getResourceName(peterMeter);
-
-				// Peters en Meters met 1 voorkeur krijgen voorrang
-				if (profiel.getVoorkeuren().size() == 1) {
-					for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
-						DefaultQuery q = new DefaultQuery();
-						q.setModelClassName("Traject");
-						q.addFilter(FilterUtils.equal("naam",
-								voorkeur.getTrajectNaam()));
-
-						// Zoeken naar voorkeurstraject
-						List<Traject> t = (List<Traject>) modelRepository
-								.searchObjects(q, false, false);
-						if (t.size() == 1) {
-							Traject tr = t.get(0);
-							// Voor elke periode PM toekennen
-							tr.setPeterMeter1(assignPeterMeter(tr,
-									resourceName, voorkeur.getPeriode()));
-							modelRepository.saveObject(tr);
-						}
-					}
-				}
-			}
-		} catch (IOException e) {
-			LOG.error("Can not search trajecten", e);
-		}
-	}
-
-	/**
-	 * Eigenlijke toekenning van de PeterMeter aan een traject in een bepaalde
-	 * periode. In geval van conflict wordt de PeterMeter met langste staat van
-	 * dienst gekozen.
-	 * 
-	 **/
-	private ResourceName assignPeterMeter(Traject traject,
-			ResourceName peterMeter1, String periode) {
-		try {
-			// Identificeren van de periode
-			ResourceIdentifier compareToPeterMeterInPeriode = null;
-			if (periode.equals(PERIODE_LENTE)) {
-				compareToPeterMeterInPeriode = traject.getPeterMeter1();
-			}
-			if (periode.equals(PERIODE_ZOMER)) {
-				compareToPeterMeterInPeriode = traject.getPeterMeter2();
-			}
-			if (periode.equals(PERIODE_HERFST)) {
-				compareToPeterMeterInPeriode = traject.getPeterMeter3();
-			}
-
-			// Indien al een andere peterMeter is toegekend
-			if (compareToPeterMeterInPeriode != null
-					&& compareToPeterMeterInPeriode != peterMeter1) {
-
-				PeterMeterProfiel profielPM1 = (PeterMeterProfiel) modelRepository
-						.loadObject(peterMeter1).getAspect("PeterMeterProfiel");
-				PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
-						.loadObject(traject.getPeterMeter1()).getAspect(
-								"PeterMeterProfiel");
-
-				Calendar cal1 = Calendar.getInstance();
-				Calendar cal2 = Calendar.getInstance();
-				cal1.setTime(profielPM1.getActiefSinds());
-				cal2.setTime(profielPM2.getActiefSinds());
-
-				// Degene met de langste staat van dienst wordt toegekend
-				if (cal1.before(cal2)) {
-					return peterMeter1;
-				} else {
-					return (ResourceName) compareToPeterMeterInPeriode;
-				}
-			}
-		} catch (IOException e) {
-			LOG.error("Can not load object.", e);
-		}
-		return peterMeter1;
 	}
 
 	/**

@@ -143,10 +143,13 @@
 					</p:column>
 					<p:column label="TrajectType">
 							<f:facet name="header">
-								<div>Type traject</div>
-							</f:facet>
-							 <h:outputText value="#{osyrisModelFunctions.getTrajectType(melding.traject)}" /> 
-						</p:column>
+						<d:displayLabel
+							property="#{d:modelClass('Melding').getProperty('trajectType')}" />
+						</f:facet>
+						<d:propertyValue id="trajectTypeColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('trajectType')}"
+							value="#{melding.trajectType }" mode="VIEW" />
+					</p:column>
 					<p:column label="Traject"
 						sortBy="#{melding.traject }">
 						<f:facet name="header">
@@ -158,11 +161,14 @@
 							value="#{melding.traject }" mode="VIEW" />
 					</p:column>
 					<p:column label="Regio">
-							<f:facet name="header">
-								<div>Regio</div>
-							</f:facet>
-							 <h:outputText value="#{osyrisModelFunctions.getTrajectRegio(melding.traject)}" /> 
-						</p:column>
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('Melding').getProperty('regio')}" />
+						</f:facet>
+						<d:propertyValue id="regioColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('regio')}"
+							value="#{melding.regio }" mode="VIEW" />
+					</p:column>
 					<p:column label="Status"
 						sortBy="#{melding.status }">
 						<f:facet name="header">
@@ -184,13 +190,13 @@
 							value="#{melding.medewerker }" mode="VIEW" />
 					</p:column>
 					<p:column label="Datum">
-							<f:facet name="header">
-								<div>Datum</div>
-							</f:facet>
-							<d:propertyValue id="datumLaatsteWijzigingColumn"
-								modelProperty="#{d:modelClass('Melding').getProperty('datumLaatsteWijziging')}"
-								value="#{melding.datumLaatsteWijziging }" mode="VIEW" /> 
-						</p:column>
+						<f:facet name="header">
+							<div>Datum</div>
+						</f:facet>
+						<d:propertyValue id="datumLaatsteWijzigingColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('datumLaatsteWijziging')}"
+							value="#{melding.datumLaatsteWijziging }" mode="VIEW" /> 
+					</p:column>
 				</p:dataTable>
 			</a:outputPanel>
 

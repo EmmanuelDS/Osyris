@@ -241,4 +241,24 @@ public class Melding extends AbstractModelObject implements StorableObject {
 		return Beans.getReference(OsyrisModelFunctions.class)
 				.getDatumLaatsteWijziging(this);
 	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("TrajectType")
+	public String getTrajectType() {
+		return Beans.getReference(OsyrisModelFunctions.class).getTrajectType(
+				this.traject);
+	}
+
+	@Transient
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Label("Regio")
+	public String getRegio() {
+		return Beans.getReference(OsyrisModelFunctions.class).getTrajectRegio(
+				this.traject);
+	}
 }

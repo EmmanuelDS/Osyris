@@ -431,10 +431,12 @@ public class OsyrisModelFunctions {
 	 * @throws IOException
 	 */
 	public List<?> getKnooppuntNummers() throws IOException {
+
 		QueryBuilder builder = new QueryBuilder("NetwerkKnooppunt");
 		builder.results(FilterUtils.properties("nummer"));
 		builder.groupBy(FilterUtils.properties("nummer"));
 		builder.orderBy(new DefaultQueryOrderBy(FilterUtils.property("nummer")));
+
 		return modelRepository.searchObjects(builder.build(), true, true);
 	}
 
@@ -446,12 +448,14 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public Date getDatumLaatsteWijziging(ControleOpdracht controleOpdracht) {
+
 		List<Date> dates = new ArrayList<Date>();
 		dates.add(controleOpdracht.getDatumTeControleren());
 		dates.add(controleOpdracht.getDatumUitTeVoeren());
 		dates.add(controleOpdracht.getDatumGerapporteerd());
 		dates.add(controleOpdracht.getDatumGevalideerd());
 		dates.removeAll(Collections.singleton(null));
+
 		if (dates.size() > 0) {
 			Date mostRecent = Collections.max(dates);
 			return mostRecent;
@@ -468,11 +472,13 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public Date getDatumLaatsteWijziging(Melding melding) {
+
 		List<Date> dates = new ArrayList<Date>();
 		dates.add(melding.getDatumVaststelling());
 		dates.add(melding.getDatumGemeld());
 		dates.add(melding.getDatumGevalideerd());
 		dates.removeAll(Collections.singleton(null));
+
 		if (dates.size() > 0) {
 			Date mostRecent = Collections.max(dates);
 			return mostRecent;
@@ -489,6 +495,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public Date getDatumLaatsteWijziging(WerkOpdracht werkOpdracht) {
+
 		List<Date> dates = new ArrayList<Date>();
 		dates.add(werkOpdracht.getDatumTeControleren());
 		dates.add(werkOpdracht.getDatumUitTeVoeren());
@@ -497,6 +504,7 @@ public class OsyrisModelFunctions {
 		dates.add(werkOpdracht.getDatumGerapporteerd());
 		dates.add(werkOpdracht.getDatumGeannuleerd());
 		dates.removeAll(Collections.singleton(null));
+
 		if (dates.size() > 0) {
 			Date mostRecent = Collections.max(dates);
 			return mostRecent;
@@ -602,6 +610,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public String getBordVolg(ResourceIdentifier BordId) {
+
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 			if (bord instanceof RouteBord) {
@@ -620,6 +629,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public String getBordStraat(ResourceIdentifier BordId) {
+
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 			if (bord instanceof RouteBord) {
@@ -638,6 +648,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public String getBordStraatNaam(ResourceIdentifier BordId) {
+
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 			if (bord instanceof RouteBord) {
@@ -657,16 +668,20 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings("unchecked")
 	public ResourceName zoekUitvoerder(ResourceIdentifier regioID) {
+
 		try {
 			Regio regio = (Regio) modelRepository.loadObject(regioID);
 			ResourceIdentifier identifier = regio.getUitvoerder();
 			DefaultQuery query = new DefaultQuery("UitvoerderProfiel");
 			query.addFilter(FilterUtils.equal("bedrijf", identifier));
+
 			List<UitvoerderProfiel> profiel = (List<UitvoerderProfiel>) modelRepository
 					.searchObjects(query, false, false);
 			User uitvoerder = (User) modelRepository.loadObject(profiel.get(0)
 					.getFor());
+
 			return modelRepository.getResourceName(uitvoerder);
+
 		} catch (IOException e) {
 			LOG.error("Can not load Traject.", e);
 		}
@@ -675,12 +690,14 @@ public class OsyrisModelFunctions {
 
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getWerkOpdrachten() {
+
 		try {
 			List<Object[]> opdrachten = new ArrayList<Object[]>();
 			QueryBuilder builder = new QueryBuilder("WerkOpdracht");
 			builder.results(FilterUtils.properties("id"));
 			List<Long> list = (List<Long>) modelRepository.searchObjects(
 					builder.build(), true, true);
+
 			for (Long id : list) {
 				Object[] object = {
 						new ResourceKey("WerkOpdracht", id.toString()),
@@ -688,6 +705,7 @@ public class OsyrisModelFunctions {
 				opdrachten.add(object);
 			}
 			return opdrachten;
+
 		} catch (IOException e) {
 			LOG.error("Can not search WerkOpdracht ids.", e);
 		}
@@ -700,7 +718,9 @@ public class OsyrisModelFunctions {
 	 * @param id
 	 */
 	public String getUitvoerderNaam(ResourceIdentifier id) {
+
 		String naam = null;
+
 		try {
 			User user = (User) modelRepository.loadObject(id);
 			UitvoerderProfiel profiel = (UitvoerderProfiel) user.getAspect(
@@ -708,6 +728,7 @@ public class OsyrisModelFunctions {
 			UitvoerderBedrijf bedrijf = (UitvoerderBedrijf) modelRepository
 					.loadObject(profiel.getBedrijf());
 			naam = bedrijf.getNaam();
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		} catch (InstantiationException e) {
@@ -726,6 +747,7 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings("unchecked")
 	public ResourceIdentifier searchRegioForProbleem(Geometry geometry) {
+
 		try {
 			DefaultQuery query = new DefaultQuery();
 			query.setModelClassName("Regio");
@@ -733,6 +755,7 @@ public class OsyrisModelFunctions {
 			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
 					query, true, true);
 			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+
 			return modelRepository.getResourceIdentifier(regio);
 
 		} catch (IOException e) {
@@ -750,6 +773,7 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings("unchecked")
 	public ResourceName zoekVerantwoordelijke(ResourceIdentifier traject) {
+
 		try {
 			Traject t = (Traject) modelRepository.loadObject(traject);
 
@@ -780,6 +804,7 @@ public class OsyrisModelFunctions {
 					}
 				}
 			}
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		} catch (InstantiationException e) {
@@ -796,6 +821,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getWerkOpdrachtValidatie() {
+
 		List<Object[]> validaties = new ArrayList<Object[]>();
 		Object[] code1 = { ValidatieStatus.OPNIEUW_UITVOEREN,
 				"Opnieuw uitvoeren" };
@@ -824,6 +850,7 @@ public class OsyrisModelFunctions {
 	 * @throws IOException
 	 */
 	public List<?> getStockSubCategories(String categorie) throws IOException {
+
 		if (categorie != null && !categorie.isEmpty()) {
 			QueryBuilder builder = new QueryBuilder("StockMateriaal");
 			builder.filter(FilterUtils.equal("categorie", categorie));

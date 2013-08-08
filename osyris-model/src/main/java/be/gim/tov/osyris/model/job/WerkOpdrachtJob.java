@@ -1,4 +1,4 @@
-package be.gim.tov.osyris.model.bean;
+package be.gim.tov.osyris.model.job;
 
 import java.io.IOException;
 import java.util.Calendar;
@@ -36,11 +36,11 @@ public class WerkOpdrachtJob {
 
 	public void processEvent(ModelEvent event) {
 
-		try {
+		Map<String, Object> myMap = new HashMap<String, Object>();
 
+		try {
 			// Manueel session starten anders exception: no active context for
 			// context niet bestaat
-			Map<String, Object> myMap = new HashMap<String, Object>();
 			sessionContext.associate(myMap);
 			sessionContext.activate();
 
@@ -78,6 +78,7 @@ public class WerkOpdrachtJob {
 						// SessionContext deactiveren
 						sessionContext.invalidate();
 						sessionContext.deactivate();
+
 					} catch (Exception e) {
 						LOG.error("Can not update WerkOpdracht.", e);
 					}
@@ -85,6 +86,9 @@ public class WerkOpdrachtJob {
 			}
 		} catch (IOException e) {
 			LOG.error("Can not search WerkOpdracht.", e);
+		} finally {
+			sessionContext.dissociate(myMap);
+
 		}
 	}
 }
