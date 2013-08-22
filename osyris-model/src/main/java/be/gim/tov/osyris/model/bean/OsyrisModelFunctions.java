@@ -798,7 +798,14 @@ public class OsyrisModelFunctions {
 						.getAspect("MedewerkerProfiel", modelRepository, true);
 				if (profiel != null) {
 					for (String trajectType : profiel.getTrajectType()) {
-						if (trajectType.equals(t.getModelClass().getName())) {
+						if (t.getModelClass().getName().contains("Lus")) {
+							String className = t.getModelClass().getName()
+									.replace("Lus", "Segment");
+							if (className.equals(trajectType)) {
+								return name;
+							}
+						} else if (trajectType.equals(t.getModelClass()
+								.getName())) {
 							return name;
 						}
 					}

@@ -1,0 +1,26 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	<h3><h:outputText value="Voor elke peter en meter die op dit moment aan een route of lus toegewezen is, wordt er automatisch een controleopdracht aangemaakt." /></h3>
+	<br/>
+	<h3><h:outputText value="Bent u zeker dat u deze controleopdrachten automatisch wilt aanmaken?" /></h3>
+	<br/>
+	<d:buttons>
+		<j:commandButton value="Bevestigen uitvoeren algoritme"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button" 
+			action="#{form.createControleOpdrachten()}"
+			render="#{r:clientId('result')}"
+			oncomplete="conscientia.widget(#{r:element('confirmPopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			oncomplete="conscientia.widget(#{r:element('confirmPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

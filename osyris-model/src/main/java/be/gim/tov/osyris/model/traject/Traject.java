@@ -12,7 +12,6 @@ import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.cache.CacheProducer;
-import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
@@ -25,11 +24,9 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
-import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
-import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.model.AbstractModelObject;
@@ -57,6 +54,12 @@ public abstract class Traject extends AbstractModelObject implements
 	private static final Log LOG = LogFactory.getLog(Traject.class);
 
 	// VARIABLES
+	@Label("Naam")
+	@Description("Naam")
+	@Edit(type = "suggestions")
+	@Search(type = "suggestions:like-wildcard-nocase")
+	private String naam;
+
 	@Label("Regio")
 	@Description("Regio")
 	@ModelClassName("Regio")
@@ -64,13 +67,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
 	private ResourceIdentifier regio;
-
-	@Label("Naam")
-	@Description("Naam")
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(null, parents[0])}")
-	@Parents({ "regio" })
-	private String naam;
 
 	@NotEditable
 	@NotSearchable
@@ -111,14 +107,6 @@ public abstract class Traject extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
-	public ResourceIdentifier getRegio() {
-		return regio;
-	}
-
-	public void setRegio(ResourceIdentifier regio) {
-		this.regio = regio;
-	}
-
 	@LabelProperty
 	public String getNaam() {
 		return naam;
@@ -126,6 +114,14 @@ public abstract class Traject extends AbstractModelObject implements
 
 	public void setNaam(String naam) {
 		this.naam = naam;
+	}
+
+	public ResourceIdentifier getRegio() {
+		return regio;
+	}
+
+	public void setRegio(ResourceIdentifier regio) {
+		this.regio = regio;
 	}
 
 	public float getLengte() {

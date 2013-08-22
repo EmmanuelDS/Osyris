@@ -107,8 +107,7 @@
 				<j:commandButton rendered="true" value="Voer algoritme uit"
 					image="#{resource['core/images/actions/12x12/apply.png']}"
 					type="button"
-					action="#{controleOpdrachtOverzichtFormBase.createControleOpdrachten()}"
-					render="objects" />
+					oncomplete="conscientia.widget(#{r:element('confirmPopup')}).show();"/>
 			</r:panel>
 		</j:layoutPane>
 		<j:layoutPane>

@@ -70,4 +70,20 @@
 			<f:param name="render" value="#{render}" />
 		</j:lazyInclude>
 	</p:dialog>
+	
+	<p:dialog id="confirmPopup" 
+				header="Automatische toewijzing van peters en meters"
+				icon="#{resources['core/images/actions/16x16/create.png']}"
+				show="true"
+				modal="true"
+				width="600"
+				resizable="false"
+				onShow="#{r:component('confirmInclude')}.show();"
+				onHide="#{r:component('confirmInclude')}.hide();">
+			<j:relocate />
+			<j:lazyInclude id="confirmInclude"
+				src="/resources/osyris/includes/_confirmPeterMeterToekenningPanel.xhtml">
+				<f:param name="form" value="#{form}" />
+			</j:lazyInclude>
+		</p:dialog>
 </u:composition>

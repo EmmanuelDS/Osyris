@@ -75,7 +75,6 @@ public class ContextFormBase {
 					DefaultMapGroup group = (DefaultMapGroup) getViewer()
 							.getContext().getLayer((type.toLowerCase()));
 					for (MapLayer layer : group.getLayers()) {
-						// TODO: Lussen editeerbaar voor bepaalde medewerker?
 						layer.set("editable", true);
 					}
 				}
@@ -100,7 +99,8 @@ public class ContextFormBase {
 					.getUniqueResult(modelRepository.searchObjects(
 							new DefaultQuery("Provincie"), false, false));
 			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
-			// viewer.updateCurrentExtent(envelope);
+
+			viewer.setCurrentExtent(envelope);
 
 		} catch (Exception e) {
 			LOG.error("Can not set MapViewer.", e);

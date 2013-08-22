@@ -58,7 +58,7 @@
 							<j:commandButton rendered="true" value="Voer algoritme uit"
 								image="#{resource['core/images/actions/12x12/apply.png']}"
 								type="button"
-								action="#{peterMeterToewijzingBean.kenPetersMetersToe()}" />
+								oncomplete="conscientia.widget(#{r:element('confirmPopup')}).show();"/>
 						</r:panel>
 		</j:layoutPane>
 

@@ -401,6 +401,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
 			context.setBoundingBox(envelope);
 
+			// Indien netwerk CO lussen zichtbaar maken
+			if (controleOpdrachtType.equals("netwerk")) {
+				// Alle lussen tonen
+				FeatureMapLayer wandelLusLayer = (FeatureMapLayer) context
+						.getLayer("wandelNetwerkLus");
+				wandelLusLayer.setHidden(false);
+
+				FeatureMapLayer fietsLusLayer = (FeatureMapLayer) context
+						.getLayer("fietsNetwerkLus");
+				fietsLusLayer.setHidden(false);
+			}
+
 			return configuration;
 		}
 		return null;
@@ -1321,7 +1333,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 			opdracht.setMedewerker(Beans.getReference(
 					OsyrisModelFunctions.class).zoekVerantwoordelijke(
 					modelRepository.getResourceIdentifier(traject)));
-			opdracht.setPeterMeter(traject.getPeterMeter1());
+
+			if (periode.equals(PERIODE_LENTE)) {
+				opdracht.setPeterMeter(traject.getPeterMeter1());
+			} else if (periode.equals(PERIODE_ZOMER)) {
+				opdracht.setPeterMeter(traject.getPeterMeter2());
+			} else if (periode.equals(PERIODE_HERFST)) {
+				opdracht.setPeterMeter(traject.getPeterMeter3());
+			}
+
 			opdracht.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
 			opdracht.setTraject(modelRepository.getResourceIdentifier(traject));
 
