@@ -57,7 +57,7 @@
 			value="Rapporteren"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"
-			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
+			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show(); #{form.resetProbleem()}" />
 		<j:commandButton
 			rendered="#{form.object.status == 'GERAPPORTEERD' }"
 			value="Valideren"

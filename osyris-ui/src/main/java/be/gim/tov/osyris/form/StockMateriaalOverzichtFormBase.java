@@ -116,15 +116,18 @@ public class StockMateriaalOverzichtFormBase extends
 	 */
 	public void createGebruiktMateriaal(WerkOpdracht opdracht) {
 		try {
+
 			// Aanmaken gebruikt materiaal en toevoegen aan Werkopdracht
 			GebruiktMateriaal gebruiktMateriaal = (GebruiktMateriaal) modelRepository
 					.createObject("GebruiktMateriaal", null);
 			gebruiktMateriaal.setStockMateriaal(object);
 			gebruiktMateriaal.setAantal(aantalGebruikt);
-			opdracht.getMaterialen().add(gebruiktMateriaal);
 
-			// GebruiktMateriaal saven
-			modelRepository.saveObject(opdracht);
+			// GebruiktMateriaal toevoegen en saven indien niet 0
+			if (aantalGebruikt != 0) {
+				opdracht.getMaterialen().add(gebruiktMateriaal);
+				modelRepository.saveObject(opdracht);
+			}
 
 			// reset aantal gebruikt
 			setAantalGebruikt(0);

@@ -104,6 +104,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaarUitvoerder;
 
+	@NotSearchable
+	@Label("Commentaar validatie")
+	@Description("Commentaar validatie")
+	@Type(value = ModelPropertyType.TEXT)
+	private String commentaarValidatie;
+
 	@Edit(type = "panels")
 	@NotSearchable
 	@Label("Foto")
@@ -212,6 +218,14 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setCommentaarUitvoerder(String commentaarUitvoerder) {
 		this.commentaarUitvoerder = commentaarUitvoerder;
+	}
+
+	public String getCommentaarValidatie() {
+		return commentaarValidatie;
+	}
+
+	public void setCommentaarValidatie(String commentaarValidatie) {
+		this.commentaarValidatie = commentaarValidatie;
 	}
 
 	public ResourceKey getFoto() {

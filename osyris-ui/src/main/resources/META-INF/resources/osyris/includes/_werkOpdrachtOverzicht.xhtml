@@ -269,12 +269,13 @@
 								mode="VIEW" />
 						</h:panelGrid>
 					</p:rowExpansion>
-					<f:facet name="footer" rendered="#{identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')}" >
+					<f:facet name="footer" >
 						<a:outputPanel
 							layout="block"
-							style="text-align: center">
+							style="text-align: center" 
+							rendered="#{identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')}">
 							<j:commandButton
-						value="Maak uitvoeringsronde"
+						value="Uitvoeringsronde maken"
 						image="#{resource['core/images/actions/12x12/apply.png']}"
 						type="button"
 						actionListener="#{werkOpdrachtOverzichtFormBase.createUitvoeringsronde()}" 

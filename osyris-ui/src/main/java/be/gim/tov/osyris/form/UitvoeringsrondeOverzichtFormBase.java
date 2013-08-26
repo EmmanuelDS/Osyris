@@ -34,6 +34,7 @@ import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
+import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
@@ -374,6 +375,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 									.getProbleem()).getBord());
 					bordSelection.add(bord.getId().toString());
 					bordLayer.setSelection(bordSelection);
+
 					Envelope envelope = GeometryUtils.getEnvelope(bord
 							.getGeom());
 					GeometryUtils.expandEnvelope(envelope, 0.1,
@@ -390,6 +392,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 							.getProbleem();
 					anderProbleemGeoms.add(anderProbleem.getGeom());
 					geomLayer.setGeometries(anderProbleemGeoms);
+					geomLayer.setHidden(false);
 					Envelope envelope = GeometryUtils.getEnvelope(anderProbleem
 							.getGeom());
 					GeometryUtils.expandEnvelope(envelope, 0.1,
@@ -502,6 +505,50 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			messages.error("Fout bij het verwijderen van materiaal uit werkopdracht: "
 					+ e.getMessage());
 			LOG.error("Can not ssave object.", e);
+		}
+	}
+
+	public boolean isBordProbleem(Probleem probleem) {
+		if (probleem instanceof BordProbleem) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Zoomen naar een probleem op de kaart
+	 * 
+	 * @param bordProbleem
+	 */
+	public void zoomToProbleem(Probleem probleem) {
+		MapViewer viewer = getViewer();
+		Envelope envelope;
+
+		try {
+			if (probleem instanceof BordProbleem) {
+				BordProbleem bordProbleem = (BordProbleem) probleem;
+				envelope = new Envelope(
+						((Bord) modelRepository.loadObject(bordProbleem
+								.getBord())).getGeom().getCoordinate());
+				viewer.updateCurrentExtent(envelope);
+			}
+
+			else if (probleem instanceof AnderProbleem) {
+				AnderProbleem anderProbleem = (AnderProbleem) probleem;
+				GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) viewer
+						.getConfiguration().getContext()
+						.getLayer(GEOMETRY_LAYER_NAME);
+				layer.setHidden(false);
+				if (anderProbleem.getGeom() instanceof Point) {
+					envelope = new Envelope(anderProbleem.getGeom()
+							.getCoordinate());
+					viewer.updateCurrentExtent(envelope);
+
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load bord.", e);
 		}
 	}
 }

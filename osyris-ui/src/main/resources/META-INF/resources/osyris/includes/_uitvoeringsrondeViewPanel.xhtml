@@ -23,7 +23,7 @@
 	<br/>
 	<!-- WerkOpdracht Samenvatting Table -->
 	<u:decorate
-				template="/resources/osyris/includes/_werkOpdrachtSamenvattingTable.xhtml">
+				template="/resources/osyris/includes/_werkOpdrachtSamenvattingViewTable.xhtml">
 				<u:param name="form" value="#{form}" />
 	</u:decorate>
 	<br/>
@@ -49,4 +49,15 @@
 			</d:field>
 	</d:fields>
 	</r:panel>
+	
+	<d:buttons>
+		<j:commandButton
+				rendered="#{(form.isCanEdit(form.object) and form.object.status == 'AANGEMAAKT') and (identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')) }"
+				value="Rapporteren"
+				image="#{resource['core/images/actions/16x16/edit.png']}"
+				type="button"
+				title="Rapporteren uitvoeringsronde"
+				oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();">
+			</j:commandButton>
+	</d:buttons>
 </u:composition>

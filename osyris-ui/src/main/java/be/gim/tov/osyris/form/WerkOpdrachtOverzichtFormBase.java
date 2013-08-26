@@ -254,7 +254,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 */
 	public List<WerkOpdracht> findWerkOpdrachtenBetweenDates(
 			List<WerkOpdracht> opdrachten) {
+
 		List<WerkOpdracht> result = new ArrayList<WerkOpdracht>();
+
 		for (WerkOpdracht opdracht : opdrachten) {
 			if (opdracht.getDatumLaatsteWijziging().before(totDatum)
 					&& opdracht.getDatumLaatsteWijziging().after(vanDatum)) {
@@ -613,6 +615,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 			// Set status en datum GEVALIDEERD
 			object.setStatus(WerkopdrachtStatus.GEVALIDEERD);
 			object.setDatumGevalideerd(new Date());
+			object.setValidatie(validatieStatus);
 
 			// Afboeken stock voor elk gebruikt materiaal
 			if (!object.getMaterialen().isEmpty()

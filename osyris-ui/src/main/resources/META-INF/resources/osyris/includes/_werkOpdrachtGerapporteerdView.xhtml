@@ -116,10 +116,43 @@
 	<br/>
 	<r:panel id="fotoPanel">
 	<d:fields>
-		<d:field for="foto" label="Foto's">
+		<d:field for="foto" label="Foto">
 			<d:propertyValue id="foto"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
 					value="#{form.object.foto}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="statusPanel" rendered="#{form.object.validatie != null}">
+	<d:fields>
+		<d:field for="status" label="Status validatie">
+			<d:propertyValue id="status"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('validatie')}"
+					value="#{form.object.validatie}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="commentaarMedewerkerPanel">
+	<d:fields>
+		<d:field for="commentaarMedewerker" label="Commentaar medewerker">
+			<d:propertyValue id="commentaarMedewerker"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+					value="#{form.object.commentaarMedewerker}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
+	<r:panel id="commentaarUitvoerderPanel">
+	<d:fields>
+		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
+			<d:propertyValue id="commentaarUitvoerder"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
+					value="#{form.object.commentaarUitvoerder}"
 					mode="VIEW" />
 		</d:field>
 	</d:fields>

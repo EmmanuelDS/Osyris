@@ -22,24 +22,12 @@
 			</f:facet>
 	   		<p:column label="Acties">
 				<a:outputPanel styleClass="model-table-actions">
-				
 					<j:commandButton
 						rendered="#{form.isCanView(werkOpdracht)}"
 						image="#{resource['core/images/actions/16x16/view.png']}"
 						type="image"
 						title="Bekijken werkopdracht"
 						oncomplete="conscientia.widget(#{r:element('viewWerkOpdrachtPopup')}).show();">
-						<f:setPropertyActionListener
-							target="#{form.selectedWerkOpdracht}"
-							value="#{werkOpdracht}" />
-					</j:commandButton>
-					
-					<j:commandButton
-						rendered="#{form.isCanView(werkOpdracht) and form.object.status == 'AANGEMAAKT'}"
-						image="#{resource['core/images/actions/16x16/edit.png']}"
-						type="image"
-						title="Rapporteren werkopdracht"
-						oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).show();">
 						<f:setPropertyActionListener
 							target="#{form.selectedWerkOpdracht}"
 							value="#{werkOpdracht}" />

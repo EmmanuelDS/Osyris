@@ -35,7 +35,7 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	@Label("Nummer")
 	@Description("Nummer")
 	@LabelProperty
-	private int nummer;
+	private Integer nummer;
 
 	@Label("Naam")
 	@Description("Naam")
@@ -78,11 +78,11 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 		return (Long) super.getId();
 	}
 
-	public int getNummer() {
+	public Integer getNummer() {
 		return nummer;
 	}
 
-	public void setNummer(int nummer) {
+	public void setNummer(Integer nummer) {
 		this.nummer = nummer;
 	}
 

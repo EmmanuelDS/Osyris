@@ -141,16 +141,16 @@
 									target="#{uitvoeringsrondeOverzichtFormBase.object}"
 									value="#{uitvoeringsronde}" />
 							</j:commandButton>
-							<j:commandButton
-								rendered="#{(uitvoeringsrondeOverzichtFormBase.isCanEdit(uitvoeringsronde) and uitvoeringsronde.status == 'AANGEMAAKT') and (identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')) }"
-								image="#{resource['core/images/actions/16x16/edit.png']}"
-								type="image"
-								title="Rapporteren uitvoeringsronde"
-								oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{uitvoeringsrondeOverzichtFormBase.object}"
-									value="#{uitvoeringsronde}" />
-							</j:commandButton>
+<!-- 							<j:commandButton -->
+<!-- 								rendered="#{(uitvoeringsrondeOverzichtFormBase.isCanEdit(uitvoeringsronde) and uitvoeringsronde.status == 'AANGEMAAKT') and (identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')) }" -->
+<!-- 								image="#{resource['core/images/actions/16x16/edit.png']}" -->
+<!-- 								type="image" -->
+<!-- 								title="Rapporteren uitvoeringsronde" -->
+<!-- 								oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).show();"> -->
+<!-- 								<f:setPropertyActionListener -->
+<!-- 									target="#{uitvoeringsrondeOverzichtFormBase.object}" -->
+<!-- 									value="#{uitvoeringsronde}" /> -->
+<!-- 							</j:commandButton> -->
 							<j:commandButton
 								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanDelete(uitvoeringsronde)}"
 								image="#{resource['core/images/actions/16x16/delete.png']}"

@@ -102,12 +102,8 @@
 				execute="@this" />
 		</h:selectOneMenu>
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
-			<d:object mode="EDIT"
-					value="#{form.melding.probleem}" />	
-				<d:propertyField id="commentaar" 
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-						value="#{form.melding.probleem.commentaar}"
-						mode="EDIT" />
+		
+			<div>
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"
@@ -121,6 +117,7 @@
 					event="click"
 					control="selectBox" />
 			</j:commandButton>
+			<br/>
 			<j:commandButton
 				id="drawPoint"
 				rendered="#{form.probleemType == 'ander'}"
@@ -150,6 +147,15 @@
 						value="#{trajectType}" />
 				</j:activateControl>
 			</j:commandButton>
+			</div>
+			<br/>
+			<d:object mode="EDIT"
+					value="#{form.melding.probleem}" />	
+				<d:propertyField id="commentaar" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{form.melding.probleem.commentaar}"
+						mode="EDIT" />
+						
 			<d:buttons>
 			<j:commandButton value="Verzenden"
 				image="#{resource['core/images/actions/12x12/apply.png']}"

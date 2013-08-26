@@ -430,14 +430,16 @@ public class OsyrisModelFunctions {
 	 * @return
 	 * @throws IOException
 	 */
-	public List<?> getKnooppuntNummers() throws IOException {
+	public List<Integer> getKnooppuntNummers() throws IOException {
 
 		QueryBuilder builder = new QueryBuilder("NetwerkKnooppunt");
+		builder.filter(FilterUtils.notEqual("nummer", 0, true));
 		builder.results(FilterUtils.properties("nummer"));
 		builder.groupBy(FilterUtils.properties("nummer"));
 		builder.orderBy(new DefaultQueryOrderBy(FilterUtils.property("nummer")));
 
-		return modelRepository.searchObjects(builder.build(), true, true);
+		return (List<Integer>) modelRepository.searchObjects(builder.build(),
+				true, true);
 	}
 
 	/**
@@ -530,6 +532,7 @@ public class OsyrisModelFunctions {
 						try {
 							Traject t = (Traject) modelRepository
 									.loadObject((ResourceIdentifier) key);
+
 							return modelRepository.getObjectLabel(t.getRegio());
 						} catch (IOException e) {
 							LOG.error("Can not load object.", e);

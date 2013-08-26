@@ -69,17 +69,6 @@
 		</d:field>
 	</d:fields>
 	</r:panel>
-	<br/>
-	<r:panel id="CommentaarUitvoerderPanel">
-	<d:fields>
-		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
-			<d:propertyValue id="commentaarUitvoerder"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
-					value="#{form.object.commentaarUitvoerder}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
-	</r:panel>
 	
 	</td>
 	<td width="50%" valign="top">
@@ -95,7 +84,7 @@
 	</table>
 	<d:buttons>
 	<j:commandButton
-			rendered="#{form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN' }"
+			rendered="#{form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN'}"
 			value="Bewerken"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"

@@ -1140,7 +1140,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				((BordProbleem) getProbleem()).setBord(new ResourceKey("Bord",
 						id));
 			} else {
-				messages.error("Gelieve precies 1 bord te selecteren.");
+				messages.error("Er zijn meerdere borden geselecteerd. Mogelijk bevinden deze borden zich op dezelfde locatie. Gelieve in dit geval de 'Tonen attributen' knop te gebruiken om uw selectie te verfijnen.");
 				layer.setSelection(new ArrayList<String>(1));
 			}
 		}
@@ -1481,5 +1481,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 		}
 		return true;
+	}
+
+	/**
+	 * Reset probleem en probleemType
+	 * 
+	 */
+	public void resetProbleem() {
+		probleem = null;
+		probleemType = null;
 	}
 }

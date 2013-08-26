@@ -85,8 +85,6 @@
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"
 			image="#{resource['core/images/actions/12x12/cancel.png']}"
-			action="#{form.cancel()}"
-			execute="@this"
-			oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide();" />
+			oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
 	</d:buttons>
 </u:composition>

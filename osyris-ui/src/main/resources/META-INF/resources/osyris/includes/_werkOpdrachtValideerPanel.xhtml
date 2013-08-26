@@ -42,7 +42,17 @@
 		</j:renderPanel>
 	</d:fields>
 	</r:panel>
-	
+	<br/>
+	<r:panel id="CommentaarValidatiePanel">
+	<d:fields>
+		<d:field for="commentaarValidatie" label="Commentaar validatie">
+			<d:propertyValue id="commentaarValidatie"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarValidatie')}"
+					value="#{form.object.commentaarValidatie}"
+					mode="EDIT" />
+		</d:field>
+	</d:fields>
+	</r:panel>
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>
