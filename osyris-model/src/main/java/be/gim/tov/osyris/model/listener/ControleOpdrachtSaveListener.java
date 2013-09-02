@@ -51,12 +51,17 @@ public class ControleOpdrachtSaveListener {
 
 	public void processEvent(ModelEvent event) throws IOException,
 			InstantiationException, IllegalAccessException {
+
 		ControleOpdracht controleOpdracht = (ControleOpdracht) event
 				.getModelObject();
 
-		// Een nieuw aangemaakte ControleOpdracht krit status te controleren
+		// Een nieuw aangemaakte ControleOpdracht krijgt status te controleren
 		if (controleOpdracht.getStatus() == null) {
 			controleOpdracht.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
+			controleOpdracht.setTypeTraject(osyrisModelFunctions
+					.getTrajectType(controleOpdracht.getTraject()));
+			controleOpdracht.setRegioId(osyrisModelFunctions
+					.getTrajectRegioId(controleOpdracht.getTraject()));
 		}
 
 		// Indien alle problemen in een ControleOpdracht een status hebben is de
@@ -93,7 +98,9 @@ public class ControleOpdrachtSaveListener {
 	 * @param controleOpdracht
 	 */
 	private void createWerkOpdrachten(ControleOpdracht controleOpdracht) {
+
 		for (Probleem probleem : controleOpdracht.getProblemen()) {
+
 			if (probleem.getStatus().equals(ProbleemStatus.WERKOPDRACHT)) {
 				try {
 					String modelClassName = "WerkOpdracht";
@@ -109,6 +116,10 @@ public class ControleOpdrachtSaveListener {
 							.setMedewerker(controleOpdracht.getMedewerker());
 					werkOpdracht.setProbleem(probleem);
 					werkOpdracht.setTraject(controleOpdracht.getTraject());
+					werkOpdracht.setTypeTraject(osyrisModelFunctions
+							.getTrajectType(werkOpdracht.getTraject()));
+					werkOpdracht.setRegioId(osyrisModelFunctions
+							.getTrajectRegioId(werkOpdracht.getTraject()));
 
 					// Voor routes uitvoerder zoeken via RegioID van de route
 					Traject traject = (Traject) modelRepository

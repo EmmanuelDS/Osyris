@@ -179,6 +179,16 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@View(type = "table")
 	private List<GebruiktMateriaal> materialen;
 
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private String typeTraject;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private ResourceIdentifier regioId;
+
 	// GETTERS AND SETTERS
 	public String getInRonde() {
 		return inRonde;
@@ -330,6 +340,22 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setHandelingen(List<WerkHandeling> handelingen) {
 		this.handelingen = handelingen;
+	}
+
+	public String getTypeTraject() {
+		return typeTraject;
+	}
+
+	public void setTypeTraject(String typeTraject) {
+		this.typeTraject = typeTraject;
+	}
+
+	public ResourceIdentifier getRegioId() {
+		return regioId;
+	}
+
+	public void setRegioId(ResourceIdentifier regioId) {
+		this.regioId = regioId;
 	}
 
 	@Transient

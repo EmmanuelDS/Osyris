@@ -11,7 +11,7 @@ header, footer, article, section, nav, menu, hgroup {
 	padding:0;
 	border:0;
 	outline:0;
-	font-size:100%;
+	/*font-size:100%;*/
 	background:transparent;
 }
 
@@ -50,12 +50,18 @@ header, footer, article, section, nav, menu, hgroup {
 	text-align:center;
 	margin-top:25px;
 	color:#fff;
-	font-size:0.8em;
+	font-size:1.2em;
 }
 
 .page-footer .address a {
 	color:#fff;
 }
+
+.header .header_logo {
+	margin-top:25px;
+	margin-left:100px;
+}
+
 .page-footer .toerisme_oost_vlaanderen {
 	margin-top:25px;
 }
@@ -85,3 +91,192 @@ header, footer, article, section, nav, menu, hgroup {
 .model-field-tail {
 	clear: both;
 }
+
+.icn_user {
+	background: url("#{resource['osyris/images/icn_user.png']}") 20px 50% no-repeat;
+}
+
+.icn_stop {
+	background: url("#{resource['osyris/images/icn_stop.png']}") 20px 50% no-repeat;
+}
+
+.account {
+	width:480px;
+	height:50px;
+	position:absolute;
+	top:0;
+	right:0;
+	padding-right: 20px;
+}
+			
+	.account ul {
+		float:right;
+		height:50px;
+		margin:0;
+		padding:0;
+		background-color:#73a42b;
+		list-style-type:none;
+	}
+		.account ul li {
+			float:left;
+			padding:0 20px 0 50px;
+			line-height:50px;
+			font-size:1.2em;
+			color:#fff;
+		}
+					
+			.account a {
+				color:#cee6ab;
+			}
+				
+			.account .stop a{
+				color:#fff;
+			}
+						
+			.account .help {
+				width:50px;
+				padding:12px 4px 13px 4px;
+				background-color:#598b1c;
+			}
+						
+			.account .help .question_mark {
+				width:25px;
+				height:25px;
+				margin:auto;
+				display:block;
+				line-height:25px;
+				text-align:center;
+				background-color:#fff;
+				border-radius:1em;
+				color:#457010;
+				font-size:1.2em;
+				text-decoration:none;
+			}
+.header .menu{
+	width:1000px;
+	height:50px;
+	margin:auto;
+	padding-left: 20px;
+}
+		
+	.menu ul{
+		height:50px;
+		margin:0;
+		padding:0;
+		display:inline-block;
+		list-style-type:none;
+		background: #689b26; /* Old browsers */
+		/* IE9 SVG, needs conditional override of 'filter' to 'none' */
+		background: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiA/Pgo8c3ZnIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgd2lkdGg9IjEwMCUiIGhlaWdodD0iMTAwJSIgdmlld0JveD0iMCAwIDEgMSIgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSI+CiAgPGxpbmVhckdyYWRpZW50IGlkPSJncmFkLXVjZ2ctZ2VuZXJhdGVkIiBncmFkaWVudFVuaXRzPSJ1c2VyU3BhY2VPblVzZSIgeDE9IjAlIiB5MT0iMCUiIHgyPSIxMDAlIiB5Mj0iMCUiPgogICAgPHN0b3Agb2Zmc2V0PSIwJSIgc3RvcC1jb2xvcj0iIzY4OWIyNiIgc3RvcC1vcGFjaXR5PSIxIi8+CiAgICA8c3RvcCBvZmZzZXQ9IjEwMCUiIHN0b3AtY29sb3I9IiM5ZGM1M2IiIHN0b3Atb3BhY2l0eT0iMSIvPgogIDwvbGluZWFyR3JhZGllbnQ+CiAgPHJlY3QgeD0iMCIgeT0iMCIgd2lkdGg9IjEiIGhlaWdodD0iMSIgZmlsbD0idXJsKCNncmFkLXVjZ2ctZ2VuZXJhdGVkKSIgLz4KPC9zdmc+);
+		background: -moz-linear-gradient(left, #689b26 0%, #9dc53b 100%); /* FF3.6+ */
+		background: -webkit-gradient(linear, left top, right top, color-stop(0%,#689b26), color-stop(100%,#9dc53b)); /* Chrome,Safari4+ */
+		background: -webkit-linear-gradient(left, #689b26 0%,#9dc53b 100%); /* Chrome10+,Safari5.1+ */
+		background: -o-linear-gradient(left, #689b26 0%,#9dc53b 100%); /* Opera 11.10+ */
+		background: -ms-linear-gradient(left, #689b26 0%,#9dc53b 100%); /* IE10+ */
+		background: linear-gradient(to right, #689b26 0%,#9dc53b 100%); /* W3C */
+		filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#689b26', endColorstr='#9dc53b',GradientType=1 ); /* IE6-8 */
+	}
+			
+		.menu ul li{
+			float:left;
+				border-right:2px solid #fff;
+			}
+			.menu ul li a{
+				height:50px;
+				display:block;
+				padding:0 12px;
+				line-height:50px;
+				color:#fff;
+				font-size:1.2em;
+				text-decoration:none;
+			}
+			.menu ul li a.active{
+				height:50px;
+				display:block;
+				padding:0 12px;
+				line-height:50px;
+				color:#000;
+				font-size:1.2em;
+				text-decoration:none;
+				background-color:#f3f3f3;
+				border-top:2px solid #be3339;
+			}
+			
+ .ui-datatable.blue th {
+    background: #4988ca;
+    color:white;
+    text-shadow:none;
+    text-align:left;
+    font-weight: normal
+}
+
+ .ui-datatable.green th {
+    background: #73a42b;
+    color:white;
+    text-shadow:none;
+    text-align:left;
+    font-weight: normal
+}
+
+
+	
+.ui-state-default.btn_red,
+.ui-widget-content .ui-state-default.btn_red,
+.ui-widget-header .ui-state-default.btn_red {
+	border: 1px solid #a42b2b;
+	background: #a42b2b url("#{resource['osyris/images/ui-bg_highlight-hard_55_a42b2b_1x100.png']}") 50% 50% repeat-x;
+	font-weight: normal;
+	color: #ffffff;
+}
+
+.ui-state-hover.btn_red,
+.ui-widget-content .ui-state-hover.btn_red,
+.ui-widget-header .ui-state-hover.btn_red,
+.ui-state-focus.btn_red,
+.ui-widget-content .ui-state-focus.btn_red,
+.ui-widget-header .ui-state-focus.btn_red {
+	border: 1px solid #a42b2b;
+	background: #a42b2b url("#{resource['osyris/images/ui-bg_highlight-soft_35_a42b2b_1x100.png']}") 50% 50% repeat-x;
+	font-weight: normal;
+	color: #ffffff;
+}
+
+.ui-state-active.btn_red,
+.ui-widget-content .ui-state-active.btn_red,
+.ui-widget-header .ui-state-active.btn_red {
+	border: 1px solid #a42b2b;
+	background: #a42b2b url("#{resource['osyris/images/ui-bg_inset-soft_25_a42b2b_1x100.png']}") 50% 50% repeat-x;
+	font-weight: normal;
+	color: #ffffff;
+}
+
+.ui-state-default.btn_blue,
+.ui-widget-content .ui-state-default.btn_blue,
+.ui-widget-header .ui-state-default.btn_blue {
+	border: 1px solid #1e5792;
+	background: #2b6ca4 url(images/ui-bg_highlight-hard_55_2b6ca4_1x100.png) 50% 50% repeat-x;
+	font-weight: normal;
+	color: #ffffff;
+}
+
+.ui-state-hover.btn_blue,
+.ui-widget-content .ui-state-hover.btn_blue,
+.ui-widget-header .ui-state-hover.btn_blue,
+.ui-state-focus.btn_blue,
+.ui-widget-content .ui-state-focus.btn_blue,
+.ui-widget-header .ui-state-focus.btn_blue {
+	border: 1px solid #1e5792;
+	background: #2b6ca4 url(images/ui-bg_highlight-soft_35_2b6ca4_1x100.png) 50% 50% repeat-x;
+	font-weight: normal;
+	color: #ffffff;
+}
+
+.ui-state-active.btn_blue,
+.ui-widget-content .ui-state-active.btn_blue,
+.ui-widget-header .ui-state-active.btn_blue {
+	border: 1px solid #1e5792;
+	background: #2b6ca4 url(images/ui-bg_inset-soft_25_2b6ca4_1x100.png) 50% 50% repeat-x;
+	font-weight: normal;
+	color: #ffffff;
+}
+

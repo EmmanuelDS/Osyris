@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -39,6 +41,9 @@ import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkLus;
+import be.gim.tov.osyris.model.traject.NetwerkSegment;
+import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
@@ -49,6 +54,7 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -63,6 +69,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	private static final long serialVersionUID = -7478667205313972513L;
 
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
+	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
 
 	private static final Log LOG = LogFactory
 			.getLog(WerkOpdrachtOverzichtFormBase.class);
@@ -85,6 +92,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected String gemeente;
 	protected WerkOpdracht[] selectedOpdrachten;
 	protected ValidatieStatus validatieStatus;
+	protected ResourceIdentifier trajectId;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -151,6 +159,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 		this.validatieStatus = validatieStatus;
 	}
 
+	public ResourceIdentifier getTrajectId() {
+		return trajectId;
+	}
+
+	public void setTrajectId(ResourceIdentifier trajectId) {
+		this.trajectId = trajectId;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -171,6 +187,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 		return (MapViewer) ComponentUtils.findComponent("viewer");
 	}
 
+	/**
+	 * Bepalen of het probleem bij de WerkOpdracht een bordProbleem is.
+	 * 
+	 * @param probleem
+	 * @return
+	 */
 	public boolean isBordProbleem(Probleem probleem) {
 		if (probleem instanceof BordProbleem) {
 			return true;
@@ -184,6 +206,21 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		if (query == null) {
 			query = getDefaultQuery();
+		}
+
+		if (trajectId != null) {
+			query.addFilter(FilterUtils.equal("traject", trajectId));
+		}
+
+		else {
+
+			if (trajectType != null) {
+				query.addFilter(FilterUtils.equal("typeTraject", trajectType));
+			}
+
+			if (regio != null) {
+				query.addFilter(FilterUtils.equal("regioId", regio));
+			}
 		}
 
 		try {
@@ -214,21 +251,28 @@ public class WerkOpdrachtOverzichtFormBase extends
 	@Override
 	public void search() {
 		try {
+
+			// Reset zoekveld trajectNaam
+			if (trajectType == null) {
+				setTrajectId(null);
+			}
+
 			List<WerkOpdracht> list = (List<WerkOpdracht>) modelRepository
 					.searchObjects(getQuery(), true, true, true);
 			List<WerkOpdracht> filteredList = new ArrayList<WerkOpdracht>();
 
-			// Filteren transient properties. Kan dit op een betere manier
-			// gebeuren?
+			// Filteren transient property gemeente
 			if (gemeente != null) {
 				for (WerkOpdracht opdracht : list) {
-					if (opdracht.getGemeente().equals(gemeente)) {
+					if (opdracht.getGemeente() != null
+							&& opdracht.getGemeente().equals(gemeente)) {
 						filteredList.add(opdracht);
 					}
 				}
 				results = filteredList;
 			}
 
+			// Filteren meest recente datum
 			if (vanDatum != null && totDatum != null) {
 				if (filteredList.isEmpty()) {
 					results = findWerkOpdrachtenBetweenDates(list);
@@ -284,82 +328,29 @@ public class WerkOpdrachtOverzichtFormBase extends
 			MapConfiguration configuration = mapFactory
 					.getConfiguration(context);
 
-			mapFactory.createGeometryLayer(configuration.getContext(),
-					GEOMETRY_LAYER_NAME, null, Point.class, null, true,
-					"single", null, null);
-
 			// Reset context
 			configuration.setContext(context);
 
 			// Reset layers
-			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				layer.setFilter(null);
-				layer.setHidden(true);
-				layer.setSelection(Collections.EMPTY_LIST);
-			}
+			resetLayers(context);
 
-			List<String> bordSelection = new ArrayList<String>();
-			List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
-
-			GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
-					.createGeometryLayer(configuration.getContext(),
-							"geometry", null, Point.class, null, true,
-							"single", null, null);
-
-			// Get traject
+			// Ophalen traject
 			Traject traject = (Traject) modelRepository.loadObject(object
 					.getTraject());
 
-			// Load layer depending on traject type
-			FeatureMapLayer trajectLayer = (FeatureMapLayer) context
-					.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
-							.getName()));
+			// ROUTES EN LUSSEN
+			if (traject instanceof Route || traject instanceof NetwerkLus) {
 
-			if (trajectLayer != null) {
-				trajectLayer.setHidden(false);
-				trajectLayer.setFilter(FilterUtils.equal("naam",
-						traject.getNaam()));
-
-				Envelope envelope = GeometryUtils
-						.getEnvelope(traject.getGeom());
-				GeometryUtils.expandEnvelope(envelope, 0.1,
-						context.getMaxBoundingBox());
-				context.setBoundingBox(envelope);
+				processRouteOrNetwerkLus(traject, configuration, context);
+				return configuration;
 			}
 
-			// BordLayer
-			FeatureMapLayer bordLayer = (FeatureMapLayer) context
-					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
-							.lowerCamelCase(traject.getModelClass().getName()
-									+ "Bord")));
+			// NETWERK SEGMENTEN
+			else if (traject instanceof NetwerkSegment) {
 
-			if (bordLayer != null) {
-				bordLayer.setHidden(false);
-				bordLayer
-						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+				processNetwerkSegment(traject, configuration, context);
+				return configuration;
 			}
-			// Probleem
-			if (object.getProbleem() instanceof BordProbleem) {
-				// Bord Probleem
-				Bord bord = (Bord) modelRepository
-						.loadObject(((BordProbleem) object.getProbleem())
-								.getBord());
-				bordSelection.add(bord.getId().toString());
-
-			} else if (object.getProbleem() instanceof AnderProbleem) {
-				// Ander Probleem
-				AnderProbleem anderProbleem = (AnderProbleem) object
-						.getProbleem();
-				anderProbleemGeoms.add(anderProbleem.getGeom());
-			}
-
-			bordLayer.setSelection(bordSelection);
-			geomLayer.setGeometries(anderProbleemGeoms);
-
-			if (!anderProbleemGeoms.isEmpty()) {
-				geomLayer.setHidden(false);
-			}
-			return configuration;
 		}
 		return null;
 	}
@@ -680,6 +671,323 @@ public class WerkOpdrachtOverzichtFormBase extends
 			messages.error("Fout bij het valideren van werkopdracht: "
 					+ e.getMessage());
 			LOG.error("illegal access at WerkOpdracht.", e);
+		}
+	}
+
+	/**
+	 * Opzoeken van knooppunten voor lussen
+	 * 
+	 * @param layer
+	 */
+	private void searchKnooppuntLayer(FeatureMapLayer layer) {
+		layer.setHidden(false);
+		layer.setFilter(null);
+		layer.setSelection(Collections.EMPTY_LIST);
+
+		try {
+
+			Traject traject = (Traject) modelRepository.loadObject(object
+					.getTraject());
+
+			Set<String> knooppuntFilterIds = new HashSet<String>();
+
+			if (traject instanceof NetwerkLus) {
+
+				NetwerkLus lus = ((NetwerkLus) traject);
+
+				for (ResourceIdentifier segment : lus.getSegmenten()) {
+					NetwerkSegment seg = (NetwerkSegment) modelRepository
+							.loadObject(segment);
+					knooppuntFilterIds.add(modelRepository
+							.loadObject(seg.getVanKnooppunt()).getId()
+							.toString());
+					knooppuntFilterIds.add(modelRepository
+							.loadObject(seg.getNaarKnooppunt()).getId()
+							.toString());
+				}
+				layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
+			}
+
+			else if (traject instanceof NetwerkSegment) {
+
+				NetwerkSegment seg = (NetwerkSegment) traject;
+
+				knooppuntFilterIds.add(modelRepository
+						.loadObject(seg.getVanKnooppunt()).getId().toString());
+				knooppuntFilterIds.add(modelRepository
+						.loadObject(seg.getNaarKnooppunt()).getId().toString());
+
+				layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+	}
+
+	/**
+	 * Reset alle lagen in de mapConfiguratie en toon enkel de provinciegrens.
+	 * 
+	 * @param context
+	 */
+	private void resetLayers(MapContext context) {
+
+		for (FeatureMapLayer layer : context.getFeatureLayers()) {
+			layer.setFilter(null);
+			layer.setHidden(true);
+			layer.setSelection(Collections.EMPTY_LIST);
+
+			// Provincie altijd zichtbaar
+			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+				layer.setHidden(false);
+			}
+		}
+	}
+
+	/**
+	 * Ophalen Envelope van een specififiek Bord.
+	 * 
+	 * @param bord
+	 * @param context
+	 * @return
+	 */
+	private Envelope getEnvelopeProbleem(Probleem probleem, MapContext context) {
+
+		try {
+			// BordProbleem
+			if (probleem instanceof BordProbleem) {
+
+				Bord bord = (Bord) modelRepository
+						.loadObject(((BordProbleem) probleem).getBord());
+
+				Envelope envelope = GeometryUtils.getEnvelope(bord.getGeom());
+				GeometryUtils.expandEnvelope(envelope, 0.1,
+						context.getMaxBoundingBox());
+
+				return envelope;
+			}
+
+			// AnderProbleem
+			else if (probleem instanceof AnderProbleem) {
+				Envelope envelope = GeometryUtils
+						.getEnvelope(((AnderProbleem) probleem).getGeom());
+				GeometryUtils.expandEnvelope(envelope, 0.1,
+						context.getMaxBoundingBox());
+
+				return envelope;
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load Bord.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Verwerken lagen voor wat betreft WerkOpdrachten die behoren tot een Route
+	 * of NetwerkLus.
+	 * 
+	 * @param traject
+	 * @param configuration
+	 * @param context
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	private void processRouteOrNetwerkLus(Traject traject,
+			MapConfiguration configuration, MapContext context)
+			throws IOException, InstantiationException, IllegalAccessException {
+
+		List<String> bordSelection = new ArrayList<String>();
+		List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+		FeatureMapLayer bordLayer = null;
+
+		// Geometry laag voor punt probleem
+		GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
+				.createGeometryLayer(configuration.getContext(),
+						GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+						"single", null, null);
+
+		// Geometrey laag voor probleem lijn
+		GeometryListFeatureMapLayer geomLineLayer = (GeometryListFeatureMapLayer) mapFactory
+				.createGeometryLayer(configuration.getContext(),
+						GEOMETRY_LAYER_LINE_NAME, null, LineString.class, null,
+						true, "single", null, null);
+
+		// Ophalen laag afhankelijk van het trajectType
+		FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+				.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
+						.getName()));
+
+		if (trajectLayer != null) {
+
+			trajectLayer.setHidden(false);
+			trajectLayer
+					.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+		}
+
+		// BordLayer
+		if (traject instanceof Route) {
+			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+							.getModelClass().getName() + "Bord")));
+
+			bordLayer.setHidden(false);
+			bordLayer.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+
+		} else if (traject instanceof NetwerkLus) {
+			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+							.getModelClass().getName().replace("Lus", "")
+							+ "Bord")));
+
+			bordLayer.setHidden(false);
+
+			// Toon borden bij segmenten lus
+			bordLayer.setFilter(FilterUtils.in("segmenten",
+					((NetwerkLus) traject).getSegmenten()));
+
+			// Toon eventueel knooppunten indien nodig
+			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+							.lowerCamelCase(traject.getModelClass().getName()
+									.replace("Lus", "Knooppunt"))));
+
+			if (knooppuntLayer != null) {
+				searchKnooppuntLayer(knooppuntLayer);
+			}
+		}
+
+		// Probleem
+		if (object.getProbleem() instanceof BordProbleem) {
+
+			// Bord Probleem
+			Bord bord = (Bord) modelRepository
+					.loadObject(((BordProbleem) object.getProbleem()).getBord());
+
+			bordSelection.add(bord.getId().toString());
+			bordLayer.setSelection(bordSelection);
+			context.setBoundingBox(getEnvelopeProbleem(object.getProbleem(),
+					context));
+
+		} else if (object.getProbleem() instanceof AnderProbleem) {
+
+			// Ander Probleem
+			AnderProbleem anderProbleem = (AnderProbleem) object.getProbleem();
+			anderProbleemGeoms.add(anderProbleem.getGeom());
+
+			if (anderProbleem.getGeom() instanceof Point) {
+				geomLayer.setGeometries(anderProbleemGeoms);
+				geomLayer.setHidden(false);
+			}
+
+			else if (anderProbleem.getGeom() instanceof LineString) {
+				geomLineLayer.setGeometries(anderProbleemGeoms);
+				geomLineLayer.setHidden(false);
+			}
+
+			context.setBoundingBox(getEnvelopeProbleem(object.getProbleem(),
+					context));
+
+		}
+
+		if (!anderProbleemGeoms.isEmpty()) {
+			geomLayer.setHidden(false);
+		}
+	}
+
+	/**
+	 * Verwerken van lagen voor wat betreft WerkOpdrachten die behoren tot een
+	 * NetwerkSegment.
+	 * 
+	 * @param traject
+	 * @param configuration
+	 * @param context
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IOException
+	 */
+	private void processNetwerkSegment(Traject traject,
+			MapConfiguration configuration, MapContext context)
+			throws InstantiationException, IllegalAccessException, IOException {
+
+		List<String> bordSelection = new ArrayList<String>();
+		List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+		FeatureMapLayer bordLayer = null;
+
+		// Geometry laag voor punt probleem
+		GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
+				.createGeometryLayer(configuration.getContext(),
+						GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+						"single", null, null);
+
+		// Geometrey laag voor probleem lijn
+		GeometryListFeatureMapLayer geomLineLayer = (GeometryListFeatureMapLayer) mapFactory
+				.createGeometryLayer(configuration.getContext(),
+						GEOMETRY_LAYER_LINE_NAME, null, LineString.class, null,
+						true, "single", null, null);
+
+		// Ophalen laag afhankelijk van het trajectType
+		FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+				.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
+						.getName()));
+
+		if (trajectLayer != null) {
+
+			trajectLayer.setHidden(false);
+
+			// Tonen knooppunten bij segment
+			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+							.lowerCamelCase(traject.getModelClass().getName()
+									.replace("Segment", "Knooppunt"))));
+
+			if (knooppuntLayer != null) {
+				searchKnooppuntLayer(knooppuntLayer);
+			}
+
+			// BordProbleem
+			if (object.getProbleem() instanceof BordProbleem) {
+
+				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName()
+								.replace("Segment", "")
+								+ "Bord")));
+
+				bordLayer.setHidden(false);
+				bordLayer.setFilter(FilterUtils.equal("segmenten", traject));
+
+				// Bord Probleem
+				Bord bord = (Bord) modelRepository
+						.loadObject(((BordProbleem) object.getProbleem())
+								.getBord());
+				bordSelection.add(bord.getId().toString());
+				bordLayer.setSelection(bordSelection);
+				context.setBoundingBox(getEnvelopeProbleem(
+						object.getProbleem(), context));
+
+			} else if (object.getProbleem() instanceof AnderProbleem) {
+
+				// Ander Probleem
+				AnderProbleem anderProbleem = (AnderProbleem) object
+						.getProbleem();
+				anderProbleemGeoms.add(anderProbleem.getGeom());
+
+				if (anderProbleem.getGeom() instanceof Point) {
+					geomLayer.setGeometries(anderProbleemGeoms);
+					geomLayer.setHidden(false);
+				}
+
+				else if (anderProbleem.getGeom() instanceof LineString) {
+					geomLineLayer.setGeometries(anderProbleemGeoms);
+					geomLineLayer.setHidden(false);
+				}
+				context.setBoundingBox(getEnvelopeProbleem(
+						object.getProbleem(), context));
+			}
+
+			if (!anderProbleemGeoms.isEmpty()) {
+				geomLayer.setHidden(false);
+			}
 		}
 	}
 }

@@ -135,6 +135,16 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private String typeTraject;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private ResourceIdentifier regioId;
+
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getTraject() {
 		return traject;
@@ -230,6 +240,22 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	public void setCommentaar(String commentaar) {
 		this.commentaar = commentaar;
+	}
+
+	public String getTypeTraject() {
+		return typeTraject;
+	}
+
+	public void setTypeTraject(String typeTraject) {
+		this.typeTraject = typeTraject;
+	}
+
+	public ResourceIdentifier getRegioId() {
+		return regioId;
+	}
+
+	public void setRegioId(ResourceIdentifier regioId) {
+		this.regioId = regioId;
 	}
 
 	@Transient

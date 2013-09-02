@@ -144,6 +144,16 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotSearchable
 	private List<Probleem> problemen;
 
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private String typeTraject;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private ResourceIdentifier regioId;
+
 	// GETTERS AND SETTERS
 	public String getPeriode() {
 		return periode;
@@ -239,6 +249,22 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 
 	public void setProblemen(List<Probleem> problemen) {
 		this.problemen = problemen;
+	}
+
+	public String getTypeTraject() {
+		return typeTraject;
+	}
+
+	public void setTypeTraject(String typeTraject) {
+		this.typeTraject = typeTraject;
+	}
+
+	public ResourceIdentifier getRegioId() {
+		return regioId;
+	}
+
+	public void setRegioId(ResourceIdentifier regioId) {
+		this.regioId = regioId;
 	}
 
 	@Transient

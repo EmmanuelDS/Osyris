@@ -16,7 +16,6 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 
 import be.gim.commons.filter.FilterUtils;
@@ -60,9 +59,9 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	protected MapFactory mapFactory;
 	protected ResourceIdentifier regio;
 	protected String trajectType;
-	protected String trajectNaam;
 	protected Date vanDatum;
 	protected Date totDatum;
+	protected ResourceIdentifier trajectId;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -79,14 +78,6 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 
 	public void setTrajectType(String trajectType) {
 		this.trajectType = trajectType;
-	}
-
-	public String getTrajectNaam() {
-		return trajectNaam;
-	}
-
-	public void setTrajectNaam(String trajectNaam) {
-		this.trajectNaam = trajectNaam;
 	}
 
 	public MapViewer getViewer() {
@@ -109,6 +100,14 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 		this.totDatum = totDatum;
 	}
 
+	public ResourceIdentifier getTrajectId() {
+		return trajectId;
+	}
+
+	public void setTrajectId(ResourceIdentifier trajectId) {
+		this.trajectId = trajectId;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -127,26 +126,18 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			query = getDefaultQuery();
 		}
 
-		// Experimental: zoeken op op transient properties Trajectregio
-		// trajectNaam
-		if (regio != null) {
-			Query q = new DefaultQuery("Traject");
-			q.addFilter(FilterUtils.equal("regio", regio));
-			if (trajectNaam != null) {
-				q.addFilter(FilterUtils.equal("naam", trajectNaam));
-			}
-			List<Traject> trajecten;
-			try {
-				trajecten = (List<Traject>) modelRepository.searchObjects(q,
-						false, false);
-				List<ResourceIdentifier> resultIds = new ArrayList<ResourceIdentifier>();
+		if (trajectId != null) {
+			query.addFilter(FilterUtils.equal("traject", trajectId));
+		}
 
-				for (Traject t : trajecten) {
-					resultIds.add(modelRepository.getResourceIdentifier(t));
-				}
-				query.addFilter(FilterUtils.in("traject", resultIds));
-			} catch (IOException e) {
-				LOG.error("Can not find Traject.", e);
+		else {
+
+			if (trajectType != null) {
+				query.addFilter(FilterUtils.equal("typeTraject", trajectType));
+			}
+
+			if (regio != null) {
+				query.addFilter(FilterUtils.equal("regioId", regio));
 			}
 		}
 
@@ -294,6 +285,12 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	@Override
 	public void search() {
 		try {
+
+			// Reset zoekveld trajectNaam
+			if (trajectType == null) {
+				setTrajectId(null);
+			}
+
 			List<Melding> list = (List<Melding>) modelRepository.searchObjects(
 					getQuery(), true, true, true);
 			List<Melding> filteredList = new ArrayList<Melding>();

@@ -126,6 +126,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Probleem selectedProbleem;
 	protected Envelope envelope = null;
 	protected String pdfType;
+	protected FeatureMapLayer bordLayer;
+	protected ResourceIdentifier trajectId;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -219,6 +221,22 @@ public class ControleOpdrachtOverzichtFormBase extends
 		this.pdfType = pdfType;
 	}
 
+	public FeatureMapLayer getBordLayer() {
+		return bordLayer;
+	}
+
+	public void setBordLayer(FeatureMapLayer bordLayer) {
+		this.bordLayer = bordLayer;
+	}
+
+	public ResourceIdentifier getTrajectId() {
+		return trajectId;
+	}
+
+	public void setTrajectId(ResourceIdentifier trajectId) {
+		this.trajectId = trajectId;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -235,13 +253,28 @@ public class ControleOpdrachtOverzichtFormBase extends
 		return modelRepository.getModelClass(getName());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
 	public Query getQuery() {
 
 		if (query == null) {
 			query = getDefaultQuery();
 		}
+
+		if (trajectId != null) {
+			query.addFilter(FilterUtils.equal("traject", trajectId));
+		}
+
+		else {
+
+			if (trajectType != null) {
+				query.addFilter(FilterUtils.equal("typeTraject", trajectType));
+			}
+
+			if (regio != null) {
+				query.addFilter(FilterUtils.equal("regioId", regio));
+			}
+		}
+
 		try {
 			// Medewerker moet gevalideerd en geannuleerd status niet kunnen
 			// zien
@@ -300,6 +333,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@Override
 	public void search() {
 		try {
+
+			// Reset zoekveld trajectNaam
+			if (trajectType == null) {
+				setTrajectId(null);
+			}
+
 			List<ControleOpdracht> list = (List<ControleOpdracht>) modelRepository
 					.searchObjects(getQuery(), true, true, true);
 			List<ControleOpdracht> filteredList = new ArrayList<ControleOpdracht>();
@@ -373,6 +412,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @throws FactoryException
 	 * @throws NoSuchAuthorityCodeException
 	 */
+	@SuppressWarnings("static-access")
 	public MapConfiguration getSearchConfiguration() throws Exception {
 		MapContext context = (MapContext) modelRepository
 				.loadObject(new ResourceKey("Form@12"));
@@ -440,17 +480,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			context = configuration.getContext();
 
 			// Reset layers
-			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				layer.setFilter(null);
-				layer.setHidden(true);
-				layer.setSelection(Collections.EMPTY_LIST);
-				layer.set("selectable", false);
-
-				// Provincie altijd zichtbaar
-				if (layer.getLayerId().equalsIgnoreCase("provincie")) {
-					layer.setHidden(false);
-				}
-			}
+			resetLayers(context);
 
 			List<String> bordSelection = new ArrayList<String>();
 			List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
@@ -488,7 +518,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 
 			// BordLayer
-			FeatureMapLayer bordLayer = null;
+			bordLayer = null;
 			// ROUTES
 			if (traject instanceof Route) {
 				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
@@ -733,21 +763,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			layer.setFilter(FilterUtils.in("segmenten", lus.getSegmenten()));
 		} catch (IOException e) {
 			LOG.error("Can not load NetwerkLus.", e);
-		}
-	}
-
-	/**
-	 * Zoekoperaties op de Netwerk lagen.
-	 * 
-	 * @param layer
-	 * @param viewer
-	 */
-	private void searchNetwerkLayer(FeatureMapLayer layer, MapViewer viewer) {
-		layer.setHidden(false);
-		if (trajectNaam != null) {
-			layer.setFilter(FilterUtils.equal("naam", trajectNaam));
-			viewer.updateCurrentExtent(viewer.getFeatureExtent(layer,
-					FilterUtils.equal("naam", trajectNaam)));
 		}
 	}
 
@@ -1097,23 +1112,32 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void addProbleem() {
-		// Toevoegen probleem aan controleOpdracht
-		Probleem p = getProbleem();
+		try {
+			// Toevoegen probleem aan controleOpdracht
+			Probleem p = getProbleem();
 
-		if (checkProbleem(p)) {
-			object.getProblemen().add(p);
+			if (checkProbleem(p)) {
+				object.getProblemen().add(p);
 
-			// Reset probleem
-			probleemType = null;
-			setProbleem(null);
+				// Reset probleem
+				probleemType = null;
+				setProbleem(null);
 
-			// Deselect all features
-			MapViewer viewer = getViewer();
-			MapContext context = viewer.getConfiguration().getContext();
-			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				layer.setSelection(new ArrayList<String>(1));
+				modelRepository.saveObject(object);
+				messages.info("Probleem succesvol toegevoegd.");
+
+				// Deselect all features
+				MapViewer viewer = getViewer();
+				MapContext context = viewer.getConfiguration().getContext();
+				for (FeatureMapLayer layer : context.getFeatureLayers()) {
+					layer.setSelection(new ArrayList<String>(1));
+				}
+				viewer.updateContext(null);
 			}
-			viewer.updateContext(null);
+		} catch (IOException e) {
+			messages.error("Fout bij het toevoegen van probleem: "
+					+ e.getMessage());
+			LOG.error("Can not save object.", e);
 		}
 	}
 
@@ -1151,13 +1175,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 * @param event
 	 */
-	@SuppressWarnings("unchecked")
 	public void onUpdateFeatures(ControllerEvent event) {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
-
-		List<String> ids = (List<String>) event.getParams().get("featureIds");
 
 		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);
@@ -1170,7 +1191,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			pointLayer.getGeometries().remove(0);
 		}
 
-		if (pointLayer.getGeometries().size() == 1) {
+		if (pointLayer.getGeometries().size() == 1 && pointLayer.isEditable()) {
 			if (probleem instanceof AnderProbleem) {
 				((AnderProbleem) probleem).setGeom(pointLayer.getGeometries()
 						.iterator().next());
@@ -1182,7 +1203,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			lineLayer.getGeometries().remove(0);
 		}
 
-		if (lineLayer.getGeometries().size() == 1) {
+		if (lineLayer.getGeometries().size() == 1 && lineLayer.isEditable()) {
 			if (probleem instanceof AnderProbleem) {
 				((AnderProbleem) probleem).setGeom(lineLayer.getGeometries()
 						.iterator().next());
@@ -1226,6 +1247,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		if (anderProbleem.getGeom() instanceof Point) {
 			envelope = new Envelope(anderProbleem.getGeom().getCoordinate());
+			viewer.updateCurrentExtent(envelope);
+		}
+
+		if (anderProbleem.getGeom() instanceof LineString) {
+			envelope = new Envelope(anderProbleem.getGeom()
+					.getEnvelopeInternal());
 			viewer.updateCurrentExtent(envelope);
 		}
 	}
@@ -1435,20 +1462,51 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			object.getProblemen().remove(probleem);
 			modelRepository.saveObject(object);
-			modelRepository.evictObject(probleem);
+			modelRepository.deleteObject(probleem);
 
 			// Updaten kaart
-			getConfiguration();
+			MapViewer viewer = getViewer();
+			MapContext context = viewer.getConfiguration().getContext();
+
+			GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
+					.getLayer(GEOMETRY_LAYER_NAME);
+
+			GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
+					.getLayer(GEOMETRY_LAYER_LINE_NAME);
+
+			// Updaten bordselectie
+			if (probleem instanceof BordProbleem) {
+
+				ArrayList<String> bordSelection = (ArrayList<String>) bordLayer
+						.getSelection();
+				Bord bord = (Bord) modelRepository
+						.loadObject(((BordProbleem) probleem).getBord());
+
+				bordSelection.remove(bord.getId().toString());
+				bordLayer.setSelection(bordSelection);
+			}
+
+			// Verwijderen punt of lijn van kaart
+			if (probleem instanceof AnderProbleem) {
+
+				if (((AnderProbleem) probleem).getGeom() instanceof Point) {
+					pointLayer.getGeometries().remove(
+							((AnderProbleem) probleem).getGeom());
+				}
+
+				else if (((AnderProbleem) probleem).getGeom() instanceof LineString) {
+					lineLayer.getGeometries().remove(
+							((AnderProbleem) probleem).getGeom());
+				}
+			}
+
+			viewer.updateContext(null);
 			messages.info("Probleem succesvol verwijderd.");
 
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van probleem: "
 					+ e.getMessage());
 			LOG.error("Can not delete Probleem from ControleOpdracht.", e);
-		} catch (InstantiationException e) {
-			LOG.error("Can not instantiate MapConfiguration.", e);
-		} catch (IllegalAccessException e) {
-			LOG.error("Illegal access at MapConfiguration.", e);
 		}
 	}
 
@@ -1490,5 +1548,94 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void resetProbleem() {
 		probleem = null;
 		probleemType = null;
+	}
+
+	/**
+	 * Reset alle lagen in de mapConfiguratie en toon enkel de provinciegrens.
+	 * 
+	 * @param context
+	 */
+	private void resetLayers(MapContext context) {
+
+		for (FeatureMapLayer layer : context.getFeatureLayers()) {
+			layer.setFilter(null);
+			layer.setHidden(true);
+			layer.setSelection(Collections.EMPTY_LIST);
+
+			// Provincie altijd zichtbaar
+			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+				layer.setHidden(false);
+			}
+		}
+	}
+
+	/**
+	 * Test switch naar PointGeomLayer bij intekenen punt
+	 */
+	public void switchToPointGeomLayer() {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_NAME);
+		pointLayer.setSelectable(true);
+		pointLayer.setSelection(new ArrayList<String>());
+		pointLayer.setEditable(true);
+		pointLayer.setGeometries(new ArrayList<Geometry>(1));
+
+		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_LINE_NAME);
+		lineLayer.setGeometries(new ArrayList<Geometry>(1));
+		lineLayer.setSelectable(false);
+		lineLayer.setEditable(false);
+
+		viewer.updateContext(null);
+	}
+
+	// TODO: Intekenen omleiding
+	/**
+	 * Test switch naar lineGeomLayer bij intekenen omleiding
+	 */
+	public void switchToLineGeomLayer() {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_NAME);
+		pointLayer.setSelectable(false);
+		pointLayer.setSelection(new ArrayList<String>());
+		pointLayer.setEditable(false);
+		pointLayer.setGeometries(new ArrayList<Geometry>(1));
+
+		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_LINE_NAME);
+		lineLayer.setGeometries(new ArrayList<Geometry>(1));
+		lineLayer.setSelectable(true);
+		lineLayer.setEditable(true);
+
+		viewer.updateContext(null);
+	}
+
+	/**
+	 * Checken of BordId een RouteBord is.
+	 * 
+	 * @param bord
+	 * @return
+	 */
+	public boolean isRouteBord(ResourceIdentifier bord) {
+		try {
+			Bord b = (Bord) modelRepository.loadObject(bord);
+			if (b instanceof RouteBord) {
+				return true;
+			} else {
+				return false;
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load Bord.", e);
+		}
+
+		return false;
 	}
 }

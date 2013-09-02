@@ -118,6 +118,65 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Ophalen alle trajectTypes met betrekking to controleOpdrachten.
+	 * 
+	 * @return
+	 */
+	public List<Object[]> getTrajectTypesCO() {
+		List<Object[]> trajectTypes = new ArrayList<Object[]>();
+		Collection<ModelClass> subClassesRoute = Collections.emptyList();
+		subClassesRoute = modelRepository.getModelClass("Route")
+				.getSubClasses();
+		for (ModelClass modelClass : subClassesRoute) {
+			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			trajectTypes.add(object);
+		}
+
+		Collection<ModelClass> subClassesNetwerkLus = Collections.emptyList();
+		subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
+				.getSubClasses();
+		for (ModelClass modelClass : subClassesNetwerkLus) {
+			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			trajectTypes.add(object);
+		}
+		return trajectTypes;
+	}
+
+	/**
+	 * Ophalen alle trajectTypes met betrekking to werkOpdrachten.
+	 * 
+	 * @return
+	 */
+	public List<Object[]> getTrajectTypesWO() {
+		List<Object[]> trajectTypes = new ArrayList<Object[]>();
+		Collection<ModelClass> subClassesRoute = Collections.emptyList();
+		subClassesRoute = modelRepository.getModelClass("Route")
+				.getSubClasses();
+		for (ModelClass modelClass : subClassesRoute) {
+			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			trajectTypes.add(object);
+		}
+
+		Collection<ModelClass> subClassesNetwerkLus = Collections.emptyList();
+		subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
+				.getSubClasses();
+		for (ModelClass modelClass : subClassesNetwerkLus) {
+			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			trajectTypes.add(object);
+		}
+
+		Collection<ModelClass> subClassesNetwerkSegment = Collections
+				.emptyList();
+		subClassesNetwerkSegment = modelRepository.getModelClass(
+				"NetwerkSegment").getSubClasses();
+		for (ModelClass modelClass : subClassesNetwerkSegment) {
+			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			trajectTypes.add(object);
+		}
+		return trajectTypes;
+	}
+
+	/**
 	 * Gets all TrajectTypes
 	 * 
 	 * @return
@@ -1009,5 +1068,64 @@ public class OsyrisModelFunctions {
 			LOG.error("Can not search Routes.", e);
 		}
 		return ids;
+	}
+
+	/**
+	 * Get Gefilterede trajectnamen voor cascading dropdowns in zoekfunctie
+	 * overzicht forms.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getTrajectNamenSearch(ResourceIdentifier regio,
+			String trajectType) {
+
+		try {
+			if (trajectType != null && !trajectType.isEmpty()) {
+
+				QueryBuilder builder = new QueryBuilder(trajectType);
+
+				if (regio != null) {
+					builder.filter(FilterUtils.equal("regio", regio));
+				}
+
+				List<Traject> trajecten = (List<Traject>) modelRepository
+						.searchObjects(builder.build(), true, true);
+
+				List<Object[]> namen = new ArrayList<Object[]>();
+
+				for (Traject t : trajecten) {
+					Object[] object = {
+							new ResourceKey("Traject", t.getId().toString()),
+							t.getNaam() };
+					namen.add(object);
+				}
+
+				return namen;
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not search " + trajectType + ".", e);
+		}
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Zoekt de regioId van een traject
+	 * 
+	 * @param trajectId
+	 * @return Het label van het traject.
+	 */
+	public ResourceIdentifier getTrajectRegioId(ResourceIdentifier trajectId) {
+
+		try {
+			Traject t = (Traject) modelRepository.loadObject(trajectId);
+
+			return t.getRegio();
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+		return null;
+
 	}
 }

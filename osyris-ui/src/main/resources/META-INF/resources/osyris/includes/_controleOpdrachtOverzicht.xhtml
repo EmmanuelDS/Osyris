@@ -21,7 +21,7 @@
 							value="#{controleOpdrachtOverzichtFormBase.trajectType}">
 							<f:selectItem itemValue="" itemLabel="" />
 							<f:selectItems
-								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypesCO)}" />
 							<a:ajax event="change" render="detailSearchPanel" execute="@this" />
 						</h:selectOneMenu>
 					</d:field>
@@ -37,13 +37,15 @@
 						</h:selectOneMenu>
 					</d:field>
 					<j:renderPanel id="detailSearchPanel"
-						rendered="#{controleOpdrachtOverzichtFormBase.trajectType.contains('Route')}">
+						rendered="#{controleOpdrachtOverzichtFormBase.trajectType.contains('Route') or controleOpdrachtOverzichtFormBase.trajectType.contains('Lus')}">
 						<d:field for="trajectNaam" label="Traject naam">
 							<h:selectOneMenu id="trajectNaam"
-								value="#{controleOpdrachtOverzichtFormBase.trajectNaam}">
+								value="#{controleOpdrachtOverzichtFormBase.trajectId}">
+								<f:converter
+								converterId="be.gim.commons.ResourceIdentifierConverter" />
 								<f:selectItem itemValue="" itemLabel="" />
 								<f:selectItems
-									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(controleOpdrachtOverzichtFormBase.regio, controleOpdrachtOverzichtFormBase.trajectType))}" />
+									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamenSearch(controleOpdrachtOverzichtFormBase.regio, controleOpdrachtOverzichtFormBase.trajectType))}" />
 							</h:selectOneMenu>
 						</d:field>
 					</j:renderPanel>
@@ -66,19 +68,19 @@
 					</h:outputText></b>
 					<d:field for="vanDatum">
 						<div>Van:</div>
-						<r:calendar id="vanDatum"
-							value="#{controleOpdrachtOverzichtFormBase.vanDatum}"
+						<p:calendar id="vanDatum"
+							value="#{controleOpdrachtOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
     						datePattern="dd/MM/yyyy">
-						</r:calendar>
+						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
 						<div>Tot:</div>
-						<r:calendar id="totDatum"
-							value="#{controleOpdrachtOverzichtFormBase.totDatum}"
+						<p:calendar id="totDatum"
+							value="#{controleOpdrachtOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
     						datePattern="dd/MM/yyyy">
-						</r:calendar>
+						</p:calendar>
 					</d:field>
 				</d:fields>
 				<d:buttons>
@@ -117,7 +119,7 @@
 					lazy="true"
 					var="controleOpdracht"
 					style="width: 100%;"
-					styleClass="model-table"
+					styleClass="blue"
 					paginator="true"
 					rows="20"
 					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"

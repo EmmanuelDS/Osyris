@@ -13,7 +13,7 @@
 
 	<h2>Meldingen</h2>
 
-	<j:layout style="height: 500px;">
+	<j:layout style="height: 650px;">
 		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
@@ -42,10 +42,12 @@
 						rendered="#{meldingOverzichtFormBase.trajectType.contains('Route')}">
 						<d:field for="trajectNaam" label="Traject naam">
 							<h:selectOneMenu id="trajectNaam"
-								value="#{meldingOverzichtFormBase.trajectNaam}">
+								value="#{meldingOverzichtFormBase.trajectId}">
+								<f:converter
+								converterId="be.gim.commons.ResourceIdentifierConverter" />
 								<f:selectItem itemValue="" itemLabel="" />
 								<f:selectItems
-									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(meldingOverzichtFormBase.regio, meldingOverzichtFormBase.trajectType))}" />
+									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamenSearch(meldingOverzichtFormBase.regio, meldingOverzichtFormBase.trajectType))}" />
 							</h:selectOneMenu>
 						</d:field>
 					</j:renderPanel>
@@ -70,17 +72,17 @@
 					</h:outputText></b>
 					<d:field for="vanDatum">
 						<div>Van:</div>
-						<r:calendar id="vanDatum" value="#{meldingOverzichtFormBase.vanDatum}"
+						<p:calendar id="vanDatum" value="#{meldingOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide" locale="#{locale.language}"
 							inputStyle="width:60px"
     						datePattern="dd/MM/yyyy">
-						</r:calendar>
+						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
 						<div>Tot:</div>
-						<r:calendar id="totDatum" value="#{meldingOverzichtFormBase.totDatum}"
+						<p:calendar id="totDatum" value="#{meldingOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide" locale="#{locale.language}"
 							inputStyle="width:60px"
     						datePattern="dd/MM/yyyy">
-						</r:calendar>
+						</p:calendar>
 					</d:field>
 				</d:fields>
 				<d:buttons>
@@ -105,7 +107,7 @@
 					lazy="true"
 					var="melding"
 					style="width: 100%;"
-					styleClass="model-table"
+					styleClass="blue"
 					paginator="true"
 					rows="50"
 					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"

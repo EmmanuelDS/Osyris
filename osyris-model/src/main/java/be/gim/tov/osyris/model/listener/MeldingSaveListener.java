@@ -52,6 +52,10 @@ public class MeldingSaveListener {
 			melding.setDatumGemeld(new Date());
 			melding.setMedewerker(osyrisModelFunctions
 					.zoekVerantwoordelijke(melding.getTraject()));
+			melding.setTypeTraject(osyrisModelFunctions.getTrajectType(melding
+					.getTraject()));
+			melding.setRegioId(osyrisModelFunctions.getTrajectRegioId(melding
+					.getTraject()));
 		}
 
 		// If probleem has a status, Melding is validated
@@ -86,6 +90,10 @@ public class MeldingSaveListener {
 			werkOpdracht.setMedewerker(melding.getMedewerker());
 			werkOpdracht.setProbleem(melding.getProbleem());
 			werkOpdracht.setTraject(melding.getTraject());
+			werkOpdracht.setTypeTraject(osyrisModelFunctions
+					.getTrajectType(melding.getTraject()));
+			werkOpdracht.setRegioId(osyrisModelFunctions
+					.getTrajectRegioId(melding.getTraject()));
 
 			Traject traject = (Traject) modelRepository.loadObject(melding
 					.getTraject());

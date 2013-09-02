@@ -1,0 +1,47 @@
+<a:outputPanel xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:p="http://primefaces.org/ui"
+	id="menu"
+	styleClass="page-menu"
+	layout="block">
+
+	<h:form>
+	<div class="menu">
+		<div style="float:left;">
+    	<ul>
+			<c:if test="#{systemManager.menu != null}">
+				<u:include src="/resources/osyris/templates/menuLinks_osyris.xhtml" />
+			</c:if>
+		</ul>
+		</div>
+		<div style="float:right; padding-top: 30px; padding-right: 20px;">
+			<c:if test="#{identity.hasPermission('', 'admin')}">
+				<u:include src="/resources/core/templates/admin.xhtml" />
+			</c:if>
+		</div>
+	<div style="float:right; padding-top: 30px;">
+			<c:if test="#{objectHolder.exists}">
+				<u:decorate template="/resources/core/includes/documentActions.xhtml">
+					<u:param name="object"
+						value="#{objectHolder.document}" />
+				</u:decorate>
+			</c:if>
+		
+			<u:include src="/resources/core/includes/createActions.xhtml" />
+			<a:outputPanel rendered="#{preferences.useGlobalSearch and identity.hasPermission('', 'search')}">
+				<h:inputText value="#{term}"
+					style="width: 150px"/>
+				<a:commandButton value="#{messages['form.general.search.label']}"
+					action="search" />
+			</a:outputPanel>
+				
+		</div>
+	</div>
+	</h:form>
+</a:outputPanel>

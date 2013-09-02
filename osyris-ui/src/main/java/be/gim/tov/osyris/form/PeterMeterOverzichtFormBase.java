@@ -51,9 +51,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	private static final long serialVersionUID = 7761265026167905576L;
 	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
-	private static final String PERIODE_LENTE = "1";
-	private static final String PERIODE_ZOMER = "2";
-	private static final String PERIODE_HERFST = "3";
 
 	// VARIABLES
 	@Inject
@@ -380,11 +377,16 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 */
 	public void redirectToEdit() {
 		try {
+
+			String contextPath = FacesContext.getCurrentInstance()
+					.getExternalContext().getRequestContextPath();
+
 			FacesContext
 					.getCurrentInstance()
 					.getExternalContext()
 					.redirect(
-							"/geocms/web/edit/"
+							contextPath
+									+ "/web/edit/"
 									+ modelRepository.getResourceName(object)
 											.toString());
 		} catch (IOException e) {

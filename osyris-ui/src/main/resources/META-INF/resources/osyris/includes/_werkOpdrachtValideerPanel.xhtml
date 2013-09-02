@@ -33,11 +33,11 @@
 		<j:renderPanel id="datumUitTeVoerenVanafPanel"
 						rendered="#{form.validatieStatus == 'LATER_OPNIEUW_UITVOEREN_VANAF'}">
 				<d:field for="uitTeVoerenVanafDatum" label="Later opnieuw uitvoeren vanaf">
-					<r:calendar id="uitTeVoerenVanafDatum"
-					value="#{form.object.datumLaterUitTeVoeren}"
+					<p:calendar id="uitTeVoerenVanafDatum"
+					value="#{form.object.datumLaterUitTeVoeren}" navigator="true" display="inline" effect="slide"
 					inputStyle="width:60px"
   						datePattern="dd/MM/yyyy">
-				</r:calendar>
+				</p:calendar>
 				</d:field>
 		</j:renderPanel>
 	</d:fields>

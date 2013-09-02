@@ -1,0 +1,82 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:j="http://conscientia.org/jsf">
+	
+	<script src="#{resource['osyris/scripts/primefaces_locale_nl.js']}"></script>
+	<script src="#{resource['osyris/scripts/jquery-ui-ramdesign.js']}"></script>
+	
+	<table width="100%">
+		<tr>
+			<td width="70%" valign="bottom">
+				<div class="logos" style="padding-left:20px">		
+					<h:graphicImage styleClass="header_logo"
+						alt="Toerisme Oost-Vlaanderen"
+						value="#{resource['osyris/images/header_logo_tov.jpg']}" />
+			
+					<h:outputLink value="#{systemManager.getDocumentURL(preferences.home, 'view')}"
+							transient="true">
+					<h:graphicImage styleClass="header_logo"
+						alt="Osyris - Onderhoudssysteem recreatieve infrastructuur"
+						value="#{resource['osyris/images/header_logo_osyris.jpg']}" />
+					</h:outputLink>
+					<br/>
+				</div>
+			</td>
+			<td width="30%" 
+				valign="top"
+				height="33%">
+					<h:form>
+					<div class="account">
+					<ul>
+						<c:choose>
+							<c:when test="#{not identity.loggedIn}">
+            				<li class="icn_user">
+								<h:commandLink action="login"
+									value="#{messages['page.header.login.label']}" />
+							</li>
+							<li>
+								<a:outputPanel rendered="#{preferences.register}" >
+									<h:outputLink value="#{systemManager.getTemplateURL('/resources/core/pages/register.xhtml')}">
+										<h:outputText value="#{messages['page.header.register.label']}" />
+									</h:outputLink>
+								</a:outputPanel>
+							</li>
+							</c:when>
+							<c:otherwise>
+								<li class="icn_user">
+									<j:formatPanel value="#{messages['page.header.loggedIn.label']}">
+										<d:link value="user:#{currentUsername}" />
+									</j:formatPanel>
+								</li>
+								<li class="icn_stop">
+									<h:commandLink action="#{identity.logout}"
+										value="#{messages['page.header.logout.label']}">
+										<f:param name="id"
+											value="#{objectHolder.id}" />
+									</h:commandLink>
+								</li>
+							</c:otherwise>
+						</c:choose>
+					 <li class="help" >
+						<a href="#" class="question_mark">?</a>
+					</li>
+					</ul>
+					</div>
+				</h:form>
+			</td>
+		</tr>
+	</table>	
+	<div>	
+	<u:include src="/resources/core/templates/menu.xhtml" />
+	</div>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+	<br/>
+</u:composition>

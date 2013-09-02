@@ -14,11 +14,9 @@
 		<r:panel id="searchTrajectPanel" header="Zoek traject">
 				<d:fields>
 					<d:field for="trajectType"
-						label="Traject type"
-						required="true">
+						label="Traject type">
 						<h:selectOneMenu id="trajectType"
-							value="#{form.trajectType}"
-							required="true">
+							value="#{form.trajectType}">
 							<f:selectItem itemValue=""
 								itemLabel="" />
 							<f:selectItems
@@ -34,8 +32,7 @@
 								rendered="true"
 								required="true">
 							<h:selectOneMenu id="trajectNaam"
-									value="#{form.trajectNaam}" rendered="true"
-									required="#{form.trajectType.contains('Route')}">
+									value="#{form.trajectNaam}">
 									<f:selectItem itemValue="" itemLabel="" />
 									<f:selectItems
 										value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />

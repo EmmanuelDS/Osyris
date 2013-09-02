@@ -11,7 +11,7 @@ import org.conscientia.api.model.annotation.ModelStore;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Wandelnetwerk")
+@Label("Wandelnetwerksegment")
 public class WandelNetwerkSegment extends NetwerkSegment {
 
 }

@@ -1,0 +1,44 @@
+<u:composition xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:p="http://primefaces.org/ui">
+	<j:cache var="menuItems"
+		value="#{systemManager.menu.menuItems}"
+		transient="true" />
+		
+	
+	<c:if test="#{!identity.isLoggedIn()}">
+		<li>
+		<d:link value="form:MeldingForm"
+							mode="view"
+							label="Routedokter"/>
+		</li>
+	</c:if>
+	
+	<c:if test="#{menuItems.size() gt 0}">
+		<c:forEach items="#{menuItems}"
+			var="menuItem"
+			transient="true">
+			<c:if test="#{identity.hasPermission(menuItem.document, 'view') or identity.hasPermission(d:modelClass(menuItem.document), 'search')}">
+				<li>
+					<d:link value="#{menuItem.document}"
+						mode="#{menuItem.mode}"
+						label="#{menuItem.label.toString()}"
+						target="#{menuItem.target}" />
+				</li>
+			</c:if>
+		</c:forEach>
+	</c:if>
+	
+	<c:if test="#{identity.inGroup('PeterMeter','CUSTOM')}">
+	 <li>
+		<d:link value="user:#{identity.getUser().id}"
+							mode="edit"
+							label="Profiel"/>
+	</li>
+	</c:if>
+</u:composition>

@@ -51,7 +51,9 @@
 			rendered="#{form.probleemType == 'ander'}"
 			image="#{resource['core/images/actions/24x24/drawPoint.png']}"
 			styleClass="component-toolbar-button"
-			value="Duid probleem aan op kaart">
+			value="Duid probleem aan op kaart"
+			action="#{form.switchToPointGeomLayer()}"
+			immediate="true">
 			<j:activateControl
 				for="viewer"
 				event="click"
@@ -63,7 +65,9 @@
 			rendered="#{form.probleemType == 'ander' }"
 			image="#{resource['core/images/actions/24x24/drawLineString.png']}"
 			styleClass="component-toolbar-button"
-			value="Duid omleiding aan op de kaart">
+			value="Duid omleiding aan op de kaart"
+			action="#{form.switchToLineGeomLayer()}"
+			immediate="true">
 			<j:activateControl
 				for="viewer"
 				event="click"
