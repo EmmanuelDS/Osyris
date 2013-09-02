@@ -39,13 +39,13 @@
 								<h:commandLink action="login"
 									value="#{messages['page.header.login.label']}" />
 							</li>
-							<li>
-								<a:outputPanel rendered="#{preferences.register}" >
-									<h:outputLink value="#{systemManager.getTemplateURL('/resources/core/pages/register.xhtml')}">
-										<h:outputText value="#{messages['page.header.register.label']}" />
-									</h:outputLink>
-								</a:outputPanel>
-							</li>
+<!-- 							<li> -->
+<!-- 								<a:outputPanel rendered="#{preferences.register}" > -->
+<!-- 									<h:outputLink value="#{systemManager.getTemplateURL('/resources/core/pages/register.xhtml')}"> -->
+<!-- 										<h:outputText value="#{messages['page.header.register.label']}" /> -->
+<!-- 									</h:outputLink> -->
+<!-- 								</a:outputPanel> -->
+<!-- 							</li> -->
 							</c:when>
 							<c:otherwise>
 								<li class="icn_user">
