@@ -4,19 +4,20 @@ import static org.conscientia.api.model.SubClassPersistence.UNION;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.ContentType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.FileSize;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
-import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
+import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 
 /**
@@ -44,12 +45,13 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
-	@Edit(type = "panels")
-	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
-	@ModelClassName("File")
-	private ResourceKey foto;
+	@View(type = "image")
+	@NotSearchable
+	@ContentType("image/*")
+	@FileSize(2 * 1024 * 1024)
+	private byte[] foto;
 
 	// GETTERS AND SETTERS
 	public ProbleemStatus getStatus() {
@@ -68,11 +70,11 @@ public abstract class Probleem extends AbstractModelObject implements
 		this.commentaar = commentaar;
 	}
 
-	public ResourceKey getFoto() {
+	public byte[] getFoto() {
 		return foto;
 	}
 
-	public void setFoto(ResourceKey foto) {
+	public void setFoto(byte[] foto) {
 		this.foto = foto;
 	}
 }

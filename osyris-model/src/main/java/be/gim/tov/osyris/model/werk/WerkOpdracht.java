@@ -7,8 +7,10 @@ import javax.persistence.Transient;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.ContentType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.FileSize;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -26,7 +28,6 @@ import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
@@ -110,12 +111,13 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaarValidatie;
 
-	@Edit(type = "panels")
-	@NotSearchable
 	@Label("Foto")
 	@Description("Foto")
-	@ModelClassName("File")
-	private ResourceKey foto;
+	@View(type = "image")
+	@NotSearchable
+	@ContentType("image/*")
+	@FileSize(2 * 1024 * 1024)
+	private byte[] foto;
 
 	@NotSearchable
 	@NotEditable
@@ -238,11 +240,11 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.commentaarValidatie = commentaarValidatie;
 	}
 
-	public ResourceKey getFoto() {
+	public byte[] getFoto() {
 		return foto;
 	}
 
-	public void setFoto(ResourceKey foto) {
+	public void setFoto(byte[] foto) {
 		this.foto = foto;
 	}
 

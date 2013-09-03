@@ -10,10 +10,9 @@
 	xmlns:cc="http://java.sun.com/jsf/composite">
 	<cc:interface componentType="org.conscientia.ui.ModelObject" />
 	<cc:implementation>
-		<div style="float: right">
+		<div style="float: right;">
 			<d:image value="#{cc.attrs.value}"
-				height="150"
-				rendered="#{cc.attrs.value.getAspect('UserProfile', modelRepository, false).image != null}" />
+				height="128" />
 		</div>
 		<div>
 			<d:fields>
@@ -27,19 +26,7 @@
 					mode="#{cc.attrs.mode}"
 					level="#{cc.attrs.level}"
 					simple="#{cc.attrs.simple}" />
-				<d:propertyField id="loginCount"
-					value="#{cc.attrs.value.loginCount}"
-					mode="#{cc.attrs.mode}"
-					level="#{cc.attrs.level}"
-					simple="#{cc.attrs.simple}"
-					rendered="#{identity.hasPermission(cc.attrs.value, 'admin')}" />
-				<d:propertyField id="lastLogin"
-					value="#{cc.attrs.value.lastLogin}"
-					mode="#{cc.attrs.mode}"
-					level="#{cc.attrs.level}"
-					simple="#{cc.attrs.simple}"
-					rendered="#{identity.hasPermission(cc.attrs.value, 'admin')}" />
-				<d:propertyField id="Geboortedatum"
+				<d:propertyField id="birthDate"
 					value="#{cc.attrs.value.getAspect('UserProfile', modelRepository, false).birthDate}"
 					mode="#{cc.attrs.mode}"
 					level="#{cc.attrs.level}"
