@@ -8,12 +8,12 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
+	
 	<p:dialog id="createPopup"
 		header="#{messages['page.create.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/create.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
 		onShow="#{r:component('createInclude')}.show();"
 		onHide="#{r:component('createInclude')}.hide();">
 		<j:relocate />
@@ -29,7 +29,6 @@
 		icon="#{resources['core/images/actions/16x16/view.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
 		onShow="#{r:component('viewInclude')}.show();"
 		onHide="#{r:component('viewInclude')}.hide();">
 		<j:relocate />
@@ -44,7 +43,6 @@
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
 		onShow="#{r:component('editInclude')}.show();"
 		onHide="#{r:component('editInclude')}.hide();">
 		<j:relocate />

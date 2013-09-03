@@ -14,7 +14,7 @@
 		<j:commandButton value="Bevestigen uitvoeren algoritme"
 			image="#{resource['core/images/actions/12x12/apply.png']}"
 			type="button" 
-			action="#{form.kenPetersMetersToe()}"
+			action="#{peterMeterToewijzingBean.kenPetersMetersToe()}"
 			render="#{r:clientId('result')}"
 			oncomplete="conscientia.widget(#{r:element('confirmPopup')}).hide();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"

@@ -95,7 +95,8 @@
 								image="#{resource['core/images/actions/16x16/edit.png']}"
 								type="image"
 								title="#{messages['page.actions.edit.label']}"
-								action="#{peterMeterOverzichtFormBase.redirectToEdit()}">
+								oncomplete="conscientia.widget(#{r:element('editPopup')}).show();">
+								
 								<f:setPropertyActionListener
 									target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
 							</j:commandButton>

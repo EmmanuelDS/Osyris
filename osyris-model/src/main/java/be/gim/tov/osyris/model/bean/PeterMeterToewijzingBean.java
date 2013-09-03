@@ -26,17 +26,17 @@ import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
 
 /**
+ * Bean klasse voor het toewijzen van Peters en Meters aan Routes en Lussen op
+ * basis van de door hun opgestelde voorkeuren.
+ * 
+ * Bij het runnen van het algortime worden alle eerdere toewijzingen verwijderd.
+ * 
+ * Peters en Meters worden niet toegewezen aan segmenten.
  * 
  * @author kristof
  * 
  */
 @Named
-// TODO: Segmenten van een lus toewijzen, hoe opvangen dat meerdere PeterMeters
-// per periode aan een segment kunnen worden toegewezen
-// TODO: eventueel verder opsplitsen trajectprioriteiten indien nodig
-// TODO: Feedback omtrent eerst deleten van de toewijzingen bij alle trajecten
-// TODO: Checken bij meerdere voorkeuren routes of het dezelde route is, indien
-// wel mag PM aan meerdere periodes toegewezen worden
 public class PeterMeterToewijzingBean {
 
 	private static final Log LOG = LogFactory
@@ -97,35 +97,54 @@ public class PeterMeterToewijzingBean {
 			// Leegmaken toewijzingen Traject
 			resetPetersMeters();
 
-			// Ophalen PetersMeters en Profiel
-			List<User> petersMeters = getAllPetersMeters();
+			// Alle PetersMeters met 1 enkele voorkeur
+			List<User> usersWithSingleVoorkeur = getPeterMetersWithSingleVoorkeur(
+					getAllPetersMeters(), true);
 
-			for (User peterMeter : petersMeters) {
-				PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
-						.getAspect("PeterMeterProfiel");
-				ResourceName resourceName = modelRepository
-						.getResourceName(peterMeter);
+			// Alle PetersMeters met meerdere voorkeuren
+			List<User> usersWithMultipleVoorkeuren = getPeterMetersWithSingleVoorkeur(
+					getAllPetersMeters(), false);
 
-				// Voorrang voor PeterMeters met 1 voorkeur
-				if (profiel.getVoorkeuren().size() == 1) {
+			// Voorrang voor PeterMeters met 1 voorkeur, toekenning gebeurt
+			// volgens trajectType prioriteitenlijst
+			for (String type : getPriorityList()) {
+
+				for (User peterMeter : usersWithSingleVoorkeur) {
+
+					PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
+							.getAspect("PeterMeterProfiel");
+					ResourceName resourceName = modelRepository
+							.getResourceName(peterMeter);
+
 					PeterMeterVoorkeur voorkeur = profiel.getVoorkeuren()
 							.get(0);
 
-					processToekenning(voorkeur, resourceName);
-				}
-
-				// Daarna pas meerdere voorkeuren behandelen
-				if (profiel.getVoorkeuren().size() > 1) {
-
-					for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
-
-						// Check of PeterMeter dit jaar reeds toegewezen aan de
-						// voorkeur
+					if (voorkeur.getTrajectType().contains(type)) {
 						processToekenning(voorkeur, resourceName);
-
 					}
 				}
 			}
+			// Daarna pas meerdere voorkeuren behandelen, toekenning volgens
+			// trajectType prioriteitenlijst
+			for (String type : getPriorityList()) {
+
+				for (User peterMeter : usersWithMultipleVoorkeuren) {
+
+					PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
+							.getAspect("PeterMeterProfiel");
+
+					ResourceName resourceName = modelRepository
+							.getResourceName(peterMeter);
+
+					for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+
+						if (voorkeur.getTrajectType().contains(type)) {
+							processToekenning(voorkeur, resourceName);
+						}
+					}
+				}
+			}
+
 			messages.info("Toekenning van peters en meters succesvol uitgevoerd.");
 
 		} catch (IOException e) {
@@ -136,7 +155,7 @@ public class PeterMeterToewijzingBean {
 	}
 
 	/**
-	 * Opsplitsen toekenning in Lussen en Routes.
+	 * Opsplitsen toekenning voor Lussen en Routes.
 	 * 
 	 * @param voorkeur
 	 * @param resourceName
@@ -179,7 +198,10 @@ public class PeterMeterToewijzingBean {
 					false).get(0);
 
 			// Check of PeterMeter voor 1 van de 3 periodes reeds is toegewezen
-			// aan een traject
+			// aan een traject en of reeds toegewezen aan een bepaald type
+			// traject
+			// Hierin zit ook de check om te kijken of een PeterMeter 1 bepaalde
+			// route wil controleren
 			if (!checkAlreadyAssigned(route, peterMeter)
 					&& !checkAlreadyAssignedToType(route, voorkeur, peterMeter)) {
 
@@ -221,6 +243,8 @@ public class PeterMeterToewijzingBean {
 				} else {
 					assignedPeterMeter = peterMeter;
 				}
+
+				// Bewaren toewijzing
 				if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
 					route.setPeterMeter1(assignedPeterMeter);
 				} else if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
@@ -237,7 +261,10 @@ public class PeterMeterToewijzingBean {
 	}
 
 	/**
-	 * Toewijzen aan lus
+	 * * Eigenlijke toekenning van de PeterMeter aan een Lus in een bepaalde
+	 * periode. De PeterMeter mag per periode aan slechts 2 trajecten worden
+	 * toegewezen. In geval van conflict krijgt de PeterMeter met het kleinste
+	 * aantal max kilometers de voorkeur
 	 * 
 	 * @param voorkeur
 	 * @param peterMeter
@@ -325,8 +352,8 @@ public class PeterMeterToewijzingBean {
 						}
 
 						// Indien al een andere peterMeter is toegekend
-						// toewijzen aan degene met kleinste aantal opegegeven
-						// kilometers
+						// toewijzen aan degene met kleinste aantal max
+						// kilometers, indien nog gelijk op ancienniteit
 						if (compareToPeterMeter != null
 								&& compareToPeterMeter != peterMeter) {
 
@@ -363,9 +390,6 @@ public class PeterMeterToewijzingBean {
 		} catch (IOException e) {
 			LOG.error("Can not search NetwerkLussen.", e);
 		}
-
-		// Indien conflict toewijzen aan degene met kleinste aantal opegegeven
-		// kilometers, indien dat gelijk op anncieniteit
 	}
 
 	/**
@@ -453,6 +477,12 @@ public class PeterMeterToewijzingBean {
 	private boolean checkAlreadyAssigned(Traject voorkeursTraject,
 			ResourceName peterMeter) {
 
+		// Uitzondering: Peters/Meters die uitsluitend 1 bepaalde route willen
+		// controleren
+		if (wantsToCheckSingleRoute(peterMeter)) {
+			return false;
+		}
+
 		int counter = 0;
 
 		if (voorkeursTraject.getPeterMeter1() != null) {
@@ -482,6 +512,12 @@ public class PeterMeterToewijzingBean {
 	private boolean checkAlreadyAssignedToType(Traject traject,
 			PeterMeterVoorkeur voorkeur, ResourceName peterMeter)
 			throws IOException {
+
+		// Uitzondering: Peters/Meters die uitsluitend 1 bepaalde route willen
+		// controleren
+		if (wantsToCheckSingleRoute(peterMeter)) {
+			return false;
+		}
 
 		QueryBuilder builder = new QueryBuilder("Traject");
 		builder.addFilter(FilterUtils.equal("peterMeter1", peterMeter));
@@ -546,5 +582,102 @@ public class PeterMeterToewijzingBean {
 		}
 
 		return vrijeLussen;
+	}
+
+	/**
+	 * Ophalen van alle Peters en Meters met ofwel 1 voorkeur ofwel meerdere
+	 * voorkeuren.
+	 * 
+	 * @param allPetersMeters
+	 * @param single
+	 * @return
+	 */
+	private List<User> getPeterMetersWithSingleVoorkeur(
+			List<User> allPetersMeters, boolean singleVoorkeur) {
+
+		List<User> result = new ArrayList<User>();
+
+		for (User peterMeter : allPetersMeters) {
+			PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
+					.getAspect("PeterMeterProfiel");
+
+			if (singleVoorkeur) {
+				if (profiel.getVoorkeuren() != null
+						&& profiel.getVoorkeuren().size() == 1) {
+					result.add(peterMeter);
+				}
+			}
+
+			else {
+				if (profiel.getVoorkeuren() != null
+						&& profiel.getVoorkeuren().size() > 1) {
+					result.add(peterMeter);
+				}
+			}
+		}
+
+		return result;
+	}
+
+	/**
+	 * Ophalen prioriteitslijst trajectTypes bij toekenning.
+	 * 
+	 * @return
+	 */
+	private List<String> getPriorityList() {
+
+		List<String> trajectTypes = new ArrayList<String>();
+		trajectTypes.add("FietsNetwerk");
+		trajectTypes.add("WandelNetwerk");
+		trajectTypes.add("FietsRoute");
+		trajectTypes.add("WandelRoute");
+		trajectTypes.add("RuiterRoute");
+		trajectTypes.add("AutoRoute");
+
+		return trajectTypes;
+	}
+
+	/**
+	 * Check of een peterMeter 1 bepaalde Route wil controleren.
+	 * 
+	 * @param voorkeur
+	 * @param peterMeter
+	 * @return
+	 */
+	private boolean wantsToCheckSingleRoute(ResourceName peterMeter) {
+
+		try {
+			boolean flag = true;
+
+			User u = (User) modelRepository.loadObject(peterMeter);
+
+			PeterMeterProfiel profiel = (PeterMeterProfiel) u
+					.getAspect("PeterMeterProfiel");
+
+			// Ophalen van een trajectNaam ter referentie, trajectNaam is uniek
+			// voor een route
+			String compareNaam = null;
+			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+				if (voorkeur.getTrajectNaam() != null) {
+					compareNaam = voorkeur.getTrajectNaam();
+					break;
+				}
+			}
+
+			// Check of er nog andere trajectNaam voorkomt, zoja wil PeterMeter
+			// meerdere routes controleren
+			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+				if (voorkeur.getTrajectNaam() != null
+						&& !voorkeur.getTrajectNaam().equals(compareNaam)) {
+					flag = false;
+				}
+			}
+
+			return flag;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return false;
 	}
 }
