@@ -6,6 +6,7 @@ import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.Ignore;
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -44,6 +45,7 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
+	@Ignore
 	@Edit(type = "panels")
 	@NotSearchable
 	@Label("Foto")

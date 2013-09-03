@@ -96,9 +96,75 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		this.object = user;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void search() {
-		results = getAllPetersMeters();
+
+		try {
+			results = (List<User>) modelRepository.searchObjects(getQuery(),
+					true, true);
+
+		} catch (IOException e) {
+			LOG.error("Can not search Users.", e);
+		}
+	}
+
+	@Override
+	public Query getQuery() {
+
+		if (query == null) {
+			query = getDefaultQuery();
+		}
+
+		try {
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			List<Filter> filters = new ArrayList<Filter>();
+
+			for (ResourceName name : group.getMembers()) {
+				Filter filter = FilterUtils.equal("username",
+						name.getNamePart());
+				filters.add(filter);
+			}
+
+			query.addFilter(FilterUtils.or(filters));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return query;
+	}
+
+	/**
+	 * Ophalen peters en meters.
+	 * 
+	 */
+	@Override
+	protected Query getDefaultQuery() {
+
+		try {
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			query = new DefaultQuery("User");
+			List<Filter> filters = new ArrayList<Filter>();
+
+			for (ResourceName name : group.getMembers()) {
+				Filter filter = FilterUtils.equal("username",
+						name.getNamePart());
+				filters.add(filter);
+			}
+
+			query.addFilter(FilterUtils.or(filters));
+
+			return query;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+
 	}
 
 	/**
@@ -350,38 +416,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				"Medewerker"), "edit", true));
 
 		return permissions;
-	}
-
-	/**
-	 * Ophalen van alle PetersMeters.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private List<User> getAllPetersMeters() {
-
-		try {
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-
-			DefaultQuery q = new DefaultQuery("User");
-			List<Filter> filters = new ArrayList<Filter>();
-
-			for (ResourceName name : group.getMembers()) {
-				Filter filter = FilterUtils.equal("username",
-						name.getNamePart());
-				filters.add(filter);
-			}
-			// Ophalen Users binnen de groep PeterMeter
-			q.addFilter(FilterUtils.or(filters));
-			List<User> petersMeters = (List<User>) modelRepository
-					.searchObjects(q, false, false);
-
-			return petersMeters;
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			return null;
-		}
 	}
 
 	/**
