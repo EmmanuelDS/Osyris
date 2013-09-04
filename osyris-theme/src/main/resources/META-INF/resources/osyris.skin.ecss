@@ -89,7 +89,7 @@ header, footer, article, section, nav, menu, hgroup {
 }
 
 .model-field-tail {
-	clear: both;
+	clear: left;
 }
 
 .icn_user {

@@ -78,10 +78,10 @@
 						scrollable="true"
 						resizableColumns="true"
 						emptyMessage="#{messages['ui.dataTable.empty']}">
-						<p:column style="width:5%">
+						<p:column style="width: 5%">
 							<p:rowToggler />
 						</p:column>
-						<p:column>
+						<p:column style="width: 60px">
 						<a:outputPanel rendered="true" styleClass="model-table-actions">
 							<j:commandButton
 								image="#{resource['core/images/actions/16x16/view.png']}"
@@ -110,6 +110,11 @@
 							</j:commandButton>
 						</a:outputPanel>
 						</p:column>
+						<p:column headerText="#{messages['model.property.userProfile.avatar.label']}"
+							style="width: 5%">
+							<d:image value="#{user}"
+								height="32" />
+						</p:column>
 						<p:column label="Voornaam"
 							sortBy="#{user.getAspect('UserProfile', modelRepository, true).firstName }">
 							<f:facet name="header">
@@ -118,7 +123,7 @@
 							</f:facet>
 							<d:propertyValue id="firstNameColumn"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
-								value="#{user.getAspect('UserProfile', modelRepository, true).firstName }"
+								value="#{user.getAspect('UserProfile', modelRepository, false).firstName }"
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Familienaam"
@@ -129,7 +134,7 @@
 							</f:facet>
 							<d:propertyValue id="lastNameColumn"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
-								value="#{user.getAspect('UserProfile', modelRepository, true).lastName}"
+								value="#{user.getAspect('UserProfile', modelRepository, false).lastName}"
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Email"
@@ -140,7 +145,7 @@
 							</f:facet>
 							<d:propertyValue id="emailColumn"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('email')}"
-								value="#{user.getAspect('UserProfile', modelRepository, true).email }"
+								value="#{user.getAspect('UserProfile', modelRepository, false).email }"
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Status"
