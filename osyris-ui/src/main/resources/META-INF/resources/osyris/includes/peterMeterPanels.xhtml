@@ -13,6 +13,8 @@
 		header="#{messages['page.create.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/create.png']}"
 		modal="true"
+		height="500"
+		width="900"
 		resizable="false"
 		onShow="#{r:component('createInclude')}.show();"
 		onHide="#{r:component('createInclude')}.hide();">
@@ -28,6 +30,7 @@
 		header="#{messages['page.view.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/view.png']}"
 		modal="true"
+		height="500"
 		resizable="false"
 		onShow="#{r:component('viewInclude')}.show();"
 		onHide="#{r:component('viewInclude')}.hide();">
@@ -42,6 +45,8 @@
 		header="#{messages['page.edit.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
+		height="500"
+		width="900"
 		resizable="false"
 		onShow="#{r:component('editInclude')}.show();"
 		onHide="#{r:component('editInclude')}.hide();">

@@ -73,7 +73,7 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin", "PeterMeter" })
 	@Label("Voorkeuren")
 	@Description("Voorkeuren")
-	@Edit(type = "table")
+	// @Edit(type = "table")
 	@View(type = "table")
 	private List<PeterMeterVoorkeur> voorkeuren;
 

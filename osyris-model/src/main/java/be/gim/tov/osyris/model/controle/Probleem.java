@@ -7,11 +7,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.ContentType;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
-<<<<<<< HEAD
-import org.conscientia.api.model.annotation.Ignore;
-=======
 import org.conscientia.api.model.annotation.FileSize;
->>>>>>> 824180a154619d74d0636c6139e80b9a6d959f57
 import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;

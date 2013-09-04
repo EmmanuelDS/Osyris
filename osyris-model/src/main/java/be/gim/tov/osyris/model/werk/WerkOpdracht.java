@@ -158,7 +158,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotEditable
 	@Label("Datum later uit te voeren")
 	@Description("Datum later uit te voeren")
-	@Type(ModelPropertyType.TIMESTAMP)
+	@Type(ModelPropertyType.DATE)
 	private Date datumLaterUitTeVoeren;
 
 	@NotSearchable
