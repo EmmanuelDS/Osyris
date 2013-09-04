@@ -968,8 +968,11 @@ public class MeldingFormBase implements Serializable {
 		// Opnieuw laden form waarden cookie worden ingevuld via createMelding()
 		// bij het opstarten van de pagina
 		try {
+			String contextPath = FacesContext.getCurrentInstance()
+					.getExternalContext().getRequestContextPath();
+
 			FacesContext.getCurrentInstance().getExternalContext()
-					.redirect("/geocms/web/view/form:MeldingForm");
+					.redirect(contextPath + "/web/view/form:MeldingForm");
 
 		} catch (IOException e1) {
 			LOG.error("Can not redirect to MeldingForm.", e1);
