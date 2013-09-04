@@ -475,7 +475,7 @@ public class MeldingFormBase implements Serializable {
 	 * Bewaart een Melding in de databank
 	 * 
 	 */
-	public void saveMelding() {
+	public String saveMelding() {
 
 		try {
 			// Save Melding
@@ -488,13 +488,14 @@ public class MeldingFormBase implements Serializable {
 				messages.info("Er is een bevestigingsmail gestuurd naar "
 						+ object.getEmail() + ".");
 
-				reset();
+				return reset();
 			}
 
 		} catch (IOException e) {
 			messages.error("Melding niet verzonden:" + e.getMessage());
 			LOG.error("Can not save model object.", e);
 		}
+		return null;
 	}
 
 	/**
@@ -960,7 +961,7 @@ public class MeldingFormBase implements Serializable {
 	 * @throws InstantiationException
 	 * @throws IOException
 	 */
-	public void reset() {
+	public String reset() {
 
 		// Toevoegen cookie
 		addRoutedokterCookie();
@@ -968,14 +969,17 @@ public class MeldingFormBase implements Serializable {
 		// Opnieuw laden form waarden cookie worden ingevuld via createMelding()
 		// bij het opstarten van de pagina
 		try {
-			String contextPath = FacesContext.getCurrentInstance()
-					.getExternalContext().getRequestContextPath();
 
-			FacesContext.getCurrentInstance().getExternalContext()
-					.redirect(contextPath + "/web/view/form:MeldingForm");
+			return "view";
+			// String contextPath = FacesContext.getCurrentInstance()
+			// .getExternalContext().getRequestContextPath();
+			//
+			// FacesContext.getCurrentInstance().getExternalContext()
+			// .redirect(contextPath + "/web/view/form:MeldingForm");
 
-		} catch (IOException e1) {
+		} catch (Exception e1) {
 			LOG.error("Can not redirect to MeldingForm.", e1);
+			return null;
 		}
 	}
 
