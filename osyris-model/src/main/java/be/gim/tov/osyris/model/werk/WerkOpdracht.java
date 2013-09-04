@@ -24,6 +24,7 @@ import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
+import org.conscientia.api.model.annotation.Width;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.bean.Beans;
@@ -117,6 +118,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotSearchable
 	@ContentType("image/*")
 	@FileSize(2 * 1024 * 1024)
+	@Width(250)
 	private byte[] foto;
 
 	@NotSearchable

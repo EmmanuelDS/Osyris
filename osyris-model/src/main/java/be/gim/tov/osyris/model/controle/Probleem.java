@@ -16,6 +16,7 @@ import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.View;
+import org.conscientia.api.model.annotation.Width;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
@@ -51,6 +52,7 @@ public abstract class Probleem extends AbstractModelObject implements
 	@NotSearchable
 	@ContentType("image/*")
 	@FileSize(2 * 1024 * 1024)
+	@Width(250)
 	private byte[] foto;
 
 	// GETTERS AND SETTERS
