@@ -362,17 +362,23 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void verzendenWerkOpdracht() {
+
 		if (object != null) {
+
 			if (object.getHandelingen().isEmpty()
 					|| object.getHandelingen() == null) {
+
 				messages.error("Gelieve minstens 1 handeling toe te voegen alvorens de werkopdracht te verzenden.");
 			} else {
+
 				object.setStatus(WerkopdrachtStatus.UIT_TE_VOEREN);
 				object.setDatumUitTeVoeren(new Date());
 				try {
+
 					modelRepository.saveObject(object);
 					clear();
 					search();
+
 					// send confirmatie mail naar Uitvoerder
 					// sendConfirmationMail();
 					messages.info("Werkopdracht succesvol verzonden.");
@@ -394,14 +400,18 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void annuleerWerkOpdracht() {
+
 		if (object != null) {
+
 			object.setStatus(WerkopdrachtStatus.GEANNULEERD);
 			object.setDatumGeannuleerd(new Date());
 			try {
+
 				modelRepository.saveObject(object);
 				messages.info("Werkopdracht succesvol geannuleerd.");
 				clear();
 				search();
+
 			} catch (IOException e) {
 				messages.error("Fout bij het annuleren van werkopdracht: "
 						+ e.getMessage());
@@ -626,8 +636,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			// OPNIEUW UIT TE VOEREN = nieuwe WerkOpdracht
 			if (validatieStatus.equals(ValidatieStatus.OPNIEUW_UITVOEREN)) {
+
 				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 						.createObject(getModelClass().getName(), null);
+
 				opdracht.setMedewerker(object.getMedewerker());
 				opdracht.setProbleem(object.getProbleem());
 				opdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
@@ -636,6 +648,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 				opdracht.setInRonde("0");
 				opdracht.setDatumTeControleren(new Date());
 				opdracht.setValidatie(validatieStatus);
+				opdracht.setTypeTraject(object.getTypeTraject());
+				opdracht.setRegioId(object.getRegioId());
 				modelRepository.saveObject(opdracht);
 				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Te controleren'");
 
@@ -647,6 +661,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 						.createObject(getModelClass().getName(), null);
+
 				opdracht.setMedewerker(object.getMedewerker());
 				opdracht.setProbleem(object.getProbleem());
 				opdracht.setStatus(WerkopdrachtStatus.UITGESTELD);
@@ -655,6 +670,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 				opdracht.setInRonde("0");
 				opdracht.setDatumLaterUitTeVoeren(new Date());
 				opdracht.setValidatie(validatieStatus);
+				opdracht.setTypeTraject(object.getTypeTraject());
+				opdracht.setRegioId(object.getRegioId());
 				modelRepository.saveObject(opdracht);
 				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Uitgesteld.' De werkopdracht zal status 'Te controleren' verkrijgen op de gespecifieerde datum.");
 			}

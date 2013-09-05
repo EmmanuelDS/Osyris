@@ -44,7 +44,7 @@
 							value="#{uitvoeringsrondeOverzichtFormBase.trajectType}">
 							<f:selectItem itemValue="" itemLabel="" />
 							<f:selectItems
-								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypesWO)}" />
 							<a:ajax event="change" render="detailSearchPanel" execute="@this" />
 						</h:selectOneMenu>
 					</d:field>
@@ -63,13 +63,16 @@
 						rendered="#{uitvoeringsrondeOverzichtFormBase.trajectType.contains('Route')}">
 						<d:field for="trajectNaam" label="Traject naam">
 							<h:selectOneMenu id="trajectNaam"
-								value="#{uitvoeringsrondeOverzichtFormBase.trajectNaam}">
+								value="#{uitvoeringsrondeOverzichtFormBase.trajectId}">
+								<f:converter
+								converterId="be.gim.commons.ResourceIdentifierConverter" />
 								<f:selectItem itemValue="" itemLabel="" />
 								<f:selectItems
-									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(uitvoeringsrondeOverzichtFormBase.regio, uitvoeringsrondeOverzichtFormBase.trajectType))}" />
+									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamenSearch(uitvoeringsrondeOverzichtFormBase.regio, uitvoeringsrondeOverzichtFormBase.trajectType))}" />
 							</h:selectOneMenu>
 						</d:field>
 					</j:renderPanel>
+					<a:outputPanel rendered="#{!identity.inGroup('Uitvoerder','CUSTOM')}">
 					<d:field for="uitvoerder" label="Uitvoerder">
 						<h:selectOneMenu id="uitvoerder"
 							value="#{uitvoeringsrondeOverzichtFormBase.uitvoerder}">
@@ -80,6 +83,7 @@
 								value="#{modelUtils.selectItems(osyrisModelFunctions.getSuggestions('Uitvoerder'))}" />
 						</h:selectOneMenu>
 					</d:field>
+					</a:outputPanel>
 					<d:field for="medewerker" label="Medewerker">
 						<h:selectOneMenu id="medewerker"
 							value="#{uitvoeringsrondeOverzichtFormBase.medewerker}">

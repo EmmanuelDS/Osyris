@@ -21,6 +21,7 @@ import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 
 import be.gim.commons.filter.FilterUtils;
@@ -89,6 +90,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected ResourceIdentifier medewerker;
 	protected WerkOpdracht selectedWerkOpdracht;
 	protected GebruiktMateriaal selectedMateriaal;
+	protected ResourceIdentifier trajectId;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -155,6 +157,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		this.selectedMateriaal = selectedMateriaal;
 	}
 
+	public ResourceIdentifier getTrajectId() {
+		return trajectId;
+	}
+
+	public void setTrajectId(ResourceIdentifier trajectId) {
+		this.trajectId = trajectId;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -202,64 +212,69 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		try {
 			List<Uitvoeringsronde> list = (List<Uitvoeringsronde>) modelRepository
 					.searchObjects(getQuery(), true, true, true);
+
 			List<Uitvoeringsronde> filteredList = new ArrayList<Uitvoeringsronde>();
 
-			if (uitvoerder != null) {
-				results = searchUitvoeringronde(uitvoerder, list);
-				filteredList = results;
-			}
-
-			if (medewerker != null) {
-				if (filteredList.isEmpty()) {
-					results = searchUitvoeringronde(medewerker, list);
-				} else {
-					results = searchUitvoeringronde(medewerker, filteredList);
-				}
-			}
-
-			if (uitvoerder == null && medewerker == null) {
+			// Deze velden moeten gezocht worden in WerkOpdrachten, indien
+			// allemaal leeg normale query uitvoeren
+			if (uitvoerder == null && medewerker == null && trajectType == null
+					&& regio == null && trajectNaam == null) {
 				results = list;
 			}
-		} catch (IOException e) {
-			LOG.error("Can not search Uitvoeringsronde.", e);
-		}
-	}
 
-	/**
-	 * Zoeken tot welke UitvoeringsRonde een opgegeven WerkOpdracht behoort.
-	 * Temporary Experimental search helper method.
-	 * 
-	 * @param id
-	 * @param list
-	 * @return
-	 */
-	public List<Uitvoeringsronde> searchUitvoeringronde(ResourceIdentifier id,
-			List<Uitvoeringsronde> list) {
-		List<Uitvoeringsronde> result = new ArrayList<Uitvoeringsronde>();
-		try {
-			boolean flag = false;
-			for (Uitvoeringsronde ronde : list) {
-				for (ResourceIdentifier opdrachtId : ronde.getOpdrachten()) {
-					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
-							.loadObject(opdrachtId);
-					if (uitvoerder != null) {
-						if (opdracht.getUitvoerder().equals(uitvoerder)) {
-							flag = true;
-						}
-					} else if (medewerker != null) {
-						if (opdracht.getMedewerker().equals(medewerker)) {
-							flag = true;
+			else {
+				// Indien minstens 1 van de velden ingevuld WerkOpdracht query
+				// uitvoeren en resultaten filteren op de uitvoeringsronde query
+				QueryBuilder builder = new QueryBuilder("WerkOpdracht");
+				if (uitvoerder != null) {
+					builder.addFilter(FilterUtils.equal("uitvoerder",
+							uitvoerder));
+				}
+				if (medewerker != null) {
+					builder.addFilter(FilterUtils.equal("medewerker",
+							medewerker));
+				}
+
+				if (trajectType != null) {
+					builder.addFilter(FilterUtils.equal("typeTraject",
+							trajectType));
+				}
+
+				if (regio != null) {
+					builder.addFilter(FilterUtils.equal("regioId", regio));
+				}
+
+				if (trajectId != null) {
+					builder.addFilter(FilterUtils.equal("traject", trajectId));
+				}
+				builder.results(FilterUtils.properties("id"));
+
+				List<Long> ids = (List<Long>) modelRepository.searchObjects(
+						builder.build(), false, false);
+				List<ResourceIdentifier> filteredWerkOpdrachten = new ArrayList<ResourceIdentifier>();
+
+				for (Long id : ids) {
+					filteredWerkOpdrachten.add(new ResourceKey("WerkOpdracht",
+							id.toString()));
+				}
+
+				for (Uitvoeringsronde ronde : list) {
+
+					for (ResourceIdentifier id : filteredWerkOpdrachten) {
+
+						if (ronde.getOpdrachten().contains(id)
+								&& !filteredList.contains(ronde)) {
+							filteredList.add(ronde);
 						}
 					}
 				}
-				if (flag) {
-					result.add(ronde);
-				}
+
+				results = filteredList;
 			}
+
 		} catch (IOException e) {
-			LOG.error("Can not load WerkOpdracht.", e);
+			LOG.error("Can not search Uitvoeringsronde.", e);
 		}
-		return result;
 	}
 
 	/**
@@ -270,13 +285,17 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	public List<WerkOpdracht> getWerkOpdrachtenInUitvoeringsronde(
 			Uitvoeringsronde ronde) {
 		try {
+
 			List<WerkOpdracht> opdrachten = new ArrayList<WerkOpdracht>();
+
 			for (ResourceIdentifier id : ronde.getOpdrachten()) {
 				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 						.loadObject(id);
 				opdrachten.add(opdracht);
 			}
+
 			return opdrachten;
+
 		} catch (IOException e) {
 			LOG.error("Can not load WerkOpdracht", e);
 		}
@@ -386,11 +405,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * 
 	 */
 	public void rapporteerWerkOpdrachtInRonde() {
+
 		try {
+
 			selectedWerkOpdracht.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
 			selectedWerkOpdracht.setDatumGerapporteerd(new Date());
 			modelRepository.saveObject(selectedWerkOpdracht);
 			messages.info("Werkopdracht in uitvoeringsronde succesvol gerapporteerd.");
+
 		} catch (IOException e) {
 			messages.error("Fout bij het rapporteren van de werkopdracht in uitvoeringsronde: "
 					+ e.getMessage());
@@ -404,6 +426,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * 
 	 */
 	public void rapporteerUitvoeringsRonde() {
+
 		try {
 
 			if (checkWerkOpdrachtenGerapporteerd()) {
@@ -413,6 +436,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			} else {
 				messages.error("Uitvoeringsronde niet gerapporteerd: De uitvoeringsronde bevat nog niet-gerapporteerde werkopdrachten.");
 			}
+
 		} catch (IOException e) {
 			messages.error("fout bij het rapporteren van uitvoeringsronde: "
 					+ e.getMessage());
@@ -426,7 +450,9 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @return
 	 */
 	private boolean checkWerkOpdrachtenGerapporteerd() {
+
 		boolean isGerapporteerd = true;
+
 		try {
 			for (ResourceIdentifier id : object.getOpdrachten()) {
 				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
@@ -449,10 +475,12 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @param materiaal
 	 */
 	public void removeMateriaalFromWerkOpdracht() {
+
 		try {
 			selectedWerkOpdracht.getMaterialen().remove(selectedMateriaal);
 			modelRepository.saveObject(selectedWerkOpdracht);
 			messages.info("Materiaal succesvol verwijderd uit werkopdracht.");
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van materiaal uit werkopdracht: "
 					+ e.getMessage());
@@ -461,6 +489,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	}
 
 	public boolean isBordProbleem(Probleem probleem) {
+
 		if (probleem instanceof BordProbleem) {
 			return true;
 		} else {
@@ -474,6 +503,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @param bordProbleem
 	 */
 	public void zoomToProbleem(Probleem probleem) {
+
 		MapViewer viewer = getViewer();
 		Envelope envelope;
 
@@ -510,6 +540,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @param layer
 	 */
 	private void searchKnooppuntLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		layer.setFilter(null);
 		layer.setSelection(Collections.EMPTY_LIST);
