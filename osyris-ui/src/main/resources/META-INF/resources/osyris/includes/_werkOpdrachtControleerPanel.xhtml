@@ -8,6 +8,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
+	
 	<h2>Werkopdracht #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
 	<br/>
 	<table max-width="100%">
@@ -21,6 +22,16 @@
 					value="#{form.object.status}"
 					mode="VIEW" />
 		</d:field>
+		
+		<a:outputPanel rendered="#{form.object.status == 'UITGESTELD'}">
+		<d:field for="datumLaterUitTeVoeren" label="Uitgesteld naar">
+			<d:propertyValue id="datumLaterUitTeVoeren"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLateruitTeVoeren')}"
+					value="#{form.object.datumLaterUitTeVoeren}"
+					mode="VIEW" />
+		</d:field>
+		</a:outputPanel>
+		
 		<d:field for="datumUitvoering" label="Datum uitvoering">
 			<d:propertyValue id="datumUitvoering"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitvoering')}"

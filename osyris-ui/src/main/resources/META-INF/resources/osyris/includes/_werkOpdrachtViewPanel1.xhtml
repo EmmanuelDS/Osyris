@@ -21,6 +21,16 @@
 					value="#{form.object.status}"
 					mode="VIEW" />
 		</d:field>
+		
+		<a:outputPanel rendered="#{form.object.status == 'UITGESTELD'}">
+		<d:field for="datumLaterUitTeVoeren" label="Uitgesteld naar">
+			<d:propertyValue id="datumLaterUitTeVoeren"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLateruitTeVoeren')}"
+					value="#{form.object.datumLaterUitTeVoeren}"
+					mode="VIEW" />
+		</d:field>
+		</a:outputPanel>
+		
 		<d:field for="datumUitvoering" label="Datum uitvoering">
 			<d:propertyValue id="datumUitvoering"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitTeVoeren')}"
@@ -84,7 +94,7 @@
 	</table>
 	<d:buttons>
 	<j:commandButton
-			rendered="#{form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN'}"
+			rendered="#{(form.isCanEdit(form.object) and form.object.status == 'TE_CONTROLEREN') or identity.inGroup('admin', 'CUSTOM')}"
 			value="Bewerken"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"

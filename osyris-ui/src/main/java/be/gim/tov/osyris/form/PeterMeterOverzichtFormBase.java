@@ -31,6 +31,7 @@ import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.security.Identity;
 import org.opengis.filter.Filter;
@@ -38,6 +39,8 @@ import org.opengis.filter.Filter;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.localization.DefaultInternationalString;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 
 /**
  * 
@@ -62,21 +65,22 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	@Inject
 	protected MailSender mailSender;
 
-	protected boolean validationFailed;
+	protected boolean hasErrors;
 
 	// GETTERS AND SETTERS
-	public boolean isValidationFailed() {
-		return validationFailed;
-	}
-
-	public void setValidationFailed(boolean validationFailed) {
-		this.validationFailed = validationFailed;
-	}
 
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
 		search();
+	}
+
+	public boolean isHasErrors() {
+		return hasErrors;
+	}
+
+	public void setHasErrors(boolean hasErrors) {
+		this.hasErrors = hasErrors;
 	}
 
 	@Override
@@ -92,9 +96,75 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		this.object = user;
 	}
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void search() {
-		results = getAllPetersMeters();
+
+		try {
+			results = (List<User>) modelRepository.searchObjects(getQuery(),
+					true, true);
+
+		} catch (IOException e) {
+			LOG.error("Can not search Users.", e);
+		}
+	}
+
+	@Override
+	public Query getQuery() {
+
+		if (query == null) {
+			query = getDefaultQuery();
+		}
+
+		try {
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			List<Filter> filters = new ArrayList<Filter>();
+
+			for (ResourceName name : group.getMembers()) {
+				Filter filter = FilterUtils.equal("username",
+						name.getNamePart());
+				filters.add(filter);
+			}
+
+			query.addFilter(FilterUtils.or(filters));
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return query;
+	}
+
+	/**
+	 * Ophalen peters en meters.
+	 * 
+	 */
+	@Override
+	protected Query getDefaultQuery() {
+
+		try {
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			query = new DefaultQuery("User");
+			List<Filter> filters = new ArrayList<Filter>();
+
+			for (ResourceName name : group.getMembers()) {
+				Filter filter = FilterUtils.equal("username",
+						name.getNamePart());
+				filters.add(filter);
+			}
+
+			query.addFilter(FilterUtils.or(filters));
+
+			return query;
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		return null;
+
 	}
 
 	/**
@@ -138,7 +208,13 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 				// User
 				object.putAspect(userProfile);
-				object.putAspect(object.getAspect("PeterMeterProfiel"));
+
+				PeterMeterProfiel profiel = (PeterMeterProfiel) object
+						.getAspect("PeterMeterProfiel");
+				if (profiel.getVoorkeuren().isEmpty()) {
+					profiel.setVoorkeuren(null);
+				}
+				object.putAspect(profiel);
 				modelRepository.saveObject(object);
 
 				// Set permissions
@@ -155,12 +231,12 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						object.getAspect("UserProfile").get("email").toString(),
 						password);
 
-				setValidationFailed(false);
+				setHasErrors(false);
 				clear();
 				search();
 
 			} else {
-				setValidationFailed(true);
+				setHasErrors(true);
 				messages.error("Gebruikersnaam bestaat al. Gelieve een andere gebruikersnaam te kiezen.");
 			}
 		} catch (IOException e) {
@@ -179,6 +255,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	@SuppressWarnings("unchecked")
 	public void delete() {
 		try {
+			// Delete trajectToewijzingen PM
+			deleteToewijzingen();
+
 			Permissions permissions = (Permissions) modelRepository.loadAspect(
 					modelRepository.getModelClass("Permissions"),
 					new ResourceName("user", object.getUsername()),
@@ -340,38 +419,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	}
 
 	/**
-	 * Ophalen van alle PetersMeters.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	private List<User> getAllPetersMeters() {
-
-		try {
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-
-			DefaultQuery q = new DefaultQuery("User");
-			List<Filter> filters = new ArrayList<Filter>();
-
-			for (ResourceName name : group.getMembers()) {
-				Filter filter = FilterUtils.equal("username",
-						name.getNamePart());
-				filters.add(filter);
-			}
-			// Ophalen Users binnen de groep PeterMeter
-			q.addFilter(FilterUtils.or(filters));
-			List<User> petersMeters = (List<User>) modelRepository
-					.searchObjects(q, false, false);
-
-			return petersMeters;
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			return null;
-		}
-	}
-
-	/**
 	 * Editeren van een PeterMeter redirecten naar het User edit form.
 	 * 
 	 */
@@ -391,6 +438,47 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 											.toString());
 		} catch (IOException e) {
 			LOG.error("Can not redirect to User edit form.", e);
+		}
+	}
+
+	/**
+	 * Verwijdert de trajectToewijzingen bij het deleten van PeterMeter.
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public void deleteToewijzingen() {
+
+		try {
+			ResourceName peterMeter = modelRepository.getResourceName(object);
+
+			QueryBuilder builder = new QueryBuilder("Traject");
+			builder.addFilter(FilterUtils.or(
+					FilterUtils.equal("peterMeter1", peterMeter),
+					FilterUtils.equal("peterMeter2", peterMeter),
+					FilterUtils.equal("peterMeter3", peterMeter)));
+
+			List<Traject> result = (List<Traject>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			for (Traject traject : result) {
+				if (traject.getPeterMeter1() != null
+						&& traject.getPeterMeter1().equals(peterMeter)) {
+					traject.setPeterMeter1(null);
+				}
+				if (traject.getPeterMeter2() != null
+						&& traject.getPeterMeter2().equals(peterMeter)) {
+					traject.setPeterMeter2(null);
+				}
+				if (traject.getPeterMeter3() != null
+						&& traject.getPeterMeter3().equals(peterMeter)) {
+					traject.setPeterMeter3(null);
+				}
+
+				modelRepository.saveObject(traject);
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not search Trajecten.", e);
 		}
 	}
 }

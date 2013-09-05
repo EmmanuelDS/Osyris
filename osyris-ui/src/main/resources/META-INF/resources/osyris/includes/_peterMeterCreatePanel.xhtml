@@ -38,7 +38,8 @@
 			type="button"
 			action="#{form.saveNewPeterMeter()}"
 			render="#{render}"
-			oncomplete="if ( !#{form.validationFailed} ) conscientia.widget(#{r:element('createPopup')}).hide();" />
+			execute="object @this"
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('createPopup')}).hide();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"
 			image="#{resource['core/images/actions/12x12/cancel.png']}"
