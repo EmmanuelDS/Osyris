@@ -8,6 +8,8 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
+	
+	<a:outputPanel id="werkOpdrachtViewPanel">
 	<h2>Werkopdracht #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
 	<br/>
 	<table width="100%">
@@ -98,7 +100,7 @@
 			value="Bewerken"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"
-			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('controleerPopup')}).show();" />
+			onclick="conscientia.widget(#{r:element('controleerPopup')}).show(); conscientia.widget(#{r:element('viewPopup')}).hide(); " />
 		<j:commandButton 
 			rendered="#{form.object.status == 'TE_CONTROLEREN' }"
 			value="Verzenden"
@@ -127,4 +129,5 @@
 			render="#{render}"
 			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
 	</d:buttons>
+	</a:outputPanel>
 </u:composition>

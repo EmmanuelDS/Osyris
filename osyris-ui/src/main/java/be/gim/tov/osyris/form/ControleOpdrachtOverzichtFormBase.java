@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.form;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -16,10 +15,13 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -46,6 +48,8 @@ import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
@@ -97,7 +101,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
 
-	public static final String CO_PDF_XSL = "META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
+	public static final String CO_PDF_XSL = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
 
 	private static final long serialVersionUID = -86881009141250710L;
 
@@ -1407,17 +1411,42 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// byte[] result = builder.transform(xslt, getViewer(), variables);
 		// return new ByteArrayContent("application/pdf", result);
 
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+		// root element
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("verslag");
+		doc.appendChild(rootElement);
+
+		List<Bord> borden = createBewegwijzering(object.getTraject());
+
+		for (Bord b : borden) {
+			// Bord elementen
+			Element bord = doc.createElement("bord");
+			rootElement.appendChild(bord);
+
+			Element id = doc.createElement("id");
+			id.appendChild(doc.createTextNode(b.getId().toString()));
+			bord.appendChild(id);
+		}
+
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
 				FopFactory.newInstance().newFOUserAgent(), out);
 
-		Source xslt = new StreamSource(new File(CO_PDF_XSL));
+		Source xslt = new StreamSource(getClass().getResourceAsStream(
+				CO_PDF_XSL));
+
+		// Transform source
 		Transformer transformer = TransformerFactory.newInstance()
 				.newTransformer(xslt);
 		Result res = new SAXResult(fop.getDefaultHandler());
 
-		transformer.transform(xslt, res);
+		transformer.transform(new DOMSource(doc), res);
 
+		// return pdf
 		return new ByteArrayContent("application/pdf", out.toByteArray());
 	}
 

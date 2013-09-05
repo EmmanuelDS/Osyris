@@ -530,7 +530,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 		try {
 			modelRepository.saveObject(object);
 			messages.info("Werkopdracht succesvol bewaard.");
-			clear();
+
+			// clear();
 			search();
 		} catch (IOException e) {
 			messages.error("Fout bij het bewaren van werkopdracht: "

@@ -9,7 +9,6 @@ import java.util.Map;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
-import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -416,29 +415,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				"Medewerker"), "edit", true));
 
 		return permissions;
-	}
-
-	/**
-	 * Editeren van een PeterMeter redirecten naar het User edit form.
-	 * 
-	 */
-	public void redirectToEdit() {
-		try {
-
-			String contextPath = FacesContext.getCurrentInstance()
-					.getExternalContext().getRequestContextPath();
-
-			FacesContext
-					.getCurrentInstance()
-					.getExternalContext()
-					.redirect(
-							contextPath
-									+ "/web/edit/"
-									+ modelRepository.getResourceName(object)
-											.toString());
-		} catch (IOException e) {
-			LOG.error("Can not redirect to User edit form.", e);
-		}
 	}
 
 	/**

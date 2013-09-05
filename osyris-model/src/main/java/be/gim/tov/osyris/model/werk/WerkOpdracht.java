@@ -118,7 +118,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotSearchable
 	@ContentType("image/*")
 	@FileSize(2 * 1024 * 1024)
-	@Width(250)
+	@Width(150)
 	private byte[] foto;
 
 	@NotSearchable
