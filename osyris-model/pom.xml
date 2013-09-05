@@ -14,11 +14,5 @@
 			<artifactId>specto-model-base</artifactId>
 			<version>${specto.version}</version>
 		</dependency>
-		
-		<dependency>
-			<groupId>be.gim.peritia</groupId>
-			<artifactId>peritia-common</artifactId>
-			<version>2.0.0-SNAPSHOT</version>
-		</dependency>
 	</dependencies>
 </project>
