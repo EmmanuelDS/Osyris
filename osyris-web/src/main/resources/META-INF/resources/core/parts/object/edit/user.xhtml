@@ -34,6 +34,15 @@
 						execute="@this" />
 				</j:commandButton>
 			</div>
+			<div style="clear: right" />
+			<d:fields>
+				<d:propertyField id="field_username"
+					modelProperty="#{c.attrs.modelClass.getProperty('username')}" 
+					modelObject="#{c.attrs.value}"
+					mode="#{c.attrs.mode}"
+					level="#{c.attrs.level}"
+					simple="#{c.attrs.simple}" />
+			</d:fields>
 			<d:aspect id="profile"
 				value="#{c.attrs.value.getAspect('UserProfile', modelRepository, true)}"
 				mode="#{c.attrs.mode}"
