@@ -95,12 +95,12 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
+
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
 	private static final String PERIODE_LENTE = "1";
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
-
 	public static final String CO_PDF_XSL = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
 
 	private static final long serialVersionUID = -86881009141250710L;
@@ -404,6 +404,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 		selectedProbleem = null;
 		object = null;
 		controleOpdrachtType = null;
+		bewegwijzering = null;
+		trajectId = null;
+		trajectType = null;
+		trajectNaam = null;
 	}
 
 	/**
