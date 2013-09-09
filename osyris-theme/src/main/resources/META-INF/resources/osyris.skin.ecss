@@ -90,6 +90,7 @@ header, footer, article, section, nav, menu, hgroup {
 
 .model-field-tail {
 	clear: left;
+	height: 10px;
 }
 
 .icn_user {

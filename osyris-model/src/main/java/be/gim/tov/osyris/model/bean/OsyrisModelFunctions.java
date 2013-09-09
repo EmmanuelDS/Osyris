@@ -25,6 +25,7 @@ import org.conscientia.core.functions.ModelFunctions;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
+import org.conscientia.core.security.annotation.RunPrivileged;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
@@ -266,6 +267,7 @@ public class OsyrisModelFunctions {
 	 * @param groupName
 	 * @return
 	 */
+	@RunPrivileged
 	public List<ResourceName> getUsersInGroup(String groupName) {
 
 		try {
@@ -468,6 +470,7 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
+	@RunPrivileged
 	public List<?> getTrajectNamen(ResourceIdentifier regio, String trajectType)
 			throws IOException {
 
@@ -493,6 +496,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 * @throws IOException
 	 */
+	@RunPrivileged
 	@SuppressWarnings("unchecked")
 	public List<String> getTrajectNamen(ModelClass modelClass,
 			ResourceIdentifier regio) throws IOException {
@@ -558,6 +562,7 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
+	@RunPrivileged
 	public List<?> getStraten() throws IOException {
 
 		QueryBuilder builder = new QueryBuilder("Bord");
@@ -572,6 +577,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 * @throws IOException
 	 */
+	@RunPrivileged
 	public List<Integer> getKnooppuntNummers() throws IOException {
 
 		QueryBuilder builder = new QueryBuilder("NetwerkKnooppunt");
@@ -663,6 +669,7 @@ public class OsyrisModelFunctions {
 	 * @param trajectId
 	 * @return Het label van het traject.
 	 */
+	@RunPrivileged
 	public String getTrajectRegio(ResourceIdentifier trajectId) {
 
 		return (String) cacheProducer.getCache("trajectRegioCache",
@@ -711,6 +718,7 @@ public class OsyrisModelFunctions {
 	 * @param probleem
 	 * @return
 	 */
+	@RunPrivileged
 	@SuppressWarnings("unchecked")
 	public String getWerkOpdrachtGemeente(Probleem probleem) {
 
@@ -811,6 +819,7 @@ public class OsyrisModelFunctions {
 	 * @param regio
 	 * @return
 	 */
+	@RunPrivileged
 	@SuppressWarnings("unchecked")
 	public ResourceName zoekUitvoerder(ResourceIdentifier regioID) {
 
@@ -826,7 +835,6 @@ public class OsyrisModelFunctions {
 					.getFor());
 
 			return modelRepository.getResourceName(uitvoerder);
-
 		} catch (IOException e) {
 			LOG.error("Can not load Traject.", e);
 		}
@@ -850,7 +858,6 @@ public class OsyrisModelFunctions {
 				opdrachten.add(object);
 			}
 			return opdrachten;
-
 		} catch (IOException e) {
 			LOG.error("Can not search WerkOpdracht ids.", e);
 		}
@@ -862,6 +869,7 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @param id
 	 */
+	@RunPrivileged
 	public String getUitvoerderNaam(ResourceIdentifier id) {
 
 		String naam = null;
@@ -916,6 +924,7 @@ public class OsyrisModelFunctions {
 	 * @param traject
 	 * @return
 	 */
+	@RunPrivileged
 	@SuppressWarnings("unchecked")
 	public ResourceName zoekVerantwoordelijke(ResourceIdentifier traject) {
 
@@ -1159,6 +1168,7 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
+	@RunPrivileged
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getTrajectNamenSearch(ResourceIdentifier regio,
 			String trajectType) {
