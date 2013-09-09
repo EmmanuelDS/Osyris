@@ -203,7 +203,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				}
 				document.setOwner(name);
 				document.set("object", object);
-				modelRepository.saveDocument(document);
 
 				// User
 				object.putAspect(userProfile);
@@ -214,7 +213,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 					profiel.setVoorkeuren(null);
 				}
 				object.putAspect(profiel);
-				modelRepository.saveObject(object);
 
 				// Set permissions
 				setDocumentPermissions(name, document);
@@ -231,6 +229,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						password);
 
 				setHasErrors(false);
+				modelRepository.saveDocument(document);
+				modelRepository.saveObject(object);
+
 				clear();
 				search();
 
@@ -241,6 +242,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		} catch (IOException e) {
 			LOG.error("Can not save model object.", e);
 		} catch (Exception e) {
+			messages.error("Peter/Meter niet bewaard: fout bij het versturen van confirmatie e-mail.");
 			LOG.error("Can not send mail.", e);
 			throw new RuntimeException(e);
 		}
