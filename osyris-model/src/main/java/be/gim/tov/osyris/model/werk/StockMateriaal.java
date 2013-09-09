@@ -32,6 +32,7 @@ import be.gim.commons.resource.ResourceIdentifier;
 @Model
 @ModelStore("OsyrisDataStore")
 @Label("Stockmateriaal")
+@Search(type = "stockMateriaal")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),

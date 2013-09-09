@@ -10,6 +10,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -25,6 +26,7 @@ import be.gim.commons.resource.ResourceIdentifier;
 public abstract class NetwerkSegment extends Traject {
 
 	// VARIABLES
+	@Required
 	@Label("Enkele richting")
 	@Description("Enkele richting")
 	@Type(value = ModelPropertyType.ENUM)

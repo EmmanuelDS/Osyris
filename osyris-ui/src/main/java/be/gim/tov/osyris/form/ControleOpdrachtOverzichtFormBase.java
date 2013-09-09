@@ -737,10 +737,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 					trajectType.replace("Lus", "") + "Knooppunt")) {
 				searchKnooppuntLayer(layer);
 			}
-
-			viewer.updateCurrentExtent(envelope);
-			viewer.updateContext(null);
 		}
+
+		viewer.updateCurrentExtent(envelope);
+		viewer.updateContext(null);
 	}
 
 	/**

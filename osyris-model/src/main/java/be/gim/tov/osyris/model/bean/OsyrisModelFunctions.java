@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -286,14 +287,15 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @param groupName
 	 * @return
+	 * 
+	 *         public List<? extends ResourceIdentifier> getSuggestions(String
+	 *         test, String groupName) {
+	 * 
+	 *         List<ResourceName> users = getUsersInGroup(groupName);
+	 *         List<ResourceIdentifier> suggestions = new
+	 *         ArrayList<ResourceIdentifier>(); suggestions.addAll(users);
+	 *         return suggestions; }
 	 */
-	public List<? extends ResourceIdentifier> getSuggestions(String groupName) {
-
-		List<ResourceName> users = getUsersInGroup(groupName);
-		List<ResourceIdentifier> suggestions = new ArrayList<ResourceIdentifier>();
-		suggestions.addAll(users);
-		return suggestions;
-	}
 
 	/**
 	 * Get suggestielijst voor PetersMeters.
@@ -322,11 +324,92 @@ public class OsyrisModelFunctions {
 												modelRepository, true);
 								Object[] object = {
 										user,
-										profiel.getFirstName() + " "
-												+ profiel.getLastName() };
+										profiel.getLastName() + " "
+												+ profiel.getFirstName() };
 								suggestions.add(object);
 							}
-							suggestions.add(geenPeterMeter);
+
+							// Sorteren suggesties
+							Collections.sort(suggestions,
+									new Comparator<Object[]>() {
+
+										@Override
+										public int compare(Object[] o1,
+												Object[] o2) {
+											String p1 = (String) o1[1];
+											String p2 = (String) o2[1];
+											int res = p1
+													.compareToIgnoreCase(p2);
+											if (res != 0) {
+												return res;
+											}
+											return p1.compareToIgnoreCase(p2);
+										}
+									});
+
+							// Geen peterMeter toegewezen komt bovenaan
+							suggestions.add(0, geenPeterMeter);
+
+						} catch (IOException e) {
+							LOG.error("Can not load user.", e);
+						} catch (InstantiationException e) {
+							LOG.error("Can not instantiate UserProfile.", e);
+						} catch (IllegalAccessException e) {
+							LOG.error("Illegal access at UserProfile.", e);
+						}
+						return suggestions;
+
+					}
+				}).get(null);
+	}
+
+	/**
+	 * Get suggestielijst voor PetersMeters.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getSuggestions(final String groupName) {
+
+		return (List<Object[]>) cacheProducer.getCache("SuggestionCache",
+				new Transformer() {
+
+					@Override
+					public Object transform(Object key) {
+						List<Object[]> suggestions = new ArrayList<Object[]>();
+						try {
+
+							List<ResourceName> users = getUsersInGroup(groupName);
+							for (ResourceName user : users) {
+								User peterMeter = (User) modelRepository
+										.loadObject(user);
+								UserProfile profiel = (UserProfile) peterMeter
+										.getAspect("UserProfile",
+												modelRepository, true);
+								Object[] object = {
+										user,
+										profiel.getLastName() + " "
+												+ profiel.getFirstName() };
+								suggestions.add(object);
+							}
+
+							// Sorteren suggesties
+							Collections.sort(suggestions,
+									new Comparator<Object[]>() {
+
+										@Override
+										public int compare(Object[] o1,
+												Object[] o2) {
+											String p1 = (String) o1[1];
+											String p2 = (String) o2[1];
+											int res = p1
+													.compareToIgnoreCase(p2);
+											if (res != 0) {
+												return res;
+											}
+											return p1.compareToIgnoreCase(p2);
+										}
+									});
 
 						} catch (IOException e) {
 							LOG.error("Can not load user.", e);
