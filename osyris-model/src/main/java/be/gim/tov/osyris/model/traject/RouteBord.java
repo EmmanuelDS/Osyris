@@ -1,8 +1,6 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.ModelPropertyType;
-import org.conscientia.api.model.annotation.Description;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -24,16 +22,12 @@ public class RouteBord extends Bord {
 
 	// VARIABLES
 	@NotSearchable
-	@Label("Afbeeldingscode")
-	@Description("Afbeeldingscode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String imageCode;
 
 	@NotSearchable
 	@NotEditable
-	@Label("Route")
-	@Description("Route")
 	@ModelClassName("Traject")
 	private ResourceIdentifier route;
 

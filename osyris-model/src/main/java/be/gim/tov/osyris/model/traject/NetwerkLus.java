@@ -2,8 +2,6 @@ package be.gim.tov.osyris.model.traject;
 
 import java.util.List;
 
-import org.conscientia.api.model.annotation.Description;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -22,13 +20,9 @@ public abstract class NetwerkLus extends Traject {
 
 	// VARIABLES
 	@NotSearchable
-	@Label("Actief")
-	@Description("Actief")
 	private boolean actief;
 
 	@NotSearchable
-	@Label("Netwerksegmenten")
-	@Description("Netwerksegmenten")
 	@ModelClassName("Traject")
 	private List<ResourceIdentifier> segmenten;
 

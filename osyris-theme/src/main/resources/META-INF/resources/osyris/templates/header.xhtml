@@ -8,7 +8,6 @@
 	xmlns:j="http://conscientia.org/jsf">
 	
 	<script src="#{resource['osyris/scripts/primefaces_locale_nl.js']}"></script>
-	<script src="#{resource['osyris/scripts/jquery-ui-ramdesign.js']}"></script>
 	
 	<table width="100%">
 		<tr>
@@ -63,7 +62,7 @@
 							</c:otherwise>
 						</c:choose>
 					 <li class="help" >
-						<a href="#" class="question_mark">?</a>
+						<a href="#{osyrisModelFunctions.helpUrl}" class="question_mark">?</a>
 					</li>
 					</ul>
 					</div>

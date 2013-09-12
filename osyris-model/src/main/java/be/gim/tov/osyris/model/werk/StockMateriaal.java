@@ -4,9 +4,7 @@ import java.util.Date;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Minimum;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -31,7 +29,6 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Stockmateriaal")
 @Search(type = "stockMateriaal")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
@@ -48,69 +45,47 @@ public class StockMateriaal extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@Label("Magazijn")
-	@Description("Magazijn")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('MagazijnCode')}")
 	private String magazijn;
 
-	@Label("Categorie")
-	@Description("Categorie")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('StockCategorieCode')}")
 	private String categorie;
 
-	@Label("Subcategorie")
-	@Description("Subcategorie")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getStockSubCategories(parents[0])}")
 	@Parents({ "categorie" })
 	private String subCategorie;
 
-	@Label("Type")
-	@Description("Type")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getStockTypes(parents[0], parents[1])}")
 	@Parents({ "categorie", "subCategorie" })
 	private String type;
 
-	@Label("Naam")
-	@Description("Naam")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getStockMateriaalNamen(parents[0], parents[1], parents[2])}")
 	@Parents({ "categorie", "subCategorie", "type" })
 	private String naam;
 
-	@Label("Nummer")
-	@Description("Nummer")
 	private String nummer;
 
 	@NotEditable
-	@Label("In stock")
-	@Description("In stock")
 	@NotSearchable
 	private int inStock;
 
-	@Label("Minimum")
-	@Description("Minimum")
 	@NotSearchable
 	@Minimum(value = 0)
 	private int min;
 
-	@Label("Maximum")
-	@Description("Maximum")
 	@NotSearchable
 	@Minimum(value = 0)
 	private int max;
 
 	@NotSearchable
-	@Label("Te bestellen")
-	@Description("Te bestellen")
 	private int teBestellen;
 
 	@NotEditable
-	@Label("Besteld")
-	@Description("Besteld")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.stockMateriaalStates}")
 	private String besteld;
@@ -118,26 +93,18 @@ public class StockMateriaal extends AbstractModelObject implements
 	@NotSearchable
 	@NotEditable
 	@NotViewable
-	@Label("Traject")
-	@Description("Traject")
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
 
-	@Label("Regio")
-	@Description("Regio")
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getRegiosUitvoerder()}")
 	private ResourceIdentifier regio;
 
-	@Label("Datum besteld")
-	@Description("Datum besteld")
 	@Type(ModelPropertyType.DATE)
 	private Date datumBesteld;
 
-	@Label("Datum geleverd")
-	@Description("Datum geleverd")
 	@Type(ModelPropertyType.DATE)
 	private Date datumGeleverd;
 

@@ -7,10 +7,8 @@ import javax.persistence.Transient;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -43,20 +41,14 @@ public abstract class Bord extends AbstractModelObject implements
 	// VARIABLES
 	@NotEditable
 	@NotSearchable
-	@Label("Bord id")
-	@Description("Bord id")
 	private Long id;
 
-	@Label("Regio")
-	@Description("Regio")
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
 	private ResourceIdentifier regio;
 
-	@Label("Trajectnaam")
-	@Description("Trajectnaam")
 	// @Edit(type = "suggestions")
 	// @ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
 	@Type(value = ModelPropertyType.ENUM)
@@ -64,89 +56,61 @@ public abstract class Bord extends AbstractModelObject implements
 	@Parents({ "className", "regio" })
 	private String naam;
 
-	@Label("Gemeente")
-	@Description("Gemeente")
 	// @Edit(type = "suggestions")
 	@Edit(type = "menu")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.gemeentes}")
 	private String gemeente;
 
-	@Label("Volgnummer")
-	@Description("Volgnummer")
 	private String volg;
 
 	@NotSearchable
 	@NotEditable
 	@NotViewable
-	@Label("SequentieNr")
-	@Description("SequentieNr")
 	private Long sequentie;
 
-	@Label("Actief")
-	@Description("Actief")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
 	private String actief;
 
-	@Label("Straatnaam")
-	@Description("Straatnaam")
 	@Edit(type = "suggestions")
 	private String straatnaam;
 
-	@Label("Wegbevoegdheid")
-	@Description("Wegbevoegdheid")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('WegbevoegdCode')}")
 	private String wegBevoegd;
 
-	@Label("Paalconstructie")
-	@Description("Paalconstructie")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalConstructieCode')}")
 	private String paalConst;
 
-	@Label("Paaldiameter")
-	@Description("Paaldiameter")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalDiameterCode')}")
 	private String paalDia;
 
-	@Label("Paalbeugel")
-	@Description("Paalbeugel")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalBeugelCode')}")
 	private String paalBeugel;
 
-	@Label("Paalgrond")
-	@Description("Paalgrond")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PaalGrondCode')}")
 	private String paalGrond;
 
-	@Label("Bordconstructie")
-	@Description("Bordconstructie")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordConstructieCode')}")
 	private String bordConst;
 
 	// @Edit(type = "panels")
 	// @NotSearchable
-	// @Label("Foto")
-	// @Description("Foto")
 	// @ModelClassName("File")
 	// private ResourceKey foto;
 
 	@NotSearchable
 	@NotEditable
-	@Label("X")
-	@Description("X")
 	private double x;
 
 	@NotSearchable
 	@NotEditable
-	@Label("Y")
-	@Description("Y")
 	private double y;
 
 	@NotViewable

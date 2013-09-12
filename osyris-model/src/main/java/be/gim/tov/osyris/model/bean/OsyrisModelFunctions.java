@@ -8,6 +8,7 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -125,6 +126,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getTrajectTypesCO() {
+
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
 		subClassesRoute = modelRepository.getModelClass("Route")
@@ -150,6 +152,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getTrajectTypesWO() {
+
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
 		subClassesRoute = modelRepository.getModelClass("Route")
@@ -184,6 +187,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getTrajectTypes() {
+
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
 		subClassesRoute = modelRepository.getModelClass("Route")
@@ -197,7 +201,8 @@ public class OsyrisModelFunctions {
 		subClassesNetwerk = modelRepository.getModelClass("NetwerkSegment")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerk) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getName().replace("NetwerkSegment", "netwerk") };
 			trajectTypes.add(object);
 		}
 		return trajectTypes;
@@ -366,15 +371,15 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Get suggestielijst voor PetersMeters.
+	 * Get suggestielijst voor een bepaalde groep.
 	 * 
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getSuggestions(final String groupName) {
 
-		return (List<Object[]>) cacheProducer.getCache("SuggestionCache",
-				new Transformer() {
+		return (List<Object[]>) cacheProducer.getCache(
+				groupName + "SuggestionCache", new Transformer() {
 
 					@Override
 					public Object transform(Object key) {
@@ -1220,5 +1225,11 @@ public class OsyrisModelFunctions {
 		}
 		return null;
 
+	}
+
+	public String getHelpUrl() {
+		String contextPath = FacesContext.getCurrentInstance()
+				.getExternalContext().getRequestContextPath();
+		return contextPath + "/web/view/help";
 	}
 }

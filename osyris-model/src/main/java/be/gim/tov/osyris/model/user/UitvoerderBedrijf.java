@@ -1,8 +1,6 @@
 package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.Model;
@@ -17,46 +15,29 @@ import org.conscientia.core.model.AbstractModelObject;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Bedrijf")
 public class UitvoerderBedrijf extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@Label("Adres")
-	@Description("Adres")
 	private String adres;
 
-	@Label("Contactpersoon")
-	@Description("Contactpersoon")
 	private String contactPersoon;
 
-	@Label("Email")
-	@Description("Email")
 	@Length(min = 3, max = 128)
 	@Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
 	private String email;
 
-	@Label("Fax")
-	@Description("Fax")
 	@Length(min = 3, max = 30)
 	@Pattern("(\\+?[\\d]+)?")
 	private String fax;
 
-	@Label("Gemeente")
-	@Description("Gemeente")
 	private String gemeente;
 
-	@Label("Naam")
-	@Description("Naam")
 	@LabelProperty
 	private String naam;
 
-	@Label("Postcode")
-	@Description("Postcode")
 	private String postcode;
 
-	@Label("Telefoon")
-	@Description("Telefoon")
 	@Length(min = 3, max = 30)
 	@Pattern("(\\+?[\\d]+)?")
 	private String telefoon;

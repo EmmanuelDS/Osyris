@@ -14,9 +14,9 @@
 	<tr>
 	<td width="40%" valign="top">
 	
-	<r:panel id="searchTrajectPanel" header="Zoek traject">
+	<r:panel id="searchTrajectPanel" header="Zoek route of netwerk">
 		<d:fields>
-			<d:field for="trajectType" label="Traject type" required="true">
+			<d:field for="trajectType" label="Route of netwerk type" required="true">
 				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" required="true">
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
@@ -38,13 +38,13 @@
 				</h:selectOneMenu>
 			</d:field>
 			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectType != null}">
-				<d:field for="trajectNaam" label="Traject naam" rendered="true" required="#{form.trajectType.contains('Route')}">
+				<d:field for="trajectNaam" label="Traject naam" rendered="#{form.trajectType.contains('Route') or form.trajectType.contains('WandelNetwerk') }" required="#{form.trajectType.contains('Route')}">
 					<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true" required="#{form.trajectType.contains('Route')}">
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
 					</h:selectOneMenu>
 				</d:field>
-				<d:field for="knooppuntNummer" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
+				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
 					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />

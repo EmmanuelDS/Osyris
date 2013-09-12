@@ -5,9 +5,7 @@ import java.util.List;
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.For;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
@@ -45,12 +43,8 @@ public class MedewerkerProfiel extends AbstractModelObject implements
 	@NotSearchable
 	@NotViewable
 	@NotEditable
-	@Label("Medewerker")
-	@Description("Medewerker")
 	private ResourceIdentifier _for;
 
-	@Label("Trajecttype")
-	@Description("Trajecttype")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.trajectTypes}")
 	private List<String> trajectType;

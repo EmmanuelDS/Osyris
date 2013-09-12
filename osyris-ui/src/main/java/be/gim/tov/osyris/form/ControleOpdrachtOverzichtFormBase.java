@@ -15,8 +15,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -34,6 +32,8 @@ import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.user.User;
+import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
@@ -49,7 +49,6 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
@@ -80,6 +79,7 @@ import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
+import be.gim.tov.osyris.model.utils.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -101,7 +101,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private static final String PERIODE_LENTE = "1";
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
-	public static final String CO_PDF_XSL = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
+	public static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
 
 	private static final long serialVersionUID = -86881009141250710L;
 
@@ -129,7 +129,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Probleem probleem;
 	protected Probleem selectedProbleem;
 	protected Envelope envelope = null;
-	protected String pdfType;
 	protected FeatureMapLayer bordLayer;
 	protected ResourceIdentifier trajectId;
 
@@ -217,14 +216,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 		this.selectedProbleem = selectedProbleem;
 	}
 
-	public String getPdfType() {
-		return pdfType;
-	}
-
-	public void setPdfType(String pdfType) {
-		this.pdfType = pdfType;
-	}
-
 	public FeatureMapLayer getBordLayer() {
 		return bordLayer;
 	}
@@ -310,6 +301,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	@Override
 	public void create() {
+
 		try {
 
 			object = null;
@@ -336,6 +328,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@SuppressWarnings("unchecked")
 	@Override
 	public void search() {
+
 		try {
 
 			// Reset zoekveld trajectNaam
@@ -753,6 +746,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 */
 	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+
 		layer.setFilter(null);
 		layer.setHidden(false);
 		try {
@@ -781,6 +775,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param viewer
 	 */
 	private void searchRouteLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		if (trajectNaam != null) {
 			layer.setFilter(FilterUtils.like("naam", trajectNaam));
@@ -792,6 +787,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 */
 	private void searchKnooppuntLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		layer.setFilter(null);
 		layer.setSelection(Collections.EMPTY_LIST);
@@ -822,6 +818,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 */
 	public void searchTrajectId(FeatureMapLayer layer) {
+
 		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
 					.getFeature(layer, getViewer().getContext().getSrsName(),
@@ -850,6 +847,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param controleOpdracht
 	 */
 	public void showOpdrachtMapData(ResourceIdentifier trajectId) {
+
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 		FeatureMapLayer layer = null;
@@ -931,10 +929,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 			object.setDatumUitTeVoeren(new Date());
 			try {
 				modelRepository.saveObject(object);
+				// Send confirmatie mail naar peterMeter
+				// sendConfirmationMail();
+
 				clear();
 				search();
-				// send confirmatie mail naar peterMeter
-				// sendConfirmationMail();
 				messages.info("Controleopdracht succesvol verzonden.");
 			} catch (IOException e) {
 				messages.error("Fout bij het verzenden van controleopdracht: "
@@ -981,12 +980,20 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @throws Exception
 	 */
 	private void sendConfirmationMail() throws IOException, Exception {
+
+		User medewerker = (User) modelRepository.loadObject(object
+				.getMedewerker());
+
+		UserProfile profiel = (UserProfile) medewerker.getAspect("UserProfile",
+				modelRepository, true);
+
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
-		// TODO: hardcoded link vervangen
-		variables
-				.put("link",
-						"http://www.tov-osyris.gim.be/geocms/web/view/form:ControleOpdrachtOverzichtForm");
+		variables.put("id", object.get("id"));
+		variables.put("trajectType", object.getTypeTraject());
+		variables.put("regio", object.getRegio());
+		variables.put("medewerker",
+				profiel.getLastName() + " " + profiel.getFirstName());
 
 		mailSender.sendMail(
 				preferences.getNoreplyEmail(),
@@ -995,7 +1002,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.getAspect("UserProfile").get("email").toString()),
 				"/META-INF/resources/core/mails/confirmControleOpdracht.fmt",
 				variables);
-		messages.info("Er is een email verzonden naar de betrokken PeterMeter");
+		messages.info("Er is een email verzonden naar de betrokken PeterMeter.");
 	}
 
 	/**
@@ -1390,11 +1397,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 		return null;
 	}
 
+	/**
+	 * Printen van een PDF bestand met overzichtskaart en bewegwijzergsverslag
+	 * in tabelvorm met betrekking tot het Traject uit de gekozen
+	 * ControleOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public Content printControleOpdracht() throws Exception {
 
-		if (pdfType.equals("1")) {
-			messages.error("Selecteer een type PDF.");
-		}
 		// Map<String, Object> variables = new HashMap<String, Object>();
 		// variables.put("title", "Test");
 		// variables.put("abstract", "test");
@@ -1409,39 +1421,51 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// variables.put("portrait", "portrait".equals("portrait"));
 		// variables.put("pageSize", 2);
 		// variables.put("extent", getViewer().getContentExtent());
-		//
-		//
-		// MapPDFBuilder builder = Beans.getReference(MapPDFBuilder.class);
-		// byte[] result = builder.transform(xslt, getViewer(), variables);
-		// return new ByteArrayContent("application/pdf", result);
 
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory
-				.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// root element
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement("verslag");
-		doc.appendChild(rootElement);
-
+		// Opbouwen XML
 		List<Bord> borden = createBewegwijzering(object.getTraject());
-
-		for (Bord b : borden) {
-			// Bord elementen
-			Element bord = doc.createElement("bord");
-			rootElement.appendChild(bord);
-
-			Element id = doc.createElement("id");
-			id.appendChild(doc.createTextNode(b.getId().toString()));
-			bord.appendChild(id);
-		}
+		Document doc = XmlBuilder.buildBordFiches(object, borden);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
 				FopFactory.newInstance().newFOUserAgent(), out);
 
+		// xslt
 		Source xslt = new StreamSource(getClass().getResourceAsStream(
-				CO_PDF_XSL));
+				BORDFICHE_PDF));
+
+		// Transform source
+		Transformer transformer = TransformerFactory.newInstance()
+				.newTransformer(xslt);
+		Result res = new SAXResult(fop.getDefaultHandler());
+
+		transformer.transform(new DOMSource(doc), res);
+
+		// return pdf
+		return new ByteArrayContent("application/pdf", out.toByteArray());
+	}
+
+	/**
+	 * Printen van een PDF bestand met de individuele bordfiches uit het
+	 * bewegwijzeringsverslag met betrekking tot het Traject in de gekozen
+	 * ControleOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Content printControleOpdrachtBordFiches() throws Exception {
+
+		// Opbouwen XML
+		List<Bord> borden = createBewegwijzering(object.getTraject());
+		Document doc = XmlBuilder.buildBordFiches(object, borden);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+				FopFactory.newInstance().newFOUserAgent(), out);
+
+		// xslt
+		Source xslt = new StreamSource(getClass().getResourceAsStream(
+				BORDFICHE_PDF));
 
 		// Transform source
 		Transformer transformer = TransformerFactory.newInstance()
@@ -1461,6 +1485,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public boolean isBordProbleem(Probleem probleem) {
+
 		if (probleem != null) {
 			if (probleem instanceof BordProbleem) {
 				return true;
@@ -1478,6 +1503,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public boolean isRouteBord(Bord bord) {
+
 		if (bord instanceof RouteBord) {
 			return true;
 		} else {
@@ -1491,8 +1517,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param probleem
 	 */
 	public void deleteProbleem(Probleem probleem) {
-		try {
 
+		try {
 			object.getProblemen().remove(probleem);
 			modelRepository.saveObject(object);
 			modelRepository.deleteObject(probleem);
@@ -1545,6 +1571,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	@Override
 	public void delete() {
+
 		try {
 			modelRepository.deleteObject(object);
 			messages.info("Controleopdracht succesvol verwijderd.");
@@ -1563,6 +1590,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param probleem
 	 */
 	public boolean checkProbleem(Probleem probleem) {
+
 		// Indien BordProbleem check of bord geselecteerd is
 		if (probleem instanceof BordProbleem) {
 			BordProbleem b = (BordProbleem) probleem;
@@ -1658,6 +1686,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public boolean isRouteBord(ResourceIdentifier bord) {
+
 		try {
 			Bord b = (Bord) modelRepository.loadObject(bord);
 			if (b instanceof RouteBord) {

@@ -1,10 +1,8 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -32,17 +30,11 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@Label("Nummer")
-	@Description("Nummer")
 	@LabelProperty
 	private Integer nummer;
 
-	@Label("Naam")
-	@Description("Naam")
 	private String naam;
 
-	@Label("Regio")
-	@Description("Regio")
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
@@ -51,14 +43,10 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 
 	@NotEditable
 	@NotSearchable
-	@Label("X")
-	@Description("X")
 	private double x;
 
 	@NotEditable
 	@NotSearchable
-	@Label("Y")
-	@Description("Y")
 	private double y;
 
 	@NotViewable
@@ -72,8 +60,6 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	@Override
 	@NotEditable
 	@NotSearchable
-	@Label("Knooppunt id")
-	@Description("Knooppunt id")
 	public Long getId() {
 		return (Long) super.getId();
 	}

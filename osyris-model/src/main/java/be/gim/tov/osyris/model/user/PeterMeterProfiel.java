@@ -5,10 +5,8 @@ import java.util.List;
 
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.For;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
@@ -51,28 +49,18 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@NotSearchable
 	@NotViewable
 	@NotEditable
-	@Label("Peter/Meter")
-	@Description("Peter/Meter")
 	private ResourceIdentifier _for;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
-	@Label("Status beschikbaarheid")
-	@Description("Status beschikbaarheid")
 	private PeterMeterStatus status;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
-	@Label("Sinds")
-	@Description("Sinds")
 	private Date actiefSinds;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
-	@Label("Tot")
-	@Description("Tot")
 	private Date actiefTot;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin", "PeterMeter" })
-	@Label("Voorkeuren")
-	@Description("Voorkeuren")
 	// @Edit(type = "table")
 	@View(type = "table")
 	private List<PeterMeterVoorkeur> voorkeuren;

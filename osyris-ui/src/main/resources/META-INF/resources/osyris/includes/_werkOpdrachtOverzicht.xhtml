@@ -133,7 +133,12 @@
 					<p:column style="width:5%">
 						<p:rowToggler />
 					</p:column>
-					<p:column selectionMode="multiple" style="width:5%" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" />
+					<p:column selectionMode="multiple" style="width:5%" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" >
+						<f:facet name="header">
+						<div>Kies</div>
+						<div>opdracht</div>
+						</f:facet>
+						</p:column>
 					<p:column label="Acties">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton

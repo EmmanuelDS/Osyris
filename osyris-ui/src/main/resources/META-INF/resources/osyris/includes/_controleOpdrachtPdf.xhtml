@@ -7,21 +7,25 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf">
-	
-	<p:outputPanel id="pdfTypePanel"> 
-	<p:selectOneRadio id="pdftype" value="#{form.pdfType}">
-        <f:selectItem itemLabel="Kaart met bewegwijzeringsverslag" itemValue="1" />
-        <f:selectItem itemLabel="Kaart met bewegwijzeringsverslag + individuele bordfiches" itemValue="2" />
-    </p:selectOneRadio>
+
+	<div>Voor een controleopdracht kan er een PDF bestand gegenereerd worden met overzichtskaart en bewegwijzering in tabelvorm.</div>
+	<div>Daarnaast kan een tweede PDF aangemaakt worden met de individuele bordfiches uit het bewegzijzeringsverslag.</div>
     <br />
     <d:buttons>
-		<d:fileDownload fileName="#{exportPDF.fileName}"
+		<d:fileDownload fileName="OSYRIS_kaart_met_bewegwijzering"
 					type="button"
 					image="#{resource['core/images/actions/12x12/print.png']}"
 					contentType="application/pdf"
 					content="#{form.printControleOpdracht()}"
-					value="Printen"
+					value="Printen kaart met bewegwijzeringsverslag"
+					eventsQueue="pdfQueue" />
+					
+		<d:fileDownload fileName="OSYRIS_bordfiches"
+					type="button"
+					image="#{resource['core/images/actions/12x12/print.png']}"
+					contentType="application/pdf"
+					content="#{form.printControleOpdrachtBordFiches()}"
+					value="Printen individuele bordfiches"
 					eventsQueue="pdfQueue" />
 	</d:buttons>
-	</p:outputPanel>
 	</u:composition>
