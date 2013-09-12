@@ -35,6 +35,17 @@
 	</d:fields>
 	</r:panel>
 	<br/>
+	<r:panel id="commentaarTOVPanel">
+	<d:fields>
+		<d:field for="commentaarTOV" label="Commentaar TOV">
+			<d:propertyValue id="commentaarTOV"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+					value="#{form.selectedWerkOpdracht.commentaarMedewerker}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
 	<r:panel id="commentaarPanel">
 	<d:fields>
 		<d:field for="commentaar" label="Commentaar uitvoerder">

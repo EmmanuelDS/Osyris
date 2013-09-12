@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 
@@ -47,6 +46,7 @@ import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
+import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
@@ -79,6 +79,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getStockMateriaalStates() {
+
 		List<Object[]> stockMateriaalStates = new ArrayList<Object[]>();
 		Object[] statusBesteld = { "1", "Besteld" };
 		Object[] statusnietBesteld = { "0", "Niet besteld" };
@@ -94,12 +95,14 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getCanonicalBoolean() {
-		List<Object[]> booleans = new ArrayList<Object[]>();
-		Object[] boolTrue = { "1", "Ja" };
-		Object[] boolFalse = { "0", "Nee" };
 
-		booleans.add(boolTrue);
+		List<Object[]> booleans = new ArrayList<Object[]>();
+
+		Object[] boolFalse = { "0", "Nee" };
+		Object[] boolTrue = { "1", "Ja" };
+
 		booleans.add(boolFalse);
+		booleans.add(boolTrue);
 		return booleans;
 	}
 
@@ -109,6 +112,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getImageCodes() {
+
 		List<Object[]> imageCodes = new ArrayList<Object[]>();
 		Object[] code1 = { "1" };
 		Object[] code2 = { "2" };
@@ -117,6 +121,7 @@ public class OsyrisModelFunctions {
 		imageCodes.add(code1);
 		imageCodes.add(code2);
 		imageCodes.add(code3);
+
 		return imageCodes;
 	}
 
@@ -132,7 +137,8 @@ public class OsyrisModelFunctions {
 		subClassesRoute = modelRepository.getModelClass("Route")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesRoute) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -140,9 +146,12 @@ public class OsyrisModelFunctions {
 		subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerkLus) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -158,7 +167,8 @@ public class OsyrisModelFunctions {
 		subClassesRoute = modelRepository.getModelClass("Route")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesRoute) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -166,7 +176,8 @@ public class OsyrisModelFunctions {
 		subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerkLus) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -175,9 +186,12 @@ public class OsyrisModelFunctions {
 		subClassesNetwerkSegment = modelRepository.getModelClass(
 				"NetwerkSegment").getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerkSegment) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -193,7 +207,8 @@ public class OsyrisModelFunctions {
 		subClassesRoute = modelRepository.getModelClass("Route")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesRoute) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -205,6 +220,8 @@ public class OsyrisModelFunctions {
 					modelClass.getName().replace("NetwerkSegment", "netwerk") };
 			trajectTypes.add(object);
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -225,7 +242,8 @@ public class OsyrisModelFunctions {
 			subClassesRoute = modelRepository.getModelClass("Route")
 					.getSubClasses();
 			for (ModelClass modelClass : subClassesRoute) {
-				Object[] object = { modelClass.getName(), modelClass.getLabel() };
+				Object[] object = { modelClass.getName(),
+						modelClass.getLabel().toString() };
 				trajectTypes.add(object);
 			}
 		}
@@ -238,10 +256,13 @@ public class OsyrisModelFunctions {
 			subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 					.getSubClasses();
 			for (ModelClass modelClass : subClassesNetwerkLus) {
-				Object[] object = { modelClass.getName(), modelClass.getLabel() };
+				Object[] object = { modelClass.getName(),
+						modelClass.getLabel().toString() };
 				trajectTypes.add(object);
 			}
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -253,6 +274,7 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings({ "deprecation" })
 	public List<?> getCodeList(String modelClassName) {
+
 		List<?> codeList = Collections.emptyList();
 
 		try {
@@ -290,21 +312,6 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Get the suggestions for users in a certain group.
-	 * 
-	 * @param groupName
-	 * @return
-	 * 
-	 *         public List<? extends ResourceIdentifier> getSuggestions(String
-	 *         test, String groupName) {
-	 * 
-	 *         List<ResourceName> users = getUsersInGroup(groupName);
-	 *         List<ResourceIdentifier> suggestions = new
-	 *         ArrayList<ResourceIdentifier>(); suggestions.addAll(users);
-	 *         return suggestions; }
-	 */
-
-	/**
 	 * Get suggestielijst voor PetersMeters.
 	 * 
 	 * @return
@@ -338,21 +345,7 @@ public class OsyrisModelFunctions {
 
 							// Sorteren suggesties
 							Collections.sort(suggestions,
-									new Comparator<Object[]>() {
-
-										@Override
-										public int compare(Object[] o1,
-												Object[] o2) {
-											String p1 = (String) o1[1];
-											String p2 = (String) o2[1];
-											int res = p1
-													.compareToIgnoreCase(p2);
-											if (res != 0) {
-												return res;
-											}
-											return p1.compareToIgnoreCase(p2);
-										}
-									});
+									new DropdownListSorting());
 
 							// Geen peterMeter toegewezen komt bovenaan
 							suggestions.add(0, geenPeterMeter);
@@ -398,25 +391,11 @@ public class OsyrisModelFunctions {
 										profiel.getLastName() + " "
 												+ profiel.getFirstName() };
 								suggestions.add(object);
+
+								// Sorteren suggesties
+								Collections.sort(suggestions,
+										new DropdownListSorting());
 							}
-
-							// Sorteren suggesties
-							Collections.sort(suggestions,
-									new Comparator<Object[]>() {
-
-										@Override
-										public int compare(Object[] o1,
-												Object[] o2) {
-											String p1 = (String) o1[1];
-											String p2 = (String) o2[1];
-											int res = p1
-													.compareToIgnoreCase(p2);
-											if (res != 0) {
-												return res;
-											}
-											return p1.compareToIgnoreCase(p2);
-										}
-									});
 
 						} catch (IOException e) {
 							LOG.error("Can not load user.", e);
@@ -453,6 +432,7 @@ public class OsyrisModelFunctions {
 		regios.add(code5);
 		regios.add(code6);
 
+		Collections.sort(regios, new DropdownListSorting());
 		return regios;
 	}
 
@@ -1005,6 +985,8 @@ public class OsyrisModelFunctions {
 		validaties.add(code3);
 		validaties.add(code4);
 		validaties.add(code5);
+
+		Collections.sort(validaties, new DropdownListSorting());
 		return validaties;
 	}
 
@@ -1135,6 +1117,9 @@ public class OsyrisModelFunctions {
 			else {
 				uitvoerderRegios = getRegiosOostVlaanderen();
 			}
+
+			Collections.sort(uitvoerderRegios, new DropdownListSorting());
+
 		} catch (IOException e) {
 			LOG.error("Can not search Regio.", e);
 		} catch (InstantiationException e) {
@@ -1199,6 +1184,7 @@ public class OsyrisModelFunctions {
 					namen.add(object);
 				}
 
+				Collections.sort(namen, new DropdownListSorting());
 				return namen;
 			}
 

@@ -1,12 +1,11 @@
 package be.gim.tov.osyris.model.traject;
 
-import org.conscientia.api.model.ModelPropertyType;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
-import org.conscientia.api.model.annotation.Type;
-import org.conscientia.api.model.annotation.ValuesExpression;
+import org.conscientia.api.model.annotation.Search;
 
 /**
  * 
@@ -18,8 +17,10 @@ import org.conscientia.api.model.annotation.ValuesExpression;
 public abstract class Route extends Traject {
 
 	// VARIABLES
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getCodeList('RouteTypeCode')}")
+	// @Type(value = ModelPropertyType.ENUM)
+	// @ValuesExpression("#{osyrisModelFunctions.getCodeList('RouteTypeCode')}")
+	@Edit(type = "suggestions")
+	@Search(type = "suggestions:like-wildcard-nocase")
 	private String routeType;
 
 	// GETTERS AND SETTERS

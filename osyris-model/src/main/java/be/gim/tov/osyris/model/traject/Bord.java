@@ -15,7 +15,6 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
-import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
@@ -49,11 +48,11 @@ public abstract class Bord extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
 	private ResourceIdentifier regio;
 
-	// @Edit(type = "suggestions")
-	// @ValuesExpression("#{osyrisModelFunctions.getCodeList('TrajectNaamCode')}")
-	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
-	@Parents({ "className", "regio" })
+	// @Type(value = ModelPropertyType.ENUM)
+	// @ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
+	// @Parents({ "className", "regio" })
+	@Edit(type = "suggestions")
+	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
 	// @Edit(type = "suggestions")
@@ -74,6 +73,7 @@ public abstract class Bord extends AbstractModelObject implements
 	private String actief;
 
 	@Edit(type = "suggestions")
+	@Search(type = "suggestions:like-wildcard-nocase")
 	private String straatnaam;
 
 	@Type(value = ModelPropertyType.ENUM)

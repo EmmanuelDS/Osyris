@@ -91,6 +91,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected WerkOpdracht selectedWerkOpdracht;
 	protected GebruiktMateriaal selectedMateriaal;
 	protected ResourceIdentifier trajectId;
+	protected boolean hasErrors;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -163,6 +164,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public void setTrajectId(ResourceIdentifier trajectId) {
 		this.trajectId = trajectId;
+	}
+
+	public boolean isHasErrors() {
+		return hasErrors;
+	}
+
+	public void setHasErrors(boolean hasErrors) {
+		this.hasErrors = hasErrors;
 	}
 
 	// METHODS
@@ -420,6 +429,20 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		}
 	}
 
+	@Override
+	public void save() {
+
+		try {
+			modelRepository.saveObject(object);
+			messages.info("Uitvoeringsronde succesvol bewaard.");
+
+		} catch (IOException e) {
+			messages.error("fout bij het bewaren van uitvoeringsronde: "
+					+ e.getMessage());
+			LOG.error("Can not save Uitvoeringsronde.", e);
+		}
+	}
+
 	/**
 	 * Rapporteren van een Uitvoeringsronde waarin alle WerkOpdrachten
 	 * gerapporteerd zijn.
@@ -427,12 +450,16 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 */
 	public void rapporteerUitvoeringsRonde() {
 
+		setHasErrors(true);
+
 		try {
 
 			if (checkWerkOpdrachtenGerapporteerd()) {
 				object.setStatus(UitvoeringsrondeStatus.UITGEVOERD);
 				modelRepository.saveObject(object);
 				messages.info("Uitvoeringsronde succesvol gerapporteerd.");
+				setHasErrors(false);
+
 			} else {
 				messages.error("Uitvoeringsronde niet gerapporteerd: De uitvoeringsronde bevat nog niet-gerapporteerde werkopdrachten.");
 			}
