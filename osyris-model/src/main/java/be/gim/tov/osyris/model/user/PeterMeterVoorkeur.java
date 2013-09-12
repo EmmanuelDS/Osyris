@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Default;
 import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Label;
@@ -66,6 +67,7 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@NotSearchable
 	@Label("Maximale afstand")
 	@Description("Maximale afstand")
+	@Default("100")
 	private float maxAfstand;
 
 	// GETTERS AND SETTERS
