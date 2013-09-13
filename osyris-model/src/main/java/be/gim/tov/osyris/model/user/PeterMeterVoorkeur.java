@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Default;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -51,6 +52,7 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	private String periode;
 
 	@NotSearchable
+	@Default("100")
 	private float maxAfstand;
 
 	// GETTERS AND SETTERS
