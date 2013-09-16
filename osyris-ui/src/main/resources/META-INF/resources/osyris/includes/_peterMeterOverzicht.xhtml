@@ -111,7 +111,7 @@
 						</a:outputPanel>
 						</p:column>
 						<p:column headerText="#{messages['model.property.userProfile.avatar.label']}"
-							style="width: 5%">
+							style="width: 30px;">
 							<d:image value="#{user}"
 								height="32" />
 						</p:column>
@@ -137,7 +137,7 @@
 								value="#{user.getAspect('UserProfile', modelRepository, false).lastName}"
 								mode="VIEW" />
 						</p:column>
-						<p:column label="Email"
+						<p:column label="Email" style="width:200px;"
 							sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
 							<f:facet name="header">
 								<d:displayLabel
@@ -151,8 +151,9 @@
 						<p:column label="Status"
 							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }">
 							<f:facet name="header">
-								<d:displayLabel
-									property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" />
+							<h:outputText value="Status"/>
+<!-- 								<d:displayLabel -->
+<!-- 									property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" /> -->
 							</f:facet>
 							<d:propertyValue id="statusColumn"
 								modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('status')}"
@@ -171,7 +172,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:rowExpansion label="Voorkeuren">
-							<h:panelGrid id="display" columns="1" style="width:400px;">
+							<h:panelGrid id="display" columns="1" style="width:600px;">
 								<f:facet name="header">
 									<d:displayLabel
 										property="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}" />

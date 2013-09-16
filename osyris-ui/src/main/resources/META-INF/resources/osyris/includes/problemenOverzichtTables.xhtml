@@ -9,6 +9,7 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
+
 	<r:panel id="problemenOverzichtPanel">
 		<p:dataTable id="bordProblemen"
 			value="#{form.bordProblemen}"
@@ -17,15 +18,16 @@
 			styleClass="model-table #{cc.attrs.contentClass}"
 			paginator="true"
 			rows="5"
+			resizableColumns="true"
 			paginatorPosition="bottom"
 			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="#{messages['ui.dataTable.empty']}">
 			<j:bindAttribute var="bordProbleem"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Bordproblemen</div>
+				<h:outputText value="Bordproblemen" />
 			</f:facet>
-			<p:column style="width:2%">
+			<p:column style="width:55px;">
 				<j:commandButton
 					src="#{resource['core/images/actions/16x16/zoom.png']}"
 					type="image"
@@ -42,9 +44,9 @@
 							</j:commandButton>
 	   		</p:column>
 	   		<c:if test="#{form.isRouteBord(bordProbleem.bord)}">
-	   		<p:column>
+	   		<p:column style="width:30px;">
 				<f:facet name="header">
-				<div>Bord</div>
+				<h:outputText value="VolgNr" />
 				</f:facet>
 					<h:outputText value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
 			</p:column>
@@ -52,14 +54,14 @@
 			<c:if test="#{!form.isRouteBord(bordProbleem.bord)}">
 			<p:column>
 				<f:facet name="header">
-				<div>Bord ID</div>
+				<h:outputText value="Bord ID" />
 				</f:facet>
 					<h:outputText value= "#{d:modelObject(bord).getId()}" mode="VIEW" />
 			</p:column>
 			</c:if>
 			<p:column>
 				<f:facet name="header">
-				<div>Type</div>
+				<h:outputText value="Type" />
 				</f:facet>
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
@@ -68,23 +70,26 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Commentaar</div>
+				<h:outputText value="Commentaar" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="commentaarColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 					value="#{bordProbleem.commentaar}"
 					mode="VIEW" />
+					</div>
 			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
-				<div>Status</div>
+				<h:outputText value="Status" />
 				</f:facet>
 				<d:propertyValue id="statusColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
 					value="#{bordProbleem.status}"
 					mode="VIEW" />
 			</p:column>
-			<p:column rendered="#{(identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM')) and form.object.status == 'GERAPPORTEERD'}">
+			<p:column style="width:20px;"
+			rendered="#{(identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM')) and form.object.status == 'GERAPPORTEERD'}">
 				<j:commandButton
 					image="#{resource['core/images/actions/16x16/edit.png']}"
 					type="image"
@@ -106,15 +111,16 @@
 			styleClass="model-table #{cc.attrs.contentClass}"
 			paginator="true"
 			rows="5"
+			resizableColumns="true"
 			paginatorPosition="bottom"
 			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 			emptyMessage="#{messages['ui.dataTable.empty']}">
 			<j:bindAttribute var="anderProbleem"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Andere problemen</div>
+				<h:outputText value="Andere problemen" />
 			</f:facet>
-			<p:column style="width:2%">
+			<p:column style="width:55px;">
 				<j:commandButton
 					src="#{resource['core/images/actions/16x16/zoom.png']}"
 					type="image"
@@ -132,7 +138,7 @@
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
-				<div>Categorie</div>
+				<h:outputText value="Categorie" />
 				</f:facet>
 				<d:propertyValue id="categorieColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
@@ -141,16 +147,18 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Commentaar</div>
+				<h:outputText value="Commentaar" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="commentaarColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 					value="#{anderProbleem.commentaar}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
-				<div>Status</div>
+				<h:outputText value="Status" />
 				</f:facet>
 				<d:propertyValue id="statusColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"

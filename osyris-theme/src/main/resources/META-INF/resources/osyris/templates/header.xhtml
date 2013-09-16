@@ -62,7 +62,14 @@
 							</c:otherwise>
 						</c:choose>
 					 <li class="help" >
-						<a href="#{osyrisModelFunctions.helpUrl}" class="question_mark">?</a>
+					 	<c:choose>
+						 	<c:when test="#{identity.isLoggedIn()}">
+								<a href="#{osyrisModelFunctions.helpUrl}" class="question_mark">?</a>
+							</c:when>
+							<c:otherwise>
+								<a href="#{osyrisModelFunctions.helpUrlRoutedokter}" class="question_mark">?</a>
+							</c:otherwise>
+						</c:choose>
 					</li>
 					</ul>
 					</div>

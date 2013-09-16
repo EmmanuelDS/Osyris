@@ -114,9 +114,9 @@ public class OsyrisModelFunctions {
 	public List<Object[]> getImageCodes() {
 
 		List<Object[]> imageCodes = new ArrayList<Object[]>();
-		Object[] code1 = { "1" };
-		Object[] code2 = { "2" };
-		Object[] code3 = { "3" };
+		Object[] code1 = { "1", "LINKS" };
+		Object[] code2 = { "2", "RECHTS" };
+		Object[] code3 = { "3", "RECHTDOOR" };
 
 		imageCodes.add(code1);
 		imageCodes.add(code2);
@@ -1213,6 +1213,22 @@ public class OsyrisModelFunctions {
 
 	}
 
+	/**
+	 * Ophalen URL voor Routedokter.
+	 * 
+	 * @return
+	 */
+	public String getHelpUrlRoutedokter() {
+		String contextPath = FacesContext.getCurrentInstance()
+				.getExternalContext().getRequestContextPath();
+		return contextPath + "/web/view/routedokterhelp";
+	}
+	
+	/**
+	 * Ophalen URL voor Hekp document ingelogde gebruikers.
+	 * 
+	 * @return
+	 */
 	public String getHelpUrl() {
 		String contextPath = FacesContext.getCurrentInstance()
 				.getExternalContext().getRequestContextPath();

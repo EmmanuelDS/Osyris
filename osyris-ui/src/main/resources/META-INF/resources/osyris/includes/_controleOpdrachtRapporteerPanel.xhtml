@@ -8,6 +8,10 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
+	<h:outputStylesheet id="fileuploadCss"
+		name="fileupload/fileupload.css"
+		library="primefaces" />
+		
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
 	<br/>
 	<table width="100%">
@@ -25,6 +29,7 @@
 			listener="#{form.createProbleem()}"
 			execute="@this" />
 	</h:selectOneMenu>
+	<br/>
 	<br/>
 	<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
 		<d:object mode="EDIT"
