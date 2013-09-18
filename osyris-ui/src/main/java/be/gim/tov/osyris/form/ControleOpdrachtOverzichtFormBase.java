@@ -101,6 +101,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private static final String PERIODE_LENTE = "1";
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
+	public static final String CO_PDF = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
 	public static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
 
 	private static final long serialVersionUID = -86881009141250710L;
@@ -415,6 +416,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	@SuppressWarnings("static-access")
 	public MapConfiguration getSearchConfiguration() throws Exception {
+
 		MapContext context = (MapContext) modelRepository
 				.loadObject(new ResourceKey("Form@12"));
 
@@ -573,8 +575,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 						anderProbleemPointGeoms.add(anderProbleem.getGeom());
 					}
 
-					if (anderProbleem.getGeom() instanceof LineString) {
-						anderProbleemLineGeoms.add(anderProbleem.getGeom());
+					if (anderProbleem.getGeomOmleiding() instanceof LineString) {
+						anderProbleemLineGeoms.add(anderProbleem
+								.getGeomOmleiding());
 					}
 				}
 			}
@@ -1082,13 +1085,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 										+ "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
+
 				} else if (layer.getLayerId().equalsIgnoreCase(
 						GEOMETRY_LAYER_NAME)
 						|| layer.getLayerId().equalsIgnoreCase(
 								GEOMETRY_LAYER_LINE_NAME)) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
-							.setGeometries(Collections.EMPTY_LIST);
+							.setGeometries(new ArrayList<Geometry>(1));
 				} else {
 					layer.set("selectable", false);
 					layer.setSelection(Collections.EMPTY_LIST);
@@ -1097,6 +1101,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 		// Ander probleem
 		else if ("ander".equals(probleemType)) {
+
 			if (object.getTrajectType().contains("route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
@@ -1110,7 +1115,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 						|| layer.getLayerId().equalsIgnoreCase(
 								GEOMETRY_LAYER_LINE_NAME)) {
 					layer.setHidden(false);
-					// layer.set("editable", true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
 				} else {
@@ -1201,27 +1205,36 @@ public class ControleOpdrachtOverzichtFormBase extends
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
 
-		// Slechts 1 punt mag ingegeven worden
-		if (pointLayer.getGeometries().size() > 1) {
-			pointLayer.getGeometries().remove(0);
-		}
+		// Debug
+		String layerId = (String) event.getParams().get("layerId");
+		FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
+				.getLayer(layerId);
 
-		if (pointLayer.getGeometries().size() == 1 && pointLayer.isEditable()) {
-			if (probleem instanceof AnderProbleem) {
-				((AnderProbleem) probleem).setGeom(pointLayer.getGeometries()
-						.iterator().next());
+		if (pointLayer.isEditable()) {
+			// Slechts 1 punt mag ingegeven worden
+			if (pointLayer.getGeometries().size() > 1) {
+				pointLayer.getGeometries().remove(0);
+			}
+
+			if (pointLayer.getGeometries().size() == 1) {
+				if (probleem instanceof AnderProbleem) {
+					((AnderProbleem) probleem).setGeom(pointLayer
+							.getGeometries().iterator().next());
+				}
 			}
 		}
 
-		// Slechts 1 lijn mag ingegeven worden
-		if (lineLayer.getGeometries().size() > 1) {
-			lineLayer.getGeometries().remove(0);
-		}
+		if (lineLayer.isEditable()) {
+			// Slechts 1 lijn mag ingegeven worden
+			if (lineLayer.getGeometries().size() > 1) {
+				lineLayer.getGeometries().remove(0);
+			}
 
-		if (lineLayer.getGeometries().size() == 1 && lineLayer.isEditable()) {
-			if (probleem instanceof AnderProbleem) {
-				((AnderProbleem) probleem).setGeom(lineLayer.getGeometries()
-						.iterator().next());
+			if (lineLayer.getGeometries().size() == 1 && lineLayer.isEditable()) {
+				if (probleem instanceof AnderProbleem) {
+					((AnderProbleem) probleem).setGeomOmleiding(lineLayer
+							.getGeometries().iterator().next());
+				}
 			}
 		}
 	}
@@ -1265,8 +1278,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 			viewer.updateCurrentExtent(envelope);
 		}
 
-		if (anderProbleem.getGeom() instanceof LineString) {
-			envelope = new Envelope(anderProbleem.getGeom()
+		if (anderProbleem.getGeomOmleiding() instanceof LineString) {
+			envelope = new Envelope(anderProbleem.getGeomOmleiding()
 					.getEnvelopeInternal());
 			viewer.updateCurrentExtent(envelope);
 		}
@@ -1424,15 +1437,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		// Opbouwen XML
 		List<Bord> borden = createBewegwijzering(object.getTraject());
-		Document doc = XmlBuilder.buildBordFiches(object, borden);
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+
+		Document doc = XmlBuilder.buildBewegwijzeringTabel(traject, object,
+				borden);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
 				FopFactory.newInstance().newFOUserAgent(), out);
 
 		// xslt
-		Source xslt = new StreamSource(getClass().getResourceAsStream(
-				BORDFICHE_PDF));
+		Source xslt = new StreamSource(getClass().getResourceAsStream(CO_PDF));
 
 		// Transform source
 		Transformer transformer = TransformerFactory.newInstance()
@@ -1553,9 +1569,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 							((AnderProbleem) probleem).getGeom());
 				}
 
-				else if (((AnderProbleem) probleem).getGeom() instanceof LineString) {
+				else if (((AnderProbleem) probleem).getGeomOmleiding() instanceof LineString) {
 					lineLayer.getGeometries().remove(
-							((AnderProbleem) probleem).getGeom());
+							((AnderProbleem) probleem).getGeomOmleiding());
 				}
 			}
 
@@ -1573,10 +1589,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void delete() {
 
 		try {
+
 			modelRepository.deleteObject(object);
 			messages.info("Controleopdracht succesvol verwijderd.");
 			clear();
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van de controleopdracht: "
 					+ e.getMessage());
@@ -1596,6 +1614,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 			BordProbleem b = (BordProbleem) probleem;
 			if (b.getBord() == null) {
 				messages.warn("Probleem niet toegevoegd: gelieve eerst een bord op de kaart te selecteren.");
+				return false;
+			}
+		}
+
+		// Indien AnderProbleem check of probleempunt is aangeduid
+		if (probleem instanceof AnderProbleem) {
+			AnderProbleem a = (AnderProbleem) probleem;
+			if (a.getGeom() == null) {
+				messages.warn("Probleem niet toegevoegd: gelieve eerst een probleem(punt) aan te duiden op de kaart.");
 				return false;
 			}
 		}
@@ -1638,42 +1665,38 @@ public class ControleOpdrachtOverzichtFormBase extends
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 
-		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
-				.getLayer(GEOMETRY_LAYER_NAME);
-		pointLayer.setSelectable(true);
-		pointLayer.setSelection(new ArrayList<String>());
-		pointLayer.setEditable(true);
-		pointLayer.setGeometries(new ArrayList<Geometry>(1));
-
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
-		lineLayer.setGeometries(new ArrayList<Geometry>(1));
-		lineLayer.setSelectable(false);
 		lineLayer.setEditable(false);
+
+		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_NAME);
+		pointLayer.setEditable(true);
+		pointLayer.setGeometries(new ArrayList<Geometry>(1));
 
 		viewer.updateContext(null);
 	}
 
-	// TODO: Intekenen omleiding
 	/**
 	 * Test switch naar lineGeomLayer bij intekenen omleiding
+	 * 
+	 * @throws IOException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	public void switchToLineGeomLayer() {
+	public void switchToLineGeomLayer() throws IOException,
+			InstantiationException, IllegalAccessException {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 
 		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);
-		pointLayer.setSelectable(false);
-		pointLayer.setSelection(new ArrayList<String>());
 		pointLayer.setEditable(false);
-		pointLayer.setGeometries(new ArrayList<Geometry>(1));
 
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
 		lineLayer.setGeometries(new ArrayList<Geometry>(1));
-		lineLayer.setSelectable(true);
 		lineLayer.setEditable(true);
 
 		viewer.updateContext(null);

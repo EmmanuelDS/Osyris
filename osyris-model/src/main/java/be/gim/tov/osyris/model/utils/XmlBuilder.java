@@ -21,6 +21,8 @@ import org.w3c.dom.Element;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
+import be.gim.tov.osyris.model.traject.RouteBord;
+import be.gim.tov.osyris.model.traject.Traject;
 
 /**
  * 
@@ -168,6 +170,110 @@ public class XmlBuilder {
 		StringWriter writer = new StringWriter();
 		trans.transform(new DOMSource(doc), new StreamResult(writer));
 		String output = writer.getBuffer().toString().replaceAll("\n|\r", "");
+
+		return doc;
+	}
+
+	/**
+	 * Ombouwen bewegwijzeringtabel in XML
+	 * 
+	 * @param object
+	 * @param borden
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws TransformerException
+	 */
+	public static Document buildBewegwijzeringTabel(Traject traject,
+			ControleOpdracht object, List<Bord> borden)
+			throws ParserConfigurationException, TransformerException {
+
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+		// root element
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("verslag");
+		doc.appendChild(rootElement);
+
+		Element trajectNaam = doc.createElement("trajectnaam");
+		trajectNaam.appendChild(doc.createTextNode(traject.getNaam()));
+		rootElement.appendChild(trajectNaam);
+
+		if (object.getTrajectType().contains("netwerk")) {
+			rootElement.setAttribute("netwerkCO", Boolean.TRUE.toString());
+		} else {
+			rootElement.setAttribute("netwerkCO", Boolean.FALSE.toString());
+		}
+
+		for (Bord b : borden) {
+			// Bord elementen
+			Element bord = doc.createElement("bord");
+			rootElement.appendChild(bord);
+
+			Element volgNr = doc.createElement("bordnr");
+			if (b.getVolg() != null) {
+				volgNr.appendChild(doc.createTextNode(b.getVolg()));
+			} else {
+				volgNr.appendChild(doc.createTextNode(StringUtils.EMPTY));
+			}
+			bord.appendChild(volgNr);
+
+			Element id = doc.createElement("id");
+			id.appendChild(doc.createTextNode(b.getId().toString()));
+			bord.appendChild(id);
+
+			if (b instanceof NetwerkBord) {
+				Element bordType = doc.createElement("bordtype");
+				bordType.appendChild(doc.createTextNode(((NetwerkBord) b)
+						.getBordType()));
+				bord.appendChild(bordType);
+
+				Element pijlkp1 = doc.createElement("pijlkp1");
+				Element pijlkp2 = doc.createElement("pijlkp2");
+				Element pijlkp3 = doc.createElement("pijlkp3");
+
+				if (((NetwerkBord) b).getKp1ImageCode() != null) {
+					pijlkp1.appendChild(doc.createTextNode(((NetwerkBord) b)
+							.getKp1ImageCode()));
+					bord.appendChild(pijlkp1);
+				}
+
+				if (((NetwerkBord) b).getKp2ImageCode() != null) {
+					pijlkp2.appendChild(doc.createTextNode(((NetwerkBord) b)
+							.getKp2ImageCode()));
+					bord.appendChild(pijlkp2);
+				}
+
+				if (((NetwerkBord) b).getKp3ImageCode() != null) {
+					pijlkp3.appendChild(doc.createTextNode(((NetwerkBord) b)
+							.getKp3ImageCode()));
+					bord.appendChild(pijlkp3);
+				}
+			}
+
+			if (b instanceof RouteBord) {
+
+				if (((RouteBord) b).getImageCode() != null) {
+					Element pijl = doc.createElement("pijl");
+					pijl.appendChild(doc.createTextNode(((RouteBord) b)
+							.getImageCode()));
+					bord.appendChild(pijl);
+				}
+			}
+
+			Element gemeente = doc.createElement("gemeente");
+			gemeente.appendChild(doc.createTextNode(b.getGemeente()));
+			bord.appendChild(gemeente);
+
+			Element straat = doc.createElement("straatnaam");
+			straat.appendChild(doc.createTextNode(b.getStraatnaam()));
+			bord.appendChild(straat);
+
+			Element paalType = doc.createElement("paaltype");
+			paalType.appendChild(doc.createTextNode(b.getPaalConst()));
+			bord.appendChild(paalType);
+		}
 
 		return doc;
 	}

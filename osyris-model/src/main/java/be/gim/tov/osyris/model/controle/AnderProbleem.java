@@ -32,6 +32,12 @@ public abstract class AnderProbleem extends Probleem {
 	@SrsName("EPSG:31370")
 	private Geometry geom;
 
+	@NotViewable
+	@NotEditable
+	@NotSearchable
+	@SrsName("EPSG:31370")
+	private Geometry geomOmleiding;
+
 	// GETTERS AND SETTERS
 	public Geometry getGeom() {
 		return geom;
@@ -47,5 +53,13 @@ public abstract class AnderProbleem extends Probleem {
 
 	public void setCategorie(String categorie) {
 		this.categorie = categorie;
+	}
+
+	public Geometry getGeomOmleiding() {
+		return geomOmleiding;
+	}
+
+	public void setGeomOmleiding(Geometry geomOmleiding) {
+		this.geomOmleiding = geomOmleiding;
 	}
 }

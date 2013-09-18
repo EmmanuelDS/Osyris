@@ -126,7 +126,7 @@
 								value="#{user.getAspect('UserProfile', modelRepository, false).firstName }"
 								mode="VIEW" />
 						</p:column>
-						<p:column label="Familienaam"
+						<p:column label="Familienaam" style="width: 80px;"
 							sortBy="#{user.getAspect('UserProfile', modelRepository, true).lastName}">
 							<f:facet name="header">
 								<d:displayLabel
@@ -137,7 +137,7 @@
 								value="#{user.getAspect('UserProfile', modelRepository, false).lastName}"
 								mode="VIEW" />
 						</p:column>
-						<p:column label="Email" style="width:200px;"
+						<p:column label="Email" style="width:180px;"
 							sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
 							<f:facet name="header">
 								<d:displayLabel

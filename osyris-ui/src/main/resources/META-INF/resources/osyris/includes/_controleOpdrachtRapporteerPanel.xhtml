@@ -38,6 +38,13 @@
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.probleem.commentaar}"
 						mode="EDIT" />
+						
+		<a:outputPanel rendered="#{form.probleemType == 'bord'}">
+			<d:fields>
+			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
 		<j:commandButton
 			id="selectFeatures"
 			rendered="#{form.probleemType == 'bord'}"
@@ -51,12 +58,21 @@
 				event="click"
 				control="selectBox" />
 		</j:commandButton>
+		</a:outputPanel>
+		
+		<a:outputPanel rendered="#{form.probleemType == 'ander'}">
+		<br/>
+		<d:fields>
+		<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
+		<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+		</d:fields>
 		<j:commandButton
 			id="drawPoint"
 			rendered="#{form.probleemType == 'ander'}"
 			image="#{resource['core/images/actions/24x24/drawPoint.png']}"
 			styleClass="component-toolbar-button"
-			value="Duid probleem aan op kaart"
+			value="Teken punt"
 			action="#{form.switchToPointGeomLayer()}"
 			immediate="true">
 			<j:activateControl
@@ -64,13 +80,20 @@
 				event="click"
 				control="drawPoint" />
 		</j:commandButton>
+		</a:outputPanel>
+		
+		<a:outputPanel rendered="#{form.probleemType == 'ander' }">
 		<br/>
+		<br/>
+		<d:fields>
+		<b><h:outputText value="Duid omleiding aan op kaart (optioneel)"></h:outputText></b>
+		</d:fields>
 		<j:commandButton
 			id="drawLineString"
 			rendered="#{form.probleemType == 'ander' }"
 			image="#{resource['core/images/actions/24x24/drawLineString.png']}"
 			styleClass="component-toolbar-button"
-			value="Duid omleiding aan op de kaart"
+			value="Teken lijn"
 			action="#{form.switchToLineGeomLayer()}"
 			immediate="true">
 			<j:activateControl
@@ -78,7 +101,7 @@
 				event="click"
 				control="drawLineString" />
 		</j:commandButton>
-		
+		</a:outputPanel>
 	<d:buttons>
 		<j:commandButton value="Probleem toevoegen" rendered="true"
 			image="#{resource['core/images/actions/12x12/apply.png']}"
