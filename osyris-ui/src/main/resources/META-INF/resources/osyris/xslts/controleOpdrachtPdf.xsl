@@ -89,7 +89,7 @@
 		          <fo:table-cell>
 	              <fo:block font-size="10pt">
 		          	<fo:block>
-	        			<fo:external-graphic src="http://tov-osyris.gim.be/images/ar_green_e.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_e.png"/>
 	     			</fo:block>
 		          </fo:block>
 		          </fo:table-cell>
@@ -98,7 +98,7 @@
 		          <fo:table-cell>
 	              <fo:block font-size="10pt">
 		          	<fo:block>
-	        			<fo:external-graphic src="http://tov-osyris.gim.be/images/ar_green_w.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_w.png"/>
 	     			</fo:block>
 		          </fo:block>
 		          </fo:table-cell>
@@ -107,7 +107,7 @@
 		          <fo:table-cell>
 	              <fo:block font-size="10pt">
 		          	<fo:block>
-	        			<fo:external-graphic src="http://tov-osyris.gim.be/images/ar_green_n.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_n.png"/>
 	     			</fo:block>
 		          </fo:block>
 		          </fo:table-cell>
@@ -118,13 +118,13 @@
 	           <fo:table-cell>
 	           <fo:block>
 		          <xsl:if test="pijlkp1='1' or pijlkp2='1' or pijlkp3='1'">
-	        			<fo:external-graphic src="http://tov-osyris.gim.be/images/ar_green_e.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_e.png"/>
 		          </xsl:if>
 		          <xsl:if test="pijlkp1='2' or pijlkp2='2' or pijlkp3='2'">
-	        			<fo:external-graphic src="http://tov-osyris.gim.be/images/ar_green_w.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_w.png"/>
 		          </xsl:if>
 		           <xsl:if test="pijlkp1='3' or pijlkp2='3' or pijlkp3='3'">
-	        			<fo:external-graphic src="http://tov-osyris.gim.be/images/ar_green_n.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_n.png"/>
 		          </xsl:if>
 		          </fo:block>
 		         </fo:table-cell>

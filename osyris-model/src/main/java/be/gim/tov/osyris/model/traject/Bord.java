@@ -8,6 +8,7 @@ import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.External;
 import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -20,6 +21,8 @@ import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
+import org.conscientia.api.model.annotation.View;
+import org.conscientia.api.model.annotation.Width;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -100,10 +103,12 @@ public abstract class Bord extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordConstructieCode')}")
 	private String bordConst;
 
-	// @Edit(type = "panels")
-	// @NotSearchable
-	// @ModelClassName("File")
-	// private ResourceKey foto;
+	@External
+	@View(type = "image")
+	@Width(150)
+	@NotSearchable
+	@ModelClassName("File")
+	private ResourceIdentifier foto;
 
 	@NotSearchable
 	@NotEditable
@@ -230,13 +235,13 @@ public abstract class Bord extends AbstractModelObject implements
 		this.bordConst = bordConst;
 	}
 
-	// public ResourceKey getFoto() {
-	// return foto;
-	// }
-	//
-	// public void setFoto(ResourceKey foto) {
-	// this.foto = foto;
-	// }
+	public ResourceIdentifier getFoto() {
+		return foto;
+	}
+
+	public void setFoto(ResourceIdentifier foto) {
+		this.foto = foto;
+	}
 
 	public double getX() {
 		return x;
