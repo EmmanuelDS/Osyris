@@ -1,5 +1,6 @@
 package be.gim.tov.osyris.form;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -15,9 +16,19 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
@@ -26,15 +37,18 @@ import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.quartz.xml.ValidationException;
+import org.w3c.dom.Document;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
@@ -55,6 +69,7 @@ import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
+import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -70,10 +85,12 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class WerkOpdrachtOverzichtFormBase extends
 		AbstractListForm<WerkOpdracht> {
+
 	private static final long serialVersionUID = -7478667205313972513L;
 
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
+	public static final String WO_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtPdf.xsl";
 
 	private static final Log LOG = LogFactory
 			.getLog(WerkOpdrachtOverzichtFormBase.class);
@@ -1095,5 +1112,54 @@ public class WerkOpdrachtOverzichtFormBase extends
 				variables);
 
 		messages.info("Er is een email verzonden naar de betrokken uitvoerder.");
+	}
+
+	/**
+	 * Printen van een PDF bestand met overzicht van de WerkOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Content printWerkOpdracht() throws Exception {
+
+		// Opbouwen XML
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+
+		Document doc = null;
+		XmlBuilder xmlBuilder = new XmlBuilder();
+
+		if (object.getProbleem() instanceof BordProbleem) {
+
+			BordProbleem bordProbleem = (BordProbleem) object.getProbleem();
+			Bord bord = (Bord) modelRepository.loadObject(bordProbleem
+					.getBord());
+
+			doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(traject,
+					object, bord);
+		}
+
+		else if (object.getProbleem() instanceof AnderProbleem) {
+
+			doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(traject,
+					object);
+		}
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+				FopFactory.newInstance().newFOUserAgent(), out);
+
+		// xslt
+		Source xslt = new StreamSource(getClass().getResourceAsStream(WO_PDF));
+
+		// Transform source
+		Transformer transformer = TransformerFactory.newInstance()
+				.newTransformer(xslt);
+		Result res = new SAXResult(fop.getDefaultHandler());
+
+		transformer.transform(new DOMSource(doc), res);
+
+		// return pdf
+		return new ByteArrayContent("application/pdf", out.toByteArray());
 	}
 }

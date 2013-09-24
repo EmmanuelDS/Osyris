@@ -217,4 +217,4 @@ header, footer, article, section, nav, menu, hgroup {
     text-shadow:none;
     text-align:left;
     font-weight: normal
-}
+}     

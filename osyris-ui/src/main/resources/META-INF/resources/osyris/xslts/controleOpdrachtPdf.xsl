@@ -7,12 +7,12 @@
   <xsl:template match="/">
     <fo:root>
       <fo:layout-master-set>
-        <fo:simple-page-master master-name="A4-portrait"
+        <fo:simple-page-master master-name="A4-landscape"
               page-height="21cm" page-width="29.7cm" margin="1cm">
           <fo:region-body/>
         </fo:simple-page-master>
       </fo:layout-master-set>
-      <fo:page-sequence master-reference="A4-portrait">
+      <fo:page-sequence master-reference="A4-landscape">
         <fo:flow flow-name="xsl-region-body">
         
         <xsl:if test="//@netwerkCO='false'">

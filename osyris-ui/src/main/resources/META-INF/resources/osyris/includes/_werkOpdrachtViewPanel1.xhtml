@@ -115,12 +115,14 @@
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"
 			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
-		<j:commandButton 
-			value="Printen"
-			image="#{resource['core/images/actions/12x12/print.png']}"
+		<d:fileDownload fileName="OSYRIS_werkopdracht_#{form.object.getId().toString()}"
 			type="button"
-			onclick="conscientia.widget(#{r:element('createPdfPopup')}).show();" />
-			<j:commandButton 
+			image="#{resource['core/images/actions/12x12/print.png']}"
+			contentType="application/pdf"
+			content="#{form.printWerkOpdracht()}"
+			value="Printen werkopdracht"
+			eventsQueue="pdfQueue" />
+		<j:commandButton 
 			rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
 			value="Opnieuw te controleren"
 			image="#{resource['core/images/actions/12x12/reload.png']}"

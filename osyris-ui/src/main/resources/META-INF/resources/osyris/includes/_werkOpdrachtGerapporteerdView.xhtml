@@ -133,6 +133,14 @@
 					value="#{form.object.validatie}"
 					mode="VIEW" />
 		</d:field>
+		<a:outputPanel rendered="#{form.object.validatie == 'LATER_OPNIEUW_UITVOEREN_VANAF'}">
+			<d:field>
+			<d:propertyValue id="datumLateruitTeVoeren"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLaterUitTeVoeren')}"
+					value="#{form.object.datumLaterUitTeVoeren}"
+					mode="VIEW" />
+			</d:field>
+		</a:outputPanel>
 	</d:fields>
 	</r:panel>
 	<br/>

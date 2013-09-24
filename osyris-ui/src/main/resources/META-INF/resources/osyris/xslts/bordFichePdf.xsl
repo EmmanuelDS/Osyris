@@ -41,95 +41,132 @@
         <fo:table-body>    
           <fo:table-row height="80mm" >
             <fo:table-cell border="solid" >
+            
+             <fo:block-container>												
+             	<fo:block>
+            		<fo:external-graphic src="http://osyristest.tov.be/fotos/geen%20foto.png" 
+            		content-width="60mm"
+            		content-height="80mm" />
+       			 </fo:block>
+             </fo:block-container>
              
-              <fo:block font-size="10pt">
-				<fo:block space-after="10pt">id:
+             <fo:block-container position="absolute">
+              <fo:block font-size="9pt" margin-top="0.3cm" margin-left="7cm">
+				<fo:block space-after="8pt">
+				<fo:inline font-weight="bold"><xsl:text>Id: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./id">
 	          	</xsl:value-of>
 	          </fo:block>
-	           <fo:block space-after="10pt">Gemeente:
+	           <fo:block space-after="10pt">
+	           <fo:inline font-weight="bold"><xsl:text>Gemeente: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./gemeente">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">Straat:
+	          <fo:block space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>Straat: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./straat">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">XY coördinaten in Lambert 72:
+	          <fo:block space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>XY coördinaten in Lambert 72: </xsl:text></fo:inline>
 	          </fo:block>
-	          <fo:block  space-after="10pt" text-indent="20mm">X:
+	          <fo:block  space-after="10pt" text-indent="20mm">
+	          <fo:inline font-weight="bold"><xsl:text>X: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./x">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block text-indent="20mm" space-after="10pt">Y:
+	          <fo:block text-indent="20mm" space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>Y: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./y">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">Wegbevoegd:
+	          <fo:block space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>Wegbevoegd: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./wegbevoegd">
 	          	</xsl:value-of>
 	          </fo:block>	
 	          
 				<xsl:if test="//@netwerkbord='true'">
-					  <fo:block space-after="10pt">KnooppuntNr 0:
+					  <fo:block space-after="10pt">
+					  <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 0: </xsl:text></fo:inline>
 			          	<xsl:value-of
 			          		select="./knooppunt0">
 			          	</xsl:value-of>
 			          </fo:block>
-			          <fo:block space-after="10pt">KnooppuntNr 1:
+			          <fo:block space-after="10pt">
+			          <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 1: </xsl:text></fo:inline>
 			          	<xsl:value-of
 			          		select="./knooppunt1">
 			          	</xsl:value-of>
 			          </fo:block>
-			           <fo:block space-after="10pt">KnooppuntNr 2:
+			           <fo:block space-after="10pt">
+			           <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 2: </xsl:text></fo:inline>
 			          	<xsl:value-of
 			          		select="./knooppunt2">
 			          	</xsl:value-of>
 			          </fo:block>
-			           <fo:block space-after="10pt">KnooppuntNr 3:
+			           <fo:block space-after="10pt">
+			           <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 3: </xsl:text></fo:inline>
 			          	<xsl:value-of
 			          		select="./knooppunt3">
 			          	</xsl:value-of>
 			          </fo:block>
-				</xsl:if>	
-						
+				</xsl:if>				
               </fo:block>
+             </fo:block-container>
             </fo:table-cell>
             
+            
             <fo:table-cell>
-           <fo:block font-size="10pt">
-                 <fo:block space-after="10pt">Constructietype:
+            <fo:block-container>
+             <xsl:variable name="url" select="./foto" />													
+             	<fo:block margin-left="0.1cm">
+            		<fo:external-graphic src="'{$url}'" 
+            		content-width="60mm"
+            		content-height="80mm" />
+       			 </fo:block>
+             </fo:block-container>
+           
+          <fo:block-container position="absolute">
+           <fo:block font-size="9pt" margin-top="0.3cm" margin-bottom="0.1cm" margin-left="7cm">
+               <fo:block space-after="10pt">
+                 <fo:inline font-weight="bold"><xsl:text>Constructietype: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./constructieType">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">Paaltype:
+	          <fo:block space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>Paaltype: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paaltype">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">paaldiameter:
+	          <fo:block space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>Paaldiameter: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paaldiameter">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">Paalbeugel:
+	          <fo:block space-after="10pt">
+	          <fo:inline font-weight="bold"><xsl:text>Paalbeugel: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paalbeugel">
 	          	</xsl:value-of>
 	          </fo:block>
-			  <fo:block space-after="10pt">Paalondergrond:
+			  <fo:block space-after="10pt">
+			  <fo:inline font-weight="bold"><xsl:text>Paalondergrond: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paalondergrond">
 	          	</xsl:value-of>
 	          </fo:block>	
-	          </fo:block>				
+	          </fo:block>	
+	          </fo:block-container>			
             </fo:table-cell>
            </fo:table-row>
            
@@ -137,14 +174,17 @@
            <fo:table-row height="90mm">
             <fo:table-cell border="solid">
             	 <fo:block>
-	          	
+
 	             </fo:block>	
 	          </fo:table-cell>
 	          	
              <fo:table-cell border="solid">
               <fo:block>
-              
-	          </fo:block>		
+				<xsl:variable name="mapOrtho_url" select="./mapOrtho" />
+				<fo:external-graphic src="'{$mapOrtho_url}'"
+						content-width="120mm"
+	            		content-height="89mm" />
+		      </fo:block>		
              </fo:table-cell>       
            </fo:table-row>
                 
@@ -168,7 +208,7 @@
   <xsl:template name="bordProperties_right">
 		<fo:block>
 			<xsl:for-each select="/verslag/bord">
-		
+			
 			</xsl:for-each>
 		</fo:block>
   </xsl:template>
