@@ -66,7 +66,7 @@
 			<j:layoutPane>
 				<a:outputPanel id="result" renderend="true">
 					<p:dataTable id="objects"
-						value="#{peterMeterOverzichtFormBase.results}" 
+						value="#{peterMeterOverzichtFormBase.dataModel}" 
 						var="user"
 						style="width: 100%;" 
 						styleClass="blue" 
@@ -76,6 +76,7 @@
 						rowsPerPageTemplate="10,20,30,40,50" 
 						tableStyle="min-width: 650px"
 						scrollable="true"
+						lazy="true"
 						resizableColumns="true"
 						emptyMessage="#{messages['ui.dataTable.empty']}">
 						<p:column style="width: 5%">
@@ -115,7 +116,7 @@
 								height="32" />
 						</p:column>
 						<p:column label="Voornaam"
-							sortBy="#{user.getAspect('UserProfile', modelRepository, true).firstName }">
+							sortBy="#{'#UserProfile/firstName'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('UserProfile').getProperty('firstName')}" />
@@ -126,7 +127,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Familienaam"
-							sortBy="#{user.getAspect('UserProfile', modelRepository, true).lastName}">
+							sortBy="#{'#UserProfile/lastName'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('UserProfile').getProperty('lastName')}" />
@@ -137,7 +138,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Email"
-							sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
+							sortBy="#{'#UserProfile/email'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('UserProfile').getProperty('email')}" />
@@ -148,7 +149,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Status"
-							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }">
+							sortBy="#{'#PeterMeterProfiel/status'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" />
@@ -159,7 +160,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="ActiefSinds"
-							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }">
+							sortBy="#{'#PeterMeterProfiel/actiefSinds'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}" />
@@ -170,7 +171,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:rowExpansion label="Voorkeuren">
-							<h:panelGrid id="display" columns="1" style="width:400px;">
+							<h:panelGrid id="display" columns="1" style="width: 100%">
 								<f:facet name="header">
 									<d:displayLabel
 										property="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}" />

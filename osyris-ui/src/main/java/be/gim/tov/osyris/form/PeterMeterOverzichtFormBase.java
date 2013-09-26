@@ -95,19 +95,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		this.object = user;
 	}
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public void search() {
-
-		try {
-			results = (List<User>) modelRepository.searchObjects(getQuery(),
-					true, true);
-
-		} catch (IOException e) {
-			LOG.error("Can not search Users.", e);
-		}
-	}
-
 	@Override
 	public Query getQuery() {
 
