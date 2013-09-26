@@ -21,8 +21,9 @@ public class PropertyProbleemEditableBean {
 
 	public boolean isEditable(ModelObject object, ModelProperty property) {
 
-		// Set geom property to editable false
+		// Set geom properties to editable false
 		if (property.getName().equals("geom")
+				|| property.getName().equals("geomOmleiding")
 				|| property.getName().equals("bord")) {
 			return false;
 		}

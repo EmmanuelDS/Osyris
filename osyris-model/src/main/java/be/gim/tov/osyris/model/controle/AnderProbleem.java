@@ -1,8 +1,6 @@
 package be.gim.tov.osyris.model.controle;
 
 import org.conscientia.api.model.ModelPropertyType;
-import org.conscientia.api.model.annotation.Description;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
@@ -24,8 +22,6 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AnderProbleem extends Probleem {
 
 	// VARIABLES
-	@Label("Categorie")
-	@Description("Categorie")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('AnderProbleemCategorieCode')}")
 	private String categorie;
@@ -34,9 +30,13 @@ public abstract class AnderProbleem extends Probleem {
 	@NotEditable
 	@NotSearchable
 	@SrsName("EPSG:31370")
-	@Label("Locatie")
-	@Description("Locatie")
 	private Geometry geom;
+
+	@NotViewable
+	@NotEditable
+	@NotSearchable
+	@SrsName("EPSG:31370")
+	private Geometry geomOmleiding;
 
 	// GETTERS AND SETTERS
 	public Geometry getGeom() {
@@ -53,5 +53,13 @@ public abstract class AnderProbleem extends Probleem {
 
 	public void setCategorie(String categorie) {
 		this.categorie = categorie;
+	}
+
+	public Geometry getGeomOmleiding() {
+		return geomOmleiding;
+	}
+
+	public void setGeomOmleiding(Geometry geomOmleiding) {
+		this.geomOmleiding = geomOmleiding;
 	}
 }

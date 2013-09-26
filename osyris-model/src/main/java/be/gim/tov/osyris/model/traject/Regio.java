@@ -1,9 +1,7 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Index;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -25,21 +23,14 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Regio")
 public class Regio extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@Label("Naam")
-	@Description("Naam")
 	@LabelProperty
 	private String naam;
 
-	@Label("Oppervlakte")
-	@Description("Oppervlakte")
 	private float oppervlakte;
 
-	@Label("Omtrek")
-	@Description("Omtrek")
 	private float omtrek;
 
 	@NotSearchable
@@ -49,8 +40,6 @@ public class Regio extends AbstractModelObject implements StorableObject {
 	@Index
 	private Geometry geom;
 
-	@Label("Uitvoerder")
-	@Description("Uitvoerder")
 	@ModelClassName("UitvoerderBedrijf")
 	private ResourceIdentifier uitvoerder;
 

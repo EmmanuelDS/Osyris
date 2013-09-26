@@ -87,6 +87,7 @@ public class MeldingSaveListener {
 			werkOpdracht.setInRonde("0");
 			werkOpdracht.setDatumTeControleren(new Date());
 			werkOpdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
+			werkOpdracht.setCommentaarMedewerker(melding.getCommentaar());
 			werkOpdracht.setMedewerker(melding.getMedewerker());
 			werkOpdracht.setProbleem(melding.getProbleem());
 			werkOpdracht.setTraject(melding.getTraject());

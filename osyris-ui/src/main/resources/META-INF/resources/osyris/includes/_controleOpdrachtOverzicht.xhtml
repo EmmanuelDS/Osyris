@@ -131,7 +131,7 @@
 					<j:layoutContent />
 					<j:bindAttribute var="controleOpdracht"
 						name="rowData" />
-					<p:column label="Acties">
+					<p:column label="Acties" style="width:40px;">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton
 								rendered="#{controleOpdrachtOverzichtFormBase.isCanView(controleOpdracht)}"
@@ -155,7 +155,7 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					<p:column label="TrajectType">
+					<p:column label="TrajectType" style="width:120px;">
 						<f:facet name="header">
 						<d:displayLabel
 							property="#{d:modelClass('ControleOpdracht').getProperty('trajectType')}" />
@@ -165,7 +165,7 @@
 							value="#{controleOpdracht.trajectType }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Periode"
+					<p:column label="Periode" style="width:60px;"
 						sortBy="#{controleOpdracht.periode }">
 						<f:facet name="header">
 							<d:displayLabel
@@ -176,17 +176,17 @@
 							value="#{controleOpdracht.periode }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Traject"
+					<p:column label="Traject" style="width:100px;"
 						sortBy="#{controleOpdracht.traject }">
 						<f:facet name="header">
-							<div>Routenaam</div>
+							<h:outputText value="Routenaam" />
 						</f:facet>
 						<d:propertyValue id="trajectColumn"
 							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('traject')}"
 							value="#{controleOpdracht.traject }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Regio">
+					<p:column label="Regio" style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('regio')}" />
@@ -195,7 +195,7 @@
 							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('regio')}"
 							value="#{controleOpdracht.regio }" mode="VIEW" />
 					</p:column>
-					<p:column label="Peter/Meter" sortBy="#{controleOpdracht.peterMeter }">
+					<p:column label="Peter/Meter" sortBy="#{controleOpdracht.peterMeter }" style="width:120px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" />
@@ -204,7 +204,7 @@
 							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
 							value="#{controleOpdracht.peterMeter }" mode="VIEW" />
 					</p:column>
-					<p:column label="Medewerker" sortBy="#{controleOpdracht.medewerker }">
+					<p:column label="Medewerker" sortBy="#{controleOpdracht.medewerker }" style="width:120px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}" />
@@ -214,7 +214,7 @@
 							value="#{controleOpdracht.medewerker }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Status" sortBy="#{controleOpdracht.status }">
+					<p:column label="Status" sortBy="#{controleOpdracht.status }" style="width:80px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('status')}" />
@@ -224,9 +224,9 @@
 							value="#{controleOpdracht.status }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Datum">
+					<p:column label="Datum" style="width:80px;">
 						<f:facet name="header">
-							<div>Datum</div>
+							<h:outputText value="Datum" />
 						</f:facet>
 						<d:propertyValue id="datumLaatsteWijzigingColumn"
 							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumLaatsteWijziging')}"

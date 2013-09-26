@@ -11,22 +11,23 @@
 	<h:outputStylesheet id="fileuploadCss"
 		name="fileupload/fileupload.css"
 		library="primefaces" />
-	<div><h2>Routedokter - Melding problemen ivm route infrastructuur</h2></div>
+
 	<br/>
 	<table width="100%">
 	<tr>
 	<td width="40%" valign="top">
 	
-	<r:panel id="searchTrajectPanel" header="Zoek traject">
+	<r:panel id="searchTrajectPanel" header="Zoek route of netwerk">
 		<d:fields>
-			<d:field for="trajectType" label="Traject type" required="true">
+			<d:field for="trajectType" label="Route of netwerk type" required="true">
 				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" required="true">
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
 					<a:ajax
 						event="change"
 						render="detailSearchPanel"
-						execute="@this" />
+						execute="@this"
+						listener="#{form.resetChildSearchParameters()}" />
 				</h:selectOneMenu>
 			</d:field>
 			<d:field for="regio" label="Regio">
@@ -41,13 +42,13 @@
 				</h:selectOneMenu>
 			</d:field>
 			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectType != null}">
-				<d:field for="trajectNaam" label="Traject naam" rendered="true" required="#{form.trajectType.contains('Route')}">
+				<d:field for="trajectNaam" label="Traject naam" rendered="#{form.trajectType.contains('Route') or form.trajectType.contains('WandelNetwerk') }" required="#{form.trajectType.contains('Route')}">
 					<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true" required="#{form.trajectType.contains('Route')}">
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
 					</h:selectOneMenu>
 				</d:field>
-				<d:field for="knooppuntNummer" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
+				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
 					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
@@ -107,12 +108,19 @@
 		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
 		
 			<div>
+			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
+			<br/>
+			<d:fields>
+			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
 			<j:commandButton
 				id="selectFeatures"
 				rendered="#{form.probleemType == 'bord'}"
 				image="#{resource['core/images/actions/24x24/select.png']}"
 				styleClass="component-toolbar-button"
-				value="Selecteer bord op kaart"
+				value="Selecteer bord"
 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
 				submit="false">
 				<j:activateControl
@@ -120,25 +128,42 @@
 					event="click"
 					control="selectBox" />
 			</j:commandButton>
+			</a:outputPanel>
 			<br/>
+			
+			<a:outputPanel rendered="#{form.probleemType == 'ander'}">
+			<br/>
+			<d:fields>
+			<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
 			<j:commandButton
 				id="drawPoint"
 				rendered="#{form.probleemType == 'ander'}"
 				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
 				styleClass="component-toolbar-button"
-				value="Duid probleem aan op kaart">
+				value="Teken punt">
 				<j:activateControl
 					for="viewer"
 					event="click"
 					control="drawPoint" />
 			</j:commandButton>
+			</a:outputPanel>
 			<br/>
+			<a:outputPanel rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}">
+			<br/>
+			<d:fields>
+			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
 			<j:commandButton
 				id="selectSegment"
 				rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}"
 				image="#{resource['core/images/actions/24x24/select.png']}"
 				styleClass="component-toolbar-button"
-				value="Selecteer segment op kaart"
+				value="Selecteer segment"
 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
 				submit="false">
 				<j:activateControl
@@ -150,6 +175,7 @@
 						value="#{trajectType}" />
 				</j:activateControl>
 			</j:commandButton>
+			</a:outputPanel>
 			</div>
 			<br/>
 			<d:object mode="EDIT"

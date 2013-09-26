@@ -1,36 +1,54 @@
 package be.gim.tov.osyris.form;
 
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.user.User;
+import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.quartz.xml.ValidationException;
+import org.w3c.dom.Document;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
@@ -51,6 +69,7 @@ import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
+import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -66,10 +85,12 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class WerkOpdrachtOverzichtFormBase extends
 		AbstractListForm<WerkOpdracht> {
+
 	private static final long serialVersionUID = -7478667205313972513L;
 
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
+	public static final String WO_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtPdf.xsl";
 
 	private static final Log LOG = LogFactory
 			.getLog(WerkOpdrachtOverzichtFormBase.class);
@@ -376,18 +397,18 @@ public class WerkOpdrachtOverzichtFormBase extends
 				try {
 
 					modelRepository.saveObject(object);
-					clear();
-					search();
-
 					// send confirmatie mail naar Uitvoerder
 					// sendConfirmationMail();
+
+					clear();
+					search();
 					messages.info("Werkopdracht succesvol verzonden.");
 				} catch (IOException e) {
 					messages.error("Fout bij het verzenden van werkopdracht: "
 							+ e.getMessage());
 					LOG.error("Can not save object.", e);
 				} catch (Exception e) {
-					messages.error("Fout bij het verzenden van werkopdracht: "
+					messages.error("Fout bij het versturen van email: "
 							+ e.getMessage());
 					LOG.error("Can not send email", e);
 				}
@@ -520,7 +541,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 					+ e.getMessage());
 			LOG.error("Illegal access at creation model object.", e);
 		} catch (IOException e) {
-			messages.error("Gelieve minstens 1 werkopdracht te selecteren die nog niet aan een ronde is toegevoegd.");
+			messages.error("Gelieve minstens 1 werkopdracht aan te vinken die nog niet aan een ronde is toegevoegd.");
 			LOG.error("Can not save Uitvoeringsronde.", e);
 		}
 	}
@@ -531,12 +552,24 @@ public class WerkOpdrachtOverzichtFormBase extends
 			modelRepository.saveObject(object);
 			messages.info("Werkopdracht succesvol bewaard.");
 
+			// Stuur mail naar uitvoerder indien werkopdracht gewijzigd door TOV
+			// en in status uit te voeren
+			if (object.getStatus().equals(WerkopdrachtStatus.UIT_TE_VOEREN)
+					&& (identity.inGroup("admin", "CUSTOM")
+							|| identity.inGroup("Medewerker", "CUSTOM") || identity
+								.inGroup("Routedokter", "CUSTOM"))) {
+				sendWerkOpdrachtEditedMail();
+			}
 			// clear();
 			search();
 		} catch (IOException e) {
 			messages.error("Fout bij het bewaren van werkopdracht: "
 					+ e.getMessage());
 			LOG.error("Can not save model object.", e);
+		} catch (Exception e) {
+			messages.error("Fout bij het versturen van email: "
+					+ e.getMessage());
+			LOG.error("Can not send email", e);
 		}
 	}
 
@@ -1007,5 +1040,126 @@ public class WerkOpdrachtOverzichtFormBase extends
 				geomLayer.setHidden(false);
 			}
 		}
+	}
+
+	/**
+	 * Stuurt een mail naar de betrokken Uitvoerder dat er een nieuwe
+	 * WerkOpdracht op status uit te voeren beschikbaar is
+	 * 
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void sendConfirmationMail() throws IOException, Exception {
+
+		User medewerker = (User) modelRepository.loadObject(object
+				.getMedewerker());
+
+		UserProfile profiel = (UserProfile) medewerker.getAspect("UserProfile",
+				modelRepository, true);
+
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("preferences", preferences);
+		variables.put("id", object.get("id"));
+		variables.put("typeTraject", object.getTypeTraject());
+		variables.put("gemeente", object.getGemeente());
+		variables.put("regio", object.getRegio());
+		variables.put("medewerker",
+				profiel.getLastName() + " " + profiel.getFirstName());
+
+		// TODO: enable profile adres
+		// modelRepository
+		// .loadObject(object.getUitvoerder())
+		// .getAspect("UserProfile").get("email").toString())
+
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton("kristof.spiessens@gim.be"),
+				"/META-INF/resources/core/mails/confirmWerkOpdracht.fmt",
+				variables);
+
+		messages.info("Er is een email verzonden naar de betrokken uitvoerder.");
+	}
+
+	/**
+	 * Stuurt een mail naar de betrokken Uitvoerder dat er een nieuwe
+	 * WerkOpdracht op status uit te voeren beschikbaar is
+	 * 
+	 * @throws IOException
+	 * @throws Exception
+	 */
+	private void sendWerkOpdrachtEditedMail() throws IOException, Exception {
+
+		User editor = (User) modelRepository.loadObject(modelRepository
+				.getResourceName(userRepository.loadUser(identity.getUser()
+						.getId())));
+
+		UserProfile profiel = (UserProfile) editor.getAspect("UserProfile",
+				modelRepository, true);
+
+		Map<String, Object> variables = new HashMap<String, Object>();
+		variables.put("preferences", preferences);
+		variables.put("id", object.get("id"));
+		variables.put("editor",
+				profiel.getLastName() + " " + profiel.getFirstName());
+
+		// TODO: enable profile adres
+		// modelRepository
+		// .loadObject(object.getUitvoerder())
+		// .getAspect("UserProfile").get("email").toString())
+
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton("babs.dumont@gim.be"),
+				"/META-INF/resources/core/mails/editedWerkOpdracht.fmt",
+				variables);
+
+		messages.info("Er is een email verzonden naar de betrokken uitvoerder.");
+	}
+
+	/**
+	 * Printen van een PDF bestand met overzicht van de WerkOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Content printWerkOpdracht() throws Exception {
+
+		// Opbouwen XML
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+
+		Document doc = null;
+		XmlBuilder xmlBuilder = new XmlBuilder();
+
+		if (object.getProbleem() instanceof BordProbleem) {
+
+			BordProbleem bordProbleem = (BordProbleem) object.getProbleem();
+			Bord bord = (Bord) modelRepository.loadObject(bordProbleem
+					.getBord());
+
+			doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(traject,
+					object, bord);
+		}
+
+		else if (object.getProbleem() instanceof AnderProbleem) {
+
+			doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(traject,
+					object);
+		}
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+				FopFactory.newInstance().newFOUserAgent(), out);
+
+		// xslt
+		Source xslt = new StreamSource(getClass().getResourceAsStream(WO_PDF));
+
+		// Transform source
+		Transformer transformer = TransformerFactory.newInstance()
+				.newTransformer(xslt);
+		Result res = new SAXResult(fop.getDefaultHandler());
+
+		transformer.transform(new DOMSource(doc), res);
+
+		// return pdf
+		return new ByteArrayContent("application/pdf", out.toByteArray());
 	}
 }

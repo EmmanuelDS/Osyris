@@ -25,14 +25,16 @@
 				<u:include src="/resources/core/templates/admin.xhtml" />
 			</c:if>
 		</div>
-	<div style="float:right; padding-top: 30px;">
+		
+		<c:if test="#{identity.isLoggedIn()}">
+	    <div style="float:right; padding-top: 30px;">
 			<c:if test="#{objectHolder.exists}">
 				<u:decorate template="/resources/core/includes/documentActions.xhtml">
 					<u:param name="object"
 						value="#{objectHolder.document}" />
 				</u:decorate>
 			</c:if>
-		
+
 			<u:include src="/resources/core/includes/createActions.xhtml" />
 			<a:outputPanel rendered="#{preferences.useGlobalSearch and identity.hasPermission('', 'search')}">
 				<h:inputText value="#{term}"
@@ -40,8 +42,8 @@
 				<a:commandButton value="#{messages['form.general.search.label']}"
 					action="search" />
 			</a:outputPanel>
-				
 		</div>
+		</c:if>
 	</div>
 	</h:form>
 </a:outputPanel>

@@ -9,9 +9,7 @@ import javax.persistence.Transient;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -39,7 +37,6 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Controleopdracht")
 @SubClassPersistence(UNION)
 @Edit(type = "controleOpdracht")
 @Permissions({
@@ -60,68 +57,49 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 
 	// VARIABLES
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Periode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
 
-	@Label("Status")
-	@Description("Status")
 	private ControleOpdrachtStatus status;
 
-	@Label("Commentaar")
-	@Description("Commentaar")
 	@NotSearchable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
 	@NotSearchable
-	@Label("Datum gerapporteerd")
-	@Description("Datum gerapporteerd")
 	@Type(ModelPropertyType.DATE)
 	@NotEditable
 	private Date datumGerapporteerd;
 
 	@NotSearchable
-	@Label("Datum gevalideerd")
-	@Description("Datum gevalideerd")
 	@Type(ModelPropertyType.DATE)
 	@NotEditable
 	private Date datumGevalideerd;
 
 	@NotSearchable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Datum te controleren")
-	@Description("Datum te controleren")
 	@Type(ModelPropertyType.DATE)
 	private Date datumTeControleren;
 
 	@NotSearchable
 	@NotEditable
-	@Label("Datum uit te voeren")
-	@Description("Datum uit te voeren")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitTeVoeren;
 
 	@NotSearchable
 	@EditableInGroup({ "PeterMeter" })
-	@Label("Datum terreinbezoek")
-	@Description("Datum terreinbezoek")
 	@Type(ModelPropertyType.DATE)
 	private Date datumTerreinBezoek;
 
 	@NotSearchable
 	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Traject")
-	@Description("Traject")
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
 
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Medewerker")
-	@Description("Medewerker")
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
@@ -129,8 +107,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	private ResourceIdentifier medewerker;
 
 	@EditableInGroup({ "Medewerker", "Routedokter" })
-	@Label("Peter/Meter")
-	@Description("Peter/Meter")
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
@@ -139,16 +115,16 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 
 	@NotViewable
 	@EditableInGroup({ "PeterMeter" })
-	@Label("Problemen")
-	@Description("Problemen")
 	@NotSearchable
 	private List<Probleem> problemen;
 
+	// Extra property om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
 	private String typeTraject;
 
+	// Extra property om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
@@ -271,7 +247,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("Datum laatste statuswijziging")
 	public Date getDatumLaatsteWijziging() {
 		return Beans.getReference(OsyrisModelFunctions.class)
 				.getDatumLaatsteWijziging(this);
@@ -281,7 +256,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("TrajectType")
 	public String getTrajectType() {
 		return Beans.getReference(OsyrisModelFunctions.class).getTrajectType(
 				this.traject);
@@ -291,7 +265,6 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("Regio")
 	public String getRegio() {
 		return Beans.getReference(OsyrisModelFunctions.class).getTrajectRegio(
 				this.traject);

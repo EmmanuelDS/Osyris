@@ -5,10 +5,8 @@ import static org.conscientia.api.model.SubClassPersistence.UNION;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.ContentType;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.FileSize;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
@@ -29,25 +27,18 @@ import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 @Model
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
-@Label("Probleem")
 @Edit(type = "probleem")
 public abstract class Probleem extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@Label("Status")
-	@Description("Status")
 	private ProbleemStatus status;
 
 	@Required
 	@NotSearchable
-	@Label("Commentaar")
-	@Description("Commentaar")
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
-	@Label("Foto")
-	@Description("Foto")
 	@View(type = "image")
 	@NotSearchable
 	@ContentType("image/*")

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
+import javax.faces.context.FacesContext;
 import javax.inject.Inject;
 import javax.inject.Named;
 
@@ -45,6 +46,7 @@ import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
+import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
@@ -77,6 +79,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getStockMateriaalStates() {
+
 		List<Object[]> stockMateriaalStates = new ArrayList<Object[]>();
 		Object[] statusBesteld = { "1", "Besteld" };
 		Object[] statusnietBesteld = { "0", "Niet besteld" };
@@ -92,12 +95,14 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getCanonicalBoolean() {
-		List<Object[]> booleans = new ArrayList<Object[]>();
-		Object[] boolTrue = { "1", "Ja" };
-		Object[] boolFalse = { "0", "Nee" };
 
-		booleans.add(boolTrue);
+		List<Object[]> booleans = new ArrayList<Object[]>();
+
+		Object[] boolFalse = { "0", "Nee" };
+		Object[] boolTrue = { "1", "Ja" };
+
 		booleans.add(boolFalse);
+		booleans.add(boolTrue);
 		return booleans;
 	}
 
@@ -107,14 +112,16 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getImageCodes() {
+
 		List<Object[]> imageCodes = new ArrayList<Object[]>();
-		Object[] code1 = { "1" };
-		Object[] code2 = { "2" };
-		Object[] code3 = { "3" };
+		Object[] code1 = { "1", "LINKS" };
+		Object[] code2 = { "2", "RECHTS" };
+		Object[] code3 = { "3", "RECHTDOOR" };
 
 		imageCodes.add(code1);
 		imageCodes.add(code2);
 		imageCodes.add(code3);
+
 		return imageCodes;
 	}
 
@@ -124,12 +131,14 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getTrajectTypesCO() {
+
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
 		subClassesRoute = modelRepository.getModelClass("Route")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesRoute) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -137,9 +146,12 @@ public class OsyrisModelFunctions {
 		subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerkLus) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -149,12 +161,14 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getTrajectTypesWO() {
+
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
 		subClassesRoute = modelRepository.getModelClass("Route")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesRoute) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -162,7 +176,8 @@ public class OsyrisModelFunctions {
 		subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerkLus) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -171,9 +186,12 @@ public class OsyrisModelFunctions {
 		subClassesNetwerkSegment = modelRepository.getModelClass(
 				"NetwerkSegment").getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerkSegment) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -183,12 +201,14 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public List<Object[]> getTrajectTypes() {
+
 		List<Object[]> trajectTypes = new ArrayList<Object[]>();
 		Collection<ModelClass> subClassesRoute = Collections.emptyList();
 		subClassesRoute = modelRepository.getModelClass("Route")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesRoute) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getLabel().toString() };
 			trajectTypes.add(object);
 		}
 
@@ -196,9 +216,12 @@ public class OsyrisModelFunctions {
 		subClassesNetwerk = modelRepository.getModelClass("NetwerkSegment")
 				.getSubClasses();
 		for (ModelClass modelClass : subClassesNetwerk) {
-			Object[] object = { modelClass.getName(), modelClass.getLabel() };
+			Object[] object = { modelClass.getName(),
+					modelClass.getName().replace("NetwerkSegment", "netwerk") };
 			trajectTypes.add(object);
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -219,7 +242,8 @@ public class OsyrisModelFunctions {
 			subClassesRoute = modelRepository.getModelClass("Route")
 					.getSubClasses();
 			for (ModelClass modelClass : subClassesRoute) {
-				Object[] object = { modelClass.getName(), modelClass.getLabel() };
+				Object[] object = { modelClass.getName(),
+						modelClass.getLabel().toString() };
 				trajectTypes.add(object);
 			}
 		}
@@ -232,10 +256,13 @@ public class OsyrisModelFunctions {
 			subClassesNetwerkLus = modelRepository.getModelClass("NetwerkLus")
 					.getSubClasses();
 			for (ModelClass modelClass : subClassesNetwerkLus) {
-				Object[] object = { modelClass.getName(), modelClass.getLabel() };
+				Object[] object = { modelClass.getName(),
+						modelClass.getLabel().toString() };
 				trajectTypes.add(object);
 			}
 		}
+
+		Collections.sort(trajectTypes, new DropdownListSorting());
 		return trajectTypes;
 	}
 
@@ -247,6 +274,7 @@ public class OsyrisModelFunctions {
 	 */
 	@SuppressWarnings({ "deprecation" })
 	public List<?> getCodeList(String modelClassName) {
+
 		List<?> codeList = Collections.emptyList();
 
 		try {
@@ -284,20 +312,6 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Get the suggestions for users in a certain group.
-	 * 
-	 * @param groupName
-	 * @return
-	 */
-	public List<? extends ResourceIdentifier> getSuggestions(String groupName) {
-
-		List<ResourceName> users = getUsersInGroup(groupName);
-		List<ResourceIdentifier> suggestions = new ArrayList<ResourceIdentifier>();
-		suggestions.addAll(users);
-		return suggestions;
-	}
-
-	/**
 	 * Get suggestielijst voor PetersMeters.
 	 * 
 	 * @return
@@ -324,11 +338,64 @@ public class OsyrisModelFunctions {
 												modelRepository, true);
 								Object[] object = {
 										user,
-										profiel.getFirstName() + " "
-												+ profiel.getLastName() };
+										profiel.getLastName() + " "
+												+ profiel.getFirstName() };
 								suggestions.add(object);
 							}
-							suggestions.add(geenPeterMeter);
+
+							// Sorteren suggesties
+							Collections.sort(suggestions,
+									new DropdownListSorting());
+
+							// Geen peterMeter toegewezen komt bovenaan
+							suggestions.add(0, geenPeterMeter);
+
+						} catch (IOException e) {
+							LOG.error("Can not load user.", e);
+						} catch (InstantiationException e) {
+							LOG.error("Can not instantiate UserProfile.", e);
+						} catch (IllegalAccessException e) {
+							LOG.error("Illegal access at UserProfile.", e);
+						}
+						return suggestions;
+
+					}
+				}).get(null);
+	}
+
+	/**
+	 * Get suggestielijst voor een bepaalde groep.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getSuggestions(final String groupName) {
+
+		return (List<Object[]>) cacheProducer.getCache(
+				groupName + "SuggestionCache", new Transformer() {
+
+					@Override
+					public Object transform(Object key) {
+						List<Object[]> suggestions = new ArrayList<Object[]>();
+						try {
+
+							List<ResourceName> users = getUsersInGroup(groupName);
+							for (ResourceName user : users) {
+								User peterMeter = (User) modelRepository
+										.loadObject(user);
+								UserProfile profiel = (UserProfile) peterMeter
+										.getAspect("UserProfile",
+												modelRepository, true);
+								Object[] object = {
+										user,
+										profiel.getLastName() + " "
+												+ profiel.getFirstName() };
+								suggestions.add(object);
+
+								// Sorteren suggesties
+								Collections.sort(suggestions,
+										new DropdownListSorting());
+							}
 
 						} catch (IOException e) {
 							LOG.error("Can not load user.", e);
@@ -365,6 +432,7 @@ public class OsyrisModelFunctions {
 		regios.add(code5);
 		regios.add(code6);
 
+		Collections.sort(regios, new DropdownListSorting());
 		return regios;
 	}
 
@@ -917,6 +985,8 @@ public class OsyrisModelFunctions {
 		validaties.add(code3);
 		validaties.add(code4);
 		validaties.add(code5);
+
+		Collections.sort(validaties, new DropdownListSorting());
 		return validaties;
 	}
 
@@ -1047,6 +1117,9 @@ public class OsyrisModelFunctions {
 			else {
 				uitvoerderRegios = getRegiosOostVlaanderen();
 			}
+
+			Collections.sort(uitvoerderRegios, new DropdownListSorting());
+
 		} catch (IOException e) {
 			LOG.error("Can not search Regio.", e);
 		} catch (InstantiationException e) {
@@ -1111,6 +1184,7 @@ public class OsyrisModelFunctions {
 					namen.add(object);
 				}
 
+				Collections.sort(namen, new DropdownListSorting());
 				return namen;
 			}
 
@@ -1137,5 +1211,27 @@ public class OsyrisModelFunctions {
 		}
 		return null;
 
+	}
+
+	/**
+	 * Ophalen URL voor Routedokter.
+	 * 
+	 * @return
+	 */
+	public String getHelpUrlRoutedokter() {
+		String contextPath = FacesContext.getCurrentInstance()
+				.getExternalContext().getRequestContextPath();
+		return contextPath + "/web/view/routedokterhelp";
+	}
+	
+	/**
+	 * Ophalen URL voor Hekp document ingelogde gebruikers.
+	 * 
+	 * @return
+	 */
+	public String getHelpUrl() {
+		String contextPath = FacesContext.getCurrentInstance()
+				.getExternalContext().getRequestContextPath();
+		return contextPath + "/web/view/help";
 	}
 }

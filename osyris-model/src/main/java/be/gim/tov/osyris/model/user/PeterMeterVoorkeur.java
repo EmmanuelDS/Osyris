@@ -3,9 +3,7 @@ package be.gim.tov.osyris.model.user;
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Default;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -27,8 +25,6 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Voorkeur")
-@Description("Voorkeur")
 @Permissions({
 		@Permission(profile = "group:PeterMeter", action = "search", allow = true),
 		@Permission(profile = "group:PeterMeter", action = "view", allow = true) })
@@ -36,37 +32,26 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	// Changed back to ResourceIdentifier
-	@Label("Regio")
-	@Description("Regio")
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
 	private ResourceIdentifier regio;
 
-	@Label("Trajecttype")
-	@Description("Trajecttype")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.trajectTypes}")
 	private String trajectType;
 
-	@Label("Trajectnaam")
-	@Description("Trajectnaam")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
 	@Parents({ "regio", "trajectType" })
 	private String trajectNaam;
 
-	@Label("Periode")
-	@Description("Periode")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
 
 	@NotSearchable
-	@Label("Maximale afstand")
-	@Description("Maximale afstand")
 	@Default("100")
 	private float maxAfstand;
 

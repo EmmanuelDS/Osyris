@@ -3,6 +3,7 @@ package be.gim.tov.osyris.form;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -15,8 +16,6 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -34,6 +33,8 @@ import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.user.User;
+import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
@@ -49,7 +50,6 @@ import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.w3c.dom.Document;
-import org.w3c.dom.Element;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
@@ -80,6 +80,7 @@ import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
+import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -95,13 +96,14 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
+
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
 	private static final String PERIODE_LENTE = "1";
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
-
-	public static final String CO_PDF_XSL = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
+	public static final String CO_PDF = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
+	public static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
 
 	private static final long serialVersionUID = -86881009141250710L;
 
@@ -129,9 +131,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Probleem probleem;
 	protected Probleem selectedProbleem;
 	protected Envelope envelope = null;
-	protected String pdfType;
 	protected FeatureMapLayer bordLayer;
 	protected ResourceIdentifier trajectId;
+	protected Collection<String> imageKeys = new ArrayList<String>();
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -215,14 +217,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	public void setSelectedProbleem(Probleem selectedProbleem) {
 		this.selectedProbleem = selectedProbleem;
-	}
-
-	public String getPdfType() {
-		return pdfType;
-	}
-
-	public void setPdfType(String pdfType) {
-		this.pdfType = pdfType;
 	}
 
 	public FeatureMapLayer getBordLayer() {
@@ -310,8 +304,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	@Override
 	public void create() {
-		try {
 
+		try {
 			object = null;
 			if (controleOpdrachtType.equals("route")) {
 				object = (ControleOpdracht) modelRepository.createObject(
@@ -336,8 +330,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@SuppressWarnings("unchecked")
 	@Override
 	public void search() {
-		try {
 
+		try {
 			// Reset zoekveld trajectNaam
 			if (trajectType == null) {
 				setTrajectId(null);
@@ -385,6 +379,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					}
 				}
 			}
+
 			if (object.getTraject() != null) {
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol bewaard.");
@@ -404,6 +399,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 		selectedProbleem = null;
 		object = null;
 		controleOpdrachtType = null;
+		bewegwijzering = null;
+		trajectId = null;
+		trajectType = null;
+		trajectNaam = null;
 	}
 
 	/**
@@ -418,6 +417,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	@SuppressWarnings("static-access")
 	public MapConfiguration getSearchConfiguration() throws Exception {
+
 		MapContext context = (MapContext) modelRepository
 				.loadObject(new ResourceKey("Form@12"));
 
@@ -486,113 +486,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// Reset layers
 			resetLayers(context);
 
-			List<String> bordSelection = new ArrayList<String>();
-			List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
-			List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+			// Setup layers
+			setupLayers(configuration, context);
 
-			GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
-					.createGeometryLayer(configuration.getContext(),
-							GEOMETRY_LAYER_NAME, null, Point.class, null, true,
-							"single", null, null);
-
-			GeometryListFeatureMapLayer geomLineLayer = (GeometryListFeatureMapLayer) mapFactory
-					.createGeometryLayer(configuration.getContext(),
-							GEOMETRY_LAYER_LINE_NAME, null, LineString.class,
-							null, true, "single", null, null);
-
-			// Get traject
-			Traject traject = (Traject) modelRepository.loadObject(object
-					.getTraject());
-
-			// Laden laag op basis van trajectType
-			FeatureMapLayer trajectLayer = (FeatureMapLayer) context
-					.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
-							.getName()));
-
-			if (trajectLayer != null) {
-				trajectLayer.setHidden(false);
-				trajectLayer.setFilter(FilterUtils.equal("naam",
-						traject.getNaam()));
-
-				Envelope envelope = GeometryUtils
-						.getEnvelope(traject.getGeom());
-				GeometryUtils.expandEnvelope(envelope, 0.1,
-						context.getMaxBoundingBox());
-				context.setBoundingBox(envelope);
-			}
-
-			// BordLayer
-			bordLayer = null;
-			// ROUTES
-			if (traject instanceof Route) {
-				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
-						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
-								.getModelClass().getName() + "Bord")));
-
-				// Filteren Routeborden op BordNaam
-				if (bordLayer != null) {
-					bordLayer.set("selectable", true);
-					bordLayer.setHidden(false);
-					bordLayer.setFilter(FilterUtils.equal("naam",
-							traject.getNaam()));
-				}
-
-			}
-			// LUSSEN
-			else if (traject instanceof NetwerkLus) {
-				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
-						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
-								.getModelClass().getName()
-								.replace("Lus", "Bord"))));
-				FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
-						.getLayer(LabelUtils.lowerCamelCase(LabelUtils
-								.lowerCamelCase(traject.getModelClass()
-										.getName().replace("Lus", "Knooppunt"))));
-				// Filteren NetwerkBorden op segmenten van de Lus
-				if (bordLayer != null) {
-					bordLayer.setHidden(false);
-					bordLayer.set("selectable", true);
-					bordLayer.setFilter(FilterUtils.in("segmenten",
-							((NetwerkLus) traject).getSegmenten()));
-				}
-				if (knooppuntLayer != null) {
-					searchKnooppuntLayer(knooppuntLayer);
-				}
-			}
-
-			// Problemen
-			for (Probleem probleem : object.getProblemen()) {
-				if (probleem instanceof BordProbleem) {
-					// Bord Probleem
-					Bord bord = (Bord) modelRepository
-							.loadObject(((BordProbleem) probleem).getBord());
-					bordSelection.add(bord.getId().toString());
-
-				} else if (probleem instanceof AnderProbleem) {
-					// Ander Probleem
-					AnderProbleem anderProbleem = (AnderProbleem) probleem;
-
-					if (anderProbleem.getGeom() instanceof Point) {
-						anderProbleemPointGeoms.add(anderProbleem.getGeom());
-					}
-
-					if (anderProbleem.getGeom() instanceof LineString) {
-						anderProbleemLineGeoms.add(anderProbleem.getGeom());
-					}
-				}
-			}
-
-			bordLayer.setSelection(bordSelection);
-			geomLayer.setGeometries(anderProbleemPointGeoms);
-			geomLineLayer.setGeometries(anderProbleemLineGeoms);
-
-			if (!anderProbleemPointGeoms.isEmpty()) {
-				geomLayer.setHidden(false);
-			}
-
-			if (!anderProbleemLineGeoms.isEmpty()) {
-				geomLineLayer.setHidden(false);
-			}
 			return configuration;
 		}
 		return null;
@@ -737,10 +633,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 					trajectType.replace("Lus", "") + "Knooppunt")) {
 				searchKnooppuntLayer(layer);
 			}
-
-			viewer.updateCurrentExtent(envelope);
-			viewer.updateContext(null);
 		}
+
+		viewer.updateCurrentExtent(envelope);
+		viewer.updateContext(null);
 	}
 
 	/**
@@ -749,6 +645,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 */
 	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+
 		layer.setFilter(null);
 		layer.setHidden(false);
 		try {
@@ -777,6 +674,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param viewer
 	 */
 	private void searchRouteLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		if (trajectNaam != null) {
 			layer.setFilter(FilterUtils.like("naam", trajectNaam));
@@ -788,6 +686,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 */
 	private void searchKnooppuntLayer(FeatureMapLayer layer) {
+
 		layer.setHidden(false);
 		layer.setFilter(null);
 		layer.setSelection(Collections.EMPTY_LIST);
@@ -818,6 +717,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param layer
 	 */
 	public void searchTrajectId(FeatureMapLayer layer) {
+
 		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
 					.getFeature(layer, getViewer().getContext().getSrsName(),
@@ -846,10 +746,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param controleOpdracht
 	 */
 	public void showOpdrachtMapData(ResourceIdentifier trajectId) {
+
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 		FeatureMapLayer layer = null;
 		String layerId = null;
+
 		try {
 			// Get traject
 			Traject t = (Traject) modelRepository.loadObject(trajectId);
@@ -881,13 +783,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void annuleerControleOpdracht() {
+
 		if (object != null) {
 			object.setStatus(ControleOpdrachtStatus.GEANNULEERD);
+
 			try {
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol geannuleerd.");
 				clear();
 				search();
+
 			} catch (IOException e) {
 				messages.error("Fout bij het annuleren van controleopdracht: "
 						+ e.getMessage());
@@ -901,9 +806,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void reopenControleOpdracht() {
+
 		if (object != null) {
+
 			object.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
 			object.setDatumTeControleren(new Date());
+
 			try {
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol heropend. De controleopdracht staat opnieuw in status 'Te controleren'.");
@@ -922,15 +830,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void verzendenControleOpdracht() {
+
 		if (object != null) {
+
 			object.setStatus(ControleOpdrachtStatus.UIT_TE_VOEREN);
 			object.setDatumUitTeVoeren(new Date());
+
 			try {
 				modelRepository.saveObject(object);
+				// Send confirmatie mail naar peterMeter
+				// sendConfirmationMail();
 				clear();
 				search();
-				// send confirmatie mail naar peterMeter
-				// sendConfirmationMail();
 				messages.info("Controleopdracht succesvol verzonden.");
 			} catch (IOException e) {
 				messages.error("Fout bij het verzenden van controleopdracht: "
@@ -949,14 +860,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void rapporterenControleOpdracht() {
+
 		if (object != null) {
+
 			object.setStatus(ControleOpdrachtStatus.GERAPPORTEERD);
 			object.setDatumGerapporteerd(new Date());
+
 			try {
 				modelRepository.saveObject(object);
 				clear();
 				search();
 				messages.info("Controleopdracht succesvol gerapporteerd.");
+
 			} catch (IOException e) {
 				messages.error("Fout bij het rapporteren van controleopdracht: "
 						+ e.getMessage());
@@ -977,12 +892,20 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @throws Exception
 	 */
 	private void sendConfirmationMail() throws IOException, Exception {
+
+		User medewerker = (User) modelRepository.loadObject(object
+				.getMedewerker());
+
+		UserProfile profiel = (UserProfile) medewerker.getAspect("UserProfile",
+				modelRepository, true);
+
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
-		// TODO: hardcoded link vervangen
-		variables
-				.put("link",
-						"http://www.tov-osyris.gim.be/geocms/web/view/form:ControleOpdrachtOverzichtForm");
+		variables.put("id", object.get("id"));
+		variables.put("trajectType", object.getTypeTraject());
+		variables.put("regio", object.getRegio());
+		variables.put("medewerker",
+				profiel.getLastName() + " " + profiel.getFirstName());
 
 		mailSender.sendMail(
 				preferences.getNoreplyEmail(),
@@ -991,7 +914,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.getAspect("UserProfile").get("email").toString()),
 				"/META-INF/resources/core/mails/confirmControleOpdracht.fmt",
 				variables);
-		messages.info("Er is een email verzonden naar de betrokken PeterMeter");
+		messages.info("Er is een email verzonden naar de betrokken PeterMeter.");
 	}
 
 	/**
@@ -1011,6 +934,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public List<BordProbleem> getBordProblemen() {
+
 		List<BordProbleem> bordProblemen = new ArrayList<BordProbleem>();
 
 		if (object != null) {
@@ -1029,7 +953,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public List<AnderProbleem> getAndereProblemen() {
+
 		List<AnderProbleem> andereProblemen = new ArrayList<AnderProbleem>();
+
 		if (object != null) {
 			for (Probleem probleem : object.getProblemen()) {
 				if (probleem instanceof AnderProbleem) {
@@ -1064,6 +990,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 			// Itereren over de lagen en de correcte lagen selecteerbaar zetten
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+
 				if (layer.getLayerId().equalsIgnoreCase(
 						object.getTrajectType() + "Bord")
 						|| layer.getLayerId().equalsIgnoreCase(
@@ -1071,13 +998,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 										+ "Bord")) {
 					layer.set("selectable", true);
 					layer.setSelection(new ArrayList<String>(1));
+
 				} else if (layer.getLayerId().equalsIgnoreCase(
 						GEOMETRY_LAYER_NAME)
 						|| layer.getLayerId().equalsIgnoreCase(
 								GEOMETRY_LAYER_LINE_NAME)) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
-							.setGeometries(Collections.EMPTY_LIST);
+							.setGeometries(new ArrayList<Geometry>(1));
 				} else {
 					layer.set("selectable", false);
 					layer.setSelection(Collections.EMPTY_LIST);
@@ -1086,6 +1014,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 		// Ander probleem
 		else if ("ander".equals(probleemType)) {
+
 			if (object.getTrajectType().contains("route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
@@ -1099,7 +1028,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 						|| layer.getLayerId().equalsIgnoreCase(
 								GEOMETRY_LAYER_LINE_NAME)) {
 					layer.setHidden(false);
-					// layer.set("editable", true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
 				} else {
@@ -1114,9 +1042,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 	/**
 	 * Toevoegen van een probleem aan de controleOpdracht
 	 * 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * 
 	 */
-	public void addProbleem() {
+	public void addProbleem() throws InstantiationException,
+			IllegalAccessException {
+
 		try {
+
 			// Toevoegen probleem aan controleOpdracht
 			Probleem p = getProbleem();
 
@@ -1132,10 +1066,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 				// Deselect all features
 				MapViewer viewer = getViewer();
+				MapConfiguration configuration = viewer.getConfiguration();
+
 				MapContext context = viewer.getConfiguration().getContext();
 				for (FeatureMapLayer layer : context.getFeatureLayers()) {
 					layer.setSelection(new ArrayList<String>(1));
 				}
+
+				setupLayers(configuration, context);
 				viewer.updateContext(null);
 			}
 		} catch (IOException e) {
@@ -1190,27 +1128,36 @@ public class ControleOpdrachtOverzichtFormBase extends
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
 
-		// Slechts 1 punt mag ingegeven worden
-		if (pointLayer.getGeometries().size() > 1) {
-			pointLayer.getGeometries().remove(0);
-		}
+		// Debug
+		String layerId = (String) event.getParams().get("layerId");
+		FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
+				.getLayer(layerId);
 
-		if (pointLayer.getGeometries().size() == 1 && pointLayer.isEditable()) {
-			if (probleem instanceof AnderProbleem) {
-				((AnderProbleem) probleem).setGeom(pointLayer.getGeometries()
-						.iterator().next());
+		if (pointLayer.isEditable()) {
+			// Slechts 1 punt mag ingegeven worden
+			if (pointLayer.getGeometries().size() > 1) {
+				pointLayer.getGeometries().remove(0);
+			}
+
+			if (pointLayer.getGeometries().size() == 1) {
+				if (probleem instanceof AnderProbleem) {
+					((AnderProbleem) probleem).setGeom(pointLayer
+							.getGeometries().iterator().next());
+				}
 			}
 		}
 
-		// Slechts 1 lijn mag ingegeven worden
-		if (lineLayer.getGeometries().size() > 1) {
-			lineLayer.getGeometries().remove(0);
-		}
+		if (lineLayer.isEditable()) {
+			// Slechts 1 lijn mag ingegeven worden
+			if (lineLayer.getGeometries().size() > 1) {
+				lineLayer.getGeometries().remove(0);
+			}
 
-		if (lineLayer.getGeometries().size() == 1 && lineLayer.isEditable()) {
-			if (probleem instanceof AnderProbleem) {
-				((AnderProbleem) probleem).setGeom(lineLayer.getGeometries()
-						.iterator().next());
+			if (lineLayer.getGeometries().size() == 1 && lineLayer.isEditable()) {
+				if (probleem instanceof AnderProbleem) {
+					((AnderProbleem) probleem).setGeomOmleiding(lineLayer
+							.getGeometries().iterator().next());
+				}
 			}
 		}
 	}
@@ -1221,6 +1168,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param bordProbleem
 	 */
 	public void zoomToBordProbleem(BordProbleem bordProbleem) {
+
 		MapViewer viewer = getViewer();
 		Envelope envelope;
 
@@ -1254,8 +1202,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 			viewer.updateCurrentExtent(envelope);
 		}
 
-		if (anderProbleem.getGeom() instanceof LineString) {
-			envelope = new Envelope(anderProbleem.getGeom()
+		if (anderProbleem.getGeomOmleiding() instanceof LineString) {
+			envelope = new Envelope(anderProbleem.getGeomOmleiding()
 					.getEnvelopeInternal());
 			viewer.updateCurrentExtent(envelope);
 		}
@@ -1266,6 +1214,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void validateProbleem() {
+
 		try {
 			modelRepository.saveObject(selectedProbleem);
 		} catch (IOException e) {
@@ -1347,6 +1296,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public ControleOpdracht buildControleOpdracht(Traject traject,
 			String periode) {
+
 		try {
 			ControleOpdracht opdracht = null;
 
@@ -1386,11 +1336,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 		return null;
 	}
 
+	/**
+	 * Printen van een PDF bestand met overzichtskaart en bewegwijzergsverslag
+	 * in tabelvorm met betrekking tot het Traject uit de gekozen
+	 * ControleOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
 	public Content printControleOpdracht() throws Exception {
 
-		if (pdfType.equals("1")) {
-			messages.error("Selecteer een type PDF.");
-		}
 		// Map<String, Object> variables = new HashMap<String, Object>();
 		// variables.put("title", "Test");
 		// variables.put("abstract", "test");
@@ -1405,39 +1360,57 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// variables.put("portrait", "portrait".equals("portrait"));
 		// variables.put("pageSize", 2);
 		// variables.put("extent", getViewer().getContentExtent());
-		//
-		//
-		// MapPDFBuilder builder = Beans.getReference(MapPDFBuilder.class);
-		// byte[] result = builder.transform(xslt, getViewer(), variables);
-		// return new ByteArrayContent("application/pdf", result);
 
-		DocumentBuilderFactory docFactory = DocumentBuilderFactory
-				.newInstance();
-		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-		// root element
-		Document doc = docBuilder.newDocument();
-		Element rootElement = doc.createElement("verslag");
-		doc.appendChild(rootElement);
-
+		// Opbouwen XML
 		List<Bord> borden = createBewegwijzering(object.getTraject());
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
 
-		for (Bord b : borden) {
-			// Bord elementen
-			Element bord = doc.createElement("bord");
-			rootElement.appendChild(bord);
-
-			Element id = doc.createElement("id");
-			id.appendChild(doc.createTextNode(b.getId().toString()));
-			bord.appendChild(id);
-		}
+		XmlBuilder xmlBuilder = new XmlBuilder();
+		Document doc = xmlBuilder.buildBewegwijzeringTabel(traject, object,
+				borden);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
 				FopFactory.newInstance().newFOUserAgent(), out);
 
+		// xslt
+		Source xslt = new StreamSource(getClass().getResourceAsStream(CO_PDF));
+
+		// Transform source
+		Transformer transformer = TransformerFactory.newInstance()
+				.newTransformer(xslt);
+		Result res = new SAXResult(fop.getDefaultHandler());
+
+		transformer.transform(new DOMSource(doc), res);
+
+		// return pdf
+		return new ByteArrayContent("application/pdf", out.toByteArray());
+	}
+
+	/**
+	 * Printen van een PDF bestand met de individuele bordfiches uit het
+	 * bewegwijzeringsverslag met betrekking tot het Traject in de gekozen
+	 * ControleOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Content printControleOpdrachtBordFiches() throws Exception {
+
+		// Opbouwen XML
+		List<Bord> borden = createBewegwijzering(object.getTraject());
+
+		XmlBuilder xmlBuilder = new XmlBuilder();
+		Document doc = xmlBuilder.buildBordFiches(object, borden, getViewer());
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+				FopFactory.newInstance().newFOUserAgent(), out);
+
+		// xslt
 		Source xslt = new StreamSource(getClass().getResourceAsStream(
-				CO_PDF_XSL));
+				BORDFICHE_PDF));
 
 		// Transform source
 		Transformer transformer = TransformerFactory.newInstance()
@@ -1457,6 +1430,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public boolean isBordProbleem(Probleem probleem) {
+
 		if (probleem != null) {
 			if (probleem instanceof BordProbleem) {
 				return true;
@@ -1474,6 +1448,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public boolean isRouteBord(Bord bord) {
+
 		if (bord instanceof RouteBord) {
 			return true;
 		} else {
@@ -1487,8 +1462,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param probleem
 	 */
 	public void deleteProbleem(Probleem probleem) {
-		try {
 
+		try {
 			object.getProblemen().remove(probleem);
 			modelRepository.saveObject(object);
 			modelRepository.deleteObject(probleem);
@@ -1523,9 +1498,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 							((AnderProbleem) probleem).getGeom());
 				}
 
-				else if (((AnderProbleem) probleem).getGeom() instanceof LineString) {
+				else if (((AnderProbleem) probleem).getGeomOmleiding() instanceof LineString) {
 					lineLayer.getGeometries().remove(
-							((AnderProbleem) probleem).getGeom());
+							((AnderProbleem) probleem).getGeomOmleiding());
 				}
 			}
 
@@ -1541,11 +1516,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	@Override
 	public void delete() {
+
 		try {
+
 			modelRepository.deleteObject(object);
 			messages.info("Controleopdracht succesvol verwijderd.");
 			clear();
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van de controleopdracht: "
 					+ e.getMessage());
@@ -1559,11 +1537,21 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param probleem
 	 */
 	public boolean checkProbleem(Probleem probleem) {
+
 		// Indien BordProbleem check of bord geselecteerd is
 		if (probleem instanceof BordProbleem) {
 			BordProbleem b = (BordProbleem) probleem;
 			if (b.getBord() == null) {
 				messages.warn("Probleem niet toegevoegd: gelieve eerst een bord op de kaart te selecteren.");
+				return false;
+			}
+		}
+
+		// Indien AnderProbleem check of probleempunt is aangeduid
+		if (probleem instanceof AnderProbleem) {
+			AnderProbleem a = (AnderProbleem) probleem;
+			if (a.getGeom() == null) {
+				messages.warn("Probleem niet toegevoegd: gelieve eerst een probleem(punt) aan te duiden op de kaart.");
 				return false;
 			}
 		}
@@ -1606,43 +1594,47 @@ public class ControleOpdrachtOverzichtFormBase extends
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 
-		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
-				.getLayer(GEOMETRY_LAYER_NAME);
-		pointLayer.setSelectable(true);
-		pointLayer.setSelection(new ArrayList<String>());
-		pointLayer.setEditable(true);
-		pointLayer.setGeometries(new ArrayList<Geometry>(1));
-
+		// Lijn laag
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
-		lineLayer.setGeometries(new ArrayList<Geometry>(1));
-		lineLayer.setSelectable(false);
 		lineLayer.setEditable(false);
+		lineLayer.setSelectable(false);
+
+		// Punten laag
+		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_NAME);
+		pointLayer.setEditable(true);
+		pointLayer.setGeometries(new ArrayList<Geometry>(1));
+		viewer.setEditLayerId(GEOMETRY_LAYER_NAME);
 
 		viewer.updateContext(null);
 	}
 
-	// TODO: Intekenen omleiding
 	/**
 	 * Test switch naar lineGeomLayer bij intekenen omleiding
+	 * 
+	 * @throws IOException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
 	 */
-	public void switchToLineGeomLayer() {
+	public void switchToLineGeomLayer() throws IOException,
+			InstantiationException, IllegalAccessException {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
 
+		// Punten laag
 		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);
-		pointLayer.setSelectable(false);
-		pointLayer.setSelection(new ArrayList<String>());
 		pointLayer.setEditable(false);
-		pointLayer.setGeometries(new ArrayList<Geometry>(1));
+		pointLayer.setSelectable(false);
 
+		// Lijn laag
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
 		lineLayer.setGeometries(new ArrayList<Geometry>(1));
-		lineLayer.setSelectable(true);
 		lineLayer.setEditable(true);
+		viewer.setEditLayerId(GEOMETRY_LAYER_LINE_NAME);
 
 		viewer.updateContext(null);
 	}
@@ -1654,6 +1646,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public boolean isRouteBord(ResourceIdentifier bord) {
+
 		try {
 			Bord b = (Bord) modelRepository.loadObject(bord);
 			if (b instanceof RouteBord) {
@@ -1666,5 +1659,125 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 
 		return false;
+	}
+
+	/**
+	 * Opzetten van de lagen bij het visualiseren van de mini kaart.
+	 * 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws IOException
+	 * 
+	 */
+	private void setupLayers(MapConfiguration configuration, MapContext context)
+			throws InstantiationException, IllegalAccessException, IOException {
+
+		List<String> bordSelection = new ArrayList<String>();
+		List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
+		List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+
+		GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
+				.createGeometryLayer(configuration.getContext(),
+						GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+						"single", null, null);
+
+		GeometryListFeatureMapLayer geomLineLayer = (GeometryListFeatureMapLayer) mapFactory
+				.createGeometryLayer(configuration.getContext(),
+						GEOMETRY_LAYER_LINE_NAME, null, LineString.class, null,
+						true, "single", null, null);
+
+		// Get traject
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+
+		// Laden laag op basis van trajectType
+		FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+				.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
+						.getName()));
+
+		if (trajectLayer != null) {
+			trajectLayer.setHidden(false);
+			trajectLayer
+					.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+
+			Envelope envelope = GeometryUtils.getEnvelope(traject.getGeom());
+			GeometryUtils.expandEnvelope(envelope, 0.1,
+					context.getMaxBoundingBox());
+			context.setBoundingBox(envelope);
+		}
+
+		// BordLayer
+		bordLayer = null;
+		// ROUTES
+		if (traject instanceof Route) {
+			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+							.getModelClass().getName() + "Bord")));
+
+			// Filteren Routeborden op BordNaam
+			if (bordLayer != null) {
+				bordLayer.set("selectable", true);
+				bordLayer.setHidden(false);
+				bordLayer
+						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+			}
+
+		}
+		// LUSSEN
+		else if (traject instanceof NetwerkLus) {
+			bordLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+							.lowerCamelCase(traject.getModelClass().getName()
+									.replace("Lus", "Bord"))));
+			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+							.lowerCamelCase(traject.getModelClass().getName()
+									.replace("Lus", "Knooppunt"))));
+			// Filteren NetwerkBorden op segmenten van de Lus
+			if (bordLayer != null) {
+				bordLayer.setHidden(false);
+				bordLayer.set("selectable", true);
+				bordLayer.setFilter(FilterUtils.in("segmenten",
+						((NetwerkLus) traject).getSegmenten()));
+			}
+			if (knooppuntLayer != null) {
+				searchKnooppuntLayer(knooppuntLayer);
+			}
+		}
+
+		// Problemen
+		for (Probleem probleem : object.getProblemen()) {
+			if (probleem instanceof BordProbleem) {
+				// Bord Probleem
+				Bord bord = (Bord) modelRepository
+						.loadObject(((BordProbleem) probleem).getBord());
+				bordSelection.add(bord.getId().toString());
+
+			} else if (probleem instanceof AnderProbleem) {
+				// Ander Probleem
+				AnderProbleem anderProbleem = (AnderProbleem) probleem;
+
+				if (anderProbleem.getGeom() instanceof Point) {
+					anderProbleemPointGeoms.add(anderProbleem.getGeom());
+				}
+
+				if (anderProbleem.getGeomOmleiding() instanceof LineString) {
+					anderProbleemLineGeoms
+							.add(anderProbleem.getGeomOmleiding());
+				}
+			}
+		}
+
+		bordLayer.setSelection(bordSelection);
+		geomLayer.setGeometries(anderProbleemPointGeoms);
+		geomLineLayer.setGeometries(anderProbleemLineGeoms);
+
+		if (!anderProbleemPointGeoms.isEmpty()) {
+			geomLayer.setHidden(false);
+		}
+
+		if (!anderProbleemLineGeoms.isEmpty()) {
+			geomLineLayer.setHidden(false);
+		}
 	}
 }

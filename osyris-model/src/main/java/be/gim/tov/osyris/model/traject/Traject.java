@@ -13,10 +13,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -54,14 +52,10 @@ public abstract class Traject extends AbstractModelObject implements
 	private static final Log LOG = LogFactory.getLog(Traject.class);
 
 	// VARIABLES
-	@Label("Naam")
-	@Description("Naam")
 	@Edit(type = "suggestions")
 	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
-	@Label("Regio")
-	@Description("Regio")
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
@@ -70,8 +64,6 @@ public abstract class Traject extends AbstractModelObject implements
 
 	@NotEditable
 	@NotSearchable
-	@Label("Lengte")
-	@Description("Lengte")
 	private float lengte;
 
 	@NotViewable
@@ -82,8 +74,6 @@ public abstract class Traject extends AbstractModelObject implements
 	private Geometry geom;
 
 	@NotSearchable
-	@Label("Peter/Meter Lente")
-	@Description("Peter/Meter Lente")
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
@@ -91,16 +81,12 @@ public abstract class Traject extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter1;
 
 	@NotSearchable
-	@Label("Peter/Meter Zomer")
-	@Description("Peter/Meter Zomer")
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
 	private ResourceIdentifier peterMeter2;
 
 	@NotSearchable
-	@Label("Peter/Meter Herfst")
-	@Description("Peter/Meter Herfst")
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
@@ -167,7 +153,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@Transient
 	@NotSearchable
 	@NotEditable
-	@Label("Medewerker TOV")
 	public ResourceIdentifier getMedewerker() {
 
 		Map<Serializable, Object> cache = Beans.getReference(

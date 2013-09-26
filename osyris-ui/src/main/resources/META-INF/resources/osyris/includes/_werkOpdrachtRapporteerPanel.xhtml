@@ -8,6 +8,11 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
+	
+	<h:outputStylesheet id="fileuploadCss"
+		name="fileupload/fileupload.css"
+		library="primefaces" />
+		
 	<h2>Werkopdracht #{d:modelObject(form.selectedWerkOpdracht).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.selectedWerkOpdracht.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.selectedWerkOpdracht.traject)}) - #{osyrisModelFunctions.getTrajectType(form.selectedWerkOpdracht.traject)}</h2>
 	<br/>
 	<table width="100%">
@@ -35,6 +40,17 @@
 	</d:fields>
 	</r:panel>
 	<br/>
+	<r:panel id="commentaarTOVPanel">
+	<d:fields>
+		<d:field for="commentaarTOV" label="Commentaar TOV">
+			<d:propertyValue id="commentaarTOV"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+					value="#{form.selectedWerkOpdracht.commentaarMedewerker}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+	</r:panel>
+	<br/>
 	<r:panel id="commentaarPanel">
 	<d:fields>
 		<d:field for="commentaar" label="Commentaar uitvoerder">
@@ -54,13 +70,11 @@
 	</r:panel>
 	<br/>
 	<r:panel id="fotoPanel">
-	<d:fields>
-		<d:field for="foto" label="Foto">
-		<d:propertyValue id="foto"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
-					value="#{form.selectedWerkOpdracht.foto}"
-					mode="EDIT" />
-		</d:field>
+	<d:fields>				
+		<d:propertyField id="foto" 
+				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
+				value="#{form.selectedWerkOpdracht.foto}"
+					mode="EDIT" />				
 	</d:fields>
 	</r:panel>
 	</td>

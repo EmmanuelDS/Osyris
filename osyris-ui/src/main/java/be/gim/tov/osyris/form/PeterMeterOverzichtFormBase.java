@@ -252,14 +252,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 					FilterUtils.equal("scope", "document"));
 
 			// Delete user from PM group
-			List<Group> groups = (List<Group>) modelRepository.searchObjects(
-					new DefaultQuery("Group"), false, false);
-			for (Group group : groups) {
-				if (group.getGroupname().equals("PeterMeter")) {
-					group.getMembers().remove(
-							modelRepository.getResourceName(object));
-				}
-			}
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+			group.getMembers().remove(modelRepository.getResourceName(object));
+			modelRepository.saveObject(group);
 
 			// Delete user and document permissions
 			modelRepository.deleteObject(object);

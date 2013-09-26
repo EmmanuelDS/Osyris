@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
@@ -19,11 +18,9 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Provincie")
 public class Provincie extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
-	@Label("Naam")
 	private String naam;
 
 	@NotSearchable

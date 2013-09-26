@@ -1057,4 +1057,13 @@ public class MeldingFormBase implements Serializable {
 		}
 		return null;
 	}
+
+	/**
+	 * Reset zoekvelden trajectNaam en knooppuntNummer bij het wijzigen van het
+	 * trajectType zoekveld.
+	 */
+	public void resetChildSearchParameters() {
+		setKnooppuntNummer(null);
+		setTrajectNaam(null);
+	}
 }

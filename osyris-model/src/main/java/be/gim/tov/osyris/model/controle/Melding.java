@@ -6,9 +6,7 @@ import javax.persistence.Transient;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -46,7 +44,6 @@ import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true) })
-@Label("Melding")
 @Edit(type = "melding")
 public class Melding extends AbstractModelObject implements StorableObject {
 
@@ -54,47 +51,33 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotSearchable
 	@NotEditable
 	@EditableInStatus("")
-	@Label("Traject")
-	@Description("Traject")
 	@ModelClassName("Traject")
 	private ResourceIdentifier traject;
 
 	@NotEditable
-	@Label("Status")
-	@Description("Status")
 	private MeldingStatus status;
 
 	@EditableInStatus("")
 	@NotSearchable
-	@Label("Voornaam")
-	@Description("Voornaam")
 	private String voornaam;
 
 	@EditableInStatus("")
 	@NotSearchable
-	@Label("Naam")
-	@Description("Naam")
 	private String naam;
 
 	@Required
 	@EditableInStatus("")
 	@NotSearchable
-	@Label("Email")
-	@Description("Email")
 	@Length(min = 3, max = 128)
 	@Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
 	private String email;
 
 	@EditableInStatus("")
 	@NotSearchable
-	@Label("Telefoon")
-	@Description("Telefoon")
 	@Length(min = 3, max = 30)
 	@Pattern("(\\+?[\\d]+)?")
 	private String telefoon;
 
-	@Label("Medewerker")
-	@Description("Medewerker")
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
@@ -102,44 +85,36 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	@NotSearchable
 	@EditableInStatus("")
-	@Label("Datum vaststelling")
-	@Description("Datum vaststelling")
 	@Type(ModelPropertyType.DATE)
 	private Date datumVaststelling;
 
 	@NotSearchable
 	@NotEditable
-	@Label("Datum gemeld")
-	@Description("Datum gemeld")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGemeld;
 
 	@NotSearchable
 	@NotEditable
-	@Label("Datum gevalideerd")
-	@Description("Peter/Meter")
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGevalideerd;
 
 	@EditableInStatus({ "", "GEMELD" })
 	@Required
 	@NotSearchable
-	@Label("Probleem")
-	@Description("Probleem")
 	private Probleem probleem;
 
 	@EditableInStatus({ "GEMELD", "GEVALIDEERD" })
 	@NotSearchable
-	@Label("Commentaar TOV")
-	@Description("Commentaar TOV")
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
+	// Extra property om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
 	private String typeTraject;
 
+	// Extra property om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
@@ -262,7 +237,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("Datum laatste statuswijziging")
 	public Date getDatumLaatsteWijziging() {
 		return Beans.getReference(OsyrisModelFunctions.class)
 				.getDatumLaatsteWijziging(this);
@@ -272,7 +246,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("TrajectType")
 	public String getTrajectType() {
 		return Beans.getReference(OsyrisModelFunctions.class).getTrajectType(
 				this.traject);
@@ -282,7 +255,6 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("Regio")
 	public String getRegio() {
 		return Beans.getReference(OsyrisModelFunctions.class).getTrajectRegio(
 				this.traject);

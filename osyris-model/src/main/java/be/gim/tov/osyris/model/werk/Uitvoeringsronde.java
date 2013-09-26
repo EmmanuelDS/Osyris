@@ -5,8 +5,6 @@ import java.util.List;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -28,7 +26,6 @@ import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Uitvoeringsronde")
 @Permissions({
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
@@ -50,36 +47,24 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 
 	// VARIABLES
 	@NotEditable
-	@Label("Status")
-	@Description("Status")
 	private UitvoeringsrondeStatus status;
 
-	@Label("Datum uitvoering")
-	@Description("Datum uitvoering")
 	@Type(ModelPropertyType.DATE)
 	private Date datumUitvoering;
 
 	@NotSearchable
-	@Label("Omschrijving ronde")
-	@Description("Omschrijving ronde")
 	@Type(value = ModelPropertyType.TEXT)
 	private String omschrijving;
 
 	@NotSearchable
-	@Label("Afgelegde afstand")
-	@Description("Afgelegde afstand")
 	private int afstand;
 
 	@NotSearchable
 	@NotEditable
 	@NotViewable
-	@Label("Uitvoerder")
-	@Description("Uitvoerder")
 	private ResourceIdentifier uitvoerder;
 
 	@NotSearchable
-	@Label("Werkopdrachten")
-	@Description("Werkopdrachten")
 	@ModelClassName("WerkOpdracht")
 	private List<ResourceIdentifier> opdrachten;
 

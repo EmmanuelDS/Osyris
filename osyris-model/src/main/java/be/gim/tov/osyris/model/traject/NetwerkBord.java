@@ -3,9 +3,7 @@ package be.gim.tov.osyris.model.traject;
 import java.util.List;
 
 import org.conscientia.api.model.ModelPropertyType;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Edit;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -26,90 +24,62 @@ import be.gim.commons.resource.ResourceIdentifier;
 public abstract class NetwerkBord extends Bord {
 
 	// VARIABLES
-	@Label("Bordtype")
-	@Description("bordtype")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordTypeCode')}")
 	private String bordType;
 
-	@Label("Bordbase")
-	@Description("Bordbase")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordBaseCode')}")
 	private String bordBase;
 
 	@NotSearchable
-	@Label("Afbeeldingscode KP1")
-	@Description("Afbeeldingscode knooppunt 1")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp1ImageCode;
 
 	@NotSearchable
-	@Label("Afbeeldingscode KP2")
-	@Description("Afbeeldingscode knooppunt 2")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp2ImageCode;
 
 	@NotSearchable
-	@Label("Afbeeldingscode KP3")
-	@Description("Afbeeldingscode knooppunt 3")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
 	private String kp3ImageCode;
 
 	@NotEditable
-	@Label("KnooppuntNr 0")
-	@Description("Knooppuntnummer 0")
 	private Integer kpnr0;
 
 	@NotEditable
-	@Label("KnooppuntNr 1")
-	@Description("Knooppuntnummer 1")
 	private Integer kpnr1;
 
 	@NotEditable
-	@Label("KnooppuntNr 2")
-	@Description("Knooppuntnummer 2")
 	private Integer kpnr2;
 
 	@NotEditable
-	@Label("KnooppuntNr 3")
-	@Description("Knooppuntnummer 3")
 	private Integer kpnr3;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
-	@Label("Knooppunt 0")
-	@Description("Netwerkknooppunt 0")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid0;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
-	@Label("Knooppunt 1")
-	@Description("Netwerkknooppunt 1")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid1;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
-	@Label("Knooppunt 2")
-	@Description("Netwerkknooppunt 2")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid2;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
-	@Label("Knooppunt 3")
-	@Description("Netwerkknooppunt 3")
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid3;
 
 	@NotSearchable
-	@Label("Segmenten")
-	@Description("Netwerksegmenten")
 	@ModelClassName("Traject")
 	private List<ResourceIdentifier> segmenten;
 

@@ -2,9 +2,7 @@ package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.For;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -41,13 +39,8 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	@Label("Uitvoerder")
-	@Description("Uitvoerder")
 	private ResourceIdentifier _for;
 
-	// Changed back to ResourceIdentifier
-	@Label("Bedrijf")
-	@Description("Bedrijf")
 	@ModelClassName("UitvoerderBedrijf")
 	private ResourceIdentifier bedrijf;
 

@@ -125,7 +125,7 @@
 					rowsPerPageTemplate="10,20,30,40,50"
 					scrollable="true"
 					resizableColumns="true"
-					tableStyle="min-width: 850px"
+					tableStyle="min-width: 700px"
 					emptyMessage="#{messages['ui.dataTable.empty']}">
 					<j:layoutContent />
 					<j:bindAttribute var="uitvoeringsronde"
@@ -133,7 +133,7 @@
 					<p:column style="width:5%">
 						<p:rowToggler />
 					</p:column>
-					<p:column label="Acties">
+					<p:column label="Acties" style="width:40px;">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton
 								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanView(uitvoeringsronde)}"
@@ -145,16 +145,6 @@
 									target="#{uitvoeringsrondeOverzichtFormBase.object}"
 									value="#{uitvoeringsronde}" />
 							</j:commandButton>
-<!-- 							<j:commandButton -->
-<!-- 								rendered="#{(uitvoeringsrondeOverzichtFormBase.isCanEdit(uitvoeringsronde) and uitvoeringsronde.status == 'AANGEMAAKT') and (identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')) }" -->
-<!-- 								image="#{resource['core/images/actions/16x16/edit.png']}" -->
-<!-- 								type="image" -->
-<!-- 								title="Rapporteren uitvoeringsronde" -->
-<!-- 								oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).show();"> -->
-<!-- 								<f:setPropertyActionListener -->
-<!-- 									target="#{uitvoeringsrondeOverzichtFormBase.object}" -->
-<!-- 									value="#{uitvoeringsronde}" /> -->
-<!-- 							</j:commandButton> -->
 							<j:commandButton
 								rendered="#{uitvoeringsrondeOverzichtFormBase.isCanDelete(uitvoeringsronde)}"
 								image="#{resource['core/images/actions/16x16/delete.png']}"
@@ -167,13 +157,13 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					 <p:column label="id">
+					 <p:column label="id" style="width:100px;">
 						<f:facet name="header">
-						<div>Identificatie</div>
+							<h:outputText value="Id" />
 						</f:facet>
 						<div>#{d:modelObject(uitvoeringsronde).getId()}</div>
 					</p:column>
-					<p:column label="Status" sortBy="#{uitvoeringsronde.status }">
+					<p:column label="Status" sortBy="#{uitvoeringsronde.status }" style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('Uitvoeringsronde').getProperty('status')}" />
@@ -182,7 +172,7 @@
 							modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('status')}"
 							value="#{uitvoeringsronde.status }" mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" sortBy="#{uitvoeringsronde.status}">
+					<p:column label="Datum" sortBy="#{uitvoeringsronde.status}" style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}" />
@@ -217,7 +207,7 @@
 							</p:column>
 							<p:column label="id">
 								<f:facet name="header">
-								<div>Identificatie</div>
+								<h:outputText value="Id" />
 								</f:facet>
 								<div>#{d:modelObject(werkOpdracht).getId()}</div>
 							</p:column>

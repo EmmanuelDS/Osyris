@@ -17,15 +17,18 @@
 		var="bord"
 		paginator="true"
 		styleClass="blue"
-		rows="5"
+		rows="50"
+		scrollHeight="150"
+		scrollable="true"
+		resizableColumns="true"
 		paginatorPosition="bottom"
 		paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
 		emptyMessage="Geen resultaten gevonden">
 
 		<f:facet name="header">
-			<div>Bewegwijzering</div>
+			<h:outputText value="Bewegwijzering"/>
 		</f:facet>
-		<p:column style="width:2%">
+		<p:column style="width:40px;">
 			<j:commandButton
 				src="#{resource['core/images/actions/16x16/zoom.png']}" type="image"
 				title="Zoomen naar bord"
@@ -33,13 +36,13 @@
 		</p:column>
 		<p:column>
 			<f:facet name="header">
-				<div>BordID</div>
+				<h:outputText value="BordID"/>
 			</f:facet>
 			<h:outputText value="#{d:modelObject(bord).getId()}" />
 		</p:column>
-		<p:column filterBy="#{bord.volg}" filterMatchMode="exact">
+		<p:column>
 			<f:facet name="header">
-				<div>Volgnr</div>
+				<h:outputText value="VolgNr"/>
 			</f:facet>
 			<d:propertyValue id="bordVolgColumn"
 				modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
@@ -47,19 +50,51 @@
 		</p:column>
 		<p:column rendered="#{!form.isRouteBord(bord)}">
 			<f:facet name="header">
-				<div>Pijlen</div>
+				<h:outputText value="Pijlen"/>
 			</f:facet>
-			<h:outputText value="#{bord.kp1ImageCode } - #{bord.kp2ImageCode } - #{bord.kp3ImageCode }"/>
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp1ImageCode == '1'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_e.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp1ImageCode == '2'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_w.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp1ImageCode == '3'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_n.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp2ImageCode == '1'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_e.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp2ImageCode == '2'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_w.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp2ImageCode == '3'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_n.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp3ImageCode == '1'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_e.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp3ImageCode == '2'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_w.png']}" />
+			<h:graphicImage rendered="#{!form.isRouteBord(bord) and bord.kp3ImageCode == '3'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_n.png']}" />
 		</p:column>
-		<p:column filterBy="#{bord.imageCode}" filterMatchMode="exact" rendered="#{form.isRouteBord(bord)}">
+		<p:column rendered="#{form.isRouteBord(bord)}" style="width:20px;">
 			<f:facet name="header">
-				<div>Pijl</div>
+				<h:outputText value="Pijl"/>
 			</f:facet>
-			<d:propertyValue id="imageCodeColumn"
-				modelProperty="#{d:modelClass('Bord').getProperty('imageCode')}"
-				value="#{bord.imageCode }" mode="VIEW" />
+			 <h:graphicImage rendered="#{form.isRouteBord(bord) and bord.imageCode == '1'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_e.png']}" />
+			<h:graphicImage rendered="#{form.isRouteBord(bord) and bord.imageCode == '2'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_w.png']}" />
+			<h:graphicImage rendered="#{form.isRouteBord(bord) and bord.imageCode == '3'}"
+				alt="Links"
+				value="#{resource['osyris/images/ar_green_n.png']}" />
 		</p:column>
-		<p:column filterBy="#{bord.straatnaam}" filterMatchMode="contains" rendered="#{form.isRouteBord(bord)}">
+		<p:column rendered="#{form.isRouteBord(bord)}">
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('Bord').getProperty('straatnaam')}" />
@@ -68,7 +103,7 @@
 				modelProperty="#{d:modelClass('Bord').getProperty('straatnaam')}"
 				value="#{bord.straatnaam }" mode="VIEW" />
 		</p:column>
-		<p:column filterBy="#{bord.paalConst}" filterMatchMode="contains">
+		<p:column>
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('Bord').getProperty('paalConst')}" />

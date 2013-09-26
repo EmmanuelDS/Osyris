@@ -7,5 +7,5 @@ package be.gim.tov.osyris.model.controle.status;
  */
 public enum ProbleemStatus {
 
-	IN_BEHANDELING, WERKOPDRACHT, GEEN_WERKOPDRACHT, REEDS_GEMELD
+	GEEN_WERKOPDRACHT, IN_BEHANDELING, REEDS_GEMELD, WERKOPDRACHT
 }

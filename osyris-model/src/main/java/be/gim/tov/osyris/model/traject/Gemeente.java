@@ -1,8 +1,6 @@
 package be.gim.tov.osyris.model.traject;
 
-import org.conscientia.api.model.annotation.Description;
 import org.conscientia.api.model.annotation.Index;
-import org.conscientia.api.model.annotation.Label;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -21,25 +19,16 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-@Label("Gemeente")
 public class Gemeente extends AbstractModelObject {
 
 	// VARIABLES
-	@Label("Naam")
-	@Description("Naam")
 	@LabelProperty
 	private String naam;
 
-	@Label("NIS code")
-	@Description("NIS code")
 	private String niscode;
 
-	@Label("EU code")
-	@Description("EU code")
 	private String eucode;
 
-	@Label("Perimeter")
-	@Description("Perimeter")
 	private float perimeter;
 
 	@NotViewable

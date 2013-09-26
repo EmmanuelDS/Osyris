@@ -1,0 +1,15 @@
+<#assign subject>
+[${preferences.title?string}] Gewijzigde werkopdracht
+</#assign>
+<html xmlns="http://www.w3.org/1999/xhtml">
+	<body>
+		<div>Toerisme Oost-Vlaanderen heeft volgende werkopdracht gewijzigd:</div>
+		<dl>
+			<dt>Werkopdracht identificatie:</dt>
+			<dd>${id}</dd>
+			<dt>Gewijzigd door:</dt>
+			<dd>${editor}</dd>
+		</dl>
+		<div>Gelieve via OSYRIS het overzicht van Uw werkopdrachten te raadplegen.</div>
+	</body>
+</html>
