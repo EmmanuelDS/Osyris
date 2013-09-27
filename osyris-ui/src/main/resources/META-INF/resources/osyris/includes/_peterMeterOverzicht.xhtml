@@ -66,7 +66,7 @@
 			<j:layoutPane>
 				<a:outputPanel id="result" renderend="true">
 					<p:dataTable id="objects"
-						value="#{peterMeterOverzichtFormBase.results}" 
+						value="#{peterMeterOverzichtFormBase.dataModel}" 
 						lazy="true"
 						var="user"
 						style="width: 100%;" 
@@ -83,32 +83,32 @@
 							<p:rowToggler />
 						</p:column>
 						<p:column style="width: 60px">
-						<a:outputPanel rendered="true" styleClass="model-table-actions">
-							<j:commandButton
-								image="#{resource['core/images/actions/16x16/view.png']}"
-								type="image"
-								title="#{messages['page.actions.view.label']}"
-								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
-							</j:commandButton>
-							<j:commandButton
-								image="#{resource['core/images/actions/16x16/edit.png']}"
-								type="image"
-								title="#{messages['page.actions.edit.label']}"
-								oncomplete="conscientia.widget(#{r:element('editPopup')}).show();">								
-								<f:setPropertyActionListener
-									target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
-							</j:commandButton>
-							<j:commandButton
-								image="#{resource['core/images/actions/16x16/delete.png']}"
-								type="image"
-								title="#{messages['page.actions.delete.label']}"
-								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
-							</j:commandButton>
-						</a:outputPanel>
+							<a:outputPanel rendered="true" styleClass="model-table-actions">
+								<j:commandButton
+									image="#{resource['core/images/actions/16x16/view.png']}"
+									type="image"
+									title="#{messages['page.actions.view.label']}"
+									oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+									<f:setPropertyActionListener
+										target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
+								</j:commandButton>
+								<j:commandButton
+									image="#{resource['core/images/actions/16x16/edit.png']}"
+									type="image"
+									title="#{messages['page.actions.edit.label']}"
+									oncomplete="conscientia.widget(#{r:element('editPopup')}).show();">								
+									<f:setPropertyActionListener
+										target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
+								</j:commandButton>
+								<j:commandButton
+									image="#{resource['core/images/actions/16x16/delete.png']}"
+									type="image"
+									title="#{messages['page.actions.delete.label']}"
+									oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
+									<f:setPropertyActionListener
+										target="#{peterMeterOverzichtFormBase.object}" value="#{user}" />
+								</j:commandButton>
+							</a:outputPanel>
 						</p:column>
 						<p:column headerText="#{messages['model.property.userProfile.avatar.label']}"
 							style="width: 30px;">
@@ -116,7 +116,7 @@
 								height="32" />
 						</p:column>
 						<p:column label="Voornaam"
-							sortBy="#{user.getAspect('UserProfile', modelRepository, true).firstName }">
+							sortBy="#{'#UserProfile/firstName'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('UserProfile').getProperty('firstName')}" />
@@ -127,7 +127,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Familienaam" style="width: 80px;"
-							sortBy="#{user.getAspect('UserProfile', modelRepository, true).lastName}">
+							sortBy="#{'#UserProfile/lastName'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('UserProfile').getProperty('lastName')}" />
@@ -138,7 +138,7 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Email" style="width:180px;"
-							sortBy="#{user.getAspect('UserProfile', modelRepository, true).email }">
+							sortBy="#{'#UserProfile/email'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('UserProfile').getProperty('email')}" />
@@ -149,19 +149,19 @@
 								mode="VIEW" />
 						</p:column>
 						<p:column label="Status"
-							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }">
+							sortBy="#{'#PeterMeterProfiel/status'}">
 							<f:facet name="header">
 							<h:outputText value="Status"/>
-<!-- 								<d:displayLabel -->
-<!-- 									property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" /> -->
+ 								<d:displayLabel
+									property="#{d:modelClass('PeterMeterProfiel').getProperty('status')}" />
 							</f:facet>
 							<d:propertyValue id="statusColumn"
 								modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('status')}"
 								value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).status }"
 								mode="VIEW" />
 						</p:column>
-						<p:column label="ActiefSinds"
-							sortBy="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }">
+						<p:column label="Actief sinds"
+							sortBy="#{'#PeterMeterProfiel/actiefSinds'}">
 							<f:facet name="header">
 								<d:displayLabel
 									property="#{d:modelClass('PeterMeterProfiel').getProperty('actiefSinds')}" />
@@ -171,8 +171,8 @@
 								value="#{user.getAspect('PeterMeterProfiel', modelRepository, true).actiefSinds }"
 								mode="VIEW" />
 						</p:column>
-						<p:rowExpansion label="Voorkeuren">
-							<h:panelGrid id="display" columns="1" style="width:600px;">
+						<p:rowExpansion label="Voorkeuren"> 
+							<h:panelGrid id="display" columns="1" style="width: 100%">
 								<f:facet name="header">
 									<d:displayLabel
 										property="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}" />
