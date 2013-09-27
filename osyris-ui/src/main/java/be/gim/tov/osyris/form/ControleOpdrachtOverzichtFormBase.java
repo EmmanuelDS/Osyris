@@ -80,6 +80,7 @@ import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
+import be.gim.tov.osyris.model.utils.DateSortingCO;
 import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -286,13 +287,19 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
 				return query;
 			}
-			// PeterMeter kan enkel status uit te voeren zien
+			// PeterMeter kan enkel status uit te voeren en gevalideerd zien
 			if (identity.inGroup("PeterMeter", "CUSTOM")) {
+
 				query.addFilter(FilterUtils.equal("peterMeter", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
-				query.addFilter(FilterUtils.equal("status",
-						ControleOpdrachtStatus.UIT_TE_VOEREN));
+				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
+						ControleOpdrachtStatus.TE_CONTROLEREN),
+						FilterUtils.notEqual("status",
+								ControleOpdrachtStatus.GEANNULEERD),
+						FilterUtils.notEqual("status",
+								ControleOpdrachtStatus.GERAPPORTEERD)));
+
 				return query;
 			}
 		} catch (IOException e) {
@@ -351,9 +358,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 				}
 				results = filteredList;
 			} else {
+
 				results = (List<ControleOpdracht>) modelRepository
 						.searchObjects(getQuery(), true, true);
 			}
+
+			Collections.sort(results, new DateSortingCO());
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;
@@ -723,6 +733,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					.getFeature(layer, getViewer().getContext().getSrsName(),
 							getViewer().getContext().getBoundingBox(), null,
 							FilterUtils.equal("naam", trajectNaam), null, 1);
+
 			FeatureIterator<SimpleFeature> iterator = features.features();
 
 			try {

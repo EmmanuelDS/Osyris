@@ -10,9 +10,17 @@
         <fo:simple-page-master master-name="A4-landscape"
               page-height="21cm" page-width="29.7cm" margin="1cm">
           <fo:region-body/>
+           <fo:region-after region-name="footer" />
         </fo:simple-page-master>
       </fo:layout-master-set>
       <fo:page-sequence master-reference="A4-landscape">
+      
+       <fo:static-content flow-name="footer">
+    	<fo:block text-align="center" font-size="10pt" color="#000000">
+      	<fo:inline><fo:page-number/></fo:inline>
+    	</fo:block>
+   	  </fo:static-content>
+   	  
         <fo:flow flow-name="xsl-region-body">
         
         <xsl:if test="//@netwerkCO='false'">

@@ -63,6 +63,7 @@ import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.utils.DateSortingWO;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
@@ -305,6 +306,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 			if (gemeente == null && vanDatum == null && totDatum == null) {
 				results = list;
 			}
+
+			Collections.sort(results, new DateSortingWO());
+
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;
@@ -1107,7 +1111,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 		// .getAspect("UserProfile").get("email").toString())
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
-				Collections.singleton("babs.dumont@gim.be"),
+				Collections.singleton("kristof.spiessens@gim.be"),
 				"/META-INF/resources/core/mails/editedWerkOpdracht.fmt",
 				variables);
 
@@ -1135,8 +1139,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 			Bord bord = (Bord) modelRepository.loadObject(bordProbleem
 					.getBord());
 
-			doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(traject,
-					object, bord);
+			doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(getViewer(),
+					traject, object, bord);
 		}
 
 		else if (object.getProbleem() instanceof AnderProbleem) {

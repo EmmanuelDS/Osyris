@@ -10,13 +10,23 @@
         <fo:simple-page-master master-name="A4-landscape"
               page-height="21cm" page-width="29.7cm" margin="1cm">
           <fo:region-body/>
+          <fo:region-after region-name="footer" />
         </fo:simple-page-master>
       </fo:layout-master-set>
+   	  
+   	  <!-- NEW PAGE SEQUENCE For EVERY PAGE TO AVOID HEAP SPACE MEMORY ISSUES -->
+      <xsl:for-each select="/verslag/bord">
       <fo:page-sequence master-reference="A4-landscape">
+       
+       <fo:static-content flow-name="footer">
+    	<fo:block text-align="center" font-size="10pt" color="#000000">
+      	<fo:inline><fo:page-number/></fo:inline>
+    	</fo:block>
+   	  </fo:static-content>
+   	  
         <fo:flow flow-name="xsl-region-body">
         
         
-       <xsl:for-each select="/verslag/bord">
        
        <fo:table border="solid" table-layout="fixed" width="100%" height="100%">
         <fo:table-header border="solid">
@@ -24,9 +34,12 @@
                     <fo:table-cell border="solid">
                         <fo:block text-align="center" font-weight="bold">TOERISME OOST-VLAANDEREN</fo:block>
                         <fo:block text-align="center" font-weight="bold">Fiche 
-	                        <xsl:value-of
-			          			select="/verslag/trajecttype">
-			          		</xsl:value-of></fo:block>
+	                        <fo:inline color="red">
+		                        <xsl:value-of
+				          			select="/verslag/trajecttype">	
+				          		</xsl:value-of>
+				          	</fo:inline> 
+			          	</fo:block>
                     </fo:table-cell>
                     <fo:table-cell>
                         <fo:block text-align="center" font-weight="bold">REGIO: 
@@ -169,12 +182,14 @@
 	          </fo:block-container>			
             </fo:table-cell>
            </fo:table-row>
-           
-           
+              
            <fo:table-row height="90mm">
             <fo:table-cell border="solid">
             	 <fo:block>
-
+					<xsl:variable name="mapTopo_url" select="./mapTopo" />
+					<fo:external-graphic src="'{$mapTopo_url}'"
+							content-width="137mm"
+		            		content-height="100mm" />
 	             </fo:block>	
 	          </fo:table-cell>
 	          	
@@ -182,34 +197,35 @@
               <fo:block>
 				<xsl:variable name="mapOrtho_url" select="./mapOrtho" />
 				<fo:external-graphic src="'{$mapOrtho_url}'"
-						content-width="120mm"
-	            		content-height="89mm" />
+						content-width="137mm"
+	            		content-height="100mm" />
 		      </fo:block>		
              </fo:table-cell>       
            </fo:table-row>
                 
         </fo:table-body>
-      </fo:table>
-       </xsl:for-each>
-       
+      	</fo:table>
         </fo:flow>
       </fo:page-sequence>
+      </xsl:for-each>
     </fo:root>
   </xsl:template>
 
-  <xsl:template name="bordProperties_left">
-		<fo:block>
-			<xsl:for-each select="/verslag/bord">
-		
-			</xsl:for-each>
-		</fo:block>
+  <xsl:template name="header_left">
   </xsl:template>
   
-  <xsl:template name="bordProperties_right">
-		<fo:block>
-			<xsl:for-each select="/verslag/bord">
-			
-			</xsl:for-each>
-		</fo:block>
+  <xsl:template name="header_right">
+  </xsl:template>
+  
+   <xsl:template name="bordProperties_left">
+  </xsl:template>
+  
+   <xsl:template name="bordProperties_right">
+  </xsl:template>
+  
+   <xsl:template name="map_left">
+  </xsl:template>
+  
+   <xsl:template name="map_right">
   </xsl:template>
 </xsl:stylesheet>

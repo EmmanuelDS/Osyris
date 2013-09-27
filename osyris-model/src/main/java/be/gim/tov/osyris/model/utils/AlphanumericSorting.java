@@ -18,6 +18,7 @@ public class AlphanumericSorting implements Comparator<Bord> {
 	 */
 	@Override
 	public int compare(Bord firstObjToCompare, Bord secondObjToCompare) {
+
 		String firstString = firstObjToCompare.getVolg();
 		String secondString = secondObjToCompare.getVolg();
 

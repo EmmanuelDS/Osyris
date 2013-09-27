@@ -39,6 +39,7 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
 @Edit(type = "controleOpdracht")
+@Search(type = "controleOpdracht")
 @Permissions({
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "create", allow = true),

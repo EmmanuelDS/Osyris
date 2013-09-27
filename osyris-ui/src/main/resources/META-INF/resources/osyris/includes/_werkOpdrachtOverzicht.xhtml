@@ -133,9 +133,11 @@
 					<p:column style="width:20px;" >
 						<p:rowToggler />
 					</p:column>
-					<p:column selectionMode="multiple" style="width:50px" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" >
+					<p:column selectionMode="multiple" style="width:50px; text-align:center;" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" >
 						<f:facet name="header">
-						<h:outputText value="Selectie" />
+						<div style="white-space:pre-line;">
+						<h:outputText value="Selectie ronde" />
+						</div>
 						</f:facet>
 						</p:column>
 					<p:column label="Acties" style="width:40px;">
