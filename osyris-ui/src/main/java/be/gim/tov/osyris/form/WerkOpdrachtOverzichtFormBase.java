@@ -40,6 +40,7 @@ import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.conscientia.jsf.prime.PrimeUtils;
 import org.quartz.xml.ValidationException;
 import org.w3c.dom.Document;
 
@@ -296,6 +297,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			// Filteren meest recente datum
 			if (vanDatum != null && totDatum != null) {
+
 				if (filteredList.isEmpty()) {
 					results = findWerkOpdrachtenBetweenDates(list);
 				} else {
@@ -308,6 +310,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 
 			Collections.sort(results, new DateSortingWO());
+			dataModel = PrimeUtils.dataModel(results);
 
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);

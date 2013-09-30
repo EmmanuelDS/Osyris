@@ -71,7 +71,7 @@
 						<p:calendar id="vanDatum"
 							value="#{controleOpdrachtOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
-    						datePattern="dd/MM/yyyy">
+    						datePattern="yyyy/MM/dd">
 						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
@@ -79,7 +79,7 @@
 						<p:calendar id="totDatum"
 							value="#{controleOpdrachtOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
-    						datePattern="dd/MM/yyyy">
+    						datePattern="yyyy/MM/dd">
 						</p:calendar>
 					</d:field>
 				</d:fields>
@@ -155,7 +155,9 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					<p:column label="TrajectType" style="width:120px;">
+					<p:column label="TrajectType" 
+						sortBy="#{controleOpdracht.typeTraject }"
+						style="width:120px;">
 						<f:facet name="header">
 						<d:displayLabel
 							property="#{d:modelClass('ControleOpdracht').getProperty('trajectType')}" />
@@ -186,7 +188,9 @@
 							value="#{controleOpdracht.traject }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Regio" style="width:100px;">
+					<p:column label="Regio" 
+						sortBy="#{controleOpdracht.regioId }"
+						style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('regio')}" />
@@ -224,7 +228,8 @@
 							value="#{controleOpdracht.status }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" style="width:80px;">
+					<p:column label="Datum" 
+						style="width:80px;">
 						<f:facet name="header">
 							<h:outputText value="Datum" />
 						</f:facet>

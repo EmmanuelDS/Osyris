@@ -17,6 +17,7 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.conscientia.jsf.prime.PrimeUtils;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
@@ -306,9 +307,11 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 				}
 				results = filteredList;
 			} else {
-				results = (List<Melding>) modelRepository.searchObjects(
-						getQuery(), true, true);
+				results = list;
 			}
+
+			dataModel = PrimeUtils.dataModel(results);
+
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;

@@ -74,14 +74,14 @@
 						<div>Van:</div>
 						<p:calendar id="vanDatum" value="#{meldingOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide" locale="#{locale.language}"
 							inputStyle="width:60px"
-    						datePattern="dd/MM/yyyy">
+    						datePattern="yyyy/MM/dd">
 						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
 						<div>Tot:</div>
 						<p:calendar id="totDatum" value="#{meldingOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide" locale="#{locale.language}"
 							inputStyle="width:60px"
-    						datePattern="dd/MM/yyyy">
+    						datePattern="yyyy/MM/dd">
 						</p:calendar>
 					</d:field>
 				</d:fields>
@@ -143,7 +143,8 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					<p:column label="TrajectType">
+					<p:column label="TrajectType"
+						sortBy="#{melding.typeTraject }">
 							<f:facet name="header">
 						<d:displayLabel
 							property="#{d:modelClass('Melding').getProperty('trajectType')}" />
@@ -162,7 +163,8 @@
 							modelProperty="#{d:modelClass('Melding').getProperty('traject')}"
 							value="#{melding.traject }" mode="VIEW" />
 					</p:column>
-					<p:column label="Regio">
+					<p:column label="Regio" 
+						sortBy="#{melding.regioId }">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('regio')}" />
@@ -191,7 +193,7 @@
 							modelProperty="#{d:modelClass('Melding').getProperty('medewerker')}"
 							value="#{melding.medewerker }" mode="VIEW" />
 					</p:column>
-					<p:column label="Datum">
+					<p:column label="Datum" >
 						<f:facet name="header">
 							<div>Datum</div>
 						</f:facet>

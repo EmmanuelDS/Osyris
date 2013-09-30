@@ -23,6 +23,7 @@ import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.conscientia.jsf.prime.PrimeUtils;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
@@ -196,6 +197,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	@Override
 	public Query getQuery() {
+
 		if (query == null) {
 			query = getDefaultQuery();
 		}
@@ -229,6 +231,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			if (uitvoerder == null && medewerker == null && trajectType == null
 					&& regio == null && trajectNaam == null) {
 				results = list;
+
 			}
 
 			else {
@@ -281,8 +284,11 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				results = filteredList;
 			}
 
+			dataModel = PrimeUtils.dataModel(results);
+
 		} catch (IOException e) {
 			LOG.error("Can not search Uitvoeringsronde.", e);
+			results = null;
 		}
 	}
 
@@ -392,11 +398,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @param opdracht
 	 */
 	public void removeFromUitvoeringsronde() {
+
 		// Verwijder werkopdracht uit ronde
 		object.getOpdrachten().remove(
 				modelRepository.getResourceIdentifier(selectedWerkOpdracht));
 		// Set flag inRonde false
 		selectedWerkOpdracht.setInRonde("0");
+
 		try {
 			// Save opdracht en ronde
 			modelRepository.saveObject(object);
@@ -453,7 +461,6 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		setHasErrors(true);
 
 		try {
-
 			if (checkWerkOpdrachtenGerapporteerd()) {
 				object.setStatus(UitvoeringsrondeStatus.UITGEVOERD);
 				modelRepository.saveObject(object);

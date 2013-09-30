@@ -157,7 +157,7 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					 <p:column label="id" style="width:100px;">
+					 <p:column label="id" sortBy="#{uitvoeringsronde.id }" style="width:100px;">
 						<f:facet name="header">
 							<h:outputText value="Id" />
 						</f:facet>
@@ -172,7 +172,7 @@
 							modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('status')}"
 							value="#{uitvoeringsronde.status }" mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" sortBy="#{uitvoeringsronde.status}" style="width:100px;">
+					<p:column label="Datum" sortBy="#{uitvoeringsronde.datumUitvoering}" style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}" />

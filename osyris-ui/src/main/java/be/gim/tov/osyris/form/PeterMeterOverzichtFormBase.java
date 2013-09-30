@@ -66,8 +66,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 	protected boolean hasErrors;
 
-	// GETTERS AND SETTERS
-
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {

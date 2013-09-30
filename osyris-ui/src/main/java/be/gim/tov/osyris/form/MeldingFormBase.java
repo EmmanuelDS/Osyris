@@ -71,6 +71,7 @@ import com.vividsolutions.jts.geom.Point;
 public class MeldingFormBase implements Serializable {
 
 	private static final long serialVersionUID = -8052917916776585407L;
+	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final Log LOG = LogFactory.getLog(MeldingFormBase.class);
 	private static final Integer MAX_COOKIE_AGE = new Integer(30 * 24 * 60 * 60);
 	private static final String COOKIE_NAME = "routedokter-token";
@@ -275,7 +276,7 @@ public class MeldingFormBase implements Serializable {
 			}
 
 			// Add edit layer to context
-			mapFactory.createGeometryLayer(context, "geometry", null,
+			mapFactory.createGeometryLayer(context, GEOMETRY_LAYER_NAME, null,
 					Point.class, null, true, "single", null, null);
 
 			// Start configuratie zoomt naar Provincie OVL
@@ -359,7 +360,7 @@ public class MeldingFormBase implements Serializable {
 			}
 
 			// Intekenen Punt
-			else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+			else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
 				layer.setHidden(true);
 				((GeometryListFeatureMapLayer) layer)
 						.setGeometries(Collections.EMPTY_LIST);
@@ -423,7 +424,8 @@ public class MeldingFormBase implements Serializable {
 					layer.setSelection(Collections.EMPTY_LIST);
 				}
 
-				else if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(Collections.EMPTY_LIST);
@@ -446,7 +448,7 @@ public class MeldingFormBase implements Serializable {
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 
 				// Geometrie laag
-				if (layer.getLayerId().equalsIgnoreCase("geometry")) {
+				if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(false);
 					layer.set("selectable", true);
 					layer.set("editable", true);
@@ -653,7 +655,7 @@ public class MeldingFormBase implements Serializable {
 		List<String> ids = (List<String>) event.getParams().get("featureIds");
 
 		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
-				.getLayer("geometry");
+				.getLayer(GEOMETRY_LAYER_NAME);
 
 		// Slechts 1 punt mag ingegeven worden
 		if (layer.getGeometries().size() > 1) {

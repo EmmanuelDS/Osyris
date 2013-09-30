@@ -42,6 +42,7 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
+import org.conscientia.jsf.prime.PrimeUtils;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
@@ -282,6 +283,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
+
 				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
 						ControleOpdrachtStatus.GEVALIDEERD), FilterUtils
 						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
@@ -293,6 +295,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				query.addFilter(FilterUtils.equal("peterMeter", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
+
 				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
 						ControleOpdrachtStatus.TE_CONTROLEREN),
 						FilterUtils.notEqual("status",
@@ -357,13 +360,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 					}
 				}
 				results = filteredList;
-			} else {
 
-				results = (List<ControleOpdracht>) modelRepository
-						.searchObjects(getQuery(), true, true);
+			} else {
+				results = list;
 			}
 
 			Collections.sort(results, new DateSortingCO());
+			dataModel = PrimeUtils.dataModel(results);
+
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
 			results = null;
