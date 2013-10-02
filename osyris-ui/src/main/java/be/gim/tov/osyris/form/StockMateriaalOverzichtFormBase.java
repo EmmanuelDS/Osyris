@@ -13,7 +13,6 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.jsf.prime.PrimeUtils;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
@@ -182,10 +181,10 @@ public class StockMateriaalOverzichtFormBase extends
 	public void search() {
 
 		try {
-			results = (List<StockMateriaal>) modelRepository.searchObjects(
-					getQuery(), true, true, true);
+			dataModel = null;
 
-			dataModel = PrimeUtils.dataModel(results);
+			results = (List<StockMateriaal>) modelRepository.searchObjects(
+					getQuery(), false, false, true);
 
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);

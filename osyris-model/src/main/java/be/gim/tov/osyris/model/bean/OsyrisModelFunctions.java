@@ -4,7 +4,6 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Date;
 import java.util.List;
 
 import javax.faces.context.FacesContext;
@@ -35,8 +34,6 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
-import be.gim.tov.osyris.model.controle.ControleOpdracht;
-import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Gemeente;
@@ -47,7 +44,6 @@ import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.utils.DropdownListSorting;
-import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -562,6 +558,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 * @throws IOException
 	 */
+	@SuppressWarnings("unchecked")
 	@RunPrivileged
 	public List<Integer> getKnooppuntNummers() throws IOException {
 
@@ -573,79 +570,6 @@ public class OsyrisModelFunctions {
 
 		return (List<Integer>) modelRepository.searchObjects(builder.build(),
 				true, true);
-	}
-
-	/**
-	 * Zoekt de meest recente datum van een statuswijziging voor wat betreft een
-	 * ControleOpdracht
-	 * 
-	 * @param controleOpdracht
-	 * @return
-	 */
-	public Date getDatumLaatsteWijziging(ControleOpdracht controleOpdracht) {
-
-		List<Date> dates = new ArrayList<Date>();
-		dates.add(controleOpdracht.getDatumTeControleren());
-		dates.add(controleOpdracht.getDatumUitTeVoeren());
-		dates.add(controleOpdracht.getDatumGerapporteerd());
-		dates.add(controleOpdracht.getDatumGevalideerd());
-		dates.removeAll(Collections.singleton(null));
-
-		if (dates.size() > 0) {
-			Date mostRecent = Collections.max(dates);
-			return mostRecent;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Zoekt de meest recente datum van een statuswijziging voor wat betreft een
-	 * Melding
-	 * 
-	 * @param melding
-	 * @return
-	 */
-	public Date getDatumLaatsteWijziging(Melding melding) {
-
-		List<Date> dates = new ArrayList<Date>();
-		dates.add(melding.getDatumVaststelling());
-		dates.add(melding.getDatumGemeld());
-		dates.add(melding.getDatumGevalideerd());
-		dates.removeAll(Collections.singleton(null));
-
-		if (dates.size() > 0) {
-			Date mostRecent = Collections.max(dates);
-			return mostRecent;
-		} else {
-			return null;
-		}
-	}
-
-	/**
-	 * Zoekt de meest recente datum van een statuswijziging voor wat betreft een
-	 * Werkopdracht
-	 * 
-	 * @param werkopdracht
-	 * @return
-	 */
-	public Date getDatumLaatsteWijziging(WerkOpdracht werkOpdracht) {
-
-		List<Date> dates = new ArrayList<Date>();
-		dates.add(werkOpdracht.getDatumTeControleren());
-		dates.add(werkOpdracht.getDatumUitTeVoeren());
-		dates.add(werkOpdracht.getDatumGerapporteerd());
-		dates.add(werkOpdracht.getDatumGevalideerd());
-		dates.add(werkOpdracht.getDatumGerapporteerd());
-		dates.add(werkOpdracht.getDatumGeannuleerd());
-		dates.removeAll(Collections.singleton(null));
-
-		if (dates.size() > 0) {
-			Date mostRecent = Collections.max(dates);
-			return mostRecent;
-		} else {
-			return null;
-		}
 	}
 
 	/**
@@ -715,6 +639,7 @@ public class OsyrisModelFunctions {
 
 						try {
 							if (probleem instanceof BordProbleem) {
+
 								Bord bord = (Bord) modelRepository
 										.loadObject(((BordProbleem) probleem)
 												.getBord());
@@ -722,6 +647,7 @@ public class OsyrisModelFunctions {
 							}
 
 							else if (probleem instanceof AnderProbleem) {
+
 								DefaultQuery query = new DefaultQuery();
 								query.setModelClassName("Gemeente");
 								query.addFilter(FilterUtils.intersects("geom",
@@ -730,6 +656,7 @@ public class OsyrisModelFunctions {
 										.searchObjects(query, true, true);
 								Gemeente gemeente = (Gemeente) modelRepository
 										.getUniqueResult(gemeentes);
+
 								return gemeente.getNaam();
 							}
 
@@ -1223,7 +1150,7 @@ public class OsyrisModelFunctions {
 				.getExternalContext().getRequestContextPath();
 		return contextPath + "/web/view/routedokterhelp";
 	}
-	
+
 	/**
 	 * Ophalen URL voor Hekp document ingelogde gebruikers.
 	 * 

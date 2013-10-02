@@ -2,8 +2,6 @@ package be.gim.tov.osyris.model.controle;
 
 import java.util.Date;
 
-import javax.persistence.Transient;
-
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
@@ -23,10 +21,8 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.EditableInStatus;
-import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 
 /**
@@ -108,17 +104,21 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
-	// Extra property om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	private String typeTraject;
+	private String trajectType;
 
-	// Extra property om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
 	private ResourceIdentifier regioId;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Type(ModelPropertyType.DATE)
+	private Date datumLaatsteWijziging;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getTraject() {
@@ -217,12 +217,12 @@ public class Melding extends AbstractModelObject implements StorableObject {
 		this.commentaar = commentaar;
 	}
 
-	public String getTypeTraject() {
-		return typeTraject;
+	public String getTrajectType() {
+		return trajectType;
 	}
 
-	public void setTypeTraject(String typeTraject) {
-		this.typeTraject = typeTraject;
+	public void setTrajectType(String trajectType) {
+		this.trajectType = trajectType;
 	}
 
 	public ResourceIdentifier getRegioId() {
@@ -233,30 +233,11 @@ public class Melding extends AbstractModelObject implements StorableObject {
 		this.regioId = regioId;
 	}
 
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
 	public Date getDatumLaatsteWijziging() {
-		return Beans.getReference(OsyrisModelFunctions.class)
-				.getDatumLaatsteWijziging(this);
+		return datumLaatsteWijziging;
 	}
 
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	public String getTrajectType() {
-		return Beans.getReference(OsyrisModelFunctions.class).getTrajectType(
-				this.traject);
-	}
-
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	public String getRegio() {
-		return Beans.getReference(OsyrisModelFunctions.class).getTrajectRegio(
-				this.traject);
+	public void setDatumLaatsteWijziging(Date datumLaatsteWijziging) {
+		this.datumLaatsteWijziging = datumLaatsteWijziging;
 	}
 }

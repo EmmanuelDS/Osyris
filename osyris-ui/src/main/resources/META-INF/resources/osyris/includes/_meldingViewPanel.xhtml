@@ -8,11 +8,11 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
-	<h2>Melding #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	<h2>Melding #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
 	<table width="100%">
 		<tr>
-			<td width="40%" valign="top">
+			<td width="50%" valign="top">
 					<r:panel id ="meldingPanel" header="Melding">
 				<d:fields>
 					<d:field label="Status" for="status">
@@ -29,6 +29,11 @@
 						<d:propertyValue id="datumGevalideerd"
 							modelProperty="#{d:modelClass('Melding').getProperty('datumGevalideerd')}"
 							value="#{form.object.datumGevalideerd}" mode="VIEW" />
+					</d:field>
+					<d:field label="Commentaar validatie" for="commentaarValidatie">
+						<d:propertyValue id="commentaarValidatie"
+							modelProperty="#{d:modelClass('Melding').getProperty('commentaar')}"
+							value="#{form.object.commentaar}" mode="VIEW" />
 					</d:field>
 					<d:field label="Medewerker" for="medewerker">
 						<d:propertyValue id="medewerker"
@@ -83,7 +88,7 @@
 				</d:fields>
 			</r:panel>
 			</td>
-			<td width="60%" valign="top">
+			<td width="50%" valign="top">
 				<r:panel>
 					<div style="height: 500px">
 						<m:mapViewer id="viewer"

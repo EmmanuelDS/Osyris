@@ -3,9 +3,7 @@ package be.gim.tov.osyris.model.job;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -16,7 +14,7 @@ import org.conscientia.api.model.annotation.Schedule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.search.QueryBuilder;
-import org.jboss.weld.context.bound.BoundSessionContext;
+import org.conscientia.core.security.annotation.RunPrivileged;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
@@ -31,19 +29,11 @@ public class WerkOpdrachtJob {
 
 	@Inject
 	protected ModelRepository modelRepository;
-	@Inject
-	protected BoundSessionContext sessionContext;
 
+	@RunPrivileged
 	public void processEvent(ModelEvent event) {
 
-		Map<String, Object> myMap = new HashMap<String, Object>();
-
 		try {
-			// Manueel session starten anders exception: no active context for
-			// context niet bestaat
-			sessionContext.associate(myMap);
-			sessionContext.activate();
-
 			QueryBuilder builder = new QueryBuilder("WerkOpdracht");
 
 			builder.addFilter(FilterUtils.equal("status",
@@ -72,12 +62,10 @@ public class WerkOpdrachtJob {
 
 							opdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
 							opdracht.setDatumTeControleren(new Date());
+							opdracht.setDatumLaterUitTeVoeren(null);
+							opdracht.setDatumLaatsteWijziging(new Date());
 							modelRepository.saveObject(opdracht);
 						}
-
-						// SessionContext deactiveren
-						sessionContext.invalidate();
-						sessionContext.deactivate();
 
 					} catch (Exception e) {
 						LOG.error("Can not update WerkOpdracht.", e);
@@ -86,9 +74,6 @@ public class WerkOpdrachtJob {
 			}
 		} catch (IOException e) {
 			LOG.error("Can not search WerkOpdracht.", e);
-		} finally {
-			sessionContext.dissociate(myMap);
-
 		}
 	}
 }

@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
@@ -134,12 +133,20 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 		else {
 
 			if (trajectType != null) {
-				query.addFilter(FilterUtils.equal("typeTraject", trajectType));
+				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
 
 			if (regio != null) {
 				query.addFilter(FilterUtils.equal("regioId", regio));
 			}
+		}
+
+		if (vanDatum != null && totDatum != null) {
+
+			query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
+					"datumLaatsteWijziging", totDatum), FilterUtils
+					.greaterOrEqual("datumLaatsteWijziging", vanDatum)));
+
 		}
 
 		if (identity.inGroup("Routedokter", "CUSTOM")) {
@@ -287,29 +294,17 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	public void search() {
 		try {
 
+			dataModel = null;
+
 			// Reset zoekveld trajectNaam
 			if (trajectType == null) {
 				setTrajectId(null);
 			}
 
 			List<Melding> list = (List<Melding>) modelRepository.searchObjects(
-					getQuery(), true, true, true);
-			List<Melding> filteredList = new ArrayList<Melding>();
+					getQuery(), false, false, true);
 
-			// Kan dit op een betere manier gebeuren?
-			if (vanDatum != null && totDatum != null) {
-				for (Melding melding : list) {
-					if (melding.getDatumLaatsteWijziging().before(totDatum)
-							&& melding.getDatumLaatsteWijziging().after(
-									vanDatum)) {
-						filteredList.add(melding);
-					}
-				}
-				results = filteredList;
-			} else {
-				results = list;
-			}
-
+			results = list;
 			dataModel = PrimeUtils.dataModel(results);
 
 		} catch (IOException e) {

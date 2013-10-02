@@ -53,7 +53,7 @@
 			<j:bindAttribute var="bordProbleem"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Bordprobleem</div>
+			<h:outputText value="Bordprobleem" />
 			</f:facet>
 			<p:column style="width:2%">
 				<j:commandButton
@@ -65,19 +65,19 @@
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
-				<div>Volgnummer</div>
+				<h:outputText value="Volgnummer" />
 				</f:facet>
 					<h:outputText value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Straat</div>
+				<h:outputText value="Straat" />
 				</f:facet>
 					<h:outputText value="#{osyrisModelFunctions.getBordStraat(bordProbleem.bord) }" mode="VIEW" />
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Type</div>
+				<h:outputText value="Type" />
 				</f:facet>
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
@@ -86,7 +86,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Commentaar</div>
+				<h:outputText value="Commentaar" />
 				</f:facet>
 				<d:propertyValue id="commentaarColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
@@ -95,7 +95,7 @@
 			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
-				<div>Status</div>
+				<h:outputText value="Status" />
 				</f:facet>
 				<d:propertyValue id="statusColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
@@ -114,7 +114,7 @@
 			<j:bindAttribute var="anderProbleem"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Ander probleem</div>
+				<h:outputText value="Ander probleem" />
 			</f:facet>
 			<p:column style="width:2%">
 				<j:commandButton
@@ -126,7 +126,7 @@
 	   		</p:column>
 	   		<p:column>
 				<f:facet name="header">
-				<div>Categorie</div>
+				<h:outputText value="Categorie" />
 				</f:facet>
 				<d:propertyValue id="categorieColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
@@ -135,7 +135,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Commentaar</div>
+				<h:outputText value="Commentaar" />
 				</f:facet>
 				<d:propertyValue id="commentaarColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
@@ -144,7 +144,7 @@
 			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
-				<div>Status</div>
+				<h:outputText value="Status" />
 				</f:facet>
 				<d:propertyValue id="statusColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
@@ -173,11 +173,11 @@
 			<j:bindAttribute var="gebruiktMateriaal"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Overzicht gebruikte materialen</div>
+				<h:outputText value="Overzicht gebruikte materialen" />
 			</f:facet>
 			<p:column>
 				<f:facet name="header">
-				<div>Categorie</div>
+				<h:outputText value="Categorie" />
 				</f:facet>
 				<d:propertyValue id="categorieColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
@@ -186,7 +186,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Subcategorie</div>
+				<h:outputText value="Subcategorie" />
 				</f:facet>
 				<d:propertyValue id="subCategorieColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
@@ -195,7 +195,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>type</div>
+				<h:outputText value="Type" />
 				</f:facet>
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
@@ -204,7 +204,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Naam</div>
+				<h:outputText value="Naam" />
 				</f:facet>
 				<d:propertyValue id="naamColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
@@ -213,7 +213,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>nummer</div>
+				<h:outputText value="Nummer" />
 				</f:facet>
 				<d:propertyValue id="nummerColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
@@ -222,7 +222,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Aantal</div>
+				<h:outputText value="Aantal" />
 				</f:facet>
 				<d:propertyValue id="aantalColumn"
 					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"

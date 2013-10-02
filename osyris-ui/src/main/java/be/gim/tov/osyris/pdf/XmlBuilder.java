@@ -6,14 +6,12 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-import javax.inject.Inject;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
 import org.apache.xerces.impl.dv.util.Base64;
-import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.service.interchange.InterchangeStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
@@ -28,6 +26,7 @@ import be.gim.commons.label.LabelUtils;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
@@ -52,8 +51,8 @@ public class XmlBuilder {
 	public static final int DPI_FACTOR = 2;
 	public static final double DPI = 72 * DPI_FACTOR;
 
-	@Inject
-	protected ModelRepository modelRepository;
+	private static double SCALE_ORTHO = 1889.7648;
+	private static double SCALE_TOPO = 7231;
 
 	protected Collection<String> imageKeys = new ArrayList<String>();
 
@@ -84,7 +83,9 @@ public class XmlBuilder {
 		doc.appendChild(rootElement);
 
 		Element regio = doc.createElement("regio");
-		regio.appendChild(doc.createTextNode(object.getRegio()));
+		regio.appendChild(doc.createTextNode(Beans.getReference(
+				OsyrisModelFunctions.class)
+				.getTrajectRegio(object.getTraject())));
 		rootElement.appendChild(regio);
 
 		Element trajectType = doc.createElement("trajecttype");
@@ -206,15 +207,6 @@ public class XmlBuilder {
 					.createTextNode(getMapBord(viewer, b, false)));
 			bord.appendChild(mapTopo);
 		}
-
-		// XML String output for debug purposes
-		// TransformerFactory tf = TransformerFactory.newInstance();
-		// Transformer trans = tf.newTransformer();
-		// trans.setOutputProperty(OutputKeys.OMIT_XML_DECLARATION, "yes");
-		// StringWriter writer = new StringWriter();
-		// trans.transform(new DOMSource(doc), new StreamResult(writer));
-		// String output = writer.getBuffer().toString().replaceAll("\n|\r",
-		// "");
 
 		return doc;
 	}
@@ -451,7 +443,9 @@ public class XmlBuilder {
 		rootElement.appendChild(foto);
 
 		Element regio = doc.createElement("regio");
-		regio.appendChild(doc.createTextNode(object.getRegio()));
+		regio.appendChild(doc.createTextNode(Beans.getReference(
+				OsyrisModelFunctions.class)
+				.getTrajectRegio(object.getTraject())));
 		rootElement.appendChild(regio);
 
 		Element trajectType = doc.createElement("trajecttype");
@@ -634,11 +628,11 @@ public class XmlBuilder {
 			boolean hasOrthoBasemap) throws InstantiationException,
 			IllegalAccessException {
 
-		double scale = 1889.7648;
+		double scale = SCALE_ORTHO;
 
 		if (!hasOrthoBasemap) {
 			viewer.setBaseLayerId("topo");
-			scale = 7231;
+			scale = SCALE_TOPO;
 		}
 
 		// Selecteer bord

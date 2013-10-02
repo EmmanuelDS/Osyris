@@ -46,24 +46,29 @@ public class MeldingSaveListener {
 			InstantiationException, IllegalAccessException {
 		Melding melding = (Melding) event.getModelObject();
 
-		// New melding
+		// Nieuwe melding
 		if (melding.getStatus() == null) {
 			melding.setStatus(MeldingStatus.GEMELD);
 			melding.setDatumGemeld(new Date());
 			melding.setMedewerker(osyrisModelFunctions
 					.zoekVerantwoordelijke(melding.getTraject()));
-			melding.setTypeTraject(osyrisModelFunctions.getTrajectType(melding
+			melding.setTrajectType(osyrisModelFunctions.getTrajectType(melding
 					.getTraject()));
 			melding.setRegioId(osyrisModelFunctions.getTrajectRegioId(melding
 					.getTraject()));
+			melding.setDatumLaatsteWijziging(new Date());
 		}
 
-		// If probleem has a status, Melding is validated
+		// Indien probleem met status Melding gevalideerd
 		if (melding.getProbleem().getStatus() != null) {
+
 			melding.setStatus(MeldingStatus.GEVALIDEERD);
 			melding.setDatumGevalideerd(new Date());
+			melding.setDatumLaatsteWijziging(new Date());
+			melding.setTrajectType(osyrisModelFunctions.getTrajectType(melding
+					.getTraject()));
 
-			// Create new werkopdracht if status probleem is werkopdracht
+			// Aanmaken werkopdracht indien status probleem werkopdracht
 			if (melding.getProbleem().getStatus()
 					.equals(ProbleemStatus.WERKOPDRACHT)) {
 				createWerkOpdracht(melding);
@@ -72,11 +77,12 @@ public class MeldingSaveListener {
 	}
 
 	/**
-	 * Aanmaken nieuwe Melding.
+	 * Aanmaken nieuwe WerkOpdracht
 	 * 
 	 * @param melding
 	 */
 	private void createWerkOpdracht(Melding melding) {
+
 		try {
 			String modelClassName = "WerkOpdracht";
 			WerkOpdracht werkOpdracht = (WerkOpdracht) modelRepository
@@ -91,10 +97,13 @@ public class MeldingSaveListener {
 			werkOpdracht.setMedewerker(melding.getMedewerker());
 			werkOpdracht.setProbleem(melding.getProbleem());
 			werkOpdracht.setTraject(melding.getTraject());
-			werkOpdracht.setTypeTraject(osyrisModelFunctions
+			werkOpdracht.setTrajectType(osyrisModelFunctions
 					.getTrajectType(melding.getTraject()));
 			werkOpdracht.setRegioId(osyrisModelFunctions
 					.getTrajectRegioId(melding.getTraject()));
+			werkOpdracht.setDatumLaatsteWijziging(new Date());
+			werkOpdracht.setGemeente(osyrisModelFunctions
+					.getWerkOpdrachtGemeente(melding.getProbleem()));
 
 			Traject traject = (Traject) modelRepository.loadObject(melding
 					.getTraject());
@@ -104,6 +113,7 @@ public class MeldingSaveListener {
 
 			modelRepository.saveObject(werkOpdracht);
 			messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
+
 		} catch (IOException e) {
 			messages.error("Fout bij het bewaren van een nieuwe werkopdracht: "
 					+ e.getMessage());

@@ -1,0 +1,23 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+
+	<r:panel id="backgroundLayerPanel" header="Achtergrondlaag" rendered="#{identity.inGroup('PeterMeter','CUSTOM') or identity.inGroup('admin', 'CUSTOM')}">
+			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+        	<h:selectOneRadio id="options" value="#{form.baseLayerName}">  
+	            <f:selectItem itemLabel="Orthofoto" itemValue="tms" />  
+	            <f:selectItem itemLabel="Topografisch" itemValue="topo" /> 
+	            <f:selectItem itemLabel="Navstreet" itemValue="navstreet" /> 
+	            <a:ajax event="click" listener="#{form.switchBaseLayers()}"/> 
+        	</h:selectOneRadio>  
+	    </h:panelGrid>  	
+	</r:panel>
+		
+</u:composition>

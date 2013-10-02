@@ -71,17 +71,17 @@
 					<b><h:outputText value="Datum laatste statuswijziging">
 					</h:outputText></b>
 					<d:field for="vanDatum">
-						<div>Van:</div>
+						<h:outputText value="Van:" />
 						<p:calendar id="vanDatum" value="#{meldingOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide" locale="#{locale.language}"
 							inputStyle="width:60px"
-    						datePattern="yyyy/MM/dd">
+    						pattern="yyyy-MM-dd">
 						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
-						<div>Tot:</div>
+						<h:outputText value="Tot:" />
 						<p:calendar id="totDatum" value="#{meldingOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide" locale="#{locale.language}"
 							inputStyle="width:60px"
-    						datePattern="yyyy/MM/dd">
+    						pattern="yyyy-MM-dd">
 						</p:calendar>
 					</d:field>
 				</d:fields>
@@ -144,7 +144,7 @@
 						</a:outputPanel>
 					</p:column>
 					<p:column label="TrajectType"
-						sortBy="#{melding.typeTraject }">
+						sortBy="#{melding.trajectType}">
 							<f:facet name="header">
 						<d:displayLabel
 							property="#{d:modelClass('Melding').getProperty('trajectType')}" />
@@ -167,11 +167,11 @@
 						sortBy="#{melding.regioId }">
 						<f:facet name="header">
 							<d:displayLabel
-								property="#{d:modelClass('Melding').getProperty('regio')}" />
+								property="#{d:modelClass('Melding').getProperty('regioId')}" />
 						</f:facet>
 						<d:propertyValue id="regioColumn"
-							modelProperty="#{d:modelClass('Melding').getProperty('regio')}"
-							value="#{melding.regio }" mode="VIEW" />
+							modelProperty="#{d:modelClass('Melding').getProperty('regioId')}"
+							value="#{melding.regioId }" mode="VIEW" />
 					</p:column>
 					<p:column label="Status"
 						sortBy="#{melding.status }">
@@ -193,9 +193,10 @@
 							modelProperty="#{d:modelClass('Melding').getProperty('medewerker')}"
 							value="#{melding.medewerker }" mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" >
+					<p:column label="Datum"
+						sortBy="#{melding.datumLaatsteWijziging }" >
 						<f:facet name="header">
-							<div>Datum</div>
+							<h:outputText value="Datum" />
 						</f:facet>
 						<d:propertyValue id="datumLaatsteWijzigingColumn"
 							modelProperty="#{d:modelClass('Melding').getProperty('datumLaatsteWijziging')}"

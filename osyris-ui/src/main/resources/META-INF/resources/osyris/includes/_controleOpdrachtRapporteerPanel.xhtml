@@ -12,7 +12,7 @@
 		name="fileupload/fileupload.css"
 		library="primefaces" />
 		
-	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
 	<table width="100%">
 			<tr>
@@ -144,6 +144,10 @@
 				</m:mapViewer>
 			</div>
 		</r:panel>
+		<u:decorate
+			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
 	</td>
 	</tr>
 	</table>

@@ -44,6 +44,7 @@ import org.conscientia.jsf.prime.PrimeUtils;
 import org.quartz.xml.ValidationException;
 import org.w3c.dom.Document;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
@@ -56,6 +57,7 @@ import be.gim.specto.api.context.MapContext;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
@@ -231,6 +233,18 @@ public class WerkOpdrachtOverzichtFormBase extends
 			query = getDefaultQuery();
 		}
 
+		// Filteren meest recente datum
+		if (vanDatum != null && totDatum != null) {
+
+			query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
+					"datumLaatsteWijziging", totDatum), FilterUtils
+					.greaterOrEqual("datumLaatsteWijziging", vanDatum)));
+		}
+
+		if (gemeente != null) {
+			query.addFilter(FilterUtils.equal("gemeente", gemeente));
+		}
+
 		if (trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
 		}
@@ -238,7 +252,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 		else {
 
 			if (trajectType != null) {
-				query.addFilter(FilterUtils.equal("typeTraject", trajectType));
+				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
 
 			if (regio != null) {
@@ -275,39 +289,15 @@ public class WerkOpdrachtOverzichtFormBase extends
 	public void search() {
 		try {
 
+			dataModel = null;
+
 			// Reset zoekveld trajectNaam
 			if (trajectType == null) {
 				setTrajectId(null);
 			}
 
-			List<WerkOpdracht> list = (List<WerkOpdracht>) modelRepository
-					.searchObjects(getQuery(), true, true, true);
-			List<WerkOpdracht> filteredList = new ArrayList<WerkOpdracht>();
-
-			// Filteren transient property gemeente
-			if (gemeente != null) {
-				for (WerkOpdracht opdracht : list) {
-					if (opdracht.getGemeente() != null
-							&& opdracht.getGemeente().equals(gemeente)) {
-						filteredList.add(opdracht);
-					}
-				}
-				results = filteredList;
-			}
-
-			// Filteren meest recente datum
-			if (vanDatum != null && totDatum != null) {
-
-				if (filteredList.isEmpty()) {
-					results = findWerkOpdrachtenBetweenDates(list);
-				} else {
-					results = findWerkOpdrachtenBetweenDates(filteredList);
-				}
-			}
-
-			if (gemeente == null && vanDatum == null && totDatum == null) {
-				results = list;
-			}
+			results = (List<WerkOpdracht>) modelRepository.searchObjects(
+					getQuery(), false, false, true);
 
 			Collections.sort(results, new DateSortingWO());
 			dataModel = PrimeUtils.dataModel(results);
@@ -324,19 +314,19 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * @param opdrachten
 	 * @return
 	 */
-	public List<WerkOpdracht> findWerkOpdrachtenBetweenDates(
-			List<WerkOpdracht> opdrachten) {
-
-		List<WerkOpdracht> result = new ArrayList<WerkOpdracht>();
-
-		for (WerkOpdracht opdracht : opdrachten) {
-			if (opdracht.getDatumLaatsteWijziging().before(totDatum)
-					&& opdracht.getDatumLaatsteWijziging().after(vanDatum)) {
-				result.add(opdracht);
-			}
-		}
-		return result;
-	}
+	// public List<WerkOpdracht> findWerkOpdrachtenBetweenDates(
+	// List<WerkOpdracht> opdrachten) {
+	//
+	// List<WerkOpdracht> result = new ArrayList<WerkOpdracht>();
+	//
+	// for (WerkOpdracht opdracht : opdrachten) {
+	// if (opdracht.getDatumLaatsteWijziging().before(totDatum)
+	// && opdracht.getDatumLaatsteWijziging().after(vanDatum)) {
+	// result.add(opdracht);
+	// }
+	// }
+	// return result;
+	// }
 
 	/**
 	 * Map Configuratie
@@ -397,10 +387,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 					|| object.getHandelingen() == null) {
 
 				messages.error("Gelieve minstens 1 handeling toe te voegen alvorens de werkopdracht te verzenden.");
+
 			} else {
 
 				object.setStatus(WerkopdrachtStatus.UIT_TE_VOEREN);
 				object.setDatumUitTeVoeren(new Date());
+				object.setDatumLaatsteWijziging(new Date());
+
 				try {
 
 					modelRepository.saveObject(object);
@@ -410,10 +403,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 					clear();
 					search();
 					messages.info("Werkopdracht succesvol verzonden.");
+
 				} catch (IOException e) {
 					messages.error("Fout bij het verzenden van werkopdracht: "
 							+ e.getMessage());
 					LOG.error("Can not save object.", e);
+
 				} catch (Exception e) {
 					messages.error("Fout bij het versturen van email: "
 							+ e.getMessage());
@@ -433,6 +428,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			object.setStatus(WerkopdrachtStatus.GEANNULEERD);
 			object.setDatumGeannuleerd(new Date());
+			object.setDatumLaatsteWijziging(new Date());
+
 			try {
 
 				modelRepository.saveObject(object);
@@ -454,13 +451,18 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 */
 	public void reopenWerkOpdracht() {
 		if (object != null) {
+
 			object.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
 			object.setDatumTeControleren(new Date());
+			object.setDatumLaatsteWijziging(new Date());
+
 			try {
+
 				modelRepository.saveObject(object);
 				clear();
 				search();
 				messages.info("Werkopdracht succesvol heropend: de werkopdracht heeft opnieuw status 'Te controleren'.");
+
 			} catch (IOException e) {
 				messages.error("Fout bij het heropenen van werkopdracht: "
 						+ e.getMessage());
@@ -658,6 +660,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 			object.setStatus(WerkopdrachtStatus.GEVALIDEERD);
 			object.setDatumGevalideerd(new Date());
 			object.setValidatie(validatieStatus);
+			object.setDatumLaatsteWijziging(new Date());
 
 			// Afboeken stock voor elk gebruikt materiaal
 			if (!object.getMaterialen().isEmpty()
@@ -689,8 +692,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 				opdracht.setInRonde("0");
 				opdracht.setDatumTeControleren(new Date());
 				opdracht.setValidatie(validatieStatus);
-				opdracht.setTypeTraject(object.getTypeTraject());
+				opdracht.setTrajectType(object.getTrajectType());
 				opdracht.setRegioId(object.getRegioId());
+				opdracht.setDatumLaatsteWijziging(new Date());
+
 				modelRepository.saveObject(opdracht);
 				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Te controleren'");
 
@@ -711,12 +716,15 @@ public class WerkOpdrachtOverzichtFormBase extends
 				opdracht.setInRonde("0");
 				opdracht.setDatumLaterUitTeVoeren(new Date());
 				opdracht.setValidatie(validatieStatus);
-				opdracht.setTypeTraject(object.getTypeTraject());
+				opdracht.setTrajectType(object.getTrajectType());
 				opdracht.setRegioId(object.getRegioId());
+				opdracht.setDatumLaatsteWijziging(new Date());
+
 				modelRepository.saveObject(opdracht);
 				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Uitgesteld.' De werkopdracht zal status 'Te controleren' verkrijgen op de gespecifieerde datum.");
 			}
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het valideren van werkopdracht: "
 					+ e.getMessage());
@@ -1067,9 +1075,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
 		variables.put("id", object.get("id"));
-		variables.put("typeTraject", object.getTypeTraject());
+		variables.put("typeTraject", object.getTrajectType());
 		variables.put("gemeente", object.getGemeente());
-		variables.put("regio", object.getRegio());
+		variables.put("regio", Beans.getReference(OsyrisModelFunctions.class)
+				.getTrajectRegio(object.getTraject()));
 		variables.put("medewerker",
 				profiel.getLastName() + " " + profiel.getFirstName());
 

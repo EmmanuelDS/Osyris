@@ -81,7 +81,7 @@
 						<p:calendar id="vanDatum"
 							value="#{werkOpdrachtOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
-    						datePattern="yyyy/MM/dd">
+    						pattern="yyyy-MM-dd">
 						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
@@ -89,7 +89,7 @@
 						<p:calendar id="totDatum"
 							value="#{werkOpdrachtOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
-    						datePattern="yyyy/MM/dd">
+    						pattern="yyyy-MM-dd">
 						</p:calendar>
 					</d:field>
 				</d:fields>
@@ -184,7 +184,7 @@
 							value="#{werkOpdracht.inRonde }" mode="VIEW" />
 					</p:column>
 					<p:column label="TrajectType" 
-						sortBy="#{werkOpdracht.typeTraject }"
+						sortBy="#{werkOpdracht.trajectType }"
 						style="width:120px;">
 						<f:facet name="header">
 						<d:displayLabel
@@ -210,13 +210,14 @@
 						style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
-								property="#{d:modelClass('WerkOpdracht').getProperty('regio')}" />
+								property="#{d:modelClass('WerkOpdracht').getProperty('regioId')}" />
 						</f:facet>
 						<d:propertyValue id="regioColumn"
-							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regio')}"
-							value="#{werkOpdracht.regio }" mode="VIEW" />
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regioId')}"
+							value="#{werkOpdracht.regioId }" mode="VIEW" />
 					</p:column>
-					<p:column label="Gemeente" 
+					<p:column label="Gemeente"
+						sortBy="#{werkOpdracht.gemeente }" 
 						style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
@@ -273,9 +274,11 @@
 							value="#{werkOpdracht.validatie }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" style="width:100px;">
+					<p:column label="Datum"
+						sortBy="#{werkOpdracht.datumLaatsteWijziging }"  
+						style="width:100px;">
 						<f:facet name="header">
-							<div>Datum</div>
+							<h:outputText value="Datum" />
 						</f:facet>
 						<d:propertyValue id="datumLaatsteWijzigingColumn"
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLaatsteWijziging')}"

@@ -188,8 +188,8 @@
 							<f:facet name="header">  
            						<d:displayLabel property="#{d:modelClass('Uitvoeringsronde').getProperty('opdrachten')}" />
       							</f:facet>
-	       					<p:column label="Acties">
-							<a:outputPanel styleClass="model-table-actions">
+	       					<p:column style="width:20px;">
+							<a:outputPanel>
 								<j:commandButton
 									rendered="#{identity.inGroup('Uitvoerder','CUSTOM') || identity.inGroup('admin','CUSTOM')}"
 									image="#{resource['core/images/actions/16x16/delete.png']}"
@@ -205,7 +205,7 @@
 								</j:commandButton>
 							</a:outputPanel>
 							</p:column>
-							<p:column label="id">
+							<p:column label="id" style="width:20px;">
 								<f:facet name="header">
 								<h:outputText value="Id" />
 								</f:facet>
@@ -232,11 +232,11 @@
 							<p:column label="Regio">
 								<f:facet name="header">
 								<d:displayLabel
-										property="#{d:modelClass('WerkOpdracht').getProperty('regio')}" />
+										property="#{d:modelClass('WerkOpdracht').getProperty('regioId')}" />
 								</f:facet>
 								<d:propertyValue id="regioColumn"
-									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regio')}"
-									value="#{werkOpdracht.regio }" mode="VIEW" />
+									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regioId')}"
+									value="#{werkOpdracht.regioId }" mode="VIEW" />
 							</p:column>
 							<p:column label="Uitvoerder">
 							<f:facet name="header">

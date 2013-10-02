@@ -67,19 +67,19 @@
 					<b><h:outputText value="Datum laatste statuswijziging">
 					</h:outputText></b>
 					<d:field for="vanDatum">
-						<div>Van:</div>
+						<h:outputText value="Van:" />
 						<p:calendar id="vanDatum"
 							value="#{controleOpdrachtOverzichtFormBase.vanDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
-    						datePattern="yyyy/MM/dd">
+    						pattern="yyyy-MM-dd">
 						</p:calendar>
 					</d:field>
 					<d:field for="totDatum">
-						<div>Tot:</div>
+						<h:outputText value="Tot:" />
 						<p:calendar id="totDatum"
 							value="#{controleOpdrachtOverzichtFormBase.totDatum}" navigator="true" display="inline" effect="slide"
 							inputStyle="width:60px"
-    						datePattern="yyyy/MM/dd">
+    						pattern="yyyy-MM-dd">
 						</p:calendar>
 					</d:field>
 				</d:fields>
@@ -156,7 +156,7 @@
 						</a:outputPanel>
 					</p:column>
 					<p:column label="TrajectType" 
-						sortBy="#{controleOpdracht.typeTraject }"
+						sortBy="#{controleOpdracht.trajectType }"
 						style="width:120px;">
 						<f:facet name="header">
 						<d:displayLabel
@@ -167,7 +167,8 @@
 							value="#{controleOpdracht.trajectType }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Periode" style="width:60px;"
+					<p:column label="Periode" 
+						style="width:60px;"
 						sortBy="#{controleOpdracht.periode }">
 						<f:facet name="header">
 							<d:displayLabel
@@ -178,7 +179,8 @@
 							value="#{controleOpdracht.periode }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Traject" style="width:100px;"
+					<p:column label="Traject" 
+						style="width:100px;"
 						sortBy="#{controleOpdracht.traject }">
 						<f:facet name="header">
 							<h:outputText value="Routenaam" />
@@ -193,13 +195,15 @@
 						style="width:100px;">
 						<f:facet name="header">
 						<d:displayLabel
-								property="#{d:modelClass('ControleOpdracht').getProperty('regio')}" />
+								property="#{d:modelClass('ControleOpdracht').getProperty('regioId')}" />
 						</f:facet>
 						<d:propertyValue id="regioColumn"
-							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('regio')}"
-							value="#{controleOpdracht.regio }" mode="VIEW" />
+							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('regioId')}"
+							value="#{controleOpdracht.regioId }" mode="VIEW" />
 					</p:column>
-					<p:column label="Peter/Meter" sortBy="#{controleOpdracht.peterMeter }" style="width:120px;">
+					<p:column label="Peter/Meter" 
+						sortBy="#{controleOpdracht.peterMeter }" 
+						style="width:120px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" />
@@ -208,7 +212,9 @@
 							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
 							value="#{controleOpdracht.peterMeter }" mode="VIEW" />
 					</p:column>
-					<p:column label="Medewerker" sortBy="#{controleOpdracht.medewerker }" style="width:120px;">
+					<p:column label="Medewerker" 
+						sortBy="#{controleOpdracht.medewerker }" 
+						style="width:120px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}" />
@@ -218,7 +224,9 @@
 							value="#{controleOpdracht.medewerker }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Status" sortBy="#{controleOpdracht.status }" style="width:80px;">
+					<p:column label="Status" 
+						sortBy="#{controleOpdracht.status }" 
+						style="width:80px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('ControleOpdracht').getProperty('status')}" />
@@ -228,7 +236,8 @@
 							value="#{controleOpdracht.status }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" 
+					<p:column label="Datum"
+						sortBy="#{controleOpdracht.datumLaatsteWijziging }" 
 						style="width:80px;">
 						<f:facet name="header">
 							<h:outputText value="Datum" />

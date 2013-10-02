@@ -57,19 +57,24 @@ public class ControleOpdrachtSaveListener {
 
 		// Een nieuw aangemaakte ControleOpdracht krijgt status te controleren
 		if (controleOpdracht.getStatus() == null) {
+
 			controleOpdracht.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
-			controleOpdracht.setTypeTraject(osyrisModelFunctions
+			controleOpdracht.setTrajectType(osyrisModelFunctions
 					.getTrajectType(controleOpdracht.getTraject()));
 			controleOpdracht.setRegioId(osyrisModelFunctions
 					.getTrajectRegioId(controleOpdracht.getTraject()));
+			controleOpdracht.setDatumLaatsteWijziging(new Date());
 		}
 
 		// Indien alle problemen in een ControleOpdracht een status hebben is de
 		// ControleOpdracht gevalideerd
 		if (checkOpenstaandeProblemen(controleOpdracht) == 0
 				&& !controleOpdracht.getProblemen().isEmpty()) {
+
 			controleOpdracht.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
 			controleOpdracht.setDatumGevalideerd(new Date());
+			controleOpdracht.setDatumLaatsteWijziging(new Date());
+
 			// WerkOpdrachten aanmaken
 			createWerkOpdrachten(controleOpdracht);
 		}
@@ -82,7 +87,9 @@ public class ControleOpdrachtSaveListener {
 	 * @return
 	 */
 	private int checkOpenstaandeProblemen(ControleOpdracht controleOpdracht) {
+
 		int probleemNotChecked = 0;
+
 		for (Probleem p : controleOpdracht.getProblemen()) {
 			if (p.getStatus() == null || p.getStatus().toString().isEmpty()) {
 				probleemNotChecked = +1;
@@ -116,10 +123,13 @@ public class ControleOpdrachtSaveListener {
 							.setMedewerker(controleOpdracht.getMedewerker());
 					werkOpdracht.setProbleem(probleem);
 					werkOpdracht.setTraject(controleOpdracht.getTraject());
-					werkOpdracht.setTypeTraject(osyrisModelFunctions
+					werkOpdracht.setTrajectType(osyrisModelFunctions
 							.getTrajectType(werkOpdracht.getTraject()));
 					werkOpdracht.setRegioId(osyrisModelFunctions
 							.getTrajectRegioId(werkOpdracht.getTraject()));
+					werkOpdracht.setDatumLaatsteWijziging(new Date());
+					werkOpdracht.setGemeente(osyrisModelFunctions
+							.getWerkOpdrachtGemeente(probleem));
 
 					// Voor routes uitvoerder zoeken via RegioID van de route
 					Traject traject = (Traject) modelRepository
@@ -152,12 +162,15 @@ public class ControleOpdrachtSaveListener {
 					}
 					modelRepository.saveObject(werkOpdracht);
 					messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
+
 				} catch (IOException e) {
 					messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
 					LOG.error("Can not save WerkOpdracht", e);
+
 				} catch (InstantiationException e) {
 					messages.error("Fout bij het aanmaken van een nieuwe werkopdracht.");
 					LOG.error("Can not create WerkOpdracht.", e);
+
 				} catch (IllegalAccessException e) {
 					LOG.error("Can not access WerkOpdracht.", e);
 				}

@@ -8,7 +8,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
-	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{osyrisModelFunctions.getTrajectType(form.object.traject)}</h2>
+	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
 	<table width="100%">
 			<tr valign="top">
@@ -29,7 +29,8 @@
 	</a:outputPanel>
 	<br/>
 	<r:panel id="controleOpdrachtInfo" header="Praktische Info">
-	<d:object mode="VIEW" modelClass="#{form.modelClass}"
+	<d:object mode="VIEW" 
+		modelClass="#{form.modelClass}"
 		value="#{form.object}">
 	</d:object>
 	</r:panel>
@@ -42,6 +43,10 @@
 				</m:mapViewer>
 			</div>
 		</r:panel>
+		<u:decorate
+			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
 	</td>
 	</tr>
 	</table>

@@ -8,6 +8,7 @@
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
+	
 		<p:dataTable id="stockMaterialen"
 			value="#{form.selectedWerkOpdracht.materialen}"
 			mode="RESULT"
@@ -16,11 +17,11 @@
 			<j:bindAttribute var="gebruiktMateriaal"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Overzicht gebruikte materialen</div>
+				<h:outputText value="Overzicht gebruikte materialen" />
 			</f:facet>
 			<p:column>
 				<f:facet name="header">
-				<div>Categorie</div>
+				<h:outputText value="Categorie" />
 				</f:facet>
 				<d:propertyValue id="categorieColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
@@ -29,7 +30,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Subcategorie</div>
+				<h:outputText value="Subcategorie" />
 				</f:facet>
 				<d:propertyValue id="subCategorieColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
@@ -38,7 +39,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>type</div>
+				<h:outputText value="Type" />
 				</f:facet>
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
@@ -47,7 +48,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Naam</div>
+				<h:outputText value="Naam" />
 				</f:facet>
 				<d:propertyValue id="naamColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
@@ -56,7 +57,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>nummer</div>
+				<h:outputText value="Nummer" />
 				</f:facet>
 				<d:propertyValue id="nummerColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
@@ -65,7 +66,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<div>Aantal</div>
+				<h:outputText value="Aantal" />
 				</f:facet>
 				<d:propertyValue id="aantalColumn"
 					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"

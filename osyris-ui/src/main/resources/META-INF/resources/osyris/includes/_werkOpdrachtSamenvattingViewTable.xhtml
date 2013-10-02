@@ -19,7 +19,7 @@
 			<j:bindAttribute var="werkOpdracht"
 						name="rowData" />
 			<f:facet name="header">
-				<div>Samenvatting werkopdrachten in uitvoeringsronde</div>
+			<h:outputText value="Samenvatting werkopdrachten in uitvoeringsronde" />
 			</f:facet>
 	   		<p:column label="Acties">
 				<a:outputPanel styleClass="model-table-actions">
@@ -37,7 +37,7 @@
 			</p:column>
 	   		<p:column label="id">
 						<f:facet name="header">
-						<div>Identificatie</div>
+						<h:outputText value="Identificatie" />
 						</f:facet>
 						<div>#{d:modelObject(werkOpdracht).getId()}</div>
 			</p:column>
@@ -53,7 +53,7 @@
 			</p:column>
 			<p:column label="Traject">
 				<f:facet name="header">
-					<div>Routenaam</div>
+					<h:outputText value="Routenaam" />
 				</f:facet>
 				<d:propertyValue id="trajectColumn"
 					modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
@@ -62,7 +62,7 @@
 			</p:column>
 			<p:column label="Status">
 				<f:facet name="header">
-				<div>Status</div>
+				<h:outputText value="Status" />
 				</f:facet>
 				<d:propertyValue id="statusColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"

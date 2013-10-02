@@ -3,8 +3,6 @@ package be.gim.tov.osyris.model.werk;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Transient;
-
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.ContentType;
@@ -25,9 +23,7 @@ import org.conscientia.api.model.annotation.View;
 import org.conscientia.api.model.annotation.Width;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
@@ -142,17 +138,26 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@View(type = "table")
 	private List<GebruiktMateriaal> materialen;
 
-	// Extra properties om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
-	private String typeTraject;
+	private String trajectType;
 
-	// Extra properties om zoeken te vergemakkelijken
 	@NotViewable
 	@NotSearchable
 	@NotEditable
 	private ResourceIdentifier regioId;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private String gemeente;
+
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	@Type(ModelPropertyType.DATE)
+	private Date datumLaatsteWijziging;
 
 	// GETTERS AND SETTERS
 	public String getInRonde() {
@@ -307,12 +312,12 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.handelingen = handelingen;
 	}
 
-	public String getTypeTraject() {
-		return typeTraject;
+	public String getTrajectType() {
+		return trajectType;
 	}
 
-	public void setTypeTraject(String typeTraject) {
-		this.typeTraject = typeTraject;
+	public void setTrajectType(String trajectType) {
+		this.trajectType = trajectType;
 	}
 
 	public ResourceIdentifier getRegioId() {
@@ -323,39 +328,19 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 		this.regioId = regioId;
 	}
 
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	public Date getDatumLaatsteWijziging() {
-		return Beans.getReference(OsyrisModelFunctions.class)
-				.getDatumLaatsteWijziging(this);
-	}
-
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	public String getTrajectType() {
-		return Beans.getReference(OsyrisModelFunctions.class).getTrajectType(
-				this.traject);
-	}
-
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	public String getRegio() {
-		return Beans.getReference(OsyrisModelFunctions.class).getTrajectRegio(
-				this.traject);
-	}
-
-	@Transient
-	@NotViewable
-	@NotSearchable
-	@NotEditable
 	public String getGemeente() {
-		return Beans.getReference(OsyrisModelFunctions.class)
-				.getWerkOpdrachtGemeente(this.probleem);
+		return gemeente;
+	}
+
+	public void setGemeente(String gemeente) {
+		this.gemeente = gemeente;
+	}
+
+	public Date getDatumLaatsteWijziging() {
+		return datumLaatsteWijziging;
+	}
+
+	public void setDatumLaatsteWijziging(Date datumLaatsteWijziging) {
+		this.datumLaatsteWijziging = datumLaatsteWijziging;
 	}
 }

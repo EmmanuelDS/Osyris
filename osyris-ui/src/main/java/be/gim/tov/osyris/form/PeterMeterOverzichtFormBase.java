@@ -12,6 +12,7 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
@@ -40,6 +41,7 @@ import be.gim.commons.localization.DefaultInternationalString;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
+import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
 
 /**
  * 
@@ -439,5 +441,51 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		} catch (IOException e) {
 			LOG.error("Can not search Trajecten.", e);
 		}
+	}
+
+	@Override
+	public void save() {
+
+		try {
+			hasErrors = true;
+
+			if (checkVoorkeuren()) {
+
+				hasErrors = false;
+				modelRepository.saveObject(object);
+
+				messages.info(documentMessages.documentSaveSuccess(ObjectUtils
+						.toString(modelRepository.getResourceIdentifier(object))));
+
+				clear();
+				search();
+
+			} else {
+				messages.error("Bewaren profiel niet gelukt: indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
+			}
+		} catch (IOException e) {
+			messages.error(documentMessages.documentSaveFailed(e.getMessage()));
+			LOG.error("Can not save model object.", e);
+		}
+	}
+
+	/**
+	 * Checken of Voorkeuren voldoen aan de voorwaarden voor opslag.
+	 * 
+	 * @return
+	 */
+	private boolean checkVoorkeuren() {
+
+		PeterMeterProfiel profiel = (PeterMeterProfiel) object
+				.getAspect("PeterMeterProfiel");
+
+		for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+
+			if (voorkeur.getTrajectType().contains("Route")
+					&& null == voorkeur.getTrajectNaam()) {
+				return false;
+			}
+		}
+		return true;
 	}
 }

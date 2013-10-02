@@ -62,6 +62,7 @@ import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
+import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
@@ -136,6 +137,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected FeatureMapLayer bordLayer;
 	protected ResourceIdentifier trajectId;
 	protected Collection<String> imageKeys = new ArrayList<String>();
+	protected String baseLayerName;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -237,6 +239,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 		this.trajectId = trajectId;
 	}
 
+	public String getBaseLayerName() {
+		return baseLayerName;
+	}
+
+	public void setBaseLayerName(String baseLayerName) {
+		this.baseLayerName = baseLayerName;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -267,12 +277,19 @@ public class ControleOpdrachtOverzichtFormBase extends
 		else {
 
 			if (trajectType != null) {
-				query.addFilter(FilterUtils.equal("typeTraject", trajectType));
+				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
 
 			if (regio != null) {
 				query.addFilter(FilterUtils.equal("regioId", regio));
 			}
+		}
+
+		if (vanDatum != null && totDatum != null) {
+
+			query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
+					"datumLaatsteWijziging", totDatum), FilterUtils
+					.greaterOrEqual("datumLaatsteWijziging", vanDatum)));
 		}
 
 		try {
@@ -342,29 +359,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void search() {
 
 		try {
+
+			dataModel = null;
+
 			// Reset zoekveld trajectNaam
 			if (trajectType == null) {
 				setTrajectId(null);
 			}
 
 			List<ControleOpdracht> list = (List<ControleOpdracht>) modelRepository
-					.searchObjects(getQuery(), true, true, true);
-			List<ControleOpdracht> filteredList = new ArrayList<ControleOpdracht>();
+					.searchObjects(getQuery(), false, false, true);
 
-			// Kan dit op een betere manier gebeuren?
-			if (vanDatum != null && totDatum != null) {
-				for (ControleOpdracht c : list) {
-					if (c.getDatumLaatsteWijziging().before(totDatum)
-							&& c.getDatumLaatsteWijziging().after(vanDatum)) {
-						filteredList.add(c);
-					}
-				}
-				results = filteredList;
-
-			} else {
-				results = list;
-			}
-
+			results = list;
 			Collections.sort(results, new DateSortingCO());
 			dataModel = PrimeUtils.dataModel(results);
 
@@ -917,8 +923,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
 		variables.put("id", object.get("id"));
-		variables.put("trajectType", object.getTypeTraject());
-		variables.put("regio", object.getRegio());
+		variables.put("trajectType", object.getTrajectType());
+		variables.put("regio", Beans.getReference(OsyrisModelFunctions.class)
+				.getTrajectRegio(object.getTraject()));
 		variables.put("medewerker",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
@@ -938,8 +945,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @param bord
 	 */
 	public void zoomToBord(Bord bord) {
+
 		MapViewer viewer = getViewer();
 		Envelope envelope = new Envelope(bord.getGeom().getCoordinate());
+
+		// Niet te ver inzoomen op Bord
+		GeometryUtils.expandEnvelope(envelope, 0.02, viewer.getConfiguration()
+				.getContext().getMaxBoundingBox());
+
 		viewer.updateCurrentExtent(envelope);
 	}
 
@@ -1599,6 +1612,17 @@ public class ControleOpdrachtOverzichtFormBase extends
 				layer.setHidden(false);
 			}
 		}
+
+		// Ortho TMS als default achtergrondlaag
+		for (RasterMapLayer baseLayer : context.getBaseRasterLayers()) {
+
+			baseLayer.setHidden(true);
+
+			if (baseLayer.getLayerId().equalsIgnoreCase("tms")) {
+				baseLayer.setHidden(false);
+				baseLayerName = baseLayer.getLayerId();
+			}
+		}
 	}
 
 	/**
@@ -1794,5 +1818,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 		if (!anderProbleemLineGeoms.isEmpty()) {
 			geomLineLayer.setHidden(false);
 		}
+	}
+
+	/**
+	 * Switchen tussen basislagen voor PetersMeters.
+	 * 
+	 */
+	public void switchBaseLayers() {
+
+		getViewer().setBaseLayerId(baseLayerName);
 	}
 }
