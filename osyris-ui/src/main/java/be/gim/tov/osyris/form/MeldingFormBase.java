@@ -96,6 +96,7 @@ public class MeldingFormBase implements Serializable {
 	protected String probleemType;
 	protected Integer knooppuntNummer;
 	protected Envelope envelope = null;
+	protected String baseLayerName;
 
 	// GETTERS AND SETTERS
 	public Melding getMelding() {
@@ -156,6 +157,14 @@ public class MeldingFormBase implements Serializable {
 
 	public void setKnooppuntNummer(Integer knooppuntNummer) {
 		this.knooppuntNummer = knooppuntNummer;
+	}
+
+	public String getBaseLayerName() {
+		return baseLayerName;
+	}
+
+	public void setBaseLayerName(String baseLayerName) {
+		this.baseLayerName = baseLayerName;
 	}
 
 	// METHODS
@@ -226,6 +235,9 @@ public class MeldingFormBase implements Serializable {
 					"/META-INF/resources/core/mails/confirmMelding.fmt",
 					variables);
 
+			messages.info("Er is een bevestigingsmail gestuurd naar "
+					+ object.getEmail() + ".");
+
 			// Ophalen emailadres Medewerker
 			UserProfile profiel = (UserProfile) modelRepository.loadAspect(
 					modelRepository.getModelClass("UserProfile"),
@@ -240,10 +252,17 @@ public class MeldingFormBase implements Serializable {
 					Collections.singleton(testEmail),
 					"/META-INF/resources/core/mails/confirmMelding.fmt",
 					variables);
+
+			// messages.info("Er is een bevestigingsmail gestuurd de verantwoordelijke TOV "
+			// + medewerkerEmail + ".");
+
 		} catch (IOException e) {
+
 			LOG.error("Can not load object.", e);
 		} catch (Exception e) {
+
 			LOG.error("Can not send email.", e);
+			messages.error("Fout bij het versturen van bevestigingsmail");
 		}
 	}
 
@@ -289,6 +308,7 @@ public class MeldingFormBase implements Serializable {
 			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
 			context.setBoundingBox(envelope);
 
+			setBaseLayerName("tms");
 			return configuration;
 		}
 
@@ -487,8 +507,6 @@ public class MeldingFormBase implements Serializable {
 				messages.info("Melding sucessvol verzonden naar TOV.");
 				// Email bevestiging sturen naar melder en medewerker
 				// sendConfirmationMail(object);
-				messages.info("Er is een bevestigingsmail gestuurd naar "
-						+ object.getEmail() + ".");
 
 				return reset();
 			}
@@ -1028,6 +1046,7 @@ public class MeldingFormBase implements Serializable {
 	private Cookie getRoutedokterCookie() {
 
 		FacesContext context = FacesContext.getCurrentInstance();
+
 		if (context != null) {
 			Map<String, Object> requestCookieMap = context.getExternalContext()
 					.getRequestCookieMap();
@@ -1065,7 +1084,17 @@ public class MeldingFormBase implements Serializable {
 	 * trajectType zoekveld.
 	 */
 	public void resetChildSearchParameters() {
+
 		setKnooppuntNummer(null);
 		setTrajectNaam(null);
+	}
+
+	/**
+	 * Switchen tussen basislagen voor PetersMeters.
+	 * 
+	 */
+	public void switchBaseLayers() {
+
+		getViewer().setBaseLayerId(baseLayerName);
 	}
 }

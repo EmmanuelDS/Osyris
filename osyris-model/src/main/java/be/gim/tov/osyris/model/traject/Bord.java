@@ -19,6 +19,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
@@ -108,6 +109,7 @@ public abstract class Bord extends AbstractModelObject implements
 	@Width(150)
 	@NotSearchable
 	@ModelClassName("File")
+	@Target("_blank")
 	private ResourceIdentifier foto;
 
 	@NotSearchable

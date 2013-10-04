@@ -71,7 +71,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@EditableInStatus("")
 	@NotSearchable
 	@Length(min = 3, max = 30)
-	@Pattern("(\\+?[\\d]+)?")
+	@Pattern("(\\+?[\\d\\s]+)?")
 	private String telefoon;
 
 	@ModelClassName("User")

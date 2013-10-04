@@ -859,17 +859,23 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			try {
 				modelRepository.saveObject(object);
+
 				// Send confirmatie mail naar peterMeter
 				// sendConfirmationMail();
+
 				clear();
 				search();
+
 				messages.info("Controleopdracht succesvol verzonden.");
+
 			} catch (IOException e) {
+
 				messages.error("Fout bij het verzenden van controleopdracht: "
 						+ e.getMessage());
 				LOG.error("Can not save object.", e);
 			} catch (Exception e) {
-				messages.error("Fout bij het verzenden van controleopdracht: "
+
+				messages.error("Fout bij het versturen van bevestigingsmail naar de betrokken Peter/Meter: "
 						+ e.getMessage());
 				LOG.error("Can not send email", e);
 			}
@@ -889,18 +895,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			try {
 				modelRepository.saveObject(object);
+
 				clear();
 				search();
+
 				messages.info("Controleopdracht succesvol gerapporteerd.");
 
 			} catch (IOException e) {
 				messages.error("Fout bij het rapporteren van controleopdracht: "
 						+ e.getMessage());
 				LOG.error("Can not save object.", e);
-			} catch (Exception e) {
-				messages.error("Fout bij het rapporteren van controleopdracht: "
-						+ e.getMessage());
-				LOG.error("Can not send email", e);
 			}
 		}
 	}
@@ -936,6 +940,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.getAspect("UserProfile").get("email").toString()),
 				"/META-INF/resources/core/mails/confirmControleOpdracht.fmt",
 				variables);
+
 		messages.info("Er is een email verzonden naar de betrokken PeterMeter.");
 	}
 
@@ -1083,6 +1088,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			Probleem p = getProbleem();
 
 			if (checkProbleem(p)) {
+
 				object.getProblemen().add(p);
 
 				// Reset probleem
@@ -1105,6 +1111,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				viewer.updateContext(null);
 			}
 		} catch (IOException e) {
+
 			messages.error("Fout bij het toevoegen van probleem: "
 					+ e.getMessage());
 			LOG.error("Can not save object.", e);
@@ -1204,6 +1211,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			envelope = new Envelope(
 					((Bord) modelRepository.loadObject(bordProbleem.getBord()))
 							.getGeom().getCoordinate());
+
+			// Niet te ver inzoomen op Bord
+			GeometryUtils.expandEnvelope(envelope, 0.02, viewer
+					.getConfiguration().getContext().getMaxBoundingBox());
 			viewer.updateCurrentExtent(envelope);
 
 		} catch (IOException e) {
@@ -1226,11 +1237,19 @@ public class ControleOpdrachtOverzichtFormBase extends
 		layer.setHidden(false);
 
 		if (anderProbleem.getGeom() instanceof Point) {
+
 			envelope = new Envelope(anderProbleem.getGeom().getCoordinate());
+
+			// Niet te ver inzoomen op Probleempunt
+			GeometryUtils.expandEnvelope(envelope, 0.02, viewer
+					.getConfiguration().getContext().getMaxBoundingBox());
+
 			viewer.updateCurrentExtent(envelope);
 		}
 
-		if (anderProbleem.getGeomOmleiding() instanceof LineString) {
+		if (anderProbleem.getGeomOmleiding() != null
+				&& anderProbleem.getGeomOmleiding() instanceof LineString) {
+
 			envelope = new Envelope(anderProbleem.getGeomOmleiding()
 					.getEnvelopeInternal());
 			viewer.updateCurrentExtent(envelope);
@@ -1257,6 +1276,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	@SuppressWarnings("unchecked")
 	public void createControleOpdrachten() {
+
 		try {
 			int counter = 0;
 			// Filter trajecten waar een PeterMeter is aan toegekend.

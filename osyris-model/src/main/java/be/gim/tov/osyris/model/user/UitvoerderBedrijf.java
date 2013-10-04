@@ -28,7 +28,7 @@ public class UitvoerderBedrijf extends AbstractModelObject implements
 	private String email;
 
 	@Length(min = 3, max = 30)
-	@Pattern("(\\+?[\\d]+)?")
+	@Pattern("(\\+?[\\d\\s]+)?")
 	private String fax;
 
 	private String gemeente;
@@ -39,7 +39,7 @@ public class UitvoerderBedrijf extends AbstractModelObject implements
 	private String postcode;
 
 	@Length(min = 3, max = 30)
-	@Pattern("(\\+?[\\d]+)?")
+	@Pattern("(\\+?[\\d\\s]+)?")
 	private String telefoon;
 
 	// GETTERS AND SETTERS

@@ -56,6 +56,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
 
+	private static final String PERIODE_LENTE = "1";
+	private static final String PERIODE_ZOMER = "2";
+	private static final String PERIODE_HERFST = "3";
+
 	// VARIABLES
 	@Inject
 	protected UserRepository userRepository;
@@ -263,9 +267,11 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			if (permissions != null) {
 				modelRepository.deleteAspect(permissions);
 			}
+
 			messages.info("Peter/Meter succesvol verwijderd.");
 			clear();
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van Peter/Meter: "
 					+ e.getMessage());
@@ -447,7 +453,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	public void save() {
 
 		try {
-			hasErrors = true;
 
 			if (checkVoorkeuren()) {
 
@@ -461,7 +466,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				search();
 
 			} else {
-				messages.error("Bewaren profiel niet gelukt: indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
+				hasErrors = true;
 			}
 		} catch (IOException e) {
 			messages.error(documentMessages.documentSaveFailed(e.getMessage()));
@@ -479,12 +484,32 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		PeterMeterProfiel profiel = (PeterMeterProfiel) object
 				.getAspect("PeterMeterProfiel");
 
+		int counterLente = 0;
+		int counterZomer = 0;
+		int counterHerfst = 0;
+
 		for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+
+			if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+				counterLente++;
+			}
+			if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+				counterZomer++;
+			}
+			if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+				counterHerfst++;
+			}
 
 			if (voorkeur.getTrajectType().contains("Route")
 					&& null == voorkeur.getTrajectNaam()) {
+				messages.error("Bewaren profiel niet gelukt: Indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
 				return false;
 			}
+		}
+
+		if (counterLente > 3 || counterZomer > 3 || counterHerfst > 3) {
+			messages.error("Bewaren profiel niet gelukt: Per periode zijn er maximaal 3 voorkeuren toegelaten.");
+			return false;
 		}
 		return true;
 	}

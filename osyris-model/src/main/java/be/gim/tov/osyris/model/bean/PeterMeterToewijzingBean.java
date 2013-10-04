@@ -184,6 +184,7 @@ public class PeterMeterToewijzingBean {
 	 * van dienst gekozen.
 	 * 
 	 **/
+	@SuppressWarnings("unchecked")
 	private void assignRoute(PeterMeterVoorkeur voorkeur,
 			ResourceName peterMeter) {
 
@@ -194,65 +195,82 @@ public class PeterMeterToewijzingBean {
 			q.addFilter(FilterUtils.equal("naam", voorkeur.getTrajectNaam()));
 
 			// Zoeken naar voorkeursroute
-			Traject route = (Traject) modelRepository.searchObjects(q, false,
-					false).get(0);
+			Traject route = null;
 
-			// Check of PeterMeter voor 1 van de 3 periodes reeds is toegewezen
-			// aan een traject en of reeds toegewezen aan een bepaald type
-			// traject
-			// Hierin zit ook de check om te kijken of een PeterMeter 1 bepaalde
-			// route wil controleren
-			if (!checkAlreadyAssigned(route, peterMeter)
-					&& !checkAlreadyAssignedToType(route, voorkeur, peterMeter)) {
+			// Checken op route effectief gevonden is
+			List<Traject> result = (List<Traject>) modelRepository
+					.searchObjects(q, false, false);
 
-				ResourceName compareToPeterMeter = null;
-				ResourceName assignedPeterMeter = null;
-				if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-					compareToPeterMeter = (ResourceName) route.getPeterMeter1();
+			if (!result.isEmpty()) {
+				route = result.get(0);
+			}
 
-				}
-				if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-					compareToPeterMeter = (ResourceName) route.getPeterMeter2();
+			if (route != null) {
 
-				}
-				if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-					compareToPeterMeter = (ResourceName) route.getPeterMeter3();
-				}
-				// Indien al een andere peterMeter is toegekend
-				if (compareToPeterMeter != null
-						&& compareToPeterMeter != peterMeter) {
+				// Check of PeterMeter voor 1 van de 3 periodes reeds is
+				// toegewezen
+				// aan een traject en of reeds toegewezen aan een bepaald type
+				// traject
+				// Hierin zit ook de check om te kijken of een PeterMeter 1
+				// bepaalde
+				// route wil controleren
+				if (!checkAlreadyAssigned(route, peterMeter)
+						&& !checkAlreadyAssignedToType(route, voorkeur,
+								peterMeter)) {
 
-					PeterMeterProfiel profielPM1 = (PeterMeterProfiel) modelRepository
-							.loadObject(peterMeter).getAspect(
-									"PeterMeterProfiel");
-					PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
-							.loadObject(compareToPeterMeter).getAspect(
-									"PeterMeterProfiel");
+					ResourceName compareToPeterMeter = null;
+					ResourceName assignedPeterMeter = null;
+					if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+						compareToPeterMeter = (ResourceName) route
+								.getPeterMeter1();
 
-					Calendar cal1 = Calendar.getInstance();
-					Calendar cal2 = Calendar.getInstance();
-					cal1.setTime(profielPM1.getActiefSinds());
-					cal2.setTime(profielPM2.getActiefSinds());
-
-					// Degene met de langste staat van dienst wordt toegekend
-					if (cal1.before(cal2)) {
-						assignedPeterMeter = peterMeter;
-					} else {
-						assignedPeterMeter = compareToPeterMeter;
 					}
-				} else {
-					assignedPeterMeter = peterMeter;
-				}
+					if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+						compareToPeterMeter = (ResourceName) route
+								.getPeterMeter2();
 
-				// Bewaren toewijzing
-				if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-					route.setPeterMeter1(assignedPeterMeter);
-				} else if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-					route.setPeterMeter2(assignedPeterMeter);
-				} else if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-					route.setPeterMeter3(assignedPeterMeter);
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+						compareToPeterMeter = (ResourceName) route
+								.getPeterMeter3();
+					}
+					// Indien al een andere peterMeter is toegekend
+					if (compareToPeterMeter != null
+							&& compareToPeterMeter != peterMeter) {
+
+						PeterMeterProfiel profielPM1 = (PeterMeterProfiel) modelRepository
+								.loadObject(peterMeter).getAspect(
+										"PeterMeterProfiel");
+						PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
+								.loadObject(compareToPeterMeter).getAspect(
+										"PeterMeterProfiel");
+
+						Calendar cal1 = Calendar.getInstance();
+						Calendar cal2 = Calendar.getInstance();
+						cal1.setTime(profielPM1.getActiefSinds());
+						cal2.setTime(profielPM2.getActiefSinds());
+
+						// Degene met de langste staat van dienst wordt
+						// toegekend
+						if (cal1.before(cal2)) {
+							assignedPeterMeter = peterMeter;
+						} else {
+							assignedPeterMeter = compareToPeterMeter;
+						}
+					} else {
+						assignedPeterMeter = peterMeter;
+					}
+
+					// Bewaren toewijzing
+					if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+						route.setPeterMeter1(assignedPeterMeter);
+					} else if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+						route.setPeterMeter2(assignedPeterMeter);
+					} else if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+						route.setPeterMeter3(assignedPeterMeter);
+					}
+					modelRepository.saveObject(route);
 				}
-				modelRepository.saveObject(route);
 			}
 
 		} catch (IOException e) {
@@ -676,7 +694,7 @@ public class PeterMeterToewijzingBean {
 			return flag;
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error("Can not load PeterMeter.", e);
 		}
 		return false;
 	}

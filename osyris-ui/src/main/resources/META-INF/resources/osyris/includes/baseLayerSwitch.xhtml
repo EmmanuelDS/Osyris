@@ -13,9 +13,9 @@
 			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
         	<h:selectOneRadio id="options" value="#{form.baseLayerName}">  
 	            <f:selectItem itemLabel="Orthofoto" itemValue="tms" />  
-	            <f:selectItem itemLabel="Topografisch" itemValue="topo" /> 
-	            <f:selectItem itemLabel="Navstreet" itemValue="navstreet" /> 
-	            <a:ajax event="click" listener="#{form.switchBaseLayers()}"/> 
+	            <f:selectItem itemLabel="Topografische kaart" itemValue="topo" /> 
+	            <f:selectItem itemLabel="Stratenkaart" itemValue="navstreet" /> 
+	            <a:ajax event="change" listener="#{form.switchBaseLayers()}" render="backgroundLayerPanel" execute="@this"/> 
         	</h:selectOneRadio>  
 	    </h:panelGrid>  	
 	</r:panel>

@@ -179,9 +179,11 @@
 			</a:outputPanel>
 			</div>
 			<br/>
+			
 			<d:object mode="EDIT"
 					value="#{form.melding.probleem}" />	
-				<d:propertyField id="commentaar" 
+					
+			<d:propertyField id="commentaar" 
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.melding.probleem.commentaar}"
 						mode="EDIT" />
@@ -215,6 +217,16 @@
 					listener="#{form.onDeleteFeatures}" />
 			</m:mapViewer>
 		</div>
+	</r:panel>
+	<r:panel id="backgroundLayerPanel" header="Achtergrondlaag">
+			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+        	<h:selectOneRadio id="options" value="#{form.baseLayerName}">  
+	            <f:selectItem itemLabel="Orthofoto" itemValue="tms" />  
+	            <f:selectItem itemLabel="Topografische kaart" itemValue="topo" /> 
+	            <f:selectItem itemLabel="Stratenkaart" itemValue="navstreet" /> 
+	            <a:ajax event="change" listener="#{form.switchBaseLayers()}" render="backgroundLayerPanel" execute="@this"/> 
+        	</h:selectOneRadio>  
+	    </h:panelGrid>  	
 	</r:panel>
 	</td>
 	</tr>
