@@ -9,12 +9,14 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.jsf.event.ControllerEvent;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceName;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapLayer;
+import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.layer.DefaultMapGroup;
 import be.gim.specto.ui.component.UIMapViewer;
 import be.gim.tov.osyris.model.traject.Provincie;
@@ -105,5 +107,20 @@ public class ContextFormBase {
 		} catch (Exception e) {
 			LOG.error("Can not set MapViewer.", e);
 		}
+	}
+
+	public boolean checkNetwerkLayer(ControllerEvent event) {
+
+		String layerId = (String) event.getParams().get("layerId");
+		return "wandelNetwerkSegment".equals(layerId)
+				|| "fietsNetwerkSegment".equals(layerId);
+	}
+
+	public void redrawNetwerkLayer(ControllerEvent event) {
+
+		String layerId = (String) event.getParams().get("layerId");
+		layerId = layerId.replace("Segment", "Lus");
+		viewer.redrawLayer((RasterMapLayer) viewer.getContext().getLayer(
+				layerId));
 	}
 }
