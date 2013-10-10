@@ -5,7 +5,9 @@ import java.util.List;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -23,6 +25,11 @@ public abstract class NetwerkLus extends Traject {
 	private boolean actief;
 
 	@NotSearchable
+	@NotViewable
+	@NotEditable
+	private RichtingEnum richting;
+
+	@NotSearchable
 	@ModelClassName("Traject")
 	private List<ResourceIdentifier> segmenten;
 
@@ -33,6 +40,14 @@ public abstract class NetwerkLus extends Traject {
 
 	public void setActief(boolean actief) {
 		this.actief = actief;
+	}
+
+	public RichtingEnum getRichting() {
+		return richting;
+	}
+
+	public void setRichting(RichtingEnum richting) {
+		this.richting = richting;
 	}
 
 	public List<ResourceIdentifier> getSegmenten() {

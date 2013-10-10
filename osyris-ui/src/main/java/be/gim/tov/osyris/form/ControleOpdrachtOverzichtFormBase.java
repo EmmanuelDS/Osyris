@@ -29,6 +29,7 @@ import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Fop;
 import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
+import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
@@ -105,8 +106,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private static final String PERIODE_LENTE = "1";
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
-	public static final String CO_PDF = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
-	public static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
+
+	private static final String CO_PDF = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
+	private static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
 
 	private static final long serialVersionUID = -86881009141250710L;
 
@@ -122,6 +124,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected Preferences preferences;
 	@Inject
 	protected MailSender mailSender;
+	@Inject
+	protected CacheProducer cacheProducer;
 
 	protected String controleOpdrachtType;
 	protected ResourceIdentifier regio;
@@ -579,25 +583,35 @@ public class ControleOpdrachtOverzichtFormBase extends
 				result = Collections.emptyList();
 			}
 			if (t instanceof Route) {
+
 				// Routes filteren op trajectNaam
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
-				// TODO: volgnummers voor netwerkborden moeten nog toegevoegd
-				// worden
 				// in DB
-				// TODO: sorteren op sequentie
+				// TODO: sorteren op sequentie, voorlopig via alphanumeric
+				// sorting
 				result = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(result, new AlphanumericSorting());
 			}
 
 			else if (t instanceof NetwerkLus) {
-				QueryBuilder builder = new QueryBuilder("NetwerkBord");
-				builder.addFilter(FilterUtils.in("segmenten",
-						((NetwerkLus) t).getSegmenten()));
-				result = (List<Bord>) modelRepository.searchObjects(
-						builder.build(), true, true);
-				Collections.sort(result, new AlphanumericSorting());
+
+				NetwerkLus lus = ((NetwerkLus) t);
+
+				// OLD
+				// QueryBuilder builder = new QueryBuilder("NetwerkBord");
+				// builder.addFilter(FilterUtils.in("segmenten",
+				// lus.getSegmenten()));
+
+				// result = (List<Bord>) modelRepository.searchObjects(
+				// builder.build(), true, true);
+
+				// Collections.sort(result, new AlphanumericSorting());
+
+				result = Beans.getReference(OsyrisModelFunctions.class)
+						.getNetwerkBordVolgorde(lus);
+
 			} else {
 				result = Collections.emptyList();
 			}
@@ -1415,8 +1429,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 				.getTraject());
 
 		XmlBuilder xmlBuilder = new XmlBuilder();
-		Document doc = xmlBuilder.buildBewegwijzeringTabel(traject, object,
-				borden);
+		Document doc = xmlBuilder.buildBewegwijzeringTabel(getViewer(),
+				traject, object, borden);
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,

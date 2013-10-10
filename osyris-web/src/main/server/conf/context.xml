@@ -60,7 +60,7 @@
         username="geonetwork"
         password="def@33"
         driverClassName="com.microsoft.sqlserver.jdbc.SQLServerDriver"
-        url="jdbc:sqlserver://tov-osyris-sql.gim.be;DatabaseName=osyris_data;SelectMethod=cursor;"
+        url="jdbc:sqlserver://tov-osyris-sql.gim.be;DatabaseName=osyris_data_final;SelectMethod=cursor;"
         validationQuery="select 1"
         defaultAutoCommit="false"
         maxActive="50"

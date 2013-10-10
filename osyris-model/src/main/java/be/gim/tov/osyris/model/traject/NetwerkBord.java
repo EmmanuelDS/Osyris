@@ -79,6 +79,8 @@ public abstract class NetwerkBord extends Bord {
 	@ModelClassName("NetwerkKnooppunt")
 	private ResourceIdentifier kpid3;
 
+	private RichtingEnum richting;
+
 	@NotSearchable
 	@ModelClassName("Traject")
 	private List<ResourceIdentifier> segmenten;
@@ -186,6 +188,14 @@ public abstract class NetwerkBord extends Bord {
 
 	public void setKpid3(ResourceIdentifier kpid3) {
 		this.kpid3 = kpid3;
+	}
+
+	public RichtingEnum getRichting() {
+		return richting;
+	}
+
+	public void setRichting(RichtingEnum richting) {
+		this.richting = richting;
 	}
 
 	public List<ResourceIdentifier> getSegmenten() {

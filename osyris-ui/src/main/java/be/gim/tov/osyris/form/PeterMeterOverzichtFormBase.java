@@ -110,15 +110,15 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
 					"group", "PeterMeter"));
 
-			List<Filter> filters = new ArrayList<Filter>();
+			List<String> nameParts = new ArrayList<String>();
 
 			for (ResourceName name : group.getMembers()) {
-				Filter filter = FilterUtils.equal("username",
-						name.getNamePart());
-				filters.add(filter);
+
+				nameParts.add(name.getNamePart());
 			}
 
-			query.addFilter(FilterUtils.or(filters));
+			query.addFilter(FilterUtils.in("username", nameParts));
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -149,6 +149,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			query.addFilter(FilterUtils.or(filters));
 
 			return query;
+
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -268,9 +269,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				modelRepository.deleteAspect(permissions);
 			}
 
-			messages.info("Peter/Meter succesvol verwijderd.");
 			clear();
 			search();
+			messages.info("Peter/Meter succesvol verwijderd.");
 
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van Peter/Meter: "
@@ -338,6 +339,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			List<Group> groups = new ArrayList<Group>();
 			groups = (List<Group>) modelRepository.searchObjects(query, false,
 					false);
+
 			Group group = (Group) ModelRepository.getUniqueResult(groups);
 			group.getMembers().add(resourceName);
 			modelRepository.saveObject(group);

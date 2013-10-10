@@ -127,6 +127,11 @@ public abstract class Bord extends AbstractModelObject implements
 	@Index
 	private Geometry geom;
 
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private String labelId;
+
 	// GETTERS AND SETTERS
 	@Override
 	public Long getId() {
@@ -267,6 +272,14 @@ public abstract class Bord extends AbstractModelObject implements
 
 	public void setGeom(Geometry geom) {
 		this.geom = geom;
+	}
+
+	public String getLabelId() {
+		return labelId;
+	}
+
+	public void setLabelId(String labelId) {
+		this.labelId = labelId;
 	}
 
 	@Transient

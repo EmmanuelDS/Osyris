@@ -1,0 +1,63 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="org.conscientia.ui.ModelValue" />
+	<cc:implementation>
+		<a:outputPanel id="panel">
+			<r:panel rendered="#{cc.attrs.value != null}">
+				
+				<d:propertyField id="periode"
+				 		modelProperty="#{d:modelClass('PeterMeterVoorkeur').getProperty('periode')}"
+						value="#{cc.attrs.value.periode}"
+						mode="EDIT" />
+						
+				<d:field for="trajectType" label="Trajecttype">
+				<h:selectOneMenu id="trajectType" value="#{cc.attrs.value.trajectType}">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+					<a:ajax
+						event="change"
+						render="detailSearchPanel"
+						execute="@this" />
+				</h:selectOneMenu>
+				</d:field>
+				
+				<d:field for="regio" label="Regio">
+				<h:selectOneMenu id="regio" value="#{cc.attrs.value.regio}">
+					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+					<a:ajax
+						event="change"
+						render="trajectNaam"
+						execute="@this" />
+				</h:selectOneMenu>
+				</d:field>
+
+			<j:renderPanel id="detailSearchPanel" rendered="#{cc.attrs.value.trajectType != null}">
+			
+				<d:field for="trajectNaam" label="Traject naam" rendered="#{cc.attrs.value.trajectType.contains('Route')}" required="#{cc.attrs.value.trajectType.contains('Route')}">
+					<h:selectOneMenu id="trajectNaam" value="#{cc.attrs.value.trajectNaam}" rendered="#{cc.attrs.value.trajectType.contains('Route')}" required="#{cc.attrs.value.trajectType.contains('Route')}">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(cc.attrs.value.regio, cc.attrs.value.trajectType))}" />
+					</h:selectOneMenu>
+				</d:field>
+					
+				<d:propertyField id="maxAfstand" required="#{cc.attrs.value.trajectType.contains('Netwerk')}" rendered="#{cc.attrs.value.trajectType.contains('Netwerk')}"
+				 		modelProperty="#{d:modelClass('PeterMeterVoorkeur').getProperty('maxAfstand')}"
+						value="#{cc.attrs.value.maxAfstand}"
+						mode="EDIT" />
+					
+				</j:renderPanel>
+			
+			</r:panel>
+		</a:outputPanel>
+	</cc:implementation>
+</div>

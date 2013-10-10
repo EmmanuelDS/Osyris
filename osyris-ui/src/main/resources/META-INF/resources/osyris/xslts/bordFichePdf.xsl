@@ -26,8 +26,6 @@
    	  
         <fo:flow flow-name="xsl-region-body">
         
-        
-       
        <fo:table border="solid" table-layout="fixed" width="100%" height="100%">
         <fo:table-header border="solid">
         	<fo:table-row>

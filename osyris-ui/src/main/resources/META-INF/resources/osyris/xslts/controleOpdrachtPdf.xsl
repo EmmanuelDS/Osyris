@@ -19,10 +19,12 @@
     	<fo:block text-align="center" font-size="10pt" color="#000000">
       	<fo:inline><fo:page-number/></fo:inline>
     	</fo:block>
-   	  </fo:static-content>
+   	   </fo:static-content>
    	  
         <fo:flow flow-name="xsl-region-body">
         
+         <xsl:call-template name="overviewMap" />
+         
         <xsl:if test="//@netwerkCO='false'">
         <fo:block margin-left="40px" padding-bottom="20px">ROUTENAAM:
           	<xsl:value-of
@@ -177,5 +179,28 @@
         </fo:flow>
       </fo:page-sequence>
     </fo:root>
+  </xsl:template>
+  
+  <xsl:template name="overviewMap">
+  
+  <fo:table table-layout="fixed" width="100%" height="100%">
+	<fo:table-body>
+	<fo:table-row>
+      <fo:table-cell >
+      
+	  	<fo:block text-align="center">		
+			<xsl:variable name="overviewMap_url" select="/verslag/overviewMap" />
+			<fo:external-graphic src="'{$overviewMap_url}'"
+				content-height="180mm"
+				scaling="uniform"/>
+	     </fo:block>
+	     		
+     </fo:table-cell>
+     </fo:table-row>
+	 </fo:table-body>
+	 </fo:table>
+	 
+	 <fo:block page-break-after="always"/> 
+	 
   </xsl:template>
 </xsl:stylesheet>

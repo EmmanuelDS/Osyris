@@ -138,7 +138,7 @@
 				   <xsl:if test="//@hasFoto='false'">
 	          		<fo:external-graphic src="http://osyristest.tov.be/fotos/geen%20foto.png"  />
 	               </xsl:if>
-        </fo:block>
+        	</fo:block>
         </fo:table-cell>
         </fo:table-row>
         </fo:table-body>

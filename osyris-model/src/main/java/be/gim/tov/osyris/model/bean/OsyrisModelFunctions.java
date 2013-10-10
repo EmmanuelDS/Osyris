@@ -37,6 +37,7 @@ import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Gemeente;
+import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
@@ -375,13 +376,19 @@ public class OsyrisModelFunctions {
 						List<Object[]> suggestions = new ArrayList<Object[]>();
 						try {
 
-							List<ResourceName> users = getUsersInGroup(groupName);
-							for (ResourceName user : users) {
-								User peterMeter = (User) modelRepository
-										.loadObject(user);
-								UserProfile profiel = (UserProfile) peterMeter
+							// List<ResourceName> users =
+							// getUsersInGroup(groupName);
+							List<User> users = getUserObjectsInGroup(groupName);
+
+							for (User user : users) {
+
+								// User peterMeter = (User) modelRepository
+								// .loadObject(user);
+
+								UserProfile profiel = (UserProfile) user
 										.getAspect("UserProfile",
-												modelRepository, true);
+												modelRepository, false);
+
 								Object[] object = {
 										user,
 										profiel.getLastName() + " "
@@ -1160,5 +1167,97 @@ public class OsyrisModelFunctions {
 		String contextPath = FacesContext.getCurrentInstance()
 				.getExternalContext().getRequestContextPath();
 		return contextPath + "/web/view/help";
+	}
+
+	/**
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<User> getUserObjectsInGroup(String groupName) {
+
+		try {
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", groupName));
+
+			List<String> nameParts = new ArrayList<String>();
+
+			for (ResourceName name : group.getMembers()) {
+
+				nameParts.add(name.getNamePart());
+			}
+
+			DefaultQuery query = new DefaultQuery("User");
+
+			query.addFilter(FilterUtils.in("username", nameParts));
+
+			List<User> result = (List<User>) modelRepository.searchObjects(
+					query, true, true);
+
+			return result;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Ophalen volgorde NetwerkBorden.
+	 * 
+	 * @param lus
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Bord> getNetwerkBordVolgorde(NetwerkLus lus) {
+
+		return (List<Bord>) cacheProducer.getCache("NetwerkBordVolgorde",
+				new Transformer() {
+
+					@Override
+					public Object transform(Object lus) {
+
+						try {
+
+							if (lus != null) {
+								List<Bord> result = new ArrayList<Bord>();
+
+								// Per segment de borden ophalen volgende de
+								// richting van de lus
+								for (ResourceIdentifier id : ((NetwerkLus) lus)
+										.getSegmenten()) {
+
+									List<Bord> subset = new ArrayList<Bord>();
+									List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
+											1);
+									ids.add(id);
+
+									QueryBuilder builder = new QueryBuilder(
+											"NetwerkBord");
+									builder.addFilter(FilterUtils.equal(
+											"richting",
+											((NetwerkLus) lus).getRichting()));
+									builder.addFilter(FilterUtils.in(
+											"segmenten", ids));
+
+									subset = (List<Bord>) modelRepository
+											.searchObjects(builder.build(),
+													false, false);
+
+									if (subset != null && !subset.isEmpty()) {
+										result.addAll(subset);
+									}
+								}
+
+								return result;
+							}
+
+						} catch (IOException e) {
+							LOG.error("Can not search segmenten.", e);
+						}
+
+						return Collections.emptyList();
+					}
+				}).get(lus);
 	}
 }

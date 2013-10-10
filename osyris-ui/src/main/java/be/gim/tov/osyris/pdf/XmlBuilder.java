@@ -1,16 +1,24 @@
 package be.gim.tov.osyris.pdf;
 
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+import javax.faces.application.Resource;
+import javax.faces.context.FacesContext;
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.impl.dv.util.Base64;
 import org.conscientia.service.interchange.InterchangeStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -53,6 +61,8 @@ public class XmlBuilder {
 
 	private static double SCALE_ORTHO = 1889.7648;
 	private static double SCALE_TOPO = 7231;
+
+	private static final Log LOG = LogFactory.getLog(XmlBuilder.class);
 
 	protected Collection<String> imageKeys = new ArrayList<String>();
 
@@ -219,10 +229,14 @@ public class XmlBuilder {
 	 * @return
 	 * @throws ParserConfigurationException
 	 * @throws TransformerException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws DOMException
 	 */
-	public Document buildBewegwijzeringTabel(Traject traject,
+	public Document buildBewegwijzeringTabel(MapViewer viewer, Traject traject,
 			ControleOpdracht object, List<Bord> borden)
-			throws ParserConfigurationException, TransformerException {
+			throws ParserConfigurationException, TransformerException,
+			DOMException, InstantiationException, IllegalAccessException {
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory
 				.newInstance();
@@ -232,6 +246,11 @@ public class XmlBuilder {
 		Document doc = docBuilder.newDocument();
 		Element rootElement = doc.createElement("verslag");
 		doc.appendChild(rootElement);
+
+		Element overviewMap = doc.createElement("overviewMap");
+		overviewMap.appendChild(doc.createTextNode(getOverviewMap(viewer,
+				traject)));
+		rootElement.appendChild(overviewMap);
 
 		Element trajectNaam = doc.createElement("trajectnaam");
 		trajectNaam.appendChild(doc.createTextNode(traject.getNaam()));
@@ -669,6 +688,40 @@ public class XmlBuilder {
 	}
 
 	/**
+	 * 
+	 * @param viewer
+	 * @param traject
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	private String getOverviewMap(MapViewer viewer, Traject traject)
+			throws InstantiationException, IllegalAccessException {
+
+		viewer.setBaseLayerId("tms");
+
+		int width = 1024;
+		int height = 780;
+
+		FeatureMapLayer layer = (FeatureMapLayer) viewer.getContext().getLayer(
+				LabelUtils.lowerCamelCase(traject.getModelClass().getName()));
+
+		RenderedImage mapImage = viewer.getMap(
+				viewer.getContext().getSrsName(),
+				viewer.getContentExtent(layer), null, width, height,
+				viewer.getCurrentScale());
+
+		Graphics2D g2d = ((BufferedImage) mapImage).createGraphics();
+
+		addNorthArrow(viewer, g2d, width, height);
+		addScaleLine(viewer, g2d, width, height, viewer.getCurrentScale(), DPI);
+
+		viewer.setBaseLayerId("tms");
+
+		return storeImage(mapImage);
+	}
+
+	/**
 	 * Opslaan en aanbieden van de url van de kaartafbeelding.
 	 * 
 	 * @param image
@@ -685,5 +738,36 @@ public class XmlBuilder {
 		imageKeys.add(key);
 
 		return Beans.getReference(InterchangeStore.class).getURL(key);
+	}
+
+	protected void addNorthArrow(MapViewer viewer, Graphics2D g2d, int width,
+			int height) {
+
+		try {
+			Resource resource = FacesContext.getCurrentInstance()
+					.getApplication().getResourceHandler()
+					.createResource("map/images/graphics/northArrow.png");
+			InputStream in = resource.getInputStream();
+			try {
+				BufferedImage image = ImageIO.read(in);
+				g2d.drawImage(image, width - 30, 5, 25, 50, null);
+			} finally {
+				in.close();
+			}
+		} catch (Exception e) {
+			LOG.error("Can not add north arrow graphic.", e);
+		}
+	}
+
+	protected void addScaleLine(MapViewer viewer, Graphics2D g2d, int width,
+			int height, double scale, double dpi) {
+
+		try {
+			BufferedImage image = (BufferedImage) viewer.getScaleGraphic(100,
+					20, scale, viewer.getContext().getSrsName(), dpi);
+			g2d.drawImage(image, width - 100, height - 20 - 25, 100, 20, null);
+		} catch (Exception e) {
+			LOG.error("Can not add scale line graphic.", e);
+		}
 	}
 }
