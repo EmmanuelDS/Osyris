@@ -338,6 +338,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		try {
 			object = null;
+			bewegwijzering = null;
+			trajectNaam = null;
+
 			if (controleOpdrachtType.equals("route")) {
 				object = (ControleOpdracht) modelRepository.createObject(
 						modelRepository.getModelClass("RouteControleOpdracht"),
@@ -530,6 +533,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			if (trajectType.contains("Route")) {
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", trajectNaam));
+
 				// TODO: sorteren op sequentie, voorlopig nog met AlphaNumeric
 				// Sorting algoritme
 				// builder.orderBy(new
@@ -553,11 +557,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 				}
 				NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 						.getTraject());
-				builder.addFilter(FilterUtils.in("segmenten",
-						lus.getSegmenten()));
-				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
-						builder.build(), true, true);
-				Collections.sort(bewegwijzering, new AlphanumericSorting());
+				// builder.addFilter(FilterUtils.in("segmenten",
+				// lus.getSegmenten()));
+				// bewegwijzering = (List<Bord>) modelRepository.searchObjects(
+				// builder.build(), true, true);
+				// Collections.sort(bewegwijzering, new AlphanumericSorting());
+
+				bewegwijzering = Beans.getReference(OsyrisModelFunctions.class)
+						.getNetwerkBordVolgordeLus(lus);
 
 			}
 		} catch (IOException e) {
@@ -610,7 +617,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				// Collections.sort(result, new AlphanumericSorting());
 
 				result = Beans.getReference(OsyrisModelFunctions.class)
-						.getNetwerkBordVolgorde(lus);
+						.getNetwerkBordVolgordeLus(lus);
 
 			} else {
 				result = Collections.emptyList();
@@ -1806,6 +1813,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
 							.lowerCamelCase(traject.getModelClass().getName()
 									.replace("Lus", "Knooppunt"))));
+
 			// Filteren NetwerkBorden op segmenten van de Lus
 			if (bordLayer != null) {
 				bordLayer.setHidden(false);

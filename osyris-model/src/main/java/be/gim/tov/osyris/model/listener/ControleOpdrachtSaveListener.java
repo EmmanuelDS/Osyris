@@ -55,6 +55,11 @@ public class ControleOpdrachtSaveListener {
 		ControleOpdracht controleOpdracht = (ControleOpdracht) event
 				.getModelObject();
 
+		if (null == controleOpdracht.getMedewerker()) {
+			controleOpdracht.setMedewerker(osyrisModelFunctions
+					.zoekVerantwoordelijke(controleOpdracht.getTraject()));
+		}
+
 		// Een nieuw aangemaakte ControleOpdracht krijgt status te controleren
 		if (controleOpdracht.getStatus() == null) {
 

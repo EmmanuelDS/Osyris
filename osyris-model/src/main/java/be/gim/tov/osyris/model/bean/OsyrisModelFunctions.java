@@ -4,7 +4,9 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -15,7 +17,9 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.group.Group;
+import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
+import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
@@ -25,6 +29,7 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.security.annotation.RunPrivileged;
+import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
@@ -34,16 +39,20 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
+import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Gemeente;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
+import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.RichtingEnum;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
+import be.gim.tov.osyris.model.utils.AlphanumericSorting;
 import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
@@ -69,6 +78,12 @@ public class OsyrisModelFunctions {
 	protected CacheProducer cacheProducer;
 	@Inject
 	protected Identity identity;
+	@Inject
+	protected Preferences preferences;
+	@Inject
+	protected Messages messages;
+	@Inject
+	protected MailSender mailSender;
 
 	/**
 	 * Get waarden status StockMateriaal.
@@ -390,7 +405,7 @@ public class OsyrisModelFunctions {
 												modelRepository, false);
 
 								Object[] object = {
-										user,
+										"user:" + user.getUsername(),
 										profiel.getLastName() + " "
 												+ profiel.getFirstName() };
 								suggestions.add(object);
@@ -1203,15 +1218,15 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Ophalen volgorde NetwerkBorden.
+	 * Ophalen volgorde NetwerkBorden in een lus.
 	 * 
 	 * @param lus
 	 * @return
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Bord> getNetwerkBordVolgorde(NetwerkLus lus) {
+	public List<Bord> getNetwerkBordVolgordeLus(NetwerkLus lus) {
 
-		return (List<Bord>) cacheProducer.getCache("NetwerkBordVolgorde",
+		return (List<Bord>) cacheProducer.getCache("NetwerkBordVolgordeLus",
 				new Transformer() {
 
 					@Override
@@ -1222,35 +1237,81 @@ public class OsyrisModelFunctions {
 							if (lus != null) {
 								List<Bord> result = new ArrayList<Bord>();
 
-								// Per segment de borden ophalen volgende de
-								// richting van de lus
-								for (ResourceIdentifier id : ((NetwerkLus) lus)
-										.getSegmenten()) {
+								// StartSegment in de lus
+								NetwerkSegment start = (NetwerkSegment) modelRepository
+										.loadObject(((NetwerkLus) lus)
+												.getSegmenten().get(0));
 
-									List<Bord> subset = new ArrayList<Bord>();
-									List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
-											1);
-									ids.add(id);
+								// ---------------
+								for (int i = 0; i < ((NetwerkLus) lus)
+										.getSegmenten().size(); i++) {
+
+									int nextIndex = i + 1;
+
+									NetwerkSegment current = (NetwerkSegment) modelRepository
+											.loadObject(((NetwerkLus) lus)
+													.getSegmenten().get(i));
+
+									NetwerkSegment next = null;
+
+									if (nextIndex < ((NetwerkLus) lus)
+											.getSegmenten().size()) {
+
+										next = (NetwerkSegment) modelRepository
+												.loadObject(((NetwerkLus) lus)
+														.getSegmenten().get(
+																nextIndex));
+									} else {
+										next = start;
+									}
+
+									String richting = null;
+									if (current.getNaarKpNr().equals(
+											next.getVanKpNr())) {
+
+										richting = RichtingEnum.FT.toString();
+
+									}
+
+									else if (current.getNaarKpNr().equals(
+											next.getNaarKpNr())) {
+
+										richting = RichtingEnum.FT.toString();
+									}
+
+									else {
+										richting = RichtingEnum.TF.toString();
+									}
 
 									QueryBuilder builder = new QueryBuilder(
 											"NetwerkBord");
-									builder.addFilter(FilterUtils.equal(
-											"richting",
-											((NetwerkLus) lus).getRichting()));
+									List<Bord> subset = new ArrayList<Bord>();
+
+									List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
+											1);
+									ids.add(modelRepository
+											.getResourceIdentifier(current));
+
 									builder.addFilter(FilterUtils.in(
 											"segmenten", ids));
+
+									builder.addFilter(FilterUtils.equal(
+											"richting", richting));
 
 									subset = (List<Bord>) modelRepository
 											.searchObjects(builder.build(),
 													false, false);
 
 									if (subset != null && !subset.isEmpty()) {
+										Collections.sort(subset,
+												new AlphanumericSorting());
 										result.addAll(subset);
 									}
 								}
 
 								return result;
 							}
+							// ----------------
 
 						} catch (IOException e) {
 							LOG.error("Can not search segmenten.", e);
@@ -1259,5 +1320,124 @@ public class OsyrisModelFunctions {
 						return Collections.emptyList();
 					}
 				}).get(lus);
+	}
+
+	// DEBUG METHOD TO BE REMOVED
+	public List<Bord> volgordeTest(NetwerkLus lus) {
+
+		try {
+			List<Bord> result = new ArrayList<Bord>();
+
+			// StartSegment in de lus
+			NetwerkSegment start = (NetwerkSegment) modelRepository
+					.loadObject(lus.getSegmenten().get(0));
+
+			// ---------------
+			for (int i = 0; i < lus.getSegmenten().size(); i++) {
+
+				int nextIndex = i + 1;
+
+				NetwerkSegment current = (NetwerkSegment) modelRepository
+						.loadObject(lus.getSegmenten().get(i));
+
+				NetwerkSegment next = null;
+
+				if (nextIndex < lus.getSegmenten().size()) {
+
+					next = (NetwerkSegment) modelRepository.loadObject(lus
+							.getSegmenten().get(nextIndex));
+				} else {
+					next = start;
+				}
+
+				String richting = null;
+				if (current.getNaarKpNr().equals(next.getVanKpNr())) {
+
+					richting = RichtingEnum.FT.toString();
+				} else {
+					richting = RichtingEnum.TF.toString();
+				}
+
+				QueryBuilder builder = new QueryBuilder("NetwerkBord");
+				List<Bord> subset = new ArrayList<Bord>();
+
+				List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
+						1);
+				ids.add(modelRepository.getResourceIdentifier(current));
+
+				builder.addFilter(FilterUtils.in("segmenten", ids));
+
+				builder.addFilter(FilterUtils.equal("richting", richting));
+
+				subset = (List<Bord>) modelRepository.searchObjects(
+						builder.build(), false, false);
+
+				if (subset != null && !subset.isEmpty()) {
+					Collections.sort(subset, new AlphanumericSorting());
+					result.addAll(subset);
+				}
+			}
+
+			return result;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * Verstuurt confirmatie mail naar de melder en de medewerker TOV
+	 * 
+	 * @param melding
+	 * @throws Exception
+	 */
+	@RunPrivileged
+	public void sendConfirmationMailMelding(Melding melding) {
+
+		try {
+			Map<String, Object> variables = new HashMap<String, Object>();
+			variables.put("preferences", preferences);
+			variables.put("firstname", melding.getVoornaam());
+			variables.put("lastname", melding.getNaam());
+			variables.put("phone", melding.getTelefoon());
+			variables.put("status", melding.getStatus());
+			variables.put("problem", melding.getProbleem());
+
+			// Mail naar melder
+			mailSender.sendMail(preferences.getNoreplyEmail(),
+					Collections.singleton(melding.getEmail()),
+					"/META-INF/resources/core/mails/confirmMelding.fmt",
+					variables);
+
+			messages.info("Er is een bevestigingsmail gestuurd naar "
+					+ melding.getEmail() + ".");
+
+			// Ophalen emailadres Medewerker
+			UserProfile profiel = (UserProfile) modelRepository.loadAspect(
+					modelRepository.getModelClass("UserProfile"),
+					modelRepository.loadObject(melding.getMedewerker()));
+			String medewerkerEmail = profiel.getEmail();
+
+			// DEBUG ONLY
+			String testEmail = "kristof.spiessens@gim.be";
+
+			// Mail naar Medewerker TOV
+			mailSender.sendMail(preferences.getNoreplyEmail(),
+					Collections.singleton(testEmail),
+					"/META-INF/resources/core/mails/confirmMelding.fmt",
+					variables);
+
+			messages.info("Er is een bevestigingsmail gestuurd de verantwoordelijke TOV "
+					+ medewerkerEmail + ".");
+
+		} catch (IOException e) {
+
+			LOG.error("Can not load object.", e);
+		} catch (Exception e) {
+
+			LOG.error("Can not send email.", e);
+			messages.error("Fout bij het versturen van bevestigingsmail");
+		}
 	}
 }

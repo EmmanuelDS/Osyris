@@ -22,7 +22,6 @@ import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
-import org.conscientia.api.user.UserProfile;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.security.annotation.RunPrivileged;
 import org.conscientia.jsf.component.ComponentUtils;
@@ -34,6 +33,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceIdentifier;
@@ -46,6 +46,7 @@ import be.gim.specto.api.context.MapContext;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
@@ -239,10 +240,10 @@ public class MeldingFormBase implements Serializable {
 					+ object.getEmail() + ".");
 
 			// Ophalen emailadres Medewerker
-			UserProfile profiel = (UserProfile) modelRepository.loadAspect(
-					modelRepository.getModelClass("UserProfile"),
-					modelRepository.loadObject(melding.getMedewerker()));
-			String medewerkerEmail = profiel.getEmail();
+			// UserProfile profiel = (UserProfile) modelRepository.loadAspect(
+			// modelRepository.getModelClass("UserProfile"),
+			// modelRepository.loadObject(melding.getMedewerker()));
+			// String medewerkerEmail = profiel.getEmail();
 
 			// DEBUG ONLY
 			String testEmail = "kristof.spiessens@gim.be";
@@ -505,7 +506,10 @@ public class MeldingFormBase implements Serializable {
 				modelRepository.saveObject(getMelding());
 
 				messages.info("Melding sucessvol verzonden naar TOV.");
+
 				// Email bevestiging sturen naar melder en medewerker
+				Beans.getReference(OsyrisModelFunctions.class)
+						.sendConfirmationMailMelding(object);
 				// sendConfirmationMail(object);
 
 				return reset();
