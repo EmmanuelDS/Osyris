@@ -37,6 +37,7 @@ import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
@@ -486,6 +487,7 @@ public class OsyrisModelFunctions {
 			builder.groupBy(FilterUtils.properties("naam"));
 
 			return modelRepository.searchObjects(builder.build(), true, true);
+
 		} else {
 			return Collections.emptyList();
 		}
@@ -509,6 +511,7 @@ public class OsyrisModelFunctions {
 		if (modelClass != null) {
 			// NetwerkBorden
 			if (modelClass.getSuperClass().getName().equals("NetwerkBord")) {
+
 				List<String> segmentNamen = new ArrayList<String>();
 				QueryBuilder builder = new QueryBuilder(modelClass.getName()
 						.replace("Bord", "Segment"));
@@ -533,6 +536,7 @@ public class OsyrisModelFunctions {
 			}
 			// Borden
 			if (modelClass.getSuperClass().getName().equals("RouteBord")) {
+
 				QueryBuilder builder = new QueryBuilder(modelClass.getName()
 						.replace("Bord", ""));
 				if (regio != null) {
@@ -546,6 +550,7 @@ public class OsyrisModelFunctions {
 		}
 
 		else {
+
 			QueryBuilder builder = new QueryBuilder("Traject");
 			if (regio != null) {
 				builder.addFilter(FilterUtils.equal("regio", regio));
@@ -571,6 +576,7 @@ public class OsyrisModelFunctions {
 		QueryBuilder builder = new QueryBuilder("Bord");
 		builder.results(FilterUtils.properties("straatnaam"));
 		builder.groupBy(FilterUtils.properties("straatnaam"));
+
 		return modelRepository.searchObjects(builder.build(), true, true);
 	}
 
@@ -972,6 +978,7 @@ public class OsyrisModelFunctions {
 	 */
 	public List<?> getStockTypes(String categorie, String subCategorie)
 			throws IOException {
+
 		if (categorie == null) {
 			return Collections.emptyList();
 		}
@@ -1439,5 +1446,39 @@ public class OsyrisModelFunctions {
 			LOG.error("Can not send email.", e);
 			messages.error("Fout bij het versturen van bevestigingsmail");
 		}
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getPeterMeterNaamCodes(boolean hasGeenPeterMeter) {
+
+		List<Object[]> peterMeterNaamCodes = new ArrayList<Object[]>();
+
+		try {
+			QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
+			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
+					.property("label")));
+
+			List<PeterMeterNaamCode> codeList = (List<PeterMeterNaamCode>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			for (PeterMeterNaamCode code : codeList) {
+
+				Object[] object = { code.getCode(), code.getLabel() };
+				peterMeterNaamCodes.add(object);
+			}
+
+			if (hasGeenPeterMeter) {
+
+				Object[] geenPeterMeter = { GEEN_PETER_METER, GEEN_PETER_METER };
+
+				peterMeterNaamCodes.add(0, geenPeterMeter);
+			}
+
+			return peterMeterNaamCodes;
+
+		} catch (IOException e) {
+			LOG.error("Can not load PeterMeterNaamCodes.", e);
+		}
+		return peterMeterNaamCodes;
 	}
 }

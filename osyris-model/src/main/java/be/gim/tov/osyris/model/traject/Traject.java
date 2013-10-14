@@ -76,20 +76,20 @@ public abstract class Traject extends AbstractModelObject implements
 	@NotSearchable
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
 	@Search(type = "menu:equals")
 	private ResourceIdentifier peterMeter1;
 
 	@NotSearchable
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
 	private ResourceIdentifier peterMeter2;
 
 	@NotSearchable
 	@ModelClassName("User")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterSuggestions()}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS

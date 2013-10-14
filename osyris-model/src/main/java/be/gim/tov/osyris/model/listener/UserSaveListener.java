@@ -41,7 +41,7 @@ public class UserSaveListener {
 					voorkeur.setMaxAfstand(0);
 				}
 
-				// Indien trajectType een Netwerk is, set routeNaam op 0
+				// Indien trajectType een Netwerk is, set routeNaam op null
 				if (voorkeur.getTrajectType().contains("Netwerk")) {
 					voorkeur.setTrajectNaam(null);
 				}

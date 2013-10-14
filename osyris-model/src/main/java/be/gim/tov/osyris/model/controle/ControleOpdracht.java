@@ -107,7 +107,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('PeterMeter')}")
+	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(false)}")
 	private ResourceIdentifier peterMeter;
 
 	@NotViewable

@@ -34,11 +34,11 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.security.Identity;
-import org.opengis.filter.Filter;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.localization.DefaultInternationalString;
 import be.gim.commons.resource.ResourceName;
+import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
@@ -120,7 +120,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			query.addFilter(FilterUtils.in("username", nameParts));
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error("Can not load group PetersMeters.", e);
 		}
 
 		return query;
@@ -138,24 +138,22 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 					"group", "PeterMeter"));
 
 			query = new DefaultQuery("User");
-			List<Filter> filters = new ArrayList<Filter>();
+			List<String> nameParts = new ArrayList<String>();
 
 			for (ResourceName name : group.getMembers()) {
-				Filter filter = FilterUtils.equal("username",
-						name.getNamePart());
-				filters.add(filter);
+
+				nameParts.add(name.getNamePart());
 			}
 
-			query.addFilter(FilterUtils.or(filters));
+			query.addFilter(FilterUtils.in("username", nameParts));
 
 			return query;
 
 		} catch (IOException e) {
-			e.printStackTrace();
+			LOG.error("Can not load group PetersMeters.", e);
 		}
 
 		return null;
-
 	}
 
 	/**
@@ -223,6 +221,12 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				setHasErrors(false);
 				modelRepository.saveDocument(document);
 				modelRepository.saveObject(object);
+
+				// Save new PM in codetabel
+				PeterMeterNaamCode code = new PeterMeterNaamCode();
+				code.setCode(resourceName.toString());
+				code.setLabel(lastName + " " + firstName);
+				modelRepository.saveObject(code);
 
 				clear();
 				search();
