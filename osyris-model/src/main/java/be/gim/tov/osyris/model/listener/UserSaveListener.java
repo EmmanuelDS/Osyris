@@ -34,16 +34,20 @@ public class UserSaveListener {
 
 		if (profiel != null) {
 
-			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+			if (profiel.getVoorkeuren() != null
+					&& !profiel.getVoorkeuren().isEmpty()) {
 
-				// Indien trajectType een Route is, set maxAfstand op 0
-				if (voorkeur.getTrajectType().contains("Route")) {
-					voorkeur.setMaxAfstand(0);
-				}
+				for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
 
-				// Indien trajectType een Netwerk is, set routeNaam op null
-				if (voorkeur.getTrajectType().contains("Netwerk")) {
-					voorkeur.setTrajectNaam(null);
+					// Indien trajectType een Route is, set maxAfstand op 0
+					if (voorkeur.getTrajectType().contains("Route")) {
+						voorkeur.setMaxAfstand(0);
+					}
+
+					// Indien trajectType een Netwerk is, set routeNaam op null
+					if (voorkeur.getTrajectType().contains("Netwerk")) {
+						voorkeur.setTrajectNaam(null);
+					}
 				}
 			}
 		}

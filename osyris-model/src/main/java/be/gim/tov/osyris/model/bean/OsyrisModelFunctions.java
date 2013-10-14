@@ -66,6 +66,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Named
 public class OsyrisModelFunctions {
+
 	private static final Log LOG = LogFactory
 			.getLog(OsyrisModelFunctions.class);
 
@@ -325,58 +326,6 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Get suggestielijst voor PetersMeters.
-	 * 
-	 * @return
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Object[]> getPeterMeterSuggestions() {
-
-		return (List<Object[]>) cacheProducer.getCache(
-				"PeterMeterSuggestionCache", new Transformer() {
-
-					@Override
-					public Object transform(Object key) {
-						List<Object[]> suggestions = new ArrayList<Object[]>();
-						try {
-							Object[] geenPeterMeter = { GEEN_PETER_METER,
-									GEEN_PETER_METER };
-
-							List<ResourceName> users = getUsersInGroup("PeterMeter");
-							for (ResourceName user : users) {
-								User peterMeter = (User) modelRepository
-										.loadObject(user);
-								UserProfile profiel = (UserProfile) peterMeter
-										.getAspect("UserProfile",
-												modelRepository, true);
-								Object[] object = {
-										user,
-										profiel.getLastName() + " "
-												+ profiel.getFirstName() };
-								suggestions.add(object);
-							}
-
-							// Sorteren suggesties
-							Collections.sort(suggestions,
-									new DropdownListSorting());
-
-							// Geen peterMeter toegewezen komt bovenaan
-							suggestions.add(0, geenPeterMeter);
-
-						} catch (IOException e) {
-							LOG.error("Can not load user.", e);
-						} catch (InstantiationException e) {
-							LOG.error("Can not instantiate UserProfile.", e);
-						} catch (IllegalAccessException e) {
-							LOG.error("Illegal access at UserProfile.", e);
-						}
-						return suggestions;
-
-					}
-				}).get(null);
-	}
-
-	/**
 	 * Get suggestielijst voor een bepaalde groep.
 	 * 
 	 * @return
@@ -392,14 +341,9 @@ public class OsyrisModelFunctions {
 						List<Object[]> suggestions = new ArrayList<Object[]>();
 						try {
 
-							// List<ResourceName> users =
-							// getUsersInGroup(groupName);
 							List<User> users = getUserObjectsInGroup(groupName);
 
 							for (User user : users) {
-
-								// User peterMeter = (User) modelRepository
-								// .loadObject(user);
 
 								UserProfile profiel = (UserProfile) user
 										.getAspect("UserProfile",
@@ -515,6 +459,7 @@ public class OsyrisModelFunctions {
 				List<String> segmentNamen = new ArrayList<String>();
 				QueryBuilder builder = new QueryBuilder(modelClass.getName()
 						.replace("Bord", "Segment"));
+
 				if (regio != null) {
 					builder.addFilter(FilterUtils.equal("regio", regio));
 				}
@@ -646,6 +591,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	public String getTrajectNaam(ResourceIdentifier trajectId) {
+
 		return modelRepository.getObjectLabel(trajectId);
 	}
 
@@ -706,6 +652,7 @@ public class OsyrisModelFunctions {
 
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
+
 			if (bord instanceof RouteBord) {
 				return ((RouteBord) bord).getVolg();
 			}
@@ -725,7 +672,9 @@ public class OsyrisModelFunctions {
 
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
+
 			if (bord instanceof RouteBord) {
+
 				return ((RouteBord) bord).getStraatnaam();
 			}
 		} catch (IOException e) {
@@ -775,6 +724,7 @@ public class OsyrisModelFunctions {
 					.getFor());
 
 			return modelRepository.getResourceName(uitvoerder);
+
 		} catch (IOException e) {
 			LOG.error("Can not load Traject.", e);
 		}
@@ -1047,6 +997,7 @@ public class OsyrisModelFunctions {
 	public List<Object[]> getRegiosUitvoerder() {
 
 		List<Object[]> uitvoerderRegios = new ArrayList<Object[]>();
+
 		try {
 			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
 				User user = (User) modelRepository.loadObject(new ResourceName(
@@ -1170,7 +1121,7 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Ophalen URL voor Routedokter.
+	 * Ophalen URL voor Routedokter Help pagina.
 	 * 
 	 * @return
 	 */
@@ -1181,7 +1132,7 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Ophalen URL voor Hekp document ingelogde gebruikers.
+	 * Ophalen URL voor Help pagina voor ingelogde gebruikers.
 	 * 
 	 * @return
 	 */
@@ -1192,6 +1143,7 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Ophalen User objecten die tot een bepaalde groep behoren.
 	 * 
 	 * @return
 	 */
@@ -1329,70 +1281,6 @@ public class OsyrisModelFunctions {
 				}).get(lus);
 	}
 
-	// DEBUG METHOD TO BE REMOVED
-	public List<Bord> volgordeTest(NetwerkLus lus) {
-
-		try {
-			List<Bord> result = new ArrayList<Bord>();
-
-			// StartSegment in de lus
-			NetwerkSegment start = (NetwerkSegment) modelRepository
-					.loadObject(lus.getSegmenten().get(0));
-
-			// ---------------
-			for (int i = 0; i < lus.getSegmenten().size(); i++) {
-
-				int nextIndex = i + 1;
-
-				NetwerkSegment current = (NetwerkSegment) modelRepository
-						.loadObject(lus.getSegmenten().get(i));
-
-				NetwerkSegment next = null;
-
-				if (nextIndex < lus.getSegmenten().size()) {
-
-					next = (NetwerkSegment) modelRepository.loadObject(lus
-							.getSegmenten().get(nextIndex));
-				} else {
-					next = start;
-				}
-
-				String richting = null;
-				if (current.getNaarKpNr().equals(next.getVanKpNr())) {
-
-					richting = RichtingEnum.FT.toString();
-				} else {
-					richting = RichtingEnum.TF.toString();
-				}
-
-				QueryBuilder builder = new QueryBuilder("NetwerkBord");
-				List<Bord> subset = new ArrayList<Bord>();
-
-				List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
-						1);
-				ids.add(modelRepository.getResourceIdentifier(current));
-
-				builder.addFilter(FilterUtils.in("segmenten", ids));
-
-				builder.addFilter(FilterUtils.equal("richting", richting));
-
-				subset = (List<Bord>) modelRepository.searchObjects(
-						builder.build(), false, false);
-
-				if (subset != null && !subset.isEmpty()) {
-					Collections.sort(subset, new AlphanumericSorting());
-					result.addAll(subset);
-				}
-			}
-
-			return result;
-
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-		return null;
-	}
-
 	/**
 	 * Verstuurt confirmatie mail naar de melder en de medewerker TOV
 	 * 
@@ -1448,6 +1336,12 @@ public class OsyrisModelFunctions {
 		}
 	}
 
+	/**
+	 * Ophalen van de PeterMeter namen (naam en voornaam).
+	 * 
+	 * @param hasGeenPeterMeter
+	 * @return
+	 */
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getPeterMeterNaamCodes(boolean hasGeenPeterMeter) {
 
