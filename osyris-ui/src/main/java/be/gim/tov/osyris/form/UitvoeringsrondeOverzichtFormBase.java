@@ -23,9 +23,9 @@ import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
-import org.conscientia.jsf.prime.PrimeUtils;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
@@ -66,7 +66,6 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class UitvoeringsrondeOverzichtFormBase extends
 		AbstractListForm<Uitvoeringsronde> {
-
 	private static final long serialVersionUID = 3771393152252852618L;
 
 	private static final Log LOG = LogFactory
@@ -200,11 +199,10 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	}
 
 	@Override
-	public Query getQuery() {
+	protected Query transformQuery(Query query) {
 
-		if (query == null) {
-			query = getDefaultQuery();
-		}
+		query = new DefaultQuery(query);
+
 		try {
 			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
@@ -218,36 +216,34 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
 		}
+
 		return query;
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
 	public void search() {
-		try {
 
-			dataModel = null;
+		dataModel = null;
+
+		try {
+			Query query = transformQuery(getQuery());
 
 			List<Uitvoeringsronde> list = (List<Uitvoeringsronde>) modelRepository
-					.searchObjects(getQuery(), true, true, true);
+					.searchObjects(query, true, true, true);
 
-			// Deze velden moeten gezocht worden in WerkOpdrachten, indien
-			// allemaal leeg normale query uitvoeren
 			if (uitvoerder == null && medewerker == null && trajectType == null
 					&& regio == null && trajectNaam == null) {
-
+				// Deze velden moeten gezocht worden in WerkOpdrachten, indien
+				// allemaal leeg normale query uitvoeren
 				results = list;
-			}
-
-			else {
+			} else {
 				// Filter Uitvoeringsronde ahv resultaten Werkopdracht query
 				query.addFilter(FilterUtils.id(getSubQueryIds(list)));
 
 				results = (List<Uitvoeringsronde>) modelRepository
-						.searchObjects(getQuery(), true, true, true);
+						.searchObjects(query, true, true, true);
 			}
-			dataModel = PrimeUtils.dataModel(results);
-
 		} catch (IOException e) {
 			LOG.error("Can not search Uitvoeringsronde.", e);
 			results = null;
@@ -853,6 +849,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		// Indien minstens 1 van de velden ingevuld WerkOpdracht query
 		// uitvoeren en resultaten filteren op de uitvoeringsronde query
 		QueryBuilder builder = new QueryBuilder("WerkOpdracht");
+		
 		if (uitvoerder != null) {
 			builder.addFilter(FilterUtils.equal("uitvoerder", uitvoerder));
 		}
@@ -879,7 +876,6 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		// Omzetten ids naar ResourceIdentifiers
 		List<ResourceIdentifier> filteredWerkOpdrachten = new ArrayList<ResourceIdentifier>();
-
 		for (Long id : ids) {
 			filteredWerkOpdrachten.add(new ResourceKey("WerkOpdracht", id
 					.toString()));
@@ -887,12 +883,9 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		// Zoeken naar de rondeIds met de gevonden WerkOpdracht Ids
 		for (Uitvoeringsronde ronde : list) {
-
 			for (ResourceIdentifier id : filteredWerkOpdrachten) {
-
 				if (ronde.getOpdrachten().contains(id)
 						&& !rondeIds.contains(ronde.getId().toString())) {
-
 					rondeIds.add(ronde.getId().toString());
 				}
 			}

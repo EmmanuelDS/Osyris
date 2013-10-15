@@ -33,12 +33,14 @@ import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.prime.PrimeUtils;
 import org.quartz.xml.ValidationException;
@@ -89,15 +91,15 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class WerkOpdrachtOverzichtFormBase extends
 		AbstractListForm<WerkOpdracht> {
-
 	private static final long serialVersionUID = -7478667205313972513L;
-
-	private static final String GEOMETRY_LAYER_NAME = "geometry";
-	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
-	public static final String WO_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtPdf.xsl";
 
 	private static final Log LOG = LogFactory
 			.getLog(WerkOpdrachtOverzichtFormBase.class);
+
+	public static final String GEOMETRY_LAYER_NAME = "geometry";
+	public static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
+
+	public static final String WO_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtPdf.xsl";
 
 	// VARIABLES
 	@Inject
@@ -227,15 +229,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 	}
 
 	@Override
-	public Query getQuery() {
+	protected Query transformQuery(Query query) {
 
-		if (query == null) {
-			query = getDefaultQuery();
-		}
+		query = new DefaultQuery(query);
 
 		// Filteren meest recente datum
 		if (vanDatum != null && totDatum != null) {
-
 			query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
 					"datumLaatsteWijziging", totDatum), FilterUtils
 					.greaterOrEqual("datumLaatsteWijziging", vanDatum)));
@@ -245,16 +244,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 			query.addFilter(FilterUtils.equal("gemeente", gemeente));
 		}
 
-		if (trajectId != null) {
+		if (trajectType != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
-		}
-
-		else {
-
+		} else {
 			if (trajectType != null) {
 				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
-
 			if (regio != null) {
 				query.addFilter(FilterUtils.equal("regioId", regio));
 			}
@@ -267,66 +262,21 @@ public class WerkOpdrachtOverzichtFormBase extends
 								.getUser().getId()))));
 				query.addFilter(FilterUtils.equal("status",
 						WerkopdrachtStatus.UIT_TE_VOEREN));
-				return query;
-			}
-
-			if (identity.inGroup("Medewerker", "CUSTOM")) {
+			} else if (identity.inGroup("Medewerker", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
-				return query;
 			}
-
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
 		}
 
+		query.setOrderBy(Collections
+				.singletonList((QueryOrderBy) new DefaultQueryOrderBy(
+						FilterUtils.property("datumLaatsteWijziging"))));
+
 		return query;
 	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void search() {
-		try {
-
-			dataModel = null;
-
-			// Reset zoekveld trajectNaam
-			if (trajectType == null) {
-				setTrajectId(null);
-			}
-
-			results = (List<WerkOpdracht>) modelRepository.searchObjects(
-					getQuery(), false, false, true);
-
-			Collections.sort(results, new DateSortingWO());
-			dataModel = PrimeUtils.dataModel(results);
-
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			results = null;
-		}
-	}
-
-	/**
-	 * Zoekt WerkOpdrachten tussen een begin en een einddatum.
-	 * 
-	 * @param opdrachten
-	 * @return
-	 */
-	// public List<WerkOpdracht> findWerkOpdrachtenBetweenDates(
-	// List<WerkOpdracht> opdrachten) {
-	//
-	// List<WerkOpdracht> result = new ArrayList<WerkOpdracht>();
-	//
-	// for (WerkOpdracht opdracht : opdrachten) {
-	// if (opdracht.getDatumLaatsteWijziging().before(totDatum)
-	// && opdracht.getDatumLaatsteWijziging().after(vanDatum)) {
-	// result.add(opdracht);
-	// }
-	// }
-	// return result;
-	// }
 
 	/**
 	 * Map Configuratie

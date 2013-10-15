@@ -13,6 +13,7 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
@@ -80,7 +81,9 @@ public class StockMateriaalOverzichtFormBase extends
 	}
 
 	@Override
-	public Query getQuery() {
+	protected Query transformQuery(Query query) {
+
+		query = new DefaultQuery(query);
 
 		try {
 			UitvoerderProfiel profiel = (UitvoerderProfiel) modelRepository
@@ -88,10 +91,6 @@ public class StockMateriaalOverzichtFormBase extends
 							.getModelClass("UitvoerderProfiel"),
 							modelRepository.getResourceKey(userRepository
 									.loadUser(identity.getUser().getId())));
-
-			if (query == null) {
-				query = getDefaultQuery();
-			}
 
 			if (identity.inGroup("Uitvoerder", "CUSTOM")
 					&& profiel.getBedrijf() != null) {
@@ -174,21 +173,5 @@ public class StockMateriaalOverzichtFormBase extends
 	public void clear() {
 		object = null;
 		setHoeveelheid(null);
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void search() {
-
-		try {
-			dataModel = null;
-
-			results = (List<StockMateriaal>) modelRepository.searchObjects(
-					getQuery(), false, false, true);
-
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			results = null;
-		}
 	}
 }

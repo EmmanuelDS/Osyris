@@ -34,12 +34,14 @@ import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
@@ -100,6 +102,10 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class ControleOpdrachtOverzichtFormBase extends
 		AbstractListForm<ControleOpdracht> {
+	private static final long serialVersionUID = -86881009141250710L;
+
+	private static final Log LOG = LogFactory
+			.getLog(ControleOpdrachtOverzichtFormBase.class);
 
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
@@ -109,11 +115,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	private static final String CO_PDF = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
 	private static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
-
-	private static final long serialVersionUID = -86881009141250710L;
-
-	private static final Log LOG = LogFactory
-			.getLog(ControleOpdrachtOverzichtFormBase.class);
 
 	// VARIABLES
 	@Inject
@@ -268,18 +269,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	@Override
-	public Query getQuery() {
+	protected Query transformQuery(Query query) {
 
-		if (query == null) {
-			query = getDefaultQuery();
-		}
+		query = new DefaultQuery(query);
 
 		if (trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
-		}
-
-		else {
-
+		}else {
 			if (trajectType != null) {
 				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
@@ -290,7 +286,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 
 		if (vanDatum != null && totDatum != null) {
-
 			query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
 					"datumLaatsteWijziging", totDatum), FilterUtils
 					.greaterOrEqual("datumLaatsteWijziging", vanDatum)));
@@ -308,8 +303,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
 						ControleOpdrachtStatus.GEVALIDEERD), FilterUtils
 						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
-				return query;
-			}
+			} else
 			// PeterMeter kan enkel status uit te voeren en gevalideerd zien
 			if (identity.inGroup("PeterMeter", "CUSTOM")) {
 
@@ -323,12 +317,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 								ControleOpdrachtStatus.GEANNULEERD),
 						FilterUtils.notEqual("status",
 								ControleOpdrachtStatus.GERAPPORTEERD)));
-
-				return query;
 			}
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
 		}
+		
+		query.setOrderBy(Collections
+				.singletonList((QueryOrderBy) new DefaultQueryOrderBy(
+						FilterUtils.property("datumLaatsteWijziging"))));
 
 		return query;
 	}
@@ -358,32 +354,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			messages.error("Fout bij het aanmaken van controleopdracht: "
 					+ e.getMessage());
 			LOG.error("Illegal access at creation model object.", e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void search() {
-
-		try {
-
-			dataModel = null;
-
-			// Reset zoekveld trajectNaam
-			if (trajectType == null) {
-				setTrajectId(null);
-			}
-
-			List<ControleOpdracht> list = (List<ControleOpdracht>) modelRepository
-					.searchObjects(getQuery(), false, false, true);
-
-			results = list;
-			Collections.sort(results, new DateSortingCO());
-			dataModel = PrimeUtils.dataModel(results);
-
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			results = null;
 		}
 	}
 
@@ -1867,7 +1837,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void switchBaseLayers() {
-
 		getViewer().setBaseLayerId(baseLayerName);
 	}
 }

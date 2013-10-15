@@ -3,7 +3,6 @@ package be.gim.tov.osyris.form;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Date;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -15,8 +14,8 @@ import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.jsf.component.ComponentUtils;
-import org.conscientia.jsf.prime.PrimeUtils;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
@@ -120,13 +119,11 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	}
 
 	@Override
-	public Query getQuery() {
+	protected Query transformQuery(Query query) {
 
-		if (query == null) {
-			query = getDefaultQuery();
-		}
+		query = new DefaultQuery(query);
 
-		if (trajectId != null) {
+		if (trajectType != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
 		}
 
@@ -161,6 +158,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 				LOG.error("Can not load user.", e);
 			}
 		}
+
 		return query;
 	}
 
@@ -286,30 +284,6 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			messages.error("Fout bij het verwijderen van melding: "
 					+ e.getMessage());
 			LOG.error("Can not delete model object.", e);
-		}
-	}
-
-	@SuppressWarnings("unchecked")
-	@Override
-	public void search() {
-		try {
-
-			dataModel = null;
-
-			// Reset zoekveld trajectNaam
-			if (trajectType == null) {
-				setTrajectId(null);
-			}
-
-			List<Melding> list = (List<Melding>) modelRepository.searchObjects(
-					getQuery(), false, false, true);
-
-			results = list;
-			dataModel = PrimeUtils.dataModel(results);
-
-		} catch (IOException e) {
-			LOG.error("Can not get search results.", e);
-			results = null;
 		}
 	}
 }

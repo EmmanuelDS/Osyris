@@ -51,8 +51,8 @@ import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
 @Named
 @ViewScoped
 public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
-
 	private static final long serialVersionUID = 7761265026167905576L;
+
 	private static final Log LOG = LogFactory
 			.getLog(PeterMeterOverzichtFormBase.class);
 
@@ -100,11 +100,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	}
 
 	@Override
-	public Query getQuery() {
+	protected Query transformQuery(Query query) {
 
-		if (query == null) {
-			query = getDefaultQuery();
-		}
+		query = new DefaultQuery(query);
 
 		try {
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
@@ -113,12 +111,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			List<String> nameParts = new ArrayList<String>();
 
 			for (ResourceName name : group.getMembers()) {
-
 				nameParts.add(name.getNamePart());
 			}
 
 			query.addFilter(FilterUtils.in("username", nameParts));
-
 		} catch (IOException e) {
 			LOG.error("Can not load group PetersMeters.", e);
 		}
@@ -126,34 +122,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		return query;
 	}
 
-	/**
-	 * Ophalen peters en meters.
-	 * 
-	 */
 	@Override
-	protected Query getDefaultQuery() {
-
-		try {
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-
-			query = new DefaultQuery("User");
-			List<String> nameParts = new ArrayList<String>();
-
-			for (ResourceName name : group.getMembers()) {
-
-				nameParts.add(name.getNamePart());
-			}
-
-			query.addFilter(FilterUtils.in("username", nameParts));
-
-			return query;
-
-		} catch (IOException e) {
-			LOG.error("Can not load group PetersMeters.", e);
-		}
-
-		return null;
+	public boolean isIndex() {
+		return false;
 	}
 
 	/**
