@@ -214,60 +214,6 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
-	 * Verstuurt confirmatie mail naar de melder en de medewerker TOV
-	 * 
-	 * @param melding
-	 * @throws Exception
-	 */
-	private void sendConfirmationMail(Melding melding) {
-
-		try {
-			Map<String, Object> variables = new HashMap<String, Object>();
-			variables.put("preferences", preferences);
-			variables.put("firstname", melding.getVoornaam());
-			variables.put("lastname", melding.getNaam());
-			variables.put("phone", melding.getTelefoon());
-			variables.put("status", melding.getStatus());
-			variables.put("problem", melding.getProbleem());
-
-			// Mail naar melder
-			mailSender.sendMail(preferences.getNoreplyEmail(),
-					Collections.singleton(melding.getEmail()),
-					"/META-INF/resources/core/mails/confirmMelding.fmt",
-					variables);
-
-			messages.info("Er is een bevestigingsmail gestuurd naar "
-					+ object.getEmail() + ".");
-
-			// Ophalen emailadres Medewerker
-			// UserProfile profiel = (UserProfile) modelRepository.loadAspect(
-			// modelRepository.getModelClass("UserProfile"),
-			// modelRepository.loadObject(melding.getMedewerker()));
-			// String medewerkerEmail = profiel.getEmail();
-
-			// DEBUG ONLY
-			String testEmail = "kristof.spiessens@gim.be";
-
-			// Mail naar Medewerker TOV
-			mailSender.sendMail(preferences.getNoreplyEmail(),
-					Collections.singleton(testEmail),
-					"/META-INF/resources/core/mails/confirmMelding.fmt",
-					variables);
-
-			// messages.info("Er is een bevestigingsmail gestuurd de verantwoordelijke TOV "
-			// + medewerkerEmail + ".");
-
-		} catch (IOException e) {
-
-			LOG.error("Can not load object.", e);
-		} catch (Exception e) {
-
-			LOG.error("Can not send email.", e);
-			messages.error("Fout bij het versturen van bevestigingsmail");
-		}
-	}
-
-	/**
 	 * Haalt de kaartconfiguratie van de kleine kaart op
 	 * 
 	 * @return

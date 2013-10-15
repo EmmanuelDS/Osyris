@@ -199,6 +199,8 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				code.setLabel(lastName + " " + firstName);
 				modelRepository.saveObject(code);
 
+				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
+
 				clear();
 				search();
 
@@ -237,6 +239,16 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			group.getMembers().remove(modelRepository.getResourceName(object));
 			modelRepository.saveObject(group);
 
+			// Search and delete PeterMeterNaamCode
+			QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
+			builder.addFilter(FilterUtils.equal("code",
+					"user:" + object.getUsername()));
+
+			List<PeterMeterNaamCode> codes = (List<PeterMeterNaamCode>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			modelRepository.deleteObject(codes.get(0));
+
 			// Delete user and document permissions
 			modelRepository.deleteObject(object);
 
@@ -265,6 +277,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 */
 	private void sendCredentailsMail(String username, String email,
 			String password) throws Exception {
+
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
 
@@ -393,7 +406,8 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	public void deleteToewijzingen() {
 
 		try {
-			ResourceName peterMeter = modelRepository.getResourceName(object);
+			ResourceName peterMeter = new ResourceName("user",
+					object.getUsername());
 
 			QueryBuilder builder = new QueryBuilder("Traject");
 			builder.addFilter(FilterUtils.or(
@@ -465,28 +479,32 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		int counterZomer = 0;
 		int counterHerfst = 0;
 
-		for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+		if (profiel.getVoorkeuren() != null
+				&& !profiel.getVoorkeuren().isEmpty()) {
 
-			if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-				counterLente++;
-			}
-			if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-				counterZomer++;
-			}
-			if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-				counterHerfst++;
+			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+
+				if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+					counterLente++;
+				}
+				if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+					counterZomer++;
+				}
+				if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+					counterHerfst++;
+				}
+
+				if (voorkeur.getTrajectType().contains("Route")
+						&& null == voorkeur.getTrajectNaam()) {
+					messages.error("Bewaren profiel niet gelukt: Indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
+					return false;
+				}
 			}
 
-			if (voorkeur.getTrajectType().contains("Route")
-					&& null == voorkeur.getTrajectNaam()) {
-				messages.error("Bewaren profiel niet gelukt: Indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
+			if (counterLente > 3 || counterZomer > 3 || counterHerfst > 3) {
+				messages.error("Bewaren profiel niet gelukt: Per periode zijn er maximaal 3 voorkeuren toegelaten.");
 				return false;
 			}
-		}
-
-		if (counterLente > 3 || counterZomer > 3 || counterHerfst > 3) {
-			messages.error("Bewaren profiel niet gelukt: Per periode zijn er maximaal 3 voorkeuren toegelaten.");
-			return false;
 		}
 		return true;
 	}
