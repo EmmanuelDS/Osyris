@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.SortOrder;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -45,7 +46,6 @@ import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
-import org.conscientia.jsf.prime.PrimeUtils;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
@@ -85,7 +85,6 @@ import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
-import be.gim.tov.osyris.model.utils.DateSortingCO;
 import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -275,7 +274,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		if (trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
-		}else {
+		} else {
 			if (trajectType != null) {
 				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
@@ -321,10 +320,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
 		}
-		
-		query.setOrderBy(Collections
-				.singletonList((QueryOrderBy) new DefaultQueryOrderBy(
-						FilterUtils.property("datumLaatsteWijziging"))));
+
+		DefaultQueryOrderBy orderBy = new DefaultQueryOrderBy(
+				FilterUtils.property("datumLaatsteWijziging"));
+		orderBy.setSortOrder(SortOrder.DESCENDING);
+
+		query.setOrderBy(Collections.singletonList((QueryOrderBy) orderBy));
 
 		return query;
 	}

@@ -12,10 +12,13 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.store.ModelStore;
 import org.conscientia.core.search.QueryBuilder;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
+import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 
@@ -33,6 +36,7 @@ public class BordSaveListener {
 	@Inject
 	private ModelRepository modelRepository;
 
+	@SuppressWarnings("unchecked")
 	public void processEvent(ModelEvent event) throws IOException,
 			InstantiationException, IllegalAccessException {
 
@@ -40,6 +44,7 @@ public class BordSaveListener {
 
 		// Indien nieuw Bord
 		if (bord.getId() == null) {
+
 			// Set correcte id range voor elk subtype
 			ModelStore modelStore = modelRepository
 					.getModelStore("OsyrisDataStore");
@@ -53,7 +58,9 @@ public class BordSaveListener {
 
 		// Set route voor RouteBord indien niet aanwezig
 		if (bord instanceof RouteBord) {
+
 			if (((RouteBord) bord).getRoute() == null && bord.getNaam() != null) {
+
 				QueryBuilder builder = new QueryBuilder("Traject");
 				builder.addFilter(FilterUtils.equal("naam", bord.getNaam()));
 				builder.maxResults(1);
@@ -68,8 +75,10 @@ public class BordSaveListener {
 		// Indien Netwerkbord set knooppuntnummers aan de hand van de ingevulde
 		// knooppuntID
 		if (bord instanceof NetwerkBord) {
+
 			NetwerkBord netwerkBord = (NetwerkBord) bord;
 			if (netwerkBord.getKpid0() != null) {
+
 				if (StringUtils.isNotBlank(netwerkBord.getKpid0().toString())) {
 					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 							.loadObject(netwerkBord.getKpid0());
@@ -80,6 +89,7 @@ public class BordSaveListener {
 				}
 			}
 			if (netwerkBord.getKpid1() != null) {
+
 				if (StringUtils.isNotBlank(netwerkBord.getKpid1().toString())) {
 					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 							.loadObject(netwerkBord.getKpid1());
@@ -90,6 +100,7 @@ public class BordSaveListener {
 				}
 			}
 			if (netwerkBord.getKpid2() != null) {
+
 				if (StringUtils.isNotBlank(netwerkBord.getKpid2().toString())) {
 					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 							.loadObject(netwerkBord.getKpid2());
@@ -100,6 +111,7 @@ public class BordSaveListener {
 				}
 			}
 			if (netwerkBord.getKpid3() != null) {
+
 				if (StringUtils.isNotBlank(netwerkBord.getKpid3().toString())) {
 					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 							.loadObject(netwerkBord.getKpid3());
@@ -109,14 +121,31 @@ public class BordSaveListener {
 					netwerkBord.setKpid3(null);
 				}
 			}
+
+			if (netwerkBord.getBordBase() == null) {
+
+				Regio regio = Beans.getReference(OsyrisModelFunctions.class)
+						.getRegioForBord(bord);
+				((NetwerkBord) bord).setBordBase(regio.getNaam());
+			}
+
 		}
 
 		// Automatically set X Y coordinates indien niet aanwezig
 		if (bord.getGeom() != null && bord.getGeom() instanceof Point) {
+
 			Point p = (Point) bord.getGeom();
 			bord.setX(p.getX());
 			bord.setY(p.getY());
 		}
+
+		if (bord.getRegio() == null) {
+
+			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
+					.getRegioForBord(bord);
+			bord.setRegio(modelRepository.getResourceKey(regio));
+		}
+
 		// TODO: bordVolgorde sequentie en BordLabels zetten?
 	}
 }

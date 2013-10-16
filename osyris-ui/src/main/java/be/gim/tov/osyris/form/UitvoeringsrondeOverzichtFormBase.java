@@ -849,7 +849,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		// Indien minstens 1 van de velden ingevuld WerkOpdracht query
 		// uitvoeren en resultaten filteren op de uitvoeringsronde query
 		QueryBuilder builder = new QueryBuilder("WerkOpdracht");
-		
+
 		if (uitvoerder != null) {
 			builder.addFilter(FilterUtils.equal("uitvoerder", uitvoerder));
 		}

@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;

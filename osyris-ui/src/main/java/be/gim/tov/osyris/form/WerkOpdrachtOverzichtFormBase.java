@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.SortOrder;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -42,7 +43,6 @@ import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.jsf.component.ComponentUtils;
-import org.conscientia.jsf.prime.PrimeUtils;
 import org.quartz.xml.ValidationException;
 import org.w3c.dom.Document;
 
@@ -68,7 +68,6 @@ import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
-import be.gim.tov.osyris.model.utils.DateSortingWO;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
@@ -271,9 +270,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 			LOG.error("Can not load user.", e);
 		}
 
-		query.setOrderBy(Collections
-				.singletonList((QueryOrderBy) new DefaultQueryOrderBy(
-						FilterUtils.property("datumLaatsteWijziging"))));
+		DefaultQueryOrderBy orderBy = new DefaultQueryOrderBy(
+				FilterUtils.property("datumLaatsteWijziging"));
+		orderBy.setSortOrder(SortOrder.DESCENDING);
+
+		query.setOrderBy(Collections.singletonList((QueryOrderBy) orderBy));
 
 		return query;
 	}

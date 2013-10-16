@@ -38,7 +38,6 @@ import org.jboss.seam.security.Identity;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.localization.DefaultInternationalString;
 import be.gim.commons.resource.ResourceName;
-import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
@@ -122,11 +121,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		return query;
 	}
 
-	@Override
-	public boolean isIndex() {
-		return false;
-	}
-
 	/**
 	 * Bewaren van nieuw aangemaakte PeterMeter.
 	 * 
@@ -193,12 +187,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				modelRepository.saveDocument(document);
 				modelRepository.saveObject(object);
 
-				// Save new PM in codetabel
-				PeterMeterNaamCode code = new PeterMeterNaamCode();
-				code.setCode(resourceName.toString());
-				code.setLabel(lastName + " " + firstName);
-				modelRepository.saveObject(code);
-
 				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
 
 				clear();
@@ -238,16 +226,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 					"group", "PeterMeter"));
 			group.getMembers().remove(modelRepository.getResourceName(object));
 			modelRepository.saveObject(group);
-
-			// Search and delete PeterMeterNaamCode
-			QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
-			builder.addFilter(FilterUtils.equal("code",
-					"user:" + object.getUsername()));
-
-			List<PeterMeterNaamCode> codes = (List<PeterMeterNaamCode>) modelRepository
-					.searchObjects(builder.build(), false, false);
-
-			modelRepository.deleteObject(codes.get(0));
 
 			// Delete user and document permissions
 			modelRepository.deleteObject(object);

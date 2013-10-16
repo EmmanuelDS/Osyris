@@ -1375,4 +1375,59 @@ public class OsyrisModelFunctions {
 		}
 		return peterMeterNaamCodes;
 	}
+
+	/**
+	 * Checken of een PeterMeterNaamCode al bestaat of niet.
+	 * 
+	 * @param resourceName
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean checkPeterMeterNaamCodeExists(ResourceName resourceName) {
+
+		try {
+			QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
+			builder.addFilter(FilterUtils.equal("code", resourceName.toString()));
+
+			List<PeterMeterNaamCode> codes = (List<PeterMeterNaamCode>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			if (codes.isEmpty()) {
+				return false;
+			}
+
+			return true;
+
+		} catch (IOException e) {
+			LOG.error("Can not search PeterMeterNaamCode", e);
+		}
+		return false;
+	}
+
+	/**
+	 * Bepalen van de Regio waarin een bord zich bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Regio getRegioForBord(Bord bord) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
+
+			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
+					query, true, true);
+			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+
+			return regio;
+
+		} catch (IOException e) {
+			LOG.error("Can not search Regio", e);
+		}
+
+		return null;
+	}
 }
