@@ -133,7 +133,11 @@
               <fo:block>
 	              <xsl:if test="//@hasFoto='true'">
 	               <xsl:variable name="foto" select="/opdracht/foto" />
-	               <fo:external-graphic src="data:image/jpeg;base64,{$foto}"/>
+	               <fo:external-graphic src="data:image/jpeg;base64,{$foto}" 
+	               		 content-width="scale-to-fit"
+						 content-height="100%"
+						 width="100%"
+						 scaling="uniform" />
 	              </xsl:if>
 				   <xsl:if test="//@hasFoto='false'">
 	          		<fo:external-graphic src="http://osyristest.tov.be/fotos/geen%20foto.png"  />

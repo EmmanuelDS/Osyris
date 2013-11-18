@@ -86,6 +86,7 @@ header, footer, article, section, nav, menu, hgroup {
 
 .model-field-value {
 	margin-left: 105px;
+	margin-right: 5px;
 }
 
 .model-field-tail {

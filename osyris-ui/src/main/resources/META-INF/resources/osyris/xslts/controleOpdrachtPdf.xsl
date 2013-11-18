@@ -42,6 +42,28 @@
         </xsl:if>
 
        <fo:table border="solid" table-layout="fixed" width="100%" height="100%">
+       
+       <!-- COLUMN WIDTH ROUTE CO -->
+       <xsl:if test="//@netwerkCO='false'">
+	       <fo:table-column column-width="10%"/>
+	       <fo:table-column column-width="10%"/>
+	       <fo:table-column column-width="10%"/>
+	       <fo:table-column column-width="25%"/>
+	       <fo:table-column column-width="20%"/>
+	       <fo:table-column column-width="20%"/>
+       </xsl:if>
+       
+       <!-- COLUMN WIDTH NETWERK CO -->
+        <xsl:if test="//@netwerkCO='true'">
+	       <fo:table-column column-width="10%"/>
+	       <fo:table-column column-width="10%"/>
+	       <fo:table-column column-width="10%"/>
+	       <fo:table-column column-width="15%"/>
+	       <fo:table-column column-width="25%"/>
+	       <fo:table-column column-width="15%"/>
+	       <fo:table-column column-width="15%"/>
+       </xsl:if>
+
         <fo:table-header>
         	<fo:table-row border="solid">
                     <fo:table-cell>
@@ -95,49 +117,35 @@
 	          </fo:table-cell>
 	          
 	          <xsl:if test="//@netwerkCO='false'">
-		          <xsl:if test="pijl='1'">
-		          <fo:table-cell>
-	              <fo:block font-size="10pt">
-		          	<fo:block>
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_e.png"/>
-	     			</fo:block>
-		          </fo:block>
-		          </fo:table-cell>
-		          </xsl:if>
-		          <xsl:if test="pijl='2'">
-		          <fo:table-cell>
-	              <fo:block font-size="10pt">
-		          	<fo:block>
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_w.png"/>
-	     			</fo:block>
-		          </fo:block>
-		          </fo:table-cell>
-		          </xsl:if>
-		           <xsl:if test="pijl='3'">
-		          <fo:table-cell>
-	              <fo:block font-size="10pt">
-		          	<fo:block>
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_n.png"/>
-	     			</fo:block>
-		          </fo:block>
-		          </fo:table-cell>
-		          </xsl:if>
+	          <fo:table-cell>
+	           <fo:block font-size="10pt">
+			          <xsl:if test="pijl='1'">
+		        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechts.png"/>	        			
+	                  </xsl:if>
+			          <xsl:if test="pijl='2'">	
+		        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_links.png"/>
+			          </xsl:if>		          
+			           <xsl:if test="pijl='3'">		
+		        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechtdoor.png"/>	  
+			          </xsl:if>    
+	          </fo:block>
+	          </fo:table-cell>
 	          </xsl:if>
-	          
+	     
 	          <xsl:if test="//@netwerkCO='true'">
-	           <fo:table-cell>
-	           <fo:block>
+	          <fo:table-cell>
+	            <fo:block font-size="10pt">
 		          <xsl:if test="pijlkp1='1' or pijlkp2='1' or pijlkp3='1'">
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_e.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechts.png"/>
 		          </xsl:if>
 		          <xsl:if test="pijlkp1='2' or pijlkp2='2' or pijlkp3='2'">
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_w.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_links.png"/>
 		          </xsl:if>
 		           <xsl:if test="pijlkp1='3' or pijlkp2='3' or pijlkp3='3'">
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/ar_green_n.png"/>
+	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechtdoor.png"/>
 		          </xsl:if>
-		          </fo:block>
-		         </fo:table-cell>
+		        </fo:block>
+	          </fo:table-cell>
 	          </xsl:if>
 	          
 	          <xsl:if test="//@netwerkCO='true'">
