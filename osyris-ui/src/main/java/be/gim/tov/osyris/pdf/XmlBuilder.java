@@ -108,6 +108,13 @@ public class XmlBuilder {
 			rootElement.setAttribute("netwerkbord", Boolean.TRUE.toString());
 		}
 
+		Element routeNaam = doc.createElement("routenaam");
+		routeNaam
+				.appendChild(doc.createTextNode(Beans.getReference(
+						OsyrisModelFunctions.class).getTrajectNaam(
+						object.getTraject())));
+		rootElement.appendChild(routeNaam);
+
 		for (Bord b : borden) {
 			// Bord elementen
 			Element bord = doc.createElement("bord");
@@ -698,7 +705,7 @@ public class XmlBuilder {
 	private String getOverviewMap(MapViewer viewer, Traject traject)
 			throws InstantiationException, IllegalAccessException {
 
-		viewer.setBaseLayerId("tms");
+		viewer.setBaseLayerId("navstreet");
 
 		int width = 1024;
 		int height = 780;
@@ -714,7 +721,8 @@ public class XmlBuilder {
 		Graphics2D g2d = ((BufferedImage) mapImage).createGraphics();
 
 		addNorthArrow(viewer, g2d, width, height);
-		addScaleLine(viewer, g2d, width, height, viewer.getCurrentScale(), DPI);
+		// addScaleLine(viewer, g2d, width, height, viewer.getCurrentScale(),
+		// DPI);
 
 		viewer.setBaseLayerId("tms");
 

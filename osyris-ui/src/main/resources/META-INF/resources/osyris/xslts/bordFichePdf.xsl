@@ -36,6 +36,13 @@
 		                        <xsl:value-of
 				          			select="/verslag/trajecttype">	
 				          		</xsl:value-of>
+				          		
+				          		<xsl:if test="//@netwerkbord='false'">
+				          		     <xsl:text> </xsl:text>
+					          		 <xsl:value-of
+					          			select="/verslag/routenaam">
+					          		</xsl:value-of>
+				          		</xsl:if>
 				          	</fo:inline> 
 			          	</fo:block>
                     </fo:table-cell>
