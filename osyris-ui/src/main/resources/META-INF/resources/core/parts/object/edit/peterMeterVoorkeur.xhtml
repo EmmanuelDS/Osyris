@@ -13,10 +13,12 @@
 		<a:outputPanel id="panel">
 			<r:panel rendered="#{cc.attrs.value != null}">
 				
-				<d:propertyField id="periode"
-				 		modelProperty="#{d:modelClass('PeterMeterVoorkeur').getProperty('periode')}"
-						value="#{cc.attrs.value.periode}"
-						mode="EDIT" />
+				<d:field for="periode" label="Periode">
+				<d:propertyValue id="periode"
+					 		modelProperty="#{d:modelClass('PeterMeterVoorkeur').getProperty('periode')}"
+							value="#{cc.attrs.value.periode}"
+							mode="EDIT" />
+				</d:field>
 						
 				<d:field for="trajectType" label="Trajecttype">
 				<h:selectOneMenu id="trajectType" value="#{cc.attrs.value.trajectType}">
@@ -43,8 +45,8 @@
 
 			<j:renderPanel id="detailSearchPanel" rendered="#{cc.attrs.value.trajectType != null}">
 			
-				<d:field for="trajectNaam" label="Traject naam" rendered="#{cc.attrs.value.trajectType.contains('Route')}" required="#{cc.attrs.value.trajectType.contains('Route')}">
-					<h:selectOneMenu id="trajectNaam" value="#{cc.attrs.value.trajectNaam}" rendered="#{cc.attrs.value.trajectType.contains('Route')}" required="#{cc.attrs.value.trajectType.contains('Route')}">
+				<d:field for="trajectNaam" label="Traject naam" rendered="#{cc.attrs.value.trajectType.contains('Route')}" >
+					<h:selectOneMenu id="trajectNaam" value="#{cc.attrs.value.trajectNaam}" rendered="#{cc.attrs.value.trajectType.contains('Route')}" >
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(cc.attrs.value.regio, cc.attrs.value.trajectType))}" />
 					</h:selectOneMenu>
@@ -56,7 +58,6 @@
 						mode="EDIT" />
 					
 				</j:renderPanel>
-			
 			</r:panel>
 		</a:outputPanel>
 	</cc:implementation>

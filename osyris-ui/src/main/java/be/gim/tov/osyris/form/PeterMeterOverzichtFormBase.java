@@ -472,9 +472,8 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 					counterHerfst++;
 				}
 
-				if (voorkeur.getTrajectType().contains("Route")
-						&& null == voorkeur.getTrajectNaam()) {
-					messages.error("Bewaren profiel niet gelukt: Indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
+				if (null == voorkeur.getRegio()) {
+					messages.error("Bewaren profiel niet gelukt: Gelieve een regio te op te geven.");
 					return false;
 				}
 			}

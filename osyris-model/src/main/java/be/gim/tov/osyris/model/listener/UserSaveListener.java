@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
+import java.util.List;
 
 import javax.inject.Inject;
 
@@ -10,8 +11,10 @@ import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
+import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
+import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
@@ -43,6 +46,27 @@ public class UserSaveListener {
 
 		if (profiel != null) {
 
+			// indien naamcode reeds bestaat, updaten
+			if (Beans.getReference(OsyrisModelFunctions.class)
+					.checkPeterMeterNaamCodeExists(resourceName)) {
+
+				QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
+				builder.addFilter(FilterUtils.equal("code",
+						resourceName.toString()));
+
+				List<PeterMeterNaamCode> codes = (List<PeterMeterNaamCode>) modelRepository
+						.searchObjects(builder.build(), false, false);
+
+				for (PeterMeterNaamCode code : codes) {
+
+					code.setCode(resourceName.toString());
+					code.setLabel(userProfile.getLastName() + " "
+							+ userProfile.getFirstName());
+					modelRepository.saveObject(code);
+				}
+			}
+
+			// Indien naamcode nog niet bestaat, aanmaken
 			if (!Beans.getReference(OsyrisModelFunctions.class)
 					.checkPeterMeterNaamCodeExists(resourceName)) {
 

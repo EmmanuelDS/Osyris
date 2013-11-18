@@ -21,9 +21,11 @@ import org.opengis.filter.Filter;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
+import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
+import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
 /**
  * Bean klasse voor het toewijzen van Peters en Meters aan Routes en Lussen op
@@ -89,9 +91,13 @@ public class PeterMeterToewijzingBean {
 	 * Toekennen van Peters en Meters aan Trajecten, voorlopig enkel voor
 	 * PetersMeters met 1 specifieke voorkeur.
 	 * 
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * 
 	 */
 	@SuppressWarnings("unchecked")
-	public void kenPetersMetersToe() {
+	public void kenPetersMetersToe() throws InstantiationException,
+			IllegalAccessException {
 
 		try {
 			// Leegmaken toewijzingen Traject
@@ -148,6 +154,7 @@ public class PeterMeterToewijzingBean {
 			messages.info("Toekenning van peters en meters succesvol uitgevoerd.");
 
 		} catch (IOException e) {
+
 			LOG.error("Can not search trajecten", e);
 			messages.error("Fout tijdens het toekennen van peters en meters: "
 					+ e.getMessage());
@@ -172,7 +179,14 @@ public class PeterMeterToewijzingBean {
 
 			// Toekenning Route
 			else if (voorkeur.getTrajectType().contains("Route")) {
-				assignRoute(voorkeur, peterMeter);
+
+				if (voorkeur.getTrajectNaam() != null) {
+					assignRoute(voorkeur, peterMeter);
+				}
+
+				else {
+					assignRandomRoute(voorkeur, peterMeter);
+				}
 			}
 		}
 	}
@@ -190,26 +204,30 @@ public class PeterMeterToewijzingBean {
 
 		try {
 
-			DefaultQuery q = new DefaultQuery();
-			q.setModelClassName("Traject");
-			q.addFilter(FilterUtils.equal("naam", voorkeur.getTrajectNaam()));
-
-			// Zoeken naar voorkeursroute
 			Traject route = null;
 
-			// Checken op route effectief gevonden is
-			List<Traject> result = (List<Traject>) modelRepository
-					.searchObjects(q, false, false);
+			// Assign route met naam
+			if (voorkeur.getTrajectNaam() != null) {
 
-			if (!result.isEmpty()) {
-				route = result.get(0);
+				DefaultQuery q = new DefaultQuery();
+				q.setModelClassName("Traject");
+				q.addFilter(FilterUtils.equal("naam", voorkeur.getTrajectNaam()));
+
+				// Checken op route effectief gevonden is
+				List<Traject> result = (List<Traject>) modelRepository
+						.searchObjects(q, false, false);
+
+				if (!result.isEmpty()) {
+					route = result.get(0);
+				}
 			}
 
 			if (route != null) {
 
 				// Check of PeterMeter voor 1 van de 3 periodes reeds is
 				// toegewezen
-				// aan een traject en of reeds toegewezen aan een bepaald type
+				// aan een traject en of reeds toegewezen aan een bepaald
+				// type
 				// traject
 				// Hierin zit ook de check om te kijken of een PeterMeter 1
 				// bepaalde
@@ -274,6 +292,132 @@ public class PeterMeterToewijzingBean {
 			}
 
 		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+	}
+
+	/**
+	 * Toewijzen van een route waarvoor in de voorkeur enkel een regio en geen
+	 * specifieke naam is opgegeven. Er wordt gezocht naar routes die voor de
+	 * voorkeursperiode nog vrij zijn voor wat betreft de voorkeursregio. Zijn
+	 * er geen vrije routes meer dan krijgt de PeterMeter met de langste staat
+	 * van dienst prioriteit.
+	 * 
+	 * @param voorkeur
+	 * @param peterMeter
+	 */
+	private void assignRandomRoute(PeterMeterVoorkeur voorkeur,
+			ResourceName peterMeter) {
+
+		try {
+			// Zoeken vrije routes in de opgegeven regio
+			if (!getVrijeRoutes(voorkeur).isEmpty()) {
+
+				Route vrijeRoute = getVrijeRoutes(voorkeur).get(0);
+
+				// Check of voor 1 vd 3 periodes al toegekend
+				if (!checkAlreadyAssigned(vrijeRoute, peterMeter)
+						&& !checkAlreadyAssignedToType(vrijeRoute, voorkeur,
+								peterMeter)) {
+
+					if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+						vrijeRoute.setPeterMeter1(peterMeter);
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+						vrijeRoute.setPeterMeter1(peterMeter);
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+						vrijeRoute.setPeterMeter3(peterMeter);
+					}
+					modelRepository.saveObject(vrijeRoute);
+				}
+			}
+
+			// Indien alle routes bezet zijn
+			else if (getVrijeRoutes(voorkeur).isEmpty()) {
+
+				List<Route> routes = new ArrayList<Route>();
+
+				QueryBuilder builder = new QueryBuilder(
+						voorkeur.getTrajectType());
+				builder.addFilter(FilterUtils.equal("regio",
+						voorkeur.getRegio()));
+				routes = (List<Route>) modelRepository.searchObjects(
+						builder.build(), false, false);
+
+				// Voor elke lus nagaan of er al een PeterMeter is
+				// toegewezen
+				for (Route r : routes) {
+
+					if (!checkAlreadyAssigned(r, peterMeter)
+							&& !checkAlreadyAssignedToType(r, voorkeur,
+									peterMeter)) {
+
+						ResourceName compareToPeterMeter = null;
+						ResourceName assignedPeterMeter = null;
+
+						if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+							compareToPeterMeter = (ResourceName) r
+									.getPeterMeter1();
+						}
+						if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+							compareToPeterMeter = (ResourceName) r
+									.getPeterMeter2();
+						}
+						if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+							compareToPeterMeter = (ResourceName) r
+									.getPeterMeter3();
+						}
+
+						// Indien al een andere peterMeter is toegekend
+						if (compareToPeterMeter != null
+								&& compareToPeterMeter != peterMeter) {
+
+							PeterMeterProfiel profielPM1 = (PeterMeterProfiel) modelRepository
+									.loadObject(peterMeter).getAspect(
+											"PeterMeterProfiel");
+							PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
+									.loadObject(compareToPeterMeter).getAspect(
+											"PeterMeterProfiel");
+
+							// Enkel checken indien actiefSinds is ingevuld.
+							if (profielPM1.getActiefSinds() != null
+									&& profielPM2.getActiefSinds() != null) {
+
+								Calendar cal1 = Calendar.getInstance();
+								Calendar cal2 = Calendar.getInstance();
+								cal1.setTime(profielPM1.getActiefSinds());
+								cal2.setTime(profielPM2.getActiefSinds());
+
+								// Degene met de langste staat van dienst wordt
+								// toegekend
+								if (cal1.before(cal2)) {
+									assignedPeterMeter = peterMeter;
+								} else {
+									assignedPeterMeter = compareToPeterMeter;
+								}
+							} else {
+								assignedPeterMeter = peterMeter;
+							}
+
+							// Bewaren toewijzing
+							if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+								r.setPeterMeter1(assignedPeterMeter);
+							} else if (voorkeur.getPeriode().equals(
+									PERIODE_ZOMER)) {
+								r.setPeterMeter2(assignedPeterMeter);
+							} else if (voorkeur.getPeriode().equals(
+									PERIODE_HERFST)) {
+								r.setPeterMeter3(assignedPeterMeter);
+							}
+							modelRepository.saveObject(r);
+						}
+					}
+				}
+			}
+
+		} catch (IOException e) {
+
 			LOG.error("Can not load object.", e);
 		}
 	}
@@ -503,13 +647,16 @@ public class PeterMeterToewijzingBean {
 
 		int counter = 0;
 
-		if (voorkeursTraject.getPeterMeter1() != null) {
+		if (voorkeursTraject.getPeterMeter1() != null
+				&& voorkeursTraject.getPeterMeter1().equals(peterMeter)) {
 			counter++;
 		}
-		if (voorkeursTraject.getPeterMeter2() != null) {
+		if (voorkeursTraject.getPeterMeter2() != null
+				&& voorkeursTraject.getPeterMeter2().equals(peterMeter)) {
 			counter++;
 		}
-		if (voorkeursTraject.getPeterMeter3() != null) {
+		if (voorkeursTraject.getPeterMeter3() != null
+				&& voorkeursTraject.getPeterMeter3().equals(peterMeter)) {
 			counter++;
 		}
 
@@ -538,14 +685,24 @@ public class PeterMeterToewijzingBean {
 		}
 
 		QueryBuilder builder = new QueryBuilder("Traject");
-		builder.addFilter(FilterUtils.equal("peterMeter1", peterMeter));
 		boolean isAlreadyAssigned = false;
 
-		List<Traject> toegewezenTrajecten = (List<Traject>) modelRepository
+		// Check per periode of het trajectType verschilt
+		if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+			builder.addFilter(FilterUtils.equal("peterMeter1", peterMeter));
+		}
+		if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+			builder.addFilter(FilterUtils.equal("peterMeter2", peterMeter));
+		}
+		if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+			builder.addFilter(FilterUtils.equal("peterMeter3", peterMeter));
+		}
+
+		List<Traject> toegewezenTrajectenInPeriode = (List<Traject>) modelRepository
 				.searchObjects(builder.build(), false, false);
 
-		if (!toegewezenTrajecten.isEmpty()) {
-			for (Traject t : toegewezenTrajecten) {
+		if (!toegewezenTrajectenInPeriode.isEmpty()) {
+			for (Traject t : toegewezenTrajectenInPeriode) {
 
 				if (t.getModelClass().getName()
 						.equalsIgnoreCase(voorkeur.getTrajectType())) {
@@ -583,9 +740,11 @@ public class PeterMeterToewijzingBean {
 
 		if (voorkeur.getTrajectType().contains("Wandel")) {
 			QueryBuilder builder = new QueryBuilder("WandelNetwerkLus");
+
 			builder.addFilter(FilterUtils.equal("regio", voorkeur.getRegio()));
 			builder.addFilter(FilterUtils.lessOrEqual("lengte",
 					voorkeur.getMaxAfstand()));
+
 			if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
 				builder.addFilter(FilterUtils.equal("peterMeter1", null));
 			}
@@ -602,34 +761,66 @@ public class PeterMeterToewijzingBean {
 		return vrijeLussen;
 	}
 
+	@SuppressWarnings("unchecked")
+	private List<Route> getVrijeRoutes(PeterMeterVoorkeur voorkeur)
+			throws IOException {
+
+		// Checken vrije lussen die aan de opgegeven voorkeur voldoen
+		List<Route> vrijeRoutes = new ArrayList<Route>();
+
+		QueryBuilder builder = new QueryBuilder(voorkeur.getTrajectType());
+		builder.addFilter(FilterUtils.equal("regio", voorkeur.getRegio()));
+
+		if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+			builder.addFilter(FilterUtils.equal("peterMeter1", null));
+		}
+		if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+			builder.addFilter(FilterUtils.equal("peterMeter2", null));
+		}
+		if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+			builder.addFilter(FilterUtils.equal("peterMeter3", null));
+		}
+		vrijeRoutes = (List<Route>) modelRepository.searchObjects(
+				builder.build(), false, false);
+
+		return vrijeRoutes;
+	}
+
 	/**
 	 * Ophalen van alle Peters en Meters met ofwel 1 voorkeur ofwel meerdere
-	 * voorkeuren.
+	 * voorkeuren. Enkel PeterMeters met status ACTIEF worden opgenomen0
 	 * 
 	 * @param allPetersMeters
 	 * @param single
 	 * @return
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * @throws IOException
 	 */
 	private List<User> getPeterMetersWithSingleVoorkeur(
-			List<User> allPetersMeters, boolean singleVoorkeur) {
+			List<User> allPetersMeters, boolean singleVoorkeur)
+			throws IOException, InstantiationException, IllegalAccessException {
 
 		List<User> result = new ArrayList<User>();
 
 		for (User peterMeter : allPetersMeters) {
 			PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
-					.getAspect("PeterMeterProfiel");
+					.getAspect("PeterMeterProfiel", modelRepository, true);
 
-			if (singleVoorkeur) {
-				if (profiel.getVoorkeuren() != null
-						&& profiel.getVoorkeuren().size() == 1) {
-					result.add(peterMeter);
+			if (profiel.getStatus().equals(PeterMeterStatus.ACTIEF)) {
+
+				if (singleVoorkeur) {
+					if (profiel.getVoorkeuren() != null
+							&& profiel.getVoorkeuren().size() == 1) {
+						result.add(peterMeter);
+					}
 				}
-			}
 
-			else {
-				if (profiel.getVoorkeuren() != null
-						&& profiel.getVoorkeuren().size() > 1) {
-					result.add(peterMeter);
+				else {
+					if (profiel.getVoorkeuren() != null
+							&& profiel.getVoorkeuren().size() > 1) {
+						result.add(peterMeter);
+					}
 				}
 			}
 		}
@@ -676,9 +867,16 @@ public class PeterMeterToewijzingBean {
 			// voor een route
 			String compareNaam = null;
 			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+
 				if (voorkeur.getTrajectNaam() != null) {
 					compareNaam = voorkeur.getTrajectNaam();
 					break;
+				}
+
+				// Route zonder naam gespecifieerd wordt beschouwd als willen
+				// controleren van meerdere routes
+				else {
+					return false;
 				}
 			}
 
