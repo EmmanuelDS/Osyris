@@ -94,6 +94,20 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Width(150)
 	private byte[] foto;
 
+	@View(type = "image")
+	@NotSearchable
+	@ContentType("image/*")
+	@FileSize(2 * 1024 * 1024)
+	@Width(150)
+	private byte[] foto2;
+
+	@View(type = "image")
+	@NotSearchable
+	@ContentType("image/*")
+	@FileSize(2 * 1024 * 1024)
+	@Width(150)
+	private byte[] foto3;
+
 	@NotSearchable
 	@NotEditable
 	@Type(ModelPropertyType.TIMESTAMP)
@@ -214,6 +228,22 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setFoto(byte[] foto) {
 		this.foto = foto;
+	}
+
+	public byte[] getFoto2() {
+		return foto2;
+	}
+
+	public void setFoto2(byte[] foto2) {
+		this.foto2 = foto2;
+	}
+
+	public byte[] getFoto3() {
+		return foto3;
+	}
+
+	public void setFoto3(byte[] foto3) {
+		this.foto3 = foto3;
 	}
 
 	public Date getDatumGeannuleerd() {
