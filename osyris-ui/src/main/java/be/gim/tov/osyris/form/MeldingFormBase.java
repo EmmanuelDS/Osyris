@@ -614,13 +614,10 @@ public class MeldingFormBase implements Serializable {
 	 * 
 	 * @param event
 	 */
-	@SuppressWarnings("unchecked")
 	public void onUpdateFeatures(ControllerEvent event) {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
-
-		List<String> ids = (List<String>) event.getParams().get("featureIds");
 
 		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);

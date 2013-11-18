@@ -10,35 +10,29 @@
 	xmlns:m="http://specto.gim.be/map">
 	
 	<r:panel id="uitvoeringsrondePanel">
-	<d:fields>
-		<d:field for="uitvoeringsrondeId" label="Uitvoeringsronde">
-			<h:outputText value= "#{d:modelObject(form.uitvoeringsronde).getId()}" />
-		</d:field>
-		<d:field for="uitvoeringsrondeDatum" label="Uitgevoerd op">
-			<d:propertyValue id="uitvoeringsrondeDatum"
+		<d:fields>
+			<d:field for="rondeId" label="Uitvoeringsronde">
+				<h:outputText id="rondeId" value= "#{d:modelObject(form.uitvoeringsronde).getId()}" />
+			</d:field>			
+			<d:propertyField id="uitvoeringsrondeDatum"
 			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}"
 					value="#{form.uitvoeringsronde.datumUitvoering}"
 					mode="VIEW" />
-		</d:field>
-		<d:field for="uitvoeringsronde" label="Uitgevoerd door">
-			<d:propertyValue id="uitvoerder"
+			<d:propertyField id="uitvoerder"
 			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('uitvoerder')}"
 					value="#{form.uitvoeringsronde.uitvoerder}"
 					mode="VIEW" />
-		</d:field>
-		<d:field for="uitvoeringsrondeAfstand" label="Totaal aantal km">
-			<d:propertyValue id="uitvoeringsrondeAfstand"
+			<d:propertyField id="uitvoeringsrondeAfstand"
 			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('afstand')}"
 					value="#{form.uitvoeringsronde.afstand}"
 					mode="VIEW" />
-		</d:field>
-	</d:fields>
+		</d:fields>
 	</r:panel>
 	<br/>
 	<r:panel id="handelingenPanel">
 	<d:fields>
 		<d:field for="handelingen" label="Handelingen">
-			<d:propertyValue id="handelingen"
+			<d:propertyField id="handelingen"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
 					value="#{form.object.handelingen}"
 					mode="VIEW" />
@@ -116,12 +110,18 @@
 	<br/>
 	<r:panel id="fotoPanel">
 	<d:fields>
-		<d:field for="foto" label="Foto">
-			<d:propertyValue id="foto"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
-					value="#{form.object.foto}"
-					mode="VIEW" />
-		</d:field>
+		<d:propertyField id="foto"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
+				value="#{form.object.foto}"
+				mode="VIEW" />
+		<d:propertyField id="foto2"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
+				value="#{form.object.foto2}"
+				mode="VIEW" />
+		<d:propertyField id="foto3"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
+				value="#{form.object.foto3}"
+				mode="VIEW" />
 	</d:fields>
 	</r:panel>
 	<br/>
@@ -134,7 +134,7 @@
 					mode="VIEW" />
 		</d:field>
 		<a:outputPanel rendered="#{form.object.validatie == 'LATER_OPNIEUW_UITVOEREN_VANAF'}">
-			<d:field>
+			<d:field for="datumLateruitTeVoeren" label="Later uit te voeren vanaf">
 			<d:propertyValue id="datumLateruitTeVoeren"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLaterUitTeVoeren')}"
 					value="#{form.object.datumLaterUitTeVoeren}"
