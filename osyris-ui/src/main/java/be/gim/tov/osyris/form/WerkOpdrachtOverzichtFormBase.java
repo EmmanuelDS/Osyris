@@ -815,6 +815,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		List<String> bordSelection = new ArrayList<String>();
 		List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+		List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
 		FeatureMapLayer bordLayer = null;
 
 		// Geometry laag voor punt probleem
@@ -889,15 +890,16 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			// Ander Probleem
 			AnderProbleem anderProbleem = (AnderProbleem) object.getProbleem();
-			anderProbleemGeoms.add(anderProbleem.getGeom());
 
-			if (anderProbleem.getGeom() instanceof Point) {
+			if (anderProbleem.getGeom() != null) {
+				anderProbleemGeoms.add(anderProbleem.getGeom());
 				geomLayer.setGeometries(anderProbleemGeoms);
 				geomLayer.setHidden(false);
 			}
 
-			else if (anderProbleem.getGeom() instanceof LineString) {
-				geomLineLayer.setGeometries(anderProbleemGeoms);
+			if (anderProbleem.getGeomOmleiding() != null) {
+				anderProbleemLineGeoms.add(anderProbleem.getGeomOmleiding());
+				geomLineLayer.setGeometries(anderProbleemLineGeoms);
 				geomLineLayer.setHidden(false);
 			}
 
@@ -1108,8 +1110,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		else if (object.getProbleem() instanceof AnderProbleem) {
 
-			doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(traject,
-					object);
+			doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(getViewer(),
+					traject, object);
 		}
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();

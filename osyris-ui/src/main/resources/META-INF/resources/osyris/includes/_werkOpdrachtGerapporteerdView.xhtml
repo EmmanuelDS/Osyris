@@ -31,12 +31,10 @@
 	<br/>
 	<r:panel id="handelingenPanel">
 	<d:fields>
-		<d:field for="handelingen" label="Handelingen">
-			<d:propertyField id="handelingen"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
-					value="#{form.object.handelingen}"
-					mode="VIEW" />
-		</d:field>
+		<d:propertyField id="handelingen"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+				value="#{form.object.handelingen}"
+				mode="VIEW" />
 	</d:fields>
 	</r:panel>
 	<br/>

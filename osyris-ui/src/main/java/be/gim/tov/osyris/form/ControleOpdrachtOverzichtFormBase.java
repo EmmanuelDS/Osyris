@@ -445,6 +445,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Indien netwerk CO lussen zichtbaar maken
 			if (controleOpdrachtType.equals("netwerk")) {
+
 				// Alle lussen tonen
 				FeatureMapLayer wandelLusLayer = (FeatureMapLayer) context
 						.getLayer("wandelNetwerkLus");
@@ -505,17 +506,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", trajectNaam));
 
-				// TODO: sorteren op sequentie, voorlopig nog met AlphaNumeric
-				// Sorting algoritme
-				// builder.orderBy(new
-				// DefaultQueryOrderBy(FilterUtils.property("sequentie")));
 				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(bewegwijzering, new AlphanumericSorting());
 			}
 
 			else if (trajectType.contains("Lus")) {
-				QueryBuilder builder = new QueryBuilder("NetwerkBord");
 
 				MapViewer viewer = getViewer();
 				MapContext context = viewer.getConfiguration().getContext();
@@ -528,11 +524,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 				}
 				NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 						.getTraject());
-				// builder.addFilter(FilterUtils.in("segmenten",
-				// lus.getSegmenten()));
-				// bewegwijzering = (List<Bord>) modelRepository.searchObjects(
-				// builder.build(), true, true);
-				// Collections.sort(bewegwijzering, new AlphanumericSorting());
 
 				bewegwijzering = Beans.getReference(OsyrisModelFunctions.class)
 						.getNetwerkBordVolgordeLus(lus);
@@ -565,9 +556,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				// Routes filteren op trajectNaam
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
-				// in DB
-				// TODO: sorteren op sequentie, voorlopig via alphanumeric
-				// sorting
+
 				result = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(result, new AlphanumericSorting());
@@ -576,16 +565,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			else if (t instanceof NetwerkLus) {
 
 				NetwerkLus lus = ((NetwerkLus) t);
-
-				// OLD
-				// QueryBuilder builder = new QueryBuilder("NetwerkBord");
-				// builder.addFilter(FilterUtils.in("segmenten",
-				// lus.getSegmenten()));
-
-				// result = (List<Bord>) modelRepository.searchObjects(
-				// builder.build(), true, true);
-
-				// Collections.sort(result, new AlphanumericSorting());
 
 				result = Beans.getReference(OsyrisModelFunctions.class)
 						.getNetwerkBordVolgordeLus(lus);
@@ -619,6 +598,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			layer.setFilter(null);
 			layer.setHidden(true);
 			layer.set("selectable", false);
+
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 				layer.setHidden(false);
@@ -674,6 +654,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
 			layer.setFilter(FilterUtils.in("segmenten", lus.getSegmenten()));
+
 		} catch (IOException e) {
 			LOG.error("Can not load NetwerkLus.", e);
 		}
@@ -717,6 +698,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.loadObject(seg.getNaarKnooppunt()).getId().toString());
 			}
 			layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
@@ -830,6 +812,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				messages.info("Controleopdracht succesvol heropend. De controleopdracht staat opnieuw in status 'Te controleren'.");
 				clear();
 				search();
+
 			} catch (IOException e) {
 				messages.error("Fout bij het heropenen van controleopdracht: "
 						+ e.getMessage());
@@ -1320,6 +1303,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			messages.info("Automatisch aanmaken van controleopdrachten succesvol uitgevoerd.");
 			messages.info("Er zijn " + counter
 					+ " nieuwe controleopdrachten aangemaakt.");
+
 		} catch (IOException e) {
 			messages.info("Automatisch aanmaken controleopdrachten niet gelukt: "
 					+ e.getMessage());
@@ -1386,21 +1370,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public Content printControleOpdracht() throws Exception {
 
-		// Map<String, Object> variables = new HashMap<String, Object>();
-		// variables.put("title", "Test");
-		// variables.put("abstract", "test");
-		// variables.put("map", true);
-		// variables.put("legend", false);
-		// variables.put("features", false);
-		// variables.put("orientation", "portrait");
-		// variables.put("size", 2);
-		// variables.put("fileName", getViewer().getContext().getTitle() +
-		// ".pdf");
-		// variables.put("landscape", "landscape".equals("portrait"));
-		// variables.put("portrait", "portrait".equals("portrait"));
-		// variables.put("pageSize", 2);
-		// variables.put("extent", getViewer().getContentExtent());
-
 		// Opbouwen XML
 		List<Bord> borden = createBewegwijzering(object.getTraject());
 		Traject traject = (Traject) modelRepository.loadObject(object
@@ -1442,7 +1411,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 		List<Bord> borden = createBewegwijzering(object.getTraject());
 
 		XmlBuilder xmlBuilder = new XmlBuilder();
-		Document doc = xmlBuilder.buildBordFiches(object, borden, getViewer());
+
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+		Document doc = xmlBuilder.buildBordFiches(traject, object, borden,
+				getViewer());
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,

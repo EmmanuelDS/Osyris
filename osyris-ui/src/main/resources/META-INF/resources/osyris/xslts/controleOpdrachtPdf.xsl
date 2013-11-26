@@ -118,32 +118,22 @@
 	          
 	          <xsl:if test="//@netwerkCO='false'">
 	          <fo:table-cell>
-	           <fo:block font-size="10pt">
-			          <xsl:if test="pijl='1'">
-		        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechts.png"/>	        			
-	                  </xsl:if>
-			          <xsl:if test="pijl='2'">	
-		        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_links.png"/>
-			          </xsl:if>		          
-			           <xsl:if test="pijl='3'">		
-		        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechtdoor.png"/>	  
-			          </xsl:if>    
-	          </fo:block>
+		           <fo:block font-size="10pt">
+		            <xsl:variable name="url_pijl" select="./pijl" />	
+			            <fo:external-graphic src="'{$url_pijl}'"/>
+		           </fo:block>
 	          </fo:table-cell>
 	          </xsl:if>
 	     
 	          <xsl:if test="//@netwerkCO='true'">
 	          <fo:table-cell>
 	            <fo:block font-size="10pt">
-		          <xsl:if test="pijlkp1='1' or pijlkp2='1' or pijlkp3='1'">
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechts.png"/>
-		          </xsl:if>
-		          <xsl:if test="pijlkp1='2' or pijlkp2='2' or pijlkp3='2'">
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_links.png"/>
-		          </xsl:if>
-		           <xsl:if test="pijlkp1='3' or pijlkp2='3' or pijlkp3='3'">
-	        			<fo:external-graphic src="http://osyristest.tov.be/fotos/icons/pijl_rechtdoor.png"/>
-		          </xsl:if>
+		            <xsl:variable name="url_kp1_pijl" select="./pijlkp1" />	
+			            <fo:external-graphic src="'{$url_kp1_pijl}'"/>	  
+		            <xsl:variable name="url_kp2_pijl" select="./pijlkp2" />	
+			            <fo:external-graphic src="'{$url_kp2_pijl}'"/>
+		            <xsl:variable name="url_kp3_pijl" select="./pijlkp3" />	
+			            <fo:external-graphic src="'{$url_kp3_pijl}'"/>
 		        </fo:block>
 	          </fo:table-cell>
 	          </xsl:if>
