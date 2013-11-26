@@ -44,15 +44,29 @@ public class NetwerkKnooppuntSaveListener {
 			Long newId = maxId + 1;
 			knooppunt.setId(newId);
 
-			// set regio en naam
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName("Regio");
-			query.addFilter(FilterUtils.intersects("geom", knooppunt.getGeom()));
+			// Indien regio bij het aanmaken leeg is automatisch regio zoeken
+			if (knooppunt.getRegio() == null) {
 
-			Regio regio = (Regio) modelRepository.searchObjects(query, false,
-					false).get(0);
-			knooppunt.setRegio(modelRepository.getResourceIdentifier(regio));
-			knooppunt.setNaam(regio.getNaam());
+				DefaultQuery query = new DefaultQuery();
+				query.setModelClassName("Regio");
+				query.addFilter(FilterUtils.intersects("geom",
+						knooppunt.getGeom()));
+
+				Regio regio = (Regio) modelRepository.searchObjects(query,
+						false, false).get(0);
+				knooppunt
+						.setRegio(modelRepository.getResourceIdentifier(regio));
+
+			}
+
+			// Indien naam bij aanmaken leeg is automatisch invullen naam regio
+			if (knooppunt.getNaam() == null || knooppunt.getNaam().isEmpty()) {
+
+				Regio regio = (Regio) modelRepository.loadObject(knooppunt
+						.getRegio());
+				knooppunt.setNaam(regio.getNaam());
+
+			}
 		}
 
 		// Automatically set X Y coordinates indien niet aanwezig

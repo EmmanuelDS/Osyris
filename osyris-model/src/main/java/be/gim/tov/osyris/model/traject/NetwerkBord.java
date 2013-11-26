@@ -9,6 +9,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -48,15 +49,19 @@ public abstract class NetwerkBord extends Bord {
 	private String kp3ImageCode;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr0;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr1;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr2;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr3;
 
 	@NotSearchable

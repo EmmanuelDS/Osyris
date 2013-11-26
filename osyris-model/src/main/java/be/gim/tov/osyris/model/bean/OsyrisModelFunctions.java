@@ -653,9 +653,8 @@ public class OsyrisModelFunctions {
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 
-			if (bord instanceof RouteBord) {
-				return ((RouteBord) bord).getVolg();
-			}
+			return bord.getVolg();
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
@@ -673,10 +672,8 @@ public class OsyrisModelFunctions {
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 
-			if (bord instanceof RouteBord) {
+			return bord.getStraatnaam();
 
-				return ((RouteBord) bord).getStraatnaam();
-			}
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}

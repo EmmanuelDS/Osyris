@@ -145,7 +145,5 @@ public class BordSaveListener {
 					.getRegioForBord(bord);
 			bord.setRegio(modelRepository.getResourceKey(regio));
 		}
-
-		// TODO: bordVolgorde sequentie en BordLabels zetten?
 	}
 }

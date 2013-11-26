@@ -8,6 +8,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
@@ -30,9 +31,11 @@ public abstract class NetwerkSegment extends Traject {
 	private String enkeleRichting;
 
 	@NotEditable
+	@NotViewable
 	private Integer vanKpNr;
 
 	@NotEditable
+	@NotViewable
 	private Integer naarKpNr;
 
 	@ModelClassName("NetwerkKnooppunt")
