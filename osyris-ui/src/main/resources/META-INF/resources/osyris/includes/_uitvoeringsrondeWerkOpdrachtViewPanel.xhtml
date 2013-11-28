@@ -88,10 +88,12 @@
 				<f:facet name="header">
 				<h:outputText value="Commentaar" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="commentaarColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 					value="#{bordProbleem.commentaar}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
@@ -137,10 +139,12 @@
 				<f:facet name="header">
 				<h:outputText value="Commentaar" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="commentaarColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 					value="#{anderProbleem.commentaar}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
@@ -206,10 +210,12 @@
 				<f:facet name="header">
 				<h:outputText value="Naam" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="naamColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
 					value="#{gebruiktMateriaal.stockMateriaal.naam}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
@@ -254,14 +260,23 @@
 	</d:fields>
 	</r:panel>
 	<br/>
-	<r:panel id="fotoPanel">
+	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}">
 	<d:fields>
-		<d:field for="foto" label="Foto">
-			<d:propertyValue id="foto"
+	
+			<d:propertyField id="foto"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
 					value="#{form.selectedWerkOpdracht.foto}"
 					mode="VIEW" />
-		</d:field>
+		
+			<d:propertyField id="foto2"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
+					value="#{form.selectedWerkOpdracht.foto2}"
+					mode="VIEW" />
+		
+			<d:propertyField id="foto3"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
+					value="#{form.selectedWerkOpdracht.foto3}"
+					mode="VIEW" />
 	</d:fields>
 	</r:panel>
 	

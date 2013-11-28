@@ -127,6 +127,13 @@
 		          <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>Pijl: </xsl:text></fo:inline>
 		            <fo:external-graphic src="'{$url_pijl}'" padding-start="5pt"/>
 		          </fo:block>
+		          
+		          <fo:block space-after="8pt">
+		          <fo:inline font-weight="bold"><xsl:text>Opschrift bord: </xsl:text></fo:inline>
+		          	<xsl:value-of
+		          		 select="/verslag/trajectnaam">
+		          	</xsl:value-of>
+		          </fo:block>
 		       </xsl:if>
 	          
 				<xsl:if test="//@netwerkbord='true'">

@@ -80,10 +80,12 @@
 				<f:facet name="header">
 				<h:outputText value="Naam" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="naamColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
 					value="#{gebruiktMateriaal.stockMateriaal.naam}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
