@@ -462,20 +462,31 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
 
-				if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-					counterLente++;
-				}
-				if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-					counterZomer++;
-				}
-				if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-					counterHerfst++;
-				}
+				if (voorkeur.getTrajectType().toLowerCase().contains("netwerk")
+						&& voorkeur.getMaxAfstand() == 0) {
 
-				if (null == voorkeur.getRegio()) {
-					messages.error("Bewaren profiel niet gelukt: Gelieve een regio te op te geven.");
+					messages.error("Bewaren profiel niet gelukt: Gelieve voor elke voorkeur van het type netwerk een maximale afstand groter dan 0 op te geven.");
 					return false;
 				}
+
+				if (voorkeur.getRegio() != null
+						&& voorkeur.getPeriode() != null
+						&& voorkeur.getTrajectType() != null) {
+
+					if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+						counterLente++;
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+						counterZomer++;
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+						counterHerfst++;
+					}
+				} else {
+					messages.error("Bewaren profiel niet gelukt: Gelieve voor elke voorkeur een periode, trajectype en regio op te geven.");
+					return false;
+				}
+
 			}
 
 			if (counterLente > 3 || counterZomer > 3 || counterHerfst > 3) {

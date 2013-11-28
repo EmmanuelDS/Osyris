@@ -527,9 +527,6 @@ public class MeldingFormBase implements Serializable {
 		if (object.getProbleem() != null
 				&& object.getProbleem() instanceof NetwerkAnderProbleem) {
 
-			List<String> ids = (List<String>) event.getParams().get(
-					"featureIds");
-
 			String layerId = (String) event.getParams().get("layerId");
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
@@ -548,14 +545,11 @@ public class MeldingFormBase implements Serializable {
 		else if (object.getProbleem() != null
 				&& object.getProbleem() instanceof BordProbleem) {
 
-			List<String> ids = (List<String>) event.getParams().get(
-					"featureIds");
 			String layerId = (String) event.getParams().get("layerId");
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
 
 			if (layer.getSelection().size() == 1) {
-				String id = ids.iterator().next();
 				((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
 						"Bord", layer.getSelection().get(0)));
 
@@ -938,11 +932,6 @@ public class MeldingFormBase implements Serializable {
 		try {
 
 			return "view";
-			// String contextPath = FacesContext.getCurrentInstance()
-			// .getExternalContext().getRequestContextPath();
-			//
-			// FacesContext.getCurrentInstance().getExternalContext()
-			// .redirect(contextPath + "/web/view/form:MeldingForm");
 
 		} catch (Exception e1) {
 			LOG.error("Can not redirect to MeldingForm.", e1);
@@ -997,7 +986,9 @@ public class MeldingFormBase implements Serializable {
 		if (context != null) {
 			Map<String, Object> requestCookieMap = context.getExternalContext()
 					.getRequestCookieMap();
+
 			return (Cookie) requestCookieMap.get(COOKIE_NAME);
+
 		} else {
 			return null;
 		}
@@ -1019,7 +1010,9 @@ public class MeldingFormBase implements Serializable {
 			Provincie provincie = (Provincie) modelRepository
 					.getUniqueResult(modelRepository.searchObjects(
 							new DefaultQuery("Provincie"), true, true));
+
 			return GeometryUtils.getEnvelope(provincie.getGeom());
+
 		} catch (IOException e) {
 			LOG.error("Can not search Provincie.", e);
 		}

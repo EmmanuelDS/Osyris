@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -311,9 +312,14 @@ public class PeterMeterToewijzingBean {
 
 		try {
 			// Zoeken vrije routes in de opgegeven regio
-			if (!getVrijeRoutes(voorkeur).isEmpty()) {
+			List<Route> vrijeRoutes = getVrijeRoutes(voorkeur);
 
-				Route vrijeRoute = getVrijeRoutes(voorkeur).get(0);
+			if (!vrijeRoutes.isEmpty()) {
+
+				Random randomGenerator = new Random();
+				int randomIndex = randomGenerator.nextInt(vrijeRoutes.size());
+
+				Route vrijeRoute = vrijeRoutes.get(randomIndex);
 
 				// Check of voor 1 vd 3 periodes al toegekend
 				if (!checkAlreadyAssigned(vrijeRoute, peterMeter)
@@ -334,7 +340,7 @@ public class PeterMeterToewijzingBean {
 			}
 
 			// Indien alle routes bezet zijn
-			else if (getVrijeRoutes(voorkeur).isEmpty()) {
+			else if (vrijeRoutes.isEmpty()) {
 
 				List<Route> routes = new ArrayList<Route>();
 
@@ -438,9 +444,14 @@ public class PeterMeterToewijzingBean {
 
 			// Zoeken naar nog vrije lussen die overeenkomen met de opgegeven
 			// voorkeur
-			if (!getVrijeLussen(voorkeur).isEmpty()) {
+			List<NetwerkLus> vrijeLussen = getVrijeLussen(voorkeur);
 
-				NetwerkLus vrijeLus = getVrijeLussen(voorkeur).get(0);
+			if (!vrijeLussen.isEmpty()) {
+
+				Random randomGenerator = new Random();
+				int randomIndex = randomGenerator.nextInt(vrijeLussen.size());
+
+				NetwerkLus vrijeLus = vrijeLussen.get(randomIndex);
 
 				// Check of voor 1 vd 3 periodes al toegekend
 				if (!checkAlreadyAssigned(vrijeLus, peterMeter)
@@ -461,7 +472,7 @@ public class PeterMeterToewijzingBean {
 			}
 
 			// Indien alle lussen bezet
-			else if (getVrijeLussen(voorkeur).isEmpty()) {
+			else if (vrijeLussen.isEmpty()) {
 
 				List<NetwerkLus> lussen = new ArrayList<NetwerkLus>();
 

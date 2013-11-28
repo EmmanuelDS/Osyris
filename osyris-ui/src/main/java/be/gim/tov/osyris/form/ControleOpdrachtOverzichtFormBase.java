@@ -78,6 +78,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Provincie;
@@ -617,7 +618,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// NetwerkBord
 			else if (layer.getLayerId().equalsIgnoreCase(
 					trajectType.replace("Lus", "") + "Bord")) {
-				layer.setHidden(false);
 				searchNetwerkBordLayer(layer);
 			}
 			// Knooppunten
@@ -640,7 +640,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		layer.setFilter(null);
 		layer.setHidden(false);
+
 		try {
+
+			// Indien nieuwe ControleOpdracht koppelen van TrajectID aan
+			// ControleOpdracht
 			MapViewer viewer = getViewer();
 			MapContext context = viewer.getConfiguration().getContext();
 
@@ -653,6 +657,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
+
 			layer.setFilter(FilterUtils.in("segmenten", lus.getSegmenten()));
 
 		} catch (IOException e) {
@@ -687,15 +692,21 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
-			Set<String> knooppuntFilterIds = new HashSet<String>();
+			Set<Long> knooppuntFilterIds = new HashSet<Long>();
 
 			for (ResourceIdentifier segment : lus.getSegmenten()) {
 				NetwerkSegment seg = (NetwerkSegment) modelRepository
 						.loadObject(segment);
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getVanKnooppunt()).getId().toString());
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getNaarKnooppunt()).getId().toString());
+
+				NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getVanKnooppunt());
+
+				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getNaarKnooppunt());
+
+				knooppuntFilterIds.add(vanKp.getId());
+
+				knooppuntFilterIds.add(naarKp.getId());
 			}
 			layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
 
@@ -705,8 +716,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Filters the layer based on trajectNaam and sets the TrajectID via
-	 * trajectNaam. Dit is enkel toepasbaar op routes.
+	 * Filteren van de laag ahv trajectNaam en koppelen van de trajectID aan de
+	 * controleOpdracht. Dit is enkel toepasbaar op routes en lussen
 	 * 
 	 * @param layer
 	 */
@@ -1753,6 +1764,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
 							.lowerCamelCase(traject.getModelClass().getName()
 									.replace("Lus", "Bord"))));
+
 			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
 					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
 							.lowerCamelCase(traject.getModelClass().getName()
@@ -1760,11 +1772,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Filteren NetwerkBorden op segmenten van de Lus
 			if (bordLayer != null) {
+
 				bordLayer.setHidden(false);
 				bordLayer.set("selectable", true);
 				bordLayer.setFilter(FilterUtils.in("segmenten",
 						((NetwerkLus) traject).getSegmenten()));
 			}
+
 			if (knooppuntLayer != null) {
 				searchKnooppuntLayer(knooppuntLayer);
 			}

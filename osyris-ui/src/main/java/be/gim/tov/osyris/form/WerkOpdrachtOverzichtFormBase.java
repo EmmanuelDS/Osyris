@@ -64,6 +64,7 @@ import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Route;
@@ -90,6 +91,7 @@ import com.vividsolutions.jts.geom.Point;
 @ViewScoped
 public class WerkOpdrachtOverzichtFormBase extends
 		AbstractListForm<WerkOpdracht> {
+
 	private static final long serialVersionUID = -7478667205313972513L;
 
 	private static final Log LOG = LogFactory
@@ -246,9 +248,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 		if (trajectType != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
 		} else {
+
 			if (trajectType != null) {
 				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
+
 			if (regio != null) {
 				query.addFilter(FilterUtils.equal("regioId", regio));
 			}
@@ -446,11 +450,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 						.getConfiguration().getContext()
 						.getLayer(GEOMETRY_LAYER_NAME);
 				layer.setHidden(false);
+
 				if (anderProbleem.getGeom() instanceof Point) {
 					envelope = new Envelope(anderProbleem.getGeom()
 							.getCoordinate());
 					viewer.updateCurrentExtent(envelope);
-
 				}
 			}
 		} catch (IOException e) {
@@ -463,6 +467,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void createUitvoeringsronde() {
+
 		try {
 			Uitvoeringsronde ronde = (Uitvoeringsronde) modelRepository
 					.createObject("Uitvoeringsronde", null);
@@ -479,10 +484,17 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 
 			ronde.setOpdrachten(ids);
+
 			for (WerkOpdracht werkOpdracht : Arrays.asList(selectedOpdrachten)) {
+
 				// Opdrachten mogen nog niet aan een ronde toegewezen zijn
 				if (werkOpdracht.getInRonde().equals("1")) {
 					throw new IOException();
+				}
+
+				if (!werkOpdracht.getStatus().equals(
+						WerkopdrachtStatus.UIT_TE_VOEREN)) {
+					throw new Exception();
 				}
 				// Set opdrachten flagged inRonde true
 				werkOpdracht.setInRonde("1");
@@ -492,17 +504,24 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 			selectedOpdrachten = null;
 			messages.info("Uitvoeringsronde succesvol aangemaakt.");
+
 		} catch (InstantiationException e) {
 			messages.error("Fout bij het aanmaken van uitvoeringsronde: "
 					+ e.getMessage());
 			LOG.error("Can not instantiate model object.", e);
+
 		} catch (IllegalAccessException e) {
 			messages.error("Fout bij het aanmaken van uitvoeringsronde: "
 					+ e.getMessage());
 			LOG.error("Illegal access at creation model object.", e);
+
 		} catch (IOException e) {
 			messages.error("Gelieve minstens 1 werkopdracht aan te vinken die nog niet aan een ronde is toegevoegd.");
 			LOG.error("Can not save Uitvoeringsronde.", e);
+
+		} catch (Exception e) {
+			messages.error("Enkel werkopdracht in status 'uit te voeren' kunnen opgenomen worden in een uitvoeringsronde.");
+			LOG.error("Can not create Uitvoeringsronde.", e);
 		}
 	}
 
@@ -522,10 +541,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 			// clear();
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het bewaren van werkopdracht: "
 					+ e.getMessage());
 			LOG.error("Can not save model object.", e);
+
 		} catch (Exception e) {
 			messages.error("Fout bij het versturen van email: "
 					+ e.getMessage());
@@ -572,6 +593,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 			messages.info("Werkopdracht succesvol verwijderd.");
 			clear();
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van werkopdracht: "
 					+ e.getMessage());
@@ -586,6 +608,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 */
 	@SuppressWarnings("unchecked")
 	public Uitvoeringsronde getUitvoeringsronde() {
+
 		try {
 			DefaultQuery query = new DefaultQuery();
 			query.setModelClassName("Uitvoeringsronde");
@@ -593,7 +616,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 					modelRepository.getResourceIdentifier(object)));
 			List<Uitvoeringsronde> result = (List<Uitvoeringsronde>) modelRepository
 					.searchObjects(query, true, true, true);
+
 			return (Uitvoeringsronde) modelRepository.getUniqueResult(result);
+
 		} catch (IOException e) {
 			LOG.error("Can not search Uitvoeringsronde.", e);
 		}
@@ -706,33 +731,43 @@ public class WerkOpdrachtOverzichtFormBase extends
 			Traject traject = (Traject) modelRepository.loadObject(object
 					.getTraject());
 
-			Set<String> knooppuntFilterIds = new HashSet<String>();
+			Set<Long> knooppuntFilterIds = new HashSet<Long>();
 
+			// KNOOPPUNTEN VOOR LUSSEN
 			if (traject instanceof NetwerkLus) {
 
-				NetwerkLus lus = ((NetwerkLus) traject);
+				NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
+						.getTraject());
 
 				for (ResourceIdentifier segment : lus.getSegmenten()) {
 					NetwerkSegment seg = (NetwerkSegment) modelRepository
 							.loadObject(segment);
-					knooppuntFilterIds.add(modelRepository
-							.loadObject(seg.getVanKnooppunt()).getId()
-							.toString());
-					knooppuntFilterIds.add(modelRepository
-							.loadObject(seg.getNaarKnooppunt()).getId()
-							.toString());
+
+					NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+							.loadObject(seg.getVanKnooppunt());
+
+					NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+							.loadObject(seg.getNaarKnooppunt());
+
+					knooppuntFilterIds.add(vanKp.getId());
+					knooppuntFilterIds.add(naarKp.getId());
 				}
 				layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
 			}
 
+			// KNOOPPUNTEN VOOR SEGMENTEN
 			else if (traject instanceof NetwerkSegment) {
 
 				NetwerkSegment seg = (NetwerkSegment) traject;
 
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getVanKnooppunt()).getId().toString());
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getNaarKnooppunt()).getId().toString());
+				NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getVanKnooppunt());
+
+				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getNaarKnooppunt());
+
+				knooppuntFilterIds.add(vanKp.getId());
+				knooppuntFilterIds.add(naarKp.getId());
 
 				layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
 			}
@@ -973,7 +1008,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 								+ "Bord")));
 
 				bordLayer.setHidden(false);
-				bordLayer.setFilter(FilterUtils.equal("segmenten", traject));
+				bordLayer.setFilter(FilterUtils.equal("segmenten",
+						modelRepository.getResourceIdentifier(traject)));
 
 				// Bord Probleem
 				Bord bord = (Bord) modelRepository
