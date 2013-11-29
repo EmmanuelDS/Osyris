@@ -467,12 +467,20 @@ public class XmlBuilder {
 		id.appendChild(doc.createTextNode(object.getId().toString()));
 		rootElement.appendChild(id);
 
-		// VOORBEELD FOTO
+		// VOORBEELD FOTO ROUTEBORD
 		Element voorbeeldFoto = doc.createElement("voorbeeldFoto");
 		if (bord instanceof RouteBord) {
 
 			voorbeeldFoto.appendChild(doc
 					.createTextNode(getVoorbeeldRouteBord(traject)));
+		}
+		// VOORBEELD FOTO NETWERKBORD
+		if (bord instanceof NetwerkBord) {
+
+			NetwerkBord nwb = (NetwerkBord) bord;
+			voorbeeldFoto.appendChild(doc
+					.createTextNode(getVoorbeeldNetwerkBord(nwb)));
+
 		}
 		rootElement.appendChild(voorbeeldFoto);
 

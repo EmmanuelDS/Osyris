@@ -492,10 +492,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 					throw new IOException();
 				}
 
-				if (!werkOpdracht.getStatus().equals(
-						WerkopdrachtStatus.UIT_TE_VOEREN)) {
-					throw new Exception();
-				}
 				// Set opdrachten flagged inRonde true
 				werkOpdracht.setInRonde("1");
 				ronde.setUitvoerder(werkOpdracht.getUitvoerder());
@@ -519,9 +515,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 			messages.error("Gelieve minstens 1 werkopdracht aan te vinken die nog niet aan een ronde is toegevoegd.");
 			LOG.error("Can not save Uitvoeringsronde.", e);
 
-		} catch (Exception e) {
-			messages.error("Enkel werkopdracht in status 'uit te voeren' kunnen opgenomen worden in een uitvoeringsronde.");
-			LOG.error("Can not create Uitvoeringsronde.", e);
 		}
 	}
 

@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -20,6 +21,7 @@ import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
+import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
 /**
  * 
@@ -45,6 +47,16 @@ public class UserSaveListener {
 				.getAspect("PeterMeterProfiel");
 
 		if (profiel != null) {
+
+			// Current date indien actiefSinds leeg
+			if (profiel.getActiefSinds() == null) {
+				profiel.setActiefSinds(new Date());
+			}
+
+			// Status ACTIEF indien leeg
+			if (profiel.getStatus() == null) {
+				profiel.setStatus(PeterMeterStatus.ACTIEF);
+			}
 
 			// indien naamcode reeds bestaat, updaten
 			if (Beans.getReference(OsyrisModelFunctions.class)

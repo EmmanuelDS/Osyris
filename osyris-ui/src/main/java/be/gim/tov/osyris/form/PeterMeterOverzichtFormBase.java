@@ -114,6 +114,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			}
 
 			query.addFilter(FilterUtils.in("username", nameParts));
+
 		} catch (IOException e) {
 			LOG.error("Can not load group PetersMeters.", e);
 		}
@@ -148,6 +149,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 				String firstName = userProfile.getFirstName();
 				String lastName = userProfile.getLastName();
+
 				if (StringUtils.isNotBlank(firstName)
 						|| StringUtils.isNotBlank(lastName)) {
 					document.setTitle(new DefaultInternationalString(firstName
@@ -169,12 +171,22 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				}
 				object.putAspect(profiel);
 
+				ResourceName resourceName = new ResourceName(User.USER_SPACE,
+						object.getUsername());
+
+				setHasErrors(false);
+
+				// Save Document
+				modelRepository.saveDocument(document);
+
+				// Save User UserProfile PeterMeterProfiel and
+				// PeterMeterNaamCode via Listener
+				modelRepository.saveObject(object);
+
 				// Set permissions
 				setDocumentPermissions(name, document);
 
 				// Assign to group
-				ResourceName resourceName = new ResourceName(User.USER_SPACE,
-						object.getUsername());
 				addUserToPeterMeterGroup(resourceName);
 
 				// Send mail
@@ -182,10 +194,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						object.getUsername(),
 						object.getAspect("UserProfile").get("email").toString(),
 						password);
-
-				setHasErrors(false);
-				modelRepository.saveDocument(document);
-				modelRepository.saveObject(object);
 
 				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
 
