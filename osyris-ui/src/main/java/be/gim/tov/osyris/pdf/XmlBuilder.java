@@ -312,6 +312,8 @@ public class XmlBuilder {
 			bord.appendChild(mapTopo);
 		}
 
+		viewer.setBaseLayerId("tms");
+
 		return doc;
 	}
 
@@ -902,7 +904,7 @@ public class XmlBuilder {
 
 		// Terugzetten naar tms baseLayer
 		viewer.unselectFeatures(layer, ids);
-		viewer.setBaseLayerId("tms");
+		// viewer.setBaseLayerId("tms");
 
 		return storeImage(mapImage);
 	}

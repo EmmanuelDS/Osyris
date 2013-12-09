@@ -1602,6 +1602,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			layer.setFilter(null);
 			layer.setHidden(true);
 			layer.setSelection(Collections.EMPTY_LIST);
+			layer.set("selectable", false);
 
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
@@ -1751,10 +1752,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Filteren Routeborden op BordNaam
 			if (bordLayer != null) {
-				bordLayer.set("selectable", true);
-				bordLayer.setHidden(false);
 				bordLayer
 						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+				bordLayer.set("selectable", true);
+				bordLayer.setHidden(false);
 			}
 
 		}
@@ -1773,10 +1774,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// Filteren NetwerkBorden op segmenten van de Lus
 			if (bordLayer != null) {
 
-				bordLayer.setHidden(false);
-				bordLayer.set("selectable", true);
 				bordLayer.setFilter(FilterUtils.in("segmenten",
 						((NetwerkLus) traject).getSegmenten()));
+
+				bordLayer.setHidden(false);
+				bordLayer.set("selectable", true);
 			}
 
 			if (knooppuntLayer != null) {

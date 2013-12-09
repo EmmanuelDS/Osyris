@@ -118,6 +118,15 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 		return "Melding";
 	}
 
+	public String getProbleemType(Probleem probleem) {
+
+		if (probleem instanceof BordProbleem) {
+			return "Bordprobleem";
+		} else {
+			return "Ander probleem";
+		}
+	}
+
 	@Override
 	protected Query transformQuery(Query query) {
 
@@ -284,6 +293,23 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 			messages.error("Fout bij het verwijderen van melding: "
 					+ e.getMessage());
 			LOG.error("Can not delete model object.", e);
+		}
+	}
+
+	/**
+	 * Check of een probleem van het type BordProbleem is.
+	 * 
+	 * @param probleem
+	 * @return
+	 */
+	public boolean isBordProbleem(Probleem probleem) {
+
+		if (probleem instanceof BordProbleem) {
+			return true;
+		}
+
+		else {
+			return false;
 		}
 	}
 }

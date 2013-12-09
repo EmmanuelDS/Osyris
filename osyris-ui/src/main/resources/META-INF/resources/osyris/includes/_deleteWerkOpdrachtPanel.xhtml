@@ -1,0 +1,103 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	<h3><h:outputText value="#{messages['form.general.delete.confirm.label']}" /></h3>
+	<br/>
+	
+	<d:object id="object"
+		mode="VIEW" 
+		modelClass="#{form.modelClass}"
+		value="#{form.object}">
+	</d:object>
+	<br/>
+	<r:panel id="materialenPanel">
+		<p:dataTable id="stockMaterialen"
+			value="#{form.object.materialen}"
+			mode="RESULT"
+			var="gebruiktMateriaal"
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+			<j:bindAttribute var="gebruiktMateriaal"
+						name="rowData" />
+			<f:facet name="header">
+				<h:outputText value="Overzicht gebruikte materialen" />
+			</f:facet>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Categorie" />
+				</f:facet>
+				<d:propertyValue id="categorieColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
+					value="#{gebruiktMateriaal.stockMateriaal.categorie}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Subcategorie" />
+				</f:facet>
+				<d:propertyValue id="subCategorieColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
+					value="#{gebruiktMateriaal.stockMateriaal.subCategorie}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Type" />
+				</f:facet>
+				<d:propertyValue id="typeColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
+					value="#{gebruiktMateriaal.stockMateriaal.type}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Naam" />
+				</f:facet>
+				<div style="white-space:pre-line;">
+				<d:propertyValue id="naamColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
+					value="#{gebruiktMateriaal.stockMateriaal.naam}"
+					mode="VIEW" />
+				</div>
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Nummer" />
+				</f:facet>
+				<d:propertyValue id="nummerColumn"
+					modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
+					value="#{gebruiktMateriaal.stockMateriaal.nummer}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Aantal" />
+				</f:facet>
+				<d:propertyValue id="aantalColumn"
+					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"
+					value="#{gebruiktMateriaal.aantal}"
+					mode="VIEW" />
+			</p:column>
+	   	</p:dataTable>
+	</r:panel>
+	<d:buttons>
+		<j:commandButton value="#{messages['form.general.delete.button']}"
+			image="#{resource['core/images/actions/12x12/delete.png']}"
+			type="button" 
+			action="#{form.delete()}"
+			execute="@this"
+			render="#{render}"
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('deletePopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			action="#{form.cancel()}"
+			execute="@this"
+			oncomplete="conscientia.widget(#{r:element('deletePopup')}).hide();" />
+	</d:buttons>
+</u:composition>

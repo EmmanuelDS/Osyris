@@ -47,14 +47,20 @@
 				</d:fields>
 			</r:panel>
 			<br/>
-			<r:panel id ="probleemPanel" header="Probleem">
+			<r:panel id ="probleemPanel" header="#{form.getProbleemType(form.object.probleem)}">
 				<d:fields>
 					<d:propertyField id="datumVaststelling"
 						modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}"
-						value="#{form.object.datumVaststelling}" mode="VIEW" />
+						value="#{form.object.datumVaststelling}" mode="VIEW" />						
+					<d:propertyField id="type" rendered="#{form.isBordProbleem(form.object.probleem)}"
+						modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
+						value="#{form.object.probleem.type}" mode="VIEW" />						
+					<d:propertyField id="categorie" rendered="#{!form.isBordProbleem(form.object.probleem)}"
+						modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
+						value="#{form.object.probleem.categorie}" mode="VIEW" />						
 					<d:propertyField id="commentaar"
 						modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-						value="#{form.object.probleem.commentaar}" mode="VIEW" />
+						value="#{form.object.probleem.commentaar}" mode="VIEW" />						
 					<d:propertyField id="validatieStatus"
 						modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
 						value="#{form.object.probleem.status}" mode="EDIT" />

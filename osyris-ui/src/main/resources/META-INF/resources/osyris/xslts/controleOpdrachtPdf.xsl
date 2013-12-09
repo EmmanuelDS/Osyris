@@ -190,7 +190,7 @@
 			<xsl:variable name="overviewMap_url" select="/verslag/overviewMap" />
 			<fo:external-graphic src="'{$overviewMap_url}'"
 				content-height="180mm"
-				scaling="uniform"/>
+				content-width="270mm"/>
 	     </fo:block>
 	     		
      </fo:table-cell>

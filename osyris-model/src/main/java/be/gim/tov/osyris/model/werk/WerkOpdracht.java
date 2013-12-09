@@ -149,7 +149,8 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	@NotSearchable
 	@Edit(type = "table")
-	@View(type = "table")
+	// @View(type = "table")
+	@NotViewable
 	private List<GebruiktMateriaal> materialen;
 
 	@NotViewable

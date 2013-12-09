@@ -271,76 +271,88 @@ public class MeldingFormBase implements Serializable {
 	@SuppressWarnings("unchecked")
 	public void searchTraject() throws IOException {
 
-		MapViewer viewer = getViewer();
-		MapContext context = viewer.getConfiguration().getContext();
-		envelope = getEnvelopeProvincie();
-
-		getMelding().setProbleem(null);
-		probleemType = "";
-
-		// Itereren over de lagen en de correcte operaties uitvoeren
-		for (FeatureMapLayer layer : context.getFeatureLayers()) {
-			layer.setFilter(null);
-			layer.setHidden(true);
-			layer.set("selectable", false);
-			// Provincie altijd zichtbaar
-			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
-				layer.setHidden(false);
-			}
-
-			else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-				// Netwerk
-				if (trajectType.contains("Segment")) {
-					searchNetwerkLayer(layer);
-				}
-				// Route
-				else {
-					searchRouteLayer(layer);
-					envelope = viewer.getContentExtent(layer);
-				}
-			}
-			// RouteBord
-			else if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
-				searchRouteBordLayer(layer);
-			}
-			// NetwerkBord
-			// Filtering op de borden
-			else if (layer.getLayerId().equalsIgnoreCase(
-					trajectType.replace("Segment", "") + "Bord")) {
-				layer.setHidden(false);
-				searchNetwerkBordLayer(layer);
-			}
-			// WandelKnooppunt
-			else if (layer.getLayerId().contains("Knooppunt")
-					&& trajectType.contains("WandelNetwerk")) {
-				FeatureMapLayer mapLayer = (FeatureMapLayer) context
-						.getLayer("wandelNetwerkKnooppunt");
-				searchKnooppuntLayer(mapLayer);
-			}
-
-			// FietsKnooppunt
-			else if (layer.getLayerId().contains("Knooppunt")
-					&& trajectType.contains("FietsNetwerk")) {
-				FeatureMapLayer mapLayer = (FeatureMapLayer) context
-						.getLayer("fietsNetwerkKnooppunt");
-				searchKnooppuntLayer(mapLayer);
-			}
-
-			// Intekenen Punt
-			else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
-				layer.setHidden(true);
-				((GeometryListFeatureMapLayer) layer)
-						.setGeometries(Collections.EMPTY_LIST);
-			} else {
-				layer.setHidden(true);
-				layer.setFilter(null);
-				layer.set("selectable", false);
-				layer.setSelection(Collections.EMPTY_LIST);
-			}
+		if (trajectType == null) {
+			messages.warn("Gelieve eerst een route- of netwerktype te selecteren alvorens te zoeken.");
 		}
 
-		viewer.updateCurrentExtent(envelope);
-		viewer.updateContext(null);
+		else if (trajectType.contains("Route") && trajectNaam == null) {
+			messages.warn("Gelieve bij het zoeken naar routes een trajectnaam te selecteren.");
+		}
+
+		else {
+			MapViewer viewer = getViewer();
+			MapContext context = viewer.getConfiguration().getContext();
+			envelope = getEnvelopeProvincie();
+
+			getMelding().setProbleem(null);
+			probleemType = "";
+
+			// Itereren over de lagen en de correcte operaties uitvoeren
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.set("selectable", false);
+				// Provincie altijd zichtbaar
+				if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+					layer.setHidden(false);
+				}
+
+				else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+					// Netwerk
+					if (trajectType.contains("Segment")) {
+						searchNetwerkLayer(layer);
+					}
+					// Route
+					else {
+						searchRouteLayer(layer);
+						envelope = viewer.getContentExtent(layer);
+					}
+				}
+				// RouteBord
+				else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType + "Bord")) {
+					searchRouteBordLayer(layer);
+				}
+				// NetwerkBord
+				// Filtering op de borden
+				else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType.replace("Segment", "") + "Bord")) {
+					layer.setHidden(false);
+					searchNetwerkBordLayer(layer);
+				}
+				// WandelKnooppunt
+				else if (layer.getLayerId().contains("Knooppunt")
+						&& trajectType.contains("WandelNetwerk")) {
+					FeatureMapLayer mapLayer = (FeatureMapLayer) context
+							.getLayer("wandelNetwerkKnooppunt");
+					searchKnooppuntLayer(mapLayer);
+				}
+
+				// FietsKnooppunt
+				else if (layer.getLayerId().contains("Knooppunt")
+						&& trajectType.contains("FietsNetwerk")) {
+					FeatureMapLayer mapLayer = (FeatureMapLayer) context
+							.getLayer("fietsNetwerkKnooppunt");
+					searchKnooppuntLayer(mapLayer);
+				}
+
+				// Intekenen Punt
+				else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
+					layer.setHidden(true);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(Collections.EMPTY_LIST);
+				} else {
+					layer.setHidden(true);
+					layer.setFilter(null);
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+
+			viewer.updateCurrentExtent(envelope);
+			viewer.updateContext(null);
+		}
 	}
 
 	/**
@@ -801,7 +813,9 @@ public class MeldingFormBase implements Serializable {
 
 		if (regio != null && trajectNaam == null) {
 			layer.setFilter(FilterUtils.equal("regio", regio));
-		} else if (trajectNaam != null) {
+		}
+
+		else if (trajectNaam != null) {
 			layer.setFilter(FilterUtils.like("naam", trajectNaam));
 		}
 
