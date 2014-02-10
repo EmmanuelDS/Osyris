@@ -12,6 +12,7 @@ import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
@@ -37,6 +38,7 @@ public class PeterMeterVoorkeur extends AbstractModelObject implements
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
+	@Target("_blank")
 	private ResourceIdentifier regio;
 
 	@Type(value = ModelPropertyType.ENUM)

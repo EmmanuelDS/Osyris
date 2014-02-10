@@ -17,6 +17,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
@@ -59,6 +60,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Uitvoerder')}")
+	@Target("_blank")
 	private ResourceIdentifier uitvoerder;
 
 	@Edit(type = "table")
@@ -68,6 +70,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	@Target("_blank")
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
@@ -145,6 +148,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotEditable
 	@NotViewable
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private ResourceIdentifier traject;
 
 	@NotSearchable
@@ -161,6 +165,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotViewable
 	@NotSearchable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier regioId;
 
 	@NotViewable

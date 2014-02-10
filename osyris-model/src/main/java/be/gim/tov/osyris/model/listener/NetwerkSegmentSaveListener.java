@@ -16,10 +16,13 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.store.ModelStore;
 import org.conscientia.core.search.QueryBuilder;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
+import be.gim.tov.osyris.model.traject.Regio;
 
 /**
  * 
@@ -50,6 +53,15 @@ public class NetwerkSegmentSaveListener {
 					.get(0);
 			Long newId = maxId + 1;
 			segment.setId(newId);
+		}
+
+		// Automatisch setten Regio
+		if (segment.getRegio() == null) {
+
+			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
+					.getRegioForSegment(segment);
+
+			segment.setRegio(modelRepository.getResourceKey(regio));
 		}
 
 		// Automatisch setten VanKpNr

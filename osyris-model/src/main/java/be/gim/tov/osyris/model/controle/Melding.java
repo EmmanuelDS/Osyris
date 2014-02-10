@@ -17,6 +17,7 @@ import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Search;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
@@ -48,6 +49,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotEditable
 	@EditableInStatus("")
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private ResourceIdentifier traject;
 
 	@NotEditable
@@ -77,6 +79,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	@Target("_blank")
 	private ResourceIdentifier medewerker;
 
 	@NotSearchable
@@ -112,6 +115,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@NotViewable
 	@NotSearchable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier regioId;
 
 	@NotViewable

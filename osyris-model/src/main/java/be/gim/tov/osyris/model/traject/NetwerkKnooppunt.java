@@ -4,14 +4,18 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.LabelProperty;
+import org.conscientia.api.model.annotation.Maximum;
+import org.conscientia.api.model.annotation.Minimum;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -31,14 +35,20 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 
 	// VARIABLES
 	@LabelProperty
+	@Required
+	@Minimum(1)
+	@Maximum(99)
 	private Integer nummer;
 
+	@Edit(type = "suggestions")
+	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getRegiosOostVlaanderen()}")
+	@Target("_blank")
 	private ResourceIdentifier regio;
 
 	@NotEditable
@@ -59,7 +69,6 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	// GETTERS AND SETTERS
 	@Override
 	@NotEditable
-	@NotSearchable
 	public Long getId() {
 		return (Long) super.getId();
 	}

@@ -18,6 +18,7 @@ import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SubClassPersistence;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
@@ -94,6 +95,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotEditable
 	@EditableInGroup({ "Medewerker", "Routedokter" })
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private ResourceIdentifier traject;
 
 	@EditableInGroup({ "Medewerker", "Routedokter" })
@@ -101,6 +103,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	@Target("_blank")
 	private ResourceIdentifier medewerker;
 
 	@EditableInGroup({ "Medewerker", "Routedokter" })
@@ -108,6 +111,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(false)}")
+	@Target("_blank")
 	private ResourceIdentifier peterMeter;
 
 	@NotViewable
@@ -123,6 +127,7 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier regioId;
 
 	@NotViewable

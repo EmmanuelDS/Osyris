@@ -14,6 +14,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -49,14 +50,17 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@NotSearchable
 	@NotViewable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier _for;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private PeterMeterStatus status;
 
+	@NotSearchable
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private Date actiefSinds;
 
+	@NotSearchable
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private Date actiefTot;
 

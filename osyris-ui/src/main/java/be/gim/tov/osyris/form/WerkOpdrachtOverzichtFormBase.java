@@ -580,6 +580,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 				// Indien ja
 				// Set probleem null en delete WerkOpdracht
 				object.setProbleem(null);
+				object.setHandelingen(null);
+				object.setMaterialen(null);
 				modelRepository.saveObject(object);
 				modelRepository.deleteObject(object);
 			}

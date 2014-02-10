@@ -4,7 +4,6 @@ import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
-import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.Search;
 
 /**
@@ -26,7 +25,6 @@ public abstract class Route extends Traject {
 	// GETTERS AND SETTERS
 	@Override
 	@NotEditable
-	@NotSearchable
 	public Long getId() {
 		return (Long) super.getId();
 	}

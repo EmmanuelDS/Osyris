@@ -14,13 +14,17 @@ import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.FietsNetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
+import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.traject.WandelNetwerkBord;
 
 import com.ocpsoft.pretty.faces.util.StringUtils;
 import com.vividsolutions.jts.geom.Point;
@@ -54,6 +58,21 @@ public class BordSaveListener {
 			Long newId = maxId + 1;
 			bord.setId(newId);
 			bord.setLabelId(newId.toString());
+		}
+
+		// Automatically set X Y coordinates indien niet aanwezig
+		if (bord.getGeom() != null && bord.getGeom() instanceof Point) {
+
+			Point p = (Point) bord.getGeom();
+			bord.setX(p.getX());
+			bord.setY(p.getY());
+		}
+
+		if (bord.getRegio() == null) {
+
+			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
+					.getRegioForBord(bord);
+			bord.setRegio(modelRepository.getResourceKey(regio));
 		}
 
 		// Set route voor RouteBord indien niet aanwezig
@@ -122,28 +141,37 @@ public class BordSaveListener {
 				}
 			}
 
-			if (netwerkBord.getBordBase() == null) {
+			// Set BordBase = naam Regio van bord
+			Regio regio = (Regio) Beans.getReference(ModelRepository.class)
+					.loadObject(bord.getRegio());
+			((NetwerkBord) bord).setBordBase(regio.getNaam());
 
-				Regio regio = Beans.getReference(OsyrisModelFunctions.class)
-						.getRegioForBord(bord);
-				((NetwerkBord) bord).setBordBase(regio.getNaam());
+			// FNW Bord regioNaam is naam
+			if (bord instanceof FietsNetwerkBord) {
+				((FietsNetwerkBord) bord).setNaam(regio.getNaam());
 			}
 
-		}
+			// WNW Bord naam van gekoppeld segment is naam
+			if (bord instanceof WandelNetwerkBord) {
 
-		// Automatically set X Y coordinates indien niet aanwezig
-		if (bord.getGeom() != null && bord.getGeom() instanceof Point) {
+				WandelNetwerkBord wnwBord = (WandelNetwerkBord) bord;
 
-			Point p = (Point) bord.getGeom();
-			bord.setX(p.getX());
-			bord.setY(p.getY());
-		}
+				if (wnwBord.getSegmenten().size() > 0) {
+					ResourceIdentifier segmentId = wnwBord.getSegmenten()
+							.get(0);
 
-		if (bord.getRegio() == null) {
+					if (segmentId != null) {
+						NetwerkSegment segment = (NetwerkSegment) modelRepository
+								.loadObject(segmentId);
+						((WandelNetwerkBord) bord).setNaam(segment.getNaam());
+					}
+				}
 
-			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
-					.getRegioForBord(bord);
-			bord.setRegio(modelRepository.getResourceKey(regio));
+				// Indien geen segment gekoppeld gebruik Regionaam
+				else {
+					wnwBord.setNaam(regio.getNaam());
+				}
+			}
 		}
 	}
 }

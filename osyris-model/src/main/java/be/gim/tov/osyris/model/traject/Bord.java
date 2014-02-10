@@ -43,23 +43,19 @@ public abstract class Bord extends AbstractModelObject implements
 
 	// VARIABLES
 	@NotEditable
-	@NotSearchable
 	private Long id;
 
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
+	@Target("_blank")
 	private ResourceIdentifier regio;
 
-	// @Type(value = ModelPropertyType.ENUM)
-	// @ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
-	// @Parents({ "className", "regio" })
 	@Edit(type = "suggestions")
 	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
-	// @Edit(type = "suggestions")
 	@Edit(type = "menu")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.gemeentes}")

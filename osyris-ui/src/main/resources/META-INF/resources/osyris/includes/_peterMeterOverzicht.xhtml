@@ -28,13 +28,29 @@
 								path="#UserProfile/firstName" mode="SEARCH" />
 							<d:propertyField id="lastName"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
-								path="#UserProfile/lastName" mode="SEARCH" />
-						</d:fields>
+								path="#UserProfile/lastName" mode="SEARCH" />													
+                        		
+							<d:field for="datumSinds" label="Sinds">
+								<p:calendar id="datumSinds"
+									value="#{peterMeterOverzichtFormBase.datumSinds}" navigator="true" display="inline" effect="slide"
+									inputStyle="width:60px"
+		    						pattern="yyyy-MM-dd">
+								</p:calendar>
+							</d:field>
+													 					
+							<d:field for="datumTot" label="Tot" path="#PeterMeterProfiel/actiefTot">
+								<p:calendar id="datumTot"
+									value="#{peterMeterOverzichtFormBase.datumTot}" navigator="true" display="inline" effect="slide"
+									inputStyle="width:60px"
+		    						pattern="yyyy-MM-dd">
+								</p:calendar>
+							</d:field>					
+						</d:fields>			
 						<d:aspect id="peterMeterProfiel"
 							modelClass="#{d:modelClass('PeterMeterProfiel')}"
 							path="#PeterMeterProfiel"
 							mode="SEARCH" />
-					</q:query>
+					</q:query>																										
 					<d:buttons>
 						<j:commandButton rendered="true"
 							value="#{messages['page.general.button.search']}"
