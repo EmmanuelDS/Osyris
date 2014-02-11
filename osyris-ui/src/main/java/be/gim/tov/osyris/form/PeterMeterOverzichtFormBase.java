@@ -42,6 +42,7 @@ import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
+import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
 /**
  * 
@@ -104,27 +105,13 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 		query = new DefaultQuery(query);
 
-		try {
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-
-			List<String> nameParts = new ArrayList<String>();
-
-			for (ResourceName name : group.getMembers()) {
-				nameParts.add(name.getNamePart());
-			}
-
-			query.addFilter(FilterUtils.in("username", nameParts));
-		} catch (IOException e) {
-			LOG.error("Can not load group PetersMeters.", e);
-		}
+		query.addFilter(FilterUtils.or(FilterUtils.equal(
+				"#PeterMeterProfiel/status", PeterMeterStatus.ACTIEF),
+				FilterUtils.equal("#PeterMeterProfiel/status",
+						PeterMeterStatus.KANDIDAAT), FilterUtils.equal(
+						"#PeterMeterProfiel/status", PeterMeterStatus.PASSIEF)));
 
 		return query;
-	}
-
-	@Override
-	public boolean isIndex() {
-		return false;
 	}
 
 	/**

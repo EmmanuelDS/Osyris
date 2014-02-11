@@ -14,6 +14,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -51,6 +52,7 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@NotEditable
 	private ResourceIdentifier _for;
 
+	@Required
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private PeterMeterStatus status;
 
