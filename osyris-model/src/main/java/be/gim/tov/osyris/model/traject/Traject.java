@@ -99,7 +99,6 @@ public abstract class Traject extends AbstractModelObject implements
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
-	@LabelProperty
 	public String getNaam() {
 		return naam;
 	}

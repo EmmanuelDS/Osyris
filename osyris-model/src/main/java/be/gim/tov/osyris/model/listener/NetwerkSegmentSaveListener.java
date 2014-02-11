@@ -13,7 +13,6 @@ import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.AfterModelEvent;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
-import org.conscientia.api.store.ModelStore;
 import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
@@ -42,18 +41,6 @@ public class NetwerkSegmentSaveListener {
 			InstantiationException, IllegalAccessException {
 
 		NetwerkSegment segment = (NetwerkSegment) event.getModelObject();
-
-		// Indien nieuw segment
-		if (segment.getId() == null) {
-			// Set correcte id range voor elk subtype
-			ModelStore modelStore = modelRepository
-					.getModelStore("OsyrisDataStore");
-			Long maxId = (Long) modelStore.searchObjects(
-					"SELECT MAX(id) FROM " + segment.getModelClass().getName())
-					.get(0);
-			Long newId = maxId + 1;
-			segment.setId(newId);
-		}
 
 		// Automatisch setten Regio
 		if (segment.getRegio() == null) {

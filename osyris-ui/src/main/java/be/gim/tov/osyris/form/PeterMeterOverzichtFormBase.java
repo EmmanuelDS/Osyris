@@ -249,11 +249,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				addUserToPeterMeterGroup(resourceName);
 
 				// Send mail
-				/*
-				 * sendCredentailsMail( object.getUsername(),
-				 * object.getAspect("UserProfile").get("email").toString(),
-				 * password);
-				 */
+				sendCredentailsMail(
+						object.getUsername(),
+						object.getAspect("UserProfile").get("email").toString(),
+						password);
 
 				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
 

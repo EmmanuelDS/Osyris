@@ -42,9 +42,6 @@ public abstract class Bord extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@NotEditable
-	private Long id;
-
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
@@ -62,11 +59,6 @@ public abstract class Bord extends AbstractModelObject implements
 	private String gemeente;
 
 	private String volg;
-
-	@NotSearchable
-	@NotEditable
-	@NotViewable
-	private Long sequentie;
 
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
@@ -130,6 +122,7 @@ public abstract class Bord extends AbstractModelObject implements
 
 	// GETTERS AND SETTERS
 	@Override
+	@NotEditable
 	public Long getId() {
 		return (Long) super.getId();
 	}
@@ -164,14 +157,6 @@ public abstract class Bord extends AbstractModelObject implements
 
 	public void setVolg(String volg) {
 		this.volg = volg;
-	}
-
-	public Long getSequentie() {
-		return sequentie;
-	}
-
-	public void setSequentie(Long sequentie) {
-		this.sequentie = sequentie;
 	}
 
 	public String getActief() {

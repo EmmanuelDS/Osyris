@@ -4,11 +4,12 @@ import java.io.IOException;
 
 import javax.inject.Inject;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.annotation.Listener;
 import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
-import org.conscientia.api.store.ModelStore;
 import org.conscientia.core.search.DefaultQuery;
 
 import be.gim.commons.filter.FilterUtils;
@@ -22,8 +23,11 @@ import com.vividsolutions.jts.geom.Point;
  * @author kristof
  * 
  */
-@Listener(rules = { @Rule(type = "save", _for = "NetwerkKnooppunt") })
-public class NetwerkKnooppuntSaveListener {
+@Listener(rules = { @Rule(type = "create", _for = "NetwerkKnooppunt") })
+public class NetwerkKnooppuntCreateListener {
+
+	private static final Log log = LogFactory
+			.getLog(NetwerkKnooppuntCreateListener.class);
 
 	@Inject
 	private ModelRepository modelRepository;
@@ -32,18 +36,6 @@ public class NetwerkKnooppuntSaveListener {
 			InstantiationException, IllegalAccessException {
 
 		NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) event.getModelObject();
-
-		// Indien nieuw NetwerkKnooppunt
-		if (knooppunt.getId() == null) {
-			// Set correcte id range voor elk subtype
-			ModelStore modelStore = modelRepository
-					.getModelStore("OsyrisDataStore");
-			Long maxId = (Long) modelStore.searchObjects(
-					"SELECT MAX(id) FROM "
-							+ knooppunt.getModelClass().getName()).get(0);
-			Long newId = maxId + 1;
-			knooppunt.setId(newId);
-		}
 
 		// Indien regio bij het aanmaken leeg is automatisch regio zoeken
 		if (knooppunt.getRegio() == null) {

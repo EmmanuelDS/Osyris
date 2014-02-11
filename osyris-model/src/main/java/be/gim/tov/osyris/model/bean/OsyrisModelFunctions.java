@@ -45,10 +45,12 @@ import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Gemeente;
+import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RichtingEnum;
+import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
@@ -1439,6 +1441,34 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Bepalen van de Gemeente waarin een bord zich bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public String getGemeenteForBord(Bord bord) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Gemeente");
+			query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
+
+			List<Gemeente> gemeentes = (List<Gemeente>) modelRepository
+					.searchObjects(query, true, true);
+			Gemeente gemeente = (Gemeente) modelRepository
+					.getUniqueResult(gemeentes);
+
+			return gemeente.getNaam();
+
+		} catch (IOException e) {
+			LOG.error("Can not search Gemeente", e);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Bepalen van de Regio waarin een bord zich bevindt.
 	 * 
 	 * @param geometry
@@ -1463,6 +1493,88 @@ public class OsyrisModelFunctions {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Bepalen van de Route waartoe het RouteBord zich het dichtst bij bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public Traject getRouteForRouteBord(RouteBord bord) throws IOException {
+
+		Route route = null;
+
+		DefaultQuery query = new DefaultQuery();
+		query.setModelClassName(bord.getModelClass().getName()
+				.replace("Bord", ""));
+		query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+
+		List<Route> routes = (List<Route>) modelRepository.searchObjects(query,
+				false, false);
+
+		Map<Route, Double> distances = new HashMap<Route, Double>();
+
+		for (Route r : routes) {
+
+			double distance = bord.getGeom().distance(r.getGeom());
+			distances.put(r, distance);
+		}
+
+		double minValueInMap = (Collections.min(distances.values()));
+		for (Entry<Route, Double> entry : distances.entrySet()) {
+			if (entry.getValue() == minValueInMap) {
+
+				route = entry.getKey();
+			}
+		}
+
+		return route;
+	}
+
+	/**
+	 * Bepalen van de Segmenten waartoe het NetwerkBord zich het dichtsbij
+	 * bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ResourceIdentifier> getSegmentenForNetwerkBord(NetwerkBord bord)
+			throws IOException {
+
+		List<ResourceIdentifier> segmentIds = new ArrayList<ResourceIdentifier>();
+
+		DefaultQuery query = new DefaultQuery();
+		query.setModelClassName(bord.getModelClass().getName()
+				.replace("Bord", "Segment"));
+		query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+
+		List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
+				.searchObjects(query, false, false);
+
+		Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
+
+		for (NetwerkSegment s : segmenten) {
+
+			double distance = bord.getGeom().distance(s.getGeom());
+			distances.put(modelRepository.getResourceIdentifier(s), distance);
+		}
+
+		double minValueInMap = (Collections.min(distances.values()));
+
+		for (Entry<ResourceIdentifier, Double> entry : distances.entrySet()) {
+			if (entry.getValue() == minValueInMap) {
+
+				ResourceIdentifier minSegmentId = entry.getKey();
+				segmentIds.add(minSegmentId);
+			}
+		}
+
+		return segmentIds;
 	}
 
 	/**

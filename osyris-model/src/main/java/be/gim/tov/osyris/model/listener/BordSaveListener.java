@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -10,23 +9,12 @@ import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.store.ModelStore;
-import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
-import be.gim.commons.filter.FilterUtils;
-import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.Bord;
-import be.gim.tov.osyris.model.traject.FietsNetwerkBord;
-import be.gim.tov.osyris.model.traject.NetwerkBord;
-import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
-import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
-import be.gim.tov.osyris.model.traject.RouteBord;
-import be.gim.tov.osyris.model.traject.Traject;
-import be.gim.tov.osyris.model.traject.WandelNetwerkBord;
 
-import com.ocpsoft.pretty.faces.util.StringUtils;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -40,7 +28,6 @@ public class BordSaveListener {
 	@Inject
 	private ModelRepository modelRepository;
 
-	@SuppressWarnings("unchecked")
 	public void processEvent(ModelEvent event) throws IOException,
 			InstantiationException, IllegalAccessException {
 
@@ -68,6 +55,7 @@ public class BordSaveListener {
 			bord.setY(p.getY());
 		}
 
+		// Automatically set Regio
 		if (bord.getRegio() == null) {
 
 			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
@@ -75,103 +63,12 @@ public class BordSaveListener {
 			bord.setRegio(modelRepository.getResourceKey(regio));
 		}
 
-		// Set route voor RouteBord indien niet aanwezig
-		if (bord instanceof RouteBord) {
+		// Automatically set Gemeente
+		if (bord.getGemeente() == null) {
 
-			if (((RouteBord) bord).getRoute() == null && bord.getNaam() != null) {
-
-				QueryBuilder builder = new QueryBuilder("Traject");
-				builder.addFilter(FilterUtils.equal("naam", bord.getNaam()));
-				builder.maxResults(1);
-				List<Traject> result = (List<Traject>) modelRepository
-						.searchObjects(builder.build(), false, false);
-				Traject route = result.get(0);
-				((RouteBord) bord).setRoute(modelRepository
-						.getResourceIdentifier(route));
-			}
-		}
-
-		// Indien Netwerkbord set knooppuntnummers aan de hand van de ingevulde
-		// knooppuntID
-		if (bord instanceof NetwerkBord) {
-
-			NetwerkBord netwerkBord = (NetwerkBord) bord;
-			if (netwerkBord.getKpid0() != null) {
-
-				if (StringUtils.isNotBlank(netwerkBord.getKpid0().toString())) {
-					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
-							.loadObject(netwerkBord.getKpid0());
-					netwerkBord.setKpnr0(knooppunt.getNummer());
-				} else {
-					netwerkBord.setKpnr0(null);
-					netwerkBord.setKpid0(null);
-				}
-			}
-			if (netwerkBord.getKpid1() != null) {
-
-				if (StringUtils.isNotBlank(netwerkBord.getKpid1().toString())) {
-					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
-							.loadObject(netwerkBord.getKpid1());
-					netwerkBord.setKpnr1(knooppunt.getNummer());
-				} else {
-					netwerkBord.setKpnr1(null);
-					netwerkBord.setKpid1(null);
-				}
-			}
-			if (netwerkBord.getKpid2() != null) {
-
-				if (StringUtils.isNotBlank(netwerkBord.getKpid2().toString())) {
-					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
-							.loadObject(netwerkBord.getKpid2());
-					netwerkBord.setKpnr2(knooppunt.getNummer());
-				} else {
-					netwerkBord.setKpnr2(null);
-					netwerkBord.setKpid2(null);
-				}
-			}
-			if (netwerkBord.getKpid3() != null) {
-
-				if (StringUtils.isNotBlank(netwerkBord.getKpid3().toString())) {
-					NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
-							.loadObject(netwerkBord.getKpid3());
-					netwerkBord.setKpnr3(knooppunt.getNummer());
-				} else {
-					netwerkBord.setKpnr3(null);
-					netwerkBord.setKpid3(null);
-				}
-			}
-
-			// Set BordBase = naam Regio van bord
-			Regio regio = (Regio) Beans.getReference(ModelRepository.class)
-					.loadObject(bord.getRegio());
-			((NetwerkBord) bord).setBordBase(regio.getNaam());
-
-			// FNW Bord regioNaam is naam
-			if (bord instanceof FietsNetwerkBord) {
-				((FietsNetwerkBord) bord).setNaam(regio.getNaam());
-			}
-
-			// WNW Bord naam van gekoppeld segment is naam
-			if (bord instanceof WandelNetwerkBord) {
-
-				WandelNetwerkBord wnwBord = (WandelNetwerkBord) bord;
-
-				if (wnwBord.getSegmenten().size() > 0) {
-					ResourceIdentifier segmentId = wnwBord.getSegmenten()
-							.get(0);
-
-					if (segmentId != null) {
-						NetwerkSegment segment = (NetwerkSegment) modelRepository
-								.loadObject(segmentId);
-						((WandelNetwerkBord) bord).setNaam(segment.getNaam());
-					}
-				}
-
-				// Indien geen segment gekoppeld gebruik Regionaam
-				else {
-					wnwBord.setNaam(regio.getNaam());
-				}
-			}
+			String gemeente = Beans.getReference(OsyrisModelFunctions.class)
+					.getGemeenteForBord(bord);
+			bord.setGemeente(gemeente);
 		}
 	}
 }
