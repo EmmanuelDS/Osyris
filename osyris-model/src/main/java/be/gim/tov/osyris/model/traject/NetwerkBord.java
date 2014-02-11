@@ -9,6 +9,8 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -28,6 +30,7 @@ public abstract class NetwerkBord extends Bord {
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordTypeCode')}")
 	private String bordType;
 
+	@NotEditable
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('BordBaseCode')}")
 	private String bordBase;
@@ -48,41 +51,50 @@ public abstract class NetwerkBord extends Bord {
 	private String kp3ImageCode;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr0;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr1;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr2;
 
 	@NotEditable
+	@NotViewable
 	private Integer kpnr3;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
 	@ModelClassName("NetwerkKnooppunt")
+	@Target("_blank")
 	private ResourceIdentifier kpid0;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
 	@ModelClassName("NetwerkKnooppunt")
+	@Target("_blank")
 	private ResourceIdentifier kpid1;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
 	@ModelClassName("NetwerkKnooppunt")
+	@Target("_blank")
 	private ResourceIdentifier kpid2;
 
 	@NotSearchable
 	@Edit(type = "suggestions")
 	@ModelClassName("NetwerkKnooppunt")
+	@Target("_blank")
 	private ResourceIdentifier kpid3;
 
 	private RichtingEnum richting;
 
 	@NotSearchable
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private List<ResourceIdentifier> segmenten;
 
 	// GETTERS AND SETTERS

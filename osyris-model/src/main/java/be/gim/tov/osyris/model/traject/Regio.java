@@ -10,6 +10,7 @@ import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.SrsName;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -41,6 +42,7 @@ public class Regio extends AbstractModelObject implements StorableObject {
 	private Geometry geom;
 
 	@ModelClassName("UitvoerderBedrijf")
+	@Target("_blank")
 	private ResourceIdentifier uitvoerder;
 
 	// GETTERS AND SETTERS

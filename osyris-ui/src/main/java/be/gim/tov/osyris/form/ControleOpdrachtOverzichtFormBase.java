@@ -16,6 +16,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.SortOrder;
 import javax.xml.transform.Result;
 import javax.xml.transform.Source;
 import javax.xml.transform.Transformer;
@@ -45,7 +46,6 @@ import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
-import org.conscientia.jsf.prime.PrimeUtils;
 import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
@@ -78,6 +78,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Provincie;
@@ -274,7 +275,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		if (trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
-		}else {
+		} else {
 			if (trajectType != null) {
 				query.addFilter(FilterUtils.equal("trajectType", trajectType));
 			}
@@ -320,10 +321,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
 		}
-		
-		query.setOrderBy(Collections
-				.singletonList((QueryOrderBy) new DefaultQueryOrderBy(
-						FilterUtils.property("datumLaatsteWijziging"))));
+
+		DefaultQueryOrderBy orderBy = new DefaultQueryOrderBy(
+				FilterUtils.property("datumLaatsteWijziging"));
+		orderBy.setSortOrder(SortOrder.DESCENDING);
+
+		query.setOrderBy(Collections.singletonList((QueryOrderBy) orderBy));
 
 		return query;
 	}
@@ -443,6 +446,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Indien netwerk CO lussen zichtbaar maken
 			if (controleOpdrachtType.equals("netwerk")) {
+
 				// Alle lussen tonen
 				FeatureMapLayer wandelLusLayer = (FeatureMapLayer) context
 						.getLayer("wandelNetwerkLus");
@@ -503,17 +507,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", trajectNaam));
 
-				// TODO: sorteren op sequentie, voorlopig nog met AlphaNumeric
-				// Sorting algoritme
-				// builder.orderBy(new
-				// DefaultQueryOrderBy(FilterUtils.property("sequentie")));
 				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(bewegwijzering, new AlphanumericSorting());
 			}
 
 			else if (trajectType.contains("Lus")) {
-				QueryBuilder builder = new QueryBuilder("NetwerkBord");
 
 				MapViewer viewer = getViewer();
 				MapContext context = viewer.getConfiguration().getContext();
@@ -526,11 +525,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 				}
 				NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 						.getTraject());
-				// builder.addFilter(FilterUtils.in("segmenten",
-				// lus.getSegmenten()));
-				// bewegwijzering = (List<Bord>) modelRepository.searchObjects(
-				// builder.build(), true, true);
-				// Collections.sort(bewegwijzering, new AlphanumericSorting());
 
 				bewegwijzering = Beans.getReference(OsyrisModelFunctions.class)
 						.getNetwerkBordVolgordeLus(lus);
@@ -563,9 +557,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				// Routes filteren op trajectNaam
 				QueryBuilder builder = new QueryBuilder("Bord");
 				builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
-				// in DB
-				// TODO: sorteren op sequentie, voorlopig via alphanumeric
-				// sorting
+
 				result = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(result, new AlphanumericSorting());
@@ -574,16 +566,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			else if (t instanceof NetwerkLus) {
 
 				NetwerkLus lus = ((NetwerkLus) t);
-
-				// OLD
-				// QueryBuilder builder = new QueryBuilder("NetwerkBord");
-				// builder.addFilter(FilterUtils.in("segmenten",
-				// lus.getSegmenten()));
-
-				// result = (List<Bord>) modelRepository.searchObjects(
-				// builder.build(), true, true);
-
-				// Collections.sort(result, new AlphanumericSorting());
 
 				result = Beans.getReference(OsyrisModelFunctions.class)
 						.getNetwerkBordVolgordeLus(lus);
@@ -617,6 +599,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			layer.setFilter(null);
 			layer.setHidden(true);
 			layer.set("selectable", false);
+
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 				layer.setHidden(false);
@@ -635,7 +618,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// NetwerkBord
 			else if (layer.getLayerId().equalsIgnoreCase(
 					trajectType.replace("Lus", "") + "Bord")) {
-				layer.setHidden(false);
 				searchNetwerkBordLayer(layer);
 			}
 			// Knooppunten
@@ -658,7 +640,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		layer.setFilter(null);
 		layer.setHidden(false);
+
 		try {
+
+			// Indien nieuwe ControleOpdracht koppelen van TrajectID aan
+			// ControleOpdracht
 			MapViewer viewer = getViewer();
 			MapContext context = viewer.getConfiguration().getContext();
 
@@ -671,7 +657,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
+
 			layer.setFilter(FilterUtils.in("segmenten", lus.getSegmenten()));
+
 		} catch (IOException e) {
 			LOG.error("Can not load NetwerkLus.", e);
 		}
@@ -704,25 +692,32 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
-			Set<String> knooppuntFilterIds = new HashSet<String>();
+			Set<Long> knooppuntFilterIds = new HashSet<Long>();
 
 			for (ResourceIdentifier segment : lus.getSegmenten()) {
 				NetwerkSegment seg = (NetwerkSegment) modelRepository
 						.loadObject(segment);
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getVanKnooppunt()).getId().toString());
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getNaarKnooppunt()).getId().toString());
+
+				NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getVanKnooppunt());
+
+				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getNaarKnooppunt());
+
+				knooppuntFilterIds.add(vanKp.getId());
+
+				knooppuntFilterIds.add(naarKp.getId());
 			}
 			layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
 	}
 
 	/**
-	 * Filters the layer based on trajectNaam and sets the TrajectID via
-	 * trajectNaam. Dit is enkel toepasbaar op routes.
+	 * Filteren van de laag ahv trajectNaam en koppelen van de trajectID aan de
+	 * controleOpdracht. Dit is enkel toepasbaar op routes en lussen
 	 * 
 	 * @param layer
 	 */
@@ -828,6 +823,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				messages.info("Controleopdracht succesvol heropend. De controleopdracht staat opnieuw in status 'Te controleren'.");
 				clear();
 				search();
+
 			} catch (IOException e) {
 				messages.error("Fout bij het heropenen van controleopdracht: "
 						+ e.getMessage());
@@ -1318,6 +1314,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			messages.info("Automatisch aanmaken van controleopdrachten succesvol uitgevoerd.");
 			messages.info("Er zijn " + counter
 					+ " nieuwe controleopdrachten aangemaakt.");
+
 		} catch (IOException e) {
 			messages.info("Automatisch aanmaken controleopdrachten niet gelukt: "
 					+ e.getMessage());
@@ -1384,21 +1381,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public Content printControleOpdracht() throws Exception {
 
-		// Map<String, Object> variables = new HashMap<String, Object>();
-		// variables.put("title", "Test");
-		// variables.put("abstract", "test");
-		// variables.put("map", true);
-		// variables.put("legend", false);
-		// variables.put("features", false);
-		// variables.put("orientation", "portrait");
-		// variables.put("size", 2);
-		// variables.put("fileName", getViewer().getContext().getTitle() +
-		// ".pdf");
-		// variables.put("landscape", "landscape".equals("portrait"));
-		// variables.put("portrait", "portrait".equals("portrait"));
-		// variables.put("pageSize", 2);
-		// variables.put("extent", getViewer().getContentExtent());
-
 		// Opbouwen XML
 		List<Bord> borden = createBewegwijzering(object.getTraject());
 		Traject traject = (Traject) modelRepository.loadObject(object
@@ -1440,7 +1422,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 		List<Bord> borden = createBewegwijzering(object.getTraject());
 
 		XmlBuilder xmlBuilder = new XmlBuilder();
-		Document doc = xmlBuilder.buildBordFiches(object, borden, getViewer());
+
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+		Document doc = xmlBuilder.buildBordFiches(traject, object, borden,
+				getViewer());
 
 		ByteArrayOutputStream out = new ByteArrayOutputStream();
 		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
@@ -1616,6 +1602,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			layer.setFilter(null);
 			layer.setHidden(true);
 			layer.setSelection(Collections.EMPTY_LIST);
+			layer.set("selectable", false);
 
 			// Provincie altijd zichtbaar
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
@@ -1765,10 +1752,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Filteren Routeborden op BordNaam
 			if (bordLayer != null) {
-				bordLayer.set("selectable", true);
-				bordLayer.setHidden(false);
 				bordLayer
 						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+				bordLayer.set("selectable", true);
+				bordLayer.setHidden(false);
 			}
 
 		}
@@ -1778,6 +1765,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
 							.lowerCamelCase(traject.getModelClass().getName()
 									.replace("Lus", "Bord"))));
+
 			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
 					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
 							.lowerCamelCase(traject.getModelClass().getName()
@@ -1785,11 +1773,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Filteren NetwerkBorden op segmenten van de Lus
 			if (bordLayer != null) {
-				bordLayer.setHidden(false);
-				bordLayer.set("selectable", true);
+
 				bordLayer.setFilter(FilterUtils.in("segmenten",
 						((NetwerkLus) traject).getSegmenten()));
+
+				bordLayer.setHidden(false);
+				bordLayer.set("selectable", true);
 			}
+
 			if (knooppuntLayer != null) {
 				searchKnooppuntLayer(knooppuntLayer);
 			}

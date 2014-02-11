@@ -42,35 +42,23 @@ public abstract class Bord extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
-	@NotEditable
-	@NotSearchable
-	private Long id;
-
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
+	@Target("_blank")
 	private ResourceIdentifier regio;
 
-	// @Type(value = ModelPropertyType.ENUM)
-	// @ValuesExpression("#{osyrisModelFunctions.getTrajectNamen(parents[0], parents[1])}")
-	// @Parents({ "className", "regio" })
 	@Edit(type = "suggestions")
 	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
-	// @Edit(type = "suggestions")
 	@Edit(type = "menu")
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.gemeentes}")
 	private String gemeente;
 
 	private String volg;
-
-	@NotSearchable
-	@NotEditable
-	@NotViewable
-	private Long sequentie;
 
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
@@ -134,6 +122,7 @@ public abstract class Bord extends AbstractModelObject implements
 
 	// GETTERS AND SETTERS
 	@Override
+	@NotEditable
 	public Long getId() {
 		return (Long) super.getId();
 	}
@@ -168,14 +157,6 @@ public abstract class Bord extends AbstractModelObject implements
 
 	public void setVolg(String volg) {
 		this.volg = volg;
-	}
-
-	public Long getSequentie() {
-		return sequentie;
-	}
-
-	public void setSequentie(Long sequentie) {
-		this.sequentie = sequentie;
 	}
 
 	public String getActief() {

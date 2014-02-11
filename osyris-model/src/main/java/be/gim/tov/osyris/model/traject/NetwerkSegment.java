@@ -8,7 +8,9 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Required;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -30,26 +32,29 @@ public abstract class NetwerkSegment extends Traject {
 	private String enkeleRichting;
 
 	@NotEditable
+	@NotViewable
 	private Integer vanKpNr;
 
 	@NotEditable
+	@NotViewable
 	private Integer naarKpNr;
 
 	@ModelClassName("NetwerkKnooppunt")
 	@Edit(type = "suggestions")
 	@NotSearchable
+	@Target("_blank")
 	private ResourceIdentifier vanKnooppunt;
 
 	@ModelClassName("NetwerkKnooppunt")
 	@Edit(type = "suggestions")
 	@NotSearchable
+	@Target("_blank")
 	private ResourceIdentifier naarKnooppunt;
 
 	// GETTERS AND SETTERS
 	@Override
 	@LabelProperty
 	@NotEditable
-	@NotSearchable
 	public Long getId() {
 		return (Long) super.getId();
 	}

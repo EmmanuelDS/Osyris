@@ -22,22 +22,14 @@
 		<br/>
 		<r:panel id="infoPanel" header="Info">
 		<d:fields>
-			<d:displayLabel
-					property="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" />
-			<d:field>
-			<d:propertyValue id="peterMeter" 
-					modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" 
-					value="#{form.object.peterMeter}" 
-					mode="VIEW" />
-			</d:field>
-			<d:displayLabel
-					property="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" />
-			<d:field>
-			<d:propertyValue id="datumGerapporteerd" 
-					modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" 
-					value="#{form.object.datumGerapporteerd}" 
-					mode="VIEW" />
-			</d:field>
+			<d:propertyField id="peterMeterField"
+		 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
+				value="#{form.object.peterMeter}"
+				mode="VIEW" />
+			<d:propertyField id="datumGerapporteerdField"
+		 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}"
+				value="#{form.object.datumGerapporteerd}"
+				mode="VIEW" />		
 		</d:fields>
 		</r:panel>
 

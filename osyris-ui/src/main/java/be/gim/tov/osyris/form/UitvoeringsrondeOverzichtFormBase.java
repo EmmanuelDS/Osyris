@@ -42,6 +42,7 @@ import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Route;
@@ -234,9 +235,11 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 			if (uitvoerder == null && medewerker == null && trajectType == null
 					&& regio == null && trajectNaam == null) {
+
 				// Deze velden moeten gezocht worden in WerkOpdrachten, indien
 				// allemaal leeg normale query uitvoeren
 				results = list;
+
 			} else {
 				// Filter Uitvoeringsronde ahv resultaten Werkopdracht query
 				query.addFilter(FilterUtils.id(getSubQueryIds(list)));
@@ -305,6 +308,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			messages.info("Uitvoeringsronde succesvol verwijderd. De bijbehorende werkopdrachten behoren niet meer toe aan een uitvoeringsronde.");
 			clear();
 			search();
+
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van de uitvoeringsronde: "
 					+ e.getMessage());
@@ -461,6 +465,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			for (ResourceIdentifier id : object.getOpdrachten()) {
 				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 						.loadObject(id);
+
 				if (!opdracht.getStatus().equals(
 						WerkopdrachtStatus.GERAPPORTEERD)) {
 					isGerapporteerd = false;
@@ -519,6 +524,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		try {
 			if (probleem instanceof BordProbleem) {
+
 				BordProbleem bordProbleem = (BordProbleem) probleem;
 				envelope = new Envelope(
 						((Bord) modelRepository.loadObject(bordProbleem
@@ -527,11 +533,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			}
 
 			else if (probleem instanceof AnderProbleem) {
+
 				AnderProbleem anderProbleem = (AnderProbleem) probleem;
 				GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) viewer
 						.getConfiguration().getContext()
 						.getLayer(GEOMETRY_LAYER_NAME);
 				layer.setHidden(false);
+
 				if (anderProbleem.getGeom() instanceof Point) {
 					envelope = new Envelope(anderProbleem.getGeom()
 							.getCoordinate());
@@ -560,21 +568,24 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			Traject traject = (Traject) modelRepository
 					.loadObject(selectedWerkOpdracht.getTraject());
 
-			Set<String> knooppuntFilterIds = new HashSet<String>();
+			Set<Long> knooppuntFilterIds = new HashSet<Long>();
 
 			if (traject instanceof NetwerkLus) {
 
-				NetwerkLus lus = ((NetwerkLus) traject);
+				NetwerkLus lus = (NetwerkLus) traject;
 
 				for (ResourceIdentifier segment : lus.getSegmenten()) {
 					NetwerkSegment seg = (NetwerkSegment) modelRepository
 							.loadObject(segment);
-					knooppuntFilterIds.add(modelRepository
-							.loadObject(seg.getVanKnooppunt()).getId()
-							.toString());
-					knooppuntFilterIds.add(modelRepository
-							.loadObject(seg.getNaarKnooppunt()).getId()
-							.toString());
+
+					NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+							.loadObject(seg.getVanKnooppunt());
+
+					NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+							.loadObject(seg.getNaarKnooppunt());
+
+					knooppuntFilterIds.add(vanKp.getId());
+					knooppuntFilterIds.add(naarKp.getId());
 				}
 				layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
 			}
@@ -583,10 +594,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 				NetwerkSegment seg = (NetwerkSegment) traject;
 
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getVanKnooppunt()).getId().toString());
-				knooppuntFilterIds.add(modelRepository
-						.loadObject(seg.getNaarKnooppunt()).getId().toString());
+				NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getVanKnooppunt());
+
+				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getNaarKnooppunt());
+
+				knooppuntFilterIds.add(vanKp.getId());
+				knooppuntFilterIds.add(naarKp.getId());
 
 				layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
 			}
@@ -664,14 +679,17 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
 					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
 							.getModelClass().getName() + "Bord")));
+
 			bordLayer.setHidden(false);
 			bordLayer.setFilter(FilterUtils.equal("naam", traject.getNaam()));
 
 		} else if (traject instanceof NetwerkLus) {
+
 			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
 					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
 							.getModelClass().getName().replace("Lus", "")
 							+ "Bord")));
+
 			bordLayer.setHidden(false);
 			bordLayer.setFilter(FilterUtils.in("segmenten",
 					((NetwerkLus) traject).getSegmenten()));
@@ -689,6 +707,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		// Probleem
 		if (selectedWerkOpdracht.getProbleem() instanceof BordProbleem) {
+
 			// Bord Probleem
 			Bord bord = (Bord) modelRepository
 					.loadObject(((BordProbleem) selectedWerkOpdracht
@@ -702,6 +721,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			context.setBoundingBox(envelope);
 
 		} else if (selectedWerkOpdracht.getProbleem() instanceof AnderProbleem) {
+
 			// Ander Probleem
 			AnderProbleem anderProbleem = (AnderProbleem) selectedWerkOpdracht
 					.getProbleem();
@@ -793,7 +813,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 							+ "Bord")));
 
 			bordLayer.setHidden(false);
-			bordLayer.setFilter(FilterUtils.equal("segmenten", traject));
+			bordLayer.setFilter(FilterUtils.equal("segmenten",
+					modelRepository.getResourceIdentifier(traject)));
 
 			if (selectedWerkOpdracht.getProbleem() instanceof BordProbleem) {
 				// Bord Probleem
@@ -849,7 +870,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		// Indien minstens 1 van de velden ingevuld WerkOpdracht query
 		// uitvoeren en resultaten filteren op de uitvoeringsronde query
 		QueryBuilder builder = new QueryBuilder("WerkOpdracht");
-		
+
 		if (uitvoerder != null) {
 			builder.addFilter(FilterUtils.equal("uitvoerder", uitvoerder));
 		}
@@ -876,6 +897,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		// Omzetten ids naar ResourceIdentifiers
 		List<ResourceIdentifier> filteredWerkOpdrachten = new ArrayList<ResourceIdentifier>();
+
 		for (Long id : ids) {
 			filteredWerkOpdrachten.add(new ResourceKey("WerkOpdracht", id
 					.toString()));
@@ -883,6 +905,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		// Zoeken naar de rondeIds met de gevonden WerkOpdracht Ids
 		for (Uitvoeringsronde ronde : list) {
+
 			for (ResourceIdentifier id : filteredWerkOpdrachten) {
 				if (ronde.getOpdrachten().contains(id)
 						&& !rondeIds.contains(ronde.getId().toString())) {

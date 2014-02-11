@@ -16,6 +16,7 @@ import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
@@ -54,18 +55,18 @@ public class StockMateriaal extends AbstractModelObject implements
 	private String categorie;
 
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getStockSubCategories(parents[0])}")
 	@Parents({ "categorie" })
+	@ValuesExpression("#{osyrisModelFunctions.getStockSubCategories(parents[0])}")
 	private String subCategorie;
 
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getStockTypes(parents[0], parents[1])}")
 	@Parents({ "categorie", "subCategorie" })
+	@ValuesExpression("#{osyrisModelFunctions.getStockTypes(parents[0], parents[1])}")
 	private String type;
 
 	@Type(value = ModelPropertyType.ENUM)
-	@ValuesExpression("#{osyrisModelFunctions.getStockMateriaalNamen(parents[0], parents[1], parents[2])}")
 	@Parents({ "categorie", "subCategorie", "type" })
+	@ValuesExpression("#{osyrisModelFunctions.getStockMateriaalNamen(parents[0], parents[1], parents[2])}")
 	private String naam;
 
 	private String nummer;
@@ -94,12 +95,14 @@ public class StockMateriaal extends AbstractModelObject implements
 	@NotEditable
 	@NotViewable
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private ResourceIdentifier traject;
 
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getRegiosUitvoerder()}")
+	@Target("_blank")
 	private ResourceIdentifier regio;
 
 	@Type(ModelPropertyType.DATE)

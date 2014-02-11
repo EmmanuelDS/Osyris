@@ -16,40 +16,32 @@
 	<td>
 	<r:panel id="werkOpdrachtInfo">
 	<d:fields>
-		<d:field for="status" label="Status">
-			<d:propertyValue id="status"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
-					value="#{form.object.status}"
-					mode="VIEW" />
-		</d:field>
+		<d:propertyField id="statusField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+				value="#{form.object.status}"
+				mode="VIEW" />
 		
 		<a:outputPanel rendered="#{form.object.status == 'UITGESTELD'}">
-		<d:field for="datumLaterUitTeVoeren" label="Uitgesteld naar">
-			<d:propertyValue id="datumLaterUitTeVoeren"
+			<d:propertyField id="datumLaterUitTeVoerenField"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLateruitTeVoeren')}"
 					value="#{form.object.datumLaterUitTeVoeren}"
 					mode="VIEW" />
-		</d:field>
 		</a:outputPanel>
 		
-		<d:field for="datumUitvoering" label="Datum uitvoering">
-			<d:propertyValue id="datumUitvoering"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitvoering')}"
-					value="#{form.object.datumUitvoering}"
-					mode="VIEW" />
-		</d:field>
-		<d:field for="medewerker" label="Medewerker">
-			<d:propertyValue id="medewerker"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
-					value="#{form.object.medewerker}"
-					mode="VIEW" />
-		</d:field>
-		<d:field for="uitvoerder" label="Uitvoerder">
-			<d:propertyValue id="uitvoerder"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
-					value="#{form.object.uitvoerder}"
-					mode="VIEW" />
-		</d:field>
+		<d:propertyField id="datumUitvoeringField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitvoering')}"
+				value="#{form.object.datumUitvoering}"
+				mode="VIEW" />
+					
+		<d:propertyField id="medewerkerField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+				value="#{form.object.medewerker}"
+				mode="VIEW" />
+					
+		<d:propertyField id="uitvoerderField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+				value="#{form.object.uitvoerder}"
+				mode="VIEW" />
 	</d:fields>
 	</r:panel>
 	<br/>
@@ -61,34 +53,28 @@
 	<br/>
 	<r:panel id="addHandelingenPanel">
 	<d:fields>
-		<d:field for="handelingen" label="Handelingen">
-			<d:propertyValue id="handelingen"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
-					value="#{form.object.handelingen}"
-					mode="EDIT" />
-		</d:field>
+		<d:propertyField id="handelingenField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+				value="#{form.object.handelingen}"
+				mode="EDIT" />
 	</d:fields>
 	</r:panel>
 	<br/>
 	<r:panel id="CommentaarTOVPanel">
 	<d:fields>
-		<d:field for="commentaarMedewerker" label="Commentaar TOV">
-			<d:propertyValue id="commentaarMedewerker"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
-					value="#{form.object.commentaarMedewerker}"
-					mode="EDIT" />
-		</d:field>
+		<d:propertyField id="commentaarMedewerkerField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+				value="#{form.object.commentaarMedewerker}"
+				mode="EDIT" />
 	</d:fields>
 	</r:panel>
 	<br/>
-	<r:panel id="CommentaarUitvoerderPanel">
+	<r:panel id="CommentaarUitvoerderPanel" rendered="#{form.object.commentaarUitvoerder != null}">
 	<d:fields>
-		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
-			<d:propertyValue id="commentaarUitvoerder"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
-					value="#{form.object.commentaarUitvoerder}"
-					mode="VIEW" />
-		</d:field>
+		<d:propertyField id="commentaarUitvoerderField"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
+				value="#{form.object.commentaarUitvoerder}"
+				mode="VIEW" />
 	</d:fields>
 	</r:panel>
 	</td>

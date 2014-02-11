@@ -2,15 +2,23 @@
 	xmlns:u="http://java.sun.com/jsf/facelets"
 	xmlns:h="http://java.sun.com/jsf/html"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:a="http://richfaces.org/a4j"
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
-	xmlns:j="http://conscientia.org/jsf" 
-	xmlns:m="http://specto.gim.be/map"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	<h3><h:outputText value="#{messages['form.general.delete.confirm.label']}" /></h3>
+	<br/>
 	
+	<d:object id="object"
+		mode="VIEW" 
+		modelClass="#{form.modelClass}"
+		value="#{form.object}">
+	</d:object>
+	<br/>
+	<r:panel id="materialenPanel">
 		<p:dataTable id="stockMaterialen"
-			value="#{form.selectedWerkOpdracht.materialen}"
+			value="#{form.object.materialen}"
 			mode="RESULT"
 			var="gebruiktMateriaal"
 			emptyMessage="#{messages['ui.dataTable.empty']}">
@@ -75,29 +83,21 @@
 					value="#{gebruiktMateriaal.aantal}"
 					mode="VIEW" />
 			</p:column>
-			<p:column>
-				<a:outputPanel styleClass="model-table-actions">
-					<j:commandButton
-							image="#{resource['core/images/actions/16x16/remove.png']}"
-							type="image"
-							title="Gebruikt materiaal verwijderen uit werkopdracht"
-							onclick="conscientia.widget(#{r:element('removeMateriaalPopup')}).show();">
-							<f:setPropertyActionListener
-								target="#{form.selectedMateriaal}"
-								value="#{gebruiktMateriaal}" />
-							</j:commandButton>
-				</a:outputPanel>
-			</p:column>
-			<f:facet name="footer">
-				<a:outputPanel
-					layout="block"
-					style="text-align: center">
-					<j:commandButton value="Zoeken en toevoegen stockmateriaal"
-					title="Materiaal toevoegen"
-					image="#{resource['core/images/actions/16x16/add.png']}"
-					type="image"
-					onclick="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).show();" />
-				</a:outputPanel>
-			</f:facet>
 	   	</p:dataTable>
+	</r:panel>
+	<d:buttons>
+		<j:commandButton value="#{messages['form.general.delete.button']}"
+			image="#{resource['core/images/actions/12x12/delete.png']}"
+			type="button" 
+			action="#{form.delete()}"
+			execute="@this"
+			render="#{render}"
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('deletePopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			action="#{form.cancel()}"
+			execute="@this"
+			oncomplete="conscientia.widget(#{r:element('deletePopup')}).hide();" />
+	</d:buttons>
 </u:composition>

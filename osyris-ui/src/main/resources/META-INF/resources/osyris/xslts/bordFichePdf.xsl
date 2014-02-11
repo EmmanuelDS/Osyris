@@ -14,7 +14,7 @@
         </fo:simple-page-master>
       </fo:layout-master-set>
    	  
-   	  <!-- NEW PAGE SEQUENCE For EVERY PAGE TO AVOID HEAP SPACE MEMORY ISSUES -->
+   	  <!-- NEW PAGE SEQUENCE FOR EVERY PAGE TO AVOID HEAP SPACE MEMORY ISSUES -->
       <xsl:for-each select="/verslag/bord">
       <fo:page-sequence master-reference="A4-landscape">
        
@@ -36,6 +36,11 @@
 		                        <xsl:value-of
 				          			select="/verslag/trajecttype">	
 				          		</xsl:value-of>
+				          		
+			          		     <xsl:text> </xsl:text>
+				          		 <xsl:value-of
+				          			select="/verslag/trajectnaam">
+				          		</xsl:value-of>
 				          	</fo:inline> 
 			          	</fo:block>
                     </fo:table-cell>
@@ -53,13 +58,26 @@
           <fo:table-row height="80mm" >
             <fo:table-cell border="solid" >
             
-             <fo:block-container>												
-             	<fo:block>
-            		<fo:external-graphic src="http://osyristest.tov.be/fotos/geen%20foto.png" 
-            		content-width="60mm"
-            		content-height="80mm" />
-       			 </fo:block>
+             <fo:block-container>	
+             	<xsl:if test="//@netwerkbord='false'">											
+	             	<fo:block margin-left="0.1cm" margin-top="0.1cm">
+	            		<xsl:variable name="url_voorbeeldFoto" select="/verslag/voorbeeldFoto" />	
+			            <fo:external-graphic src="'{$url_voorbeeldFoto}'"
+			            content-width="60mm"
+	            		content-height="90mm" />
+	       			 </fo:block>
+       			 </xsl:if>
+       			 
+       			 <xsl:if test="//@netwerkbord='true'">											
+	             	<fo:block margin-left="0.1cm" margin-top="0.1cm">
+	            		<xsl:variable name="url_voorbeeld_kp_bord" select="./voorbeeld_kp_bord" />	
+			            <fo:external-graphic src="'{$url_voorbeeld_kp_bord}'"
+			           	  content-width="55mm"
+	            		  content-height="79mm" />
+	       			 </fo:block>
+       			 </xsl:if>
              </fo:block-container>
+             
              
              <fo:block-container position="absolute">
               <fo:block font-size="9pt" margin-top="0.3cm" margin-left="7cm">
@@ -69,22 +87,22 @@
 	          		select="./id">
 	          	</xsl:value-of>
 	          </fo:block>
-	           <fo:block space-after="10pt">
+	           <fo:block space-after="8pt">
 	           <fo:inline font-weight="bold"><xsl:text>Gemeente: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./gemeente">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">
+	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Straat: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./straat">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">
+	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>XY coördinaten in Lambert 72: </xsl:text></fo:inline>
 	          </fo:block>
-	          <fo:block  space-after="10pt" text-indent="20mm">
+	          <fo:block  space-after="8pt" text-indent="20mm">
 	          <fo:inline font-weight="bold"><xsl:text>X: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./x">
@@ -96,37 +114,58 @@
 	          		select="./y">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">
+	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Wegbevoegd: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./wegbevoegd">
 	          	</xsl:value-of>
 	          </fo:block>	
 	          
+	          <xsl:if test="//@netwerkbord='false'">
+		          <fo:block space-after="8pt">
+		          <xsl:variable name="url_pijl" select="./pijl" />	
+		          <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>Pijl: </xsl:text></fo:inline>
+		            <fo:external-graphic src="'{$url_pijl}'" padding-start="5pt"/>
+		          </fo:block>
+		          
+		          <fo:block space-after="8pt">
+		          <fo:inline font-weight="bold"><xsl:text>Opschrift bord: </xsl:text></fo:inline>
+		          	<xsl:value-of
+		          		 select="/verslag/trajectnaam">
+		          	</xsl:value-of>
+		          </fo:block>
+		       </xsl:if>
+	          
 				<xsl:if test="//@netwerkbord='true'">
-					  <fo:block space-after="10pt">
-					  <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 0: </xsl:text></fo:inline>
+					  <fo:block space-after="8pt">
+					  <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>KnooppuntNr 0:</xsl:text></fo:inline>
 			          	<xsl:value-of
-			          		select="./knooppunt0">
-			          	</xsl:value-of>
+			          		select="./knooppunt0">	
+			          	</xsl:value-of>		         			          	
 			          </fo:block>
-			          <fo:block space-after="10pt">
-			          <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 1: </xsl:text></fo:inline>
-			          	<xsl:value-of
+			          <fo:block space-after="8pt">
+			          <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>KnooppuntNr 1:</xsl:text></fo:inline>
+			            <xsl:value-of
 			          		select="./knooppunt1">
-			          	</xsl:value-of>
+			          	</xsl:value-of>			          
+			          	<xsl:variable name="url_kp1_pijl" select="./kp1_pijl" />	
+					            <fo:external-graphic src="'{$url_kp1_pijl}'" padding-start="5pt"/>
 			          </fo:block>
-			           <fo:block space-after="10pt">
-			           <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 2: </xsl:text></fo:inline>
+			           <fo:block space-after="8pt">
+			           <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>KnooppuntNr 2:</xsl:text></fo:inline>
 			          	<xsl:value-of
 			          		select="./knooppunt2">
 			          	</xsl:value-of>
+			          	<xsl:variable name="url_kp2_pijl" select="./kp2_pijl" />	
+					            <fo:external-graphic src="'{$url_kp2_pijl}'" padding-start="5pt"/>
 			          </fo:block>
-			           <fo:block space-after="10pt">
-			           <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 3: </xsl:text></fo:inline>
+			           <fo:block space-after="8pt">
+			           <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>KnooppuntNr 3:</xsl:text></fo:inline>
 			          	<xsl:value-of
 			          		select="./knooppunt3">
 			          	</xsl:value-of>
+			          	<xsl:variable name="url_kp3_pijl" select="./kp3_pijl" />	
+					            <fo:external-graphic src="'{$url_kp3_pijl}'" padding-start="5pt"/>
 			          </fo:block>
 				</xsl:if>				
               </fo:block>
@@ -136,9 +175,9 @@
             
             <fo:table-cell>
             <fo:block-container>
-             <xsl:variable name="url" select="./foto" />													
+             <xsl:variable name="url_bordfoto" select="./bordfoto" />													
              	<fo:block margin-left="0.1cm">
-            		<fo:external-graphic src="'{$url}'" 
+            		<fo:external-graphic src="'{$url_bordfoto}'" 
             		content-width="60mm"
             		content-height="80mm" />
        			 </fo:block>
@@ -146,31 +185,31 @@
            
           <fo:block-container position="absolute">
            <fo:block font-size="9pt" margin-top="0.3cm" margin-bottom="0.1cm" margin-left="7cm">
-               <fo:block space-after="10pt">
+               <fo:block space-after="8pt">
                  <fo:inline font-weight="bold"><xsl:text>Constructietype: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./constructieType">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">
+	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Paaltype: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paaltype">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">
+	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Paaldiameter: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paaldiameter">
 	          	</xsl:value-of>
 	          </fo:block>
-	          <fo:block space-after="10pt">
+	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Paalbeugel: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paalbeugel">
 	          	</xsl:value-of>
 	          </fo:block>
-			  <fo:block space-after="10pt">
+			  <fo:block space-after="8pt">
 			  <fo:inline font-weight="bold"><xsl:text>Paalondergrond: </xsl:text></fo:inline>
 	          	<xsl:value-of
 	          		select="./paalondergrond">

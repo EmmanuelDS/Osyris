@@ -6,6 +6,7 @@ import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Target;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -24,6 +25,7 @@ public abstract class NetwerkLus extends Traject {
 
 	@NotSearchable
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private List<ResourceIdentifier> segmenten;
 
 	// GETTERS AND SETTERS

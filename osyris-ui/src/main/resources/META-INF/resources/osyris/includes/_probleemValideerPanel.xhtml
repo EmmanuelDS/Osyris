@@ -9,35 +9,31 @@
 	xmlns:j="http://conscientia.org/jsf">	
 	<r:panel>
 	<d:fields>
-		<a:outputPanel rendered="#{form.isBordProbleem(form.selectedProbleem)}">
-			<d:field label="Type probleem" for="type">
-						<d:propertyValue id="type"
-							modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
-							value="#{form.selectedProbleem.type}" mode="VIEW" />
-			</d:field>
-			<d:field label="Bordvolgnummer">
-				<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
+		<a:outputPanel rendered="#{form.isBordProbleem(form.selectedProbleem)}">			
+			<d:fields>
+				<d:propertyField id="typeField"
+			 		modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+					value="#{form.selectedProbleem.type}"
+					mode="VIEW" />	
+							
+				<d:propertyField id="bordVolgField"
+			 		modelProperty="#{d:modelClass('Bord').getProperty('volg')}"
+					value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
 					mode="VIEW" />
-			</d:field>
-			<d:field label="Straatnaam">
-				<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
+					
+				<d:propertyField id="straatNaamField"
+			 		modelProperty="#{d:modelClass('Bord').getProperty('straat')}"
+					value="osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
 					mode="VIEW" />
-			</d:field>
+			</d:fields>
 		</a:outputPanel>
-		<a:outputPanel rendered="#{!form.isBordProbleem(form.selectedProbleem)}">
-			<d:field label="Categorie probleem" for="categorie">
-						<d:propertyValue id="categorie"
-							modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
-							value="#{form.selectedProbleem.categorie}" mode="VIEW" />
-			</d:field>
-			<d:field label="Bordvolgnummer">
-				<h:outputText value="#{osyrisModelFunctions.getBordVolg(form.selectedProbleem.bord) }"
-					mode="VIEW" />
-			</d:field>
-			<d:field label="Straatnaam">
-				<h:outputText value="#{osyrisModelFunctions.getBordStraatNaam(form.selectedProbleem.bord) }"
-					mode="VIEW" />
-			</d:field>
+		<a:outputPanel rendered="#{!form.isBordProbleem(form.selectedProbleem)}">			
+			<d:fields>
+				<d:propertyField id="categorieField"
+			 		modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+					value="#{form.selectedProbleem.categorie}"
+					mode="VIEW" />		
+			</d:fields>	
 		</a:outputPanel>
 	</d:fields>
 	<d:object mode="EDIT"

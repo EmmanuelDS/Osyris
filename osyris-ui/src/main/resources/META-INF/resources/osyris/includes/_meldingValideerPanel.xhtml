@@ -15,81 +15,63 @@
 			<td width="40%" valign="top">
 			<r:panel id ="meldingPanel" header="Melding">
 				<d:fields>
-					<d:field label="Status" for="status">
-						<d:propertyValue id="status"
-							modelProperty="#{d:modelClass('Melding').getProperty('status')}"
-							value="#{form.object.status}" mode="VIEW" />
-					</d:field>
-					<d:field label="Datum gemeld" for="datumGemeld">
-						<d:propertyValue id="datumGemeld"
-							modelProperty="#{d:modelClass('Melding').getProperty('datumGemeld')}"
-							value="#{form.object.datumGemeld}" mode="VIEW" />
-					</d:field>
-					<d:field label="Datum validatie" for="datumGevalideerd">
-						<d:propertyValue id="datumGevalideerd"
-							modelProperty="#{d:modelClass('Melding').getProperty('datumGevalideerd')}"
-							value="#{form.object.datumGevalideerd}" mode="VIEW" />
-					</d:field>
-					<d:field label="Medewerker" for="medewerker">
-						<d:propertyValue id="medewerker"
-							modelProperty="#{d:modelClass('Melding').getProperty('medewerker')}"
-							value="#{form.object.medewerker}" mode="VIEW" />
-					</d:field>
+					<d:propertyField id="status"
+						modelProperty="#{d:modelClass('Melding').getProperty('status')}"
+						value="#{form.object.status}" mode="VIEW" />
+					<d:propertyField id="datumGemeld"
+						modelProperty="#{d:modelClass('Melding').getProperty('datumGemeld')}"
+						value="#{form.object.datumGemeld}" mode="VIEW" />
+					<d:propertyField id="datumGevalideerd"
+						modelProperty="#{d:modelClass('Melding').getProperty('datumGevalideerd')}"
+						value="#{form.object.datumGevalideerd}" mode="VIEW" />
+					<d:propertyField id="medewerker"
+						modelProperty="#{d:modelClass('Melding').getProperty('medewerker')}"
+						value="#{form.object.medewerker}" mode="VIEW" />
 				</d:fields>
 			</r:panel>
 			<br/>
 			<r:panel id ="melderPanel" header="Melder">
 				<d:fields>
-					<d:field label="Voornaam" for="voornaam">
-						<d:propertyValue id="voornaam"
-							modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}"
-							value="#{form.object.voornaam}" mode="VIEW" />
-					</d:field>
-					<d:field label="Naam" for="naam">
-						<d:propertyValue id="naam"
-							modelProperty="#{d:modelClass('Melding').getProperty('naam')}"
-							value="#{form.object.naam}" mode="VIEW" />
-					</d:field>
-					<d:field label="Email" for="email">
-						<d:propertyValue id="email"
-							modelProperty="#{d:modelClass('Melding').getProperty('email')}"
-							value="#{form.object.email}" mode="VIEW" />
-					</d:field>
-					<d:field label="Tel/GSM" for="telefoon">
-						<d:propertyValue id="telefoon"
-							modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}"
-							value="#{form.object.telefoon}" mode="VIEW" />
-					</d:field>
+					<d:propertyField id="voornaam"
+						modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}"
+						value="#{form.object.voornaam}" mode="VIEW" />
+					<d:propertyField id="naam"
+						modelProperty="#{d:modelClass('Melding').getProperty('naam')}"
+						value="#{form.object.naam}" mode="VIEW" />
+					<d:propertyField id="email"
+						modelProperty="#{d:modelClass('Melding').getProperty('email')}"
+						value="#{form.object.email}" mode="VIEW" />
+					<d:propertyField id="telefoon"
+						modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}"
+						value="#{form.object.telefoon}" mode="VIEW" />
 				</d:fields>
 			</r:panel>
 			<br/>
-			<r:panel id ="probleemPanel" header="Probleem">
+			<r:panel id ="probleemPanel" header="#{form.getProbleemType(form.object.probleem)}">
 				<d:fields>
-					<d:field label="Datum vaststelling" for="datumVastelling">
-						<d:propertyValue id="datumVaststelling"
-							modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}"
-							value="#{form.object.datumVaststelling}" mode="VIEW" />
-					</d:field>
-					<d:field label="Commentaar" for="commentaar">
-						<d:propertyValue id="commentaar"
-							modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-							value="#{form.object.probleem.commentaar}" mode="VIEW" />
-					</d:field>
-					<d:field label="Validatie" for="validatieStatus">
-						<d:propertyValue id="validatieStatus"
-							modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
-							value="#{form.object.probleem.status}" mode="EDIT" />
-					</d:field>
+					<d:propertyField id="datumVaststelling"
+						modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}"
+						value="#{form.object.datumVaststelling}" mode="VIEW" />						
+					<d:propertyField id="type" rendered="#{form.isBordProbleem(form.object.probleem)}"
+						modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
+						value="#{form.object.probleem.type}" mode="VIEW" />						
+					<d:propertyField id="categorie" rendered="#{!form.isBordProbleem(form.object.probleem)}"
+						modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
+						value="#{form.object.probleem.categorie}" mode="VIEW" />						
+					<d:propertyField id="commentaar"
+						modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{form.object.probleem.commentaar}" mode="VIEW" />						
+					<d:propertyField id="validatieStatus"
+						modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+						value="#{form.object.probleem.status}" mode="EDIT" />
 				</d:fields>
 			</r:panel>
 			<br/>
 			<r:panel>
 				<d:fields>
-					<d:field label="Commentaar TOV" for="commentaarTOV">
-						<d:propertyValue id="commentaarTOV"
-							modelProperty="#{d:modelClass('Melding').getProperty('commentaar')}"
-							value="#{form.object.commentaar}" mode="EDIT" />
-					</d:field>
+					<d:propertyField id="commentaarTOV"
+						modelProperty="#{d:modelClass('Melding').getProperty('commentaar')}"
+						value="#{form.object.commentaar}" mode="EDIT" />
 				</d:fields>
 			</r:panel>
 			</td>

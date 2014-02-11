@@ -13,6 +13,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.core.model.AbstractModelObject;
 
@@ -62,10 +63,12 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	@NotSearchable
 	@NotEditable
 	@NotViewable
+	@Target("_blank")
 	private ResourceIdentifier uitvoerder;
 
 	@NotSearchable
 	@ModelClassName("WerkOpdracht")
+	@Target("_blank")
 	private List<ResourceIdentifier> opdrachten;
 
 	// GETTERS AND SETTERS

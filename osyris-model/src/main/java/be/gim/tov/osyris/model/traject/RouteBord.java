@@ -6,6 +6,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -29,6 +30,7 @@ public class RouteBord extends Bord {
 	@NotSearchable
 	@NotEditable
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS

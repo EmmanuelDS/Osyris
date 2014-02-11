@@ -25,6 +25,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.model.AbstractModelObject;
@@ -53,6 +54,7 @@ public abstract class Traject extends AbstractModelObject implements
 
 	// VARIABLES
 	@Edit(type = "suggestions")
+	@LabelProperty
 	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
@@ -60,6 +62,7 @@ public abstract class Traject extends AbstractModelObject implements
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.regiosOostVlaanderen}")
+	@Target("_blank")
 	private ResourceIdentifier regio;
 
 	@NotEditable
@@ -78,22 +81,24 @@ public abstract class Traject extends AbstractModelObject implements
 	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
 	@Search(type = "menu:equals")
+	@Target("_blank")
 	private ResourceIdentifier peterMeter1;
 
 	@NotSearchable
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
+	@Target("_blank")
 	private ResourceIdentifier peterMeter2;
 
 	@NotSearchable
 	@ModelClassName("User")
 	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
+	@Target("_blank")
 	private ResourceIdentifier peterMeter3;
 
 	// GETTERS AND SETTERS
-	@LabelProperty
 	public String getNaam() {
 		return naam;
 	}

@@ -7,6 +7,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -44,10 +45,12 @@ import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Gemeente;
+import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RichtingEnum;
+import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
@@ -137,6 +140,23 @@ public class OsyrisModelFunctions {
 		imageCodes.add(code3);
 
 		return imageCodes;
+	}
+
+	/**
+	 * Get KpNummers
+	 * 
+	 * @return
+	 */
+	public List<Object[]> getKpNummers() {
+
+		List<Object[]> kpNummerCodes = new ArrayList<Object[]>();
+
+		for (int i = 1; i < 100; i++) {
+			Object[] code = { Integer.valueOf(i), Integer.valueOf(i).toString() };
+			kpNummerCodes.add(code);
+		}
+
+		return kpNummerCodes;
 	}
 
 	/**
@@ -301,6 +321,23 @@ public class OsyrisModelFunctions {
 		}
 		return codeList;
 	}
+
+	/*
+	 * public List<?> getCodes(String modelClassName) {
+	 * 
+	 * try {
+	 * 
+	 * QueryBuilder builder = new QueryBuilder(modelClassName);
+	 * builder.results(FilterUtils.properties("label"));
+	 * builder.groupBy(FilterUtils.properties("label"));
+	 * 
+	 * return modelRepository.searchObjects(builder.build(), true, true);
+	 * 
+	 * } catch (IOException e) {
+	 * LOG.error("Can not get list of codes for class " + modelClassName, e); }
+	 * 
+	 * return Collections.emptyList(); }
+	 */
 
 	/**
 	 * Zoeken gebruikers in een bepaalde groep.
@@ -653,9 +690,8 @@ public class OsyrisModelFunctions {
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 
-			if (bord instanceof RouteBord) {
-				return ((RouteBord) bord).getVolg();
-			}
+			return bord.getVolg();
+
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
@@ -673,10 +709,8 @@ public class OsyrisModelFunctions {
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 
-			if (bord instanceof RouteBord) {
+			return bord.getStraatnaam();
 
-				return ((RouteBord) bord).getStraatnaam();
-			}
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
 		}
@@ -910,8 +944,9 @@ public class OsyrisModelFunctions {
 			builder.results(FilterUtils.properties("subCategorie"));
 			builder.groupBy(FilterUtils.properties("subCategorie"));
 
-			return modelRepository.searchObjects(builder.build(), true, true,
-					true);
+			return modelRepository.searchObjects(builder.build(), false, false,
+					false);
+
 		} else {
 			return Collections.emptyList();
 		}
@@ -942,8 +977,8 @@ public class OsyrisModelFunctions {
 			builder.results(FilterUtils.properties("type"));
 			builder.groupBy(FilterUtils.properties("type"));
 
-			return modelRepository.searchObjects(builder.build(), true, true,
-					true);
+			return modelRepository.searchObjects(builder.build(), false, false,
+					false);
 		} else {
 			return Collections.emptyList();
 		}
@@ -978,7 +1013,8 @@ public class OsyrisModelFunctions {
 			builder.results(FilterUtils.properties("naam"));
 			builder.groupBy(FilterUtils.properties("naam"));
 
-			return modelRepository.searchObjects(builder.build(), false, false);
+			return modelRepository.searchObjects(builder.build(), false, false,
+					false);
 
 		} else {
 			return Collections.emptyList();
@@ -1374,5 +1410,314 @@ public class OsyrisModelFunctions {
 			LOG.error("Can not load PeterMeterNaamCodes.", e);
 		}
 		return peterMeterNaamCodes;
+	}
+
+	/**
+	 * Checken of een PeterMeterNaamCode al bestaat of niet.
+	 * 
+	 * @param resourceName
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public boolean checkPeterMeterNaamCodeExists(ResourceName resourceName) {
+
+		try {
+			QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
+			builder.addFilter(FilterUtils.equal("code", resourceName.toString()));
+
+			List<PeterMeterNaamCode> codes = (List<PeterMeterNaamCode>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			if (codes.isEmpty()) {
+				return false;
+			}
+
+			return true;
+
+		} catch (IOException e) {
+			LOG.error("Can not search PeterMeterNaamCode", e);
+		}
+		return false;
+	}
+
+	/**
+	 * Bepalen van de Gemeente waarin een bord zich bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public String getGemeenteForBord(Bord bord) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Gemeente");
+			query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
+
+			List<Gemeente> gemeentes = (List<Gemeente>) modelRepository
+					.searchObjects(query, true, true);
+			Gemeente gemeente = (Gemeente) modelRepository
+					.getUniqueResult(gemeentes);
+
+			return gemeente.getNaam();
+
+		} catch (IOException e) {
+			LOG.error("Can not search Gemeente", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Bepalen van de Regio waarin een bord zich bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Regio getRegioForBord(Bord bord) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
+
+			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
+					query, true, true);
+			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+
+			return regio;
+
+		} catch (IOException e) {
+			LOG.error("Can not search Regio", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Bepalen van de Route waartoe het RouteBord zich het dichtst bij bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public Traject getRouteForRouteBord(RouteBord bord) throws IOException {
+
+		Route route = null;
+
+		DefaultQuery query = new DefaultQuery();
+		query.setModelClassName(bord.getModelClass().getName()
+				.replace("Bord", ""));
+		query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+
+		List<Route> routes = (List<Route>) modelRepository.searchObjects(query,
+				false, false);
+
+		Map<Route, Double> distances = new HashMap<Route, Double>();
+
+		for (Route r : routes) {
+
+			double distance = bord.getGeom().distance(r.getGeom());
+			distances.put(r, distance);
+		}
+
+		double minValueInMap = (Collections.min(distances.values()));
+		for (Entry<Route, Double> entry : distances.entrySet()) {
+			if (entry.getValue() == minValueInMap) {
+
+				route = entry.getKey();
+			}
+		}
+
+		return route;
+	}
+
+	/**
+	 * Bepalen van de Segmenten waartoe het NetwerkBord zich het dichtsbij
+	 * bevindt.
+	 * 
+	 * @param geometry
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public List<ResourceIdentifier> getSegmentenForNetwerkBord(NetwerkBord bord)
+			throws IOException {
+
+		List<ResourceIdentifier> segmentIds = new ArrayList<ResourceIdentifier>();
+
+		DefaultQuery query = new DefaultQuery();
+		query.setModelClassName(bord.getModelClass().getName()
+				.replace("Bord", "Segment"));
+		query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+
+		List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
+				.searchObjects(query, false, false);
+
+		Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
+
+		for (NetwerkSegment s : segmenten) {
+
+			double distance = bord.getGeom().distance(s.getGeom());
+			distances.put(modelRepository.getResourceIdentifier(s), distance);
+		}
+
+		double minValueInMap = (Collections.min(distances.values()));
+
+		for (Entry<ResourceIdentifier, Double> entry : distances.entrySet()) {
+			if (entry.getValue() == minValueInMap) {
+
+				ResourceIdentifier minSegmentId = entry.getKey();
+				segmentIds.add(minSegmentId);
+			}
+		}
+
+		return segmentIds;
+	}
+
+	/**
+	 * Bepalen van de Regio waarin een segment zich bevindt. Indien een segment
+	 * meerdere regios doorkruist, wordt de regio genomen waar de intersectie
+	 * oppervlakte het grootst is.
+	 * 
+	 * @param segment
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Regio getRegioForSegment(NetwerkSegment segment) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", segment.getGeom()));
+
+			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
+					query, true, true);
+
+			Regio regio = null;
+
+			// Indien 1 regio
+			if (regios.size() == 1) {
+				regio = (Regio) modelRepository.getUniqueResult(regios);
+			}
+
+			// Indien intersectie met meerdere regios
+			else if (regios.size() > 1) {
+				Map<Regio, Double> intersections = new HashMap<Regio, Double>();
+
+				for (Regio r : regios) {
+
+					Geometry g1 = r.getGeom().intersection(segment.getGeom());
+					intersections.put(r, g1.getLength());
+				}
+
+				double maxValueInMap = (Collections.max(intersections.values()));
+				for (Entry<Regio, Double> entry : intersections.entrySet()) {
+					if (entry.getValue() == maxValueInMap) {
+
+						regio = entry.getKey();
+					}
+				}
+			}
+
+			return regio;
+
+		} catch (IOException e) {
+			LOG.error("Can not search Regio", e);
+		}
+
+		return null;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> completeFirstName(String query) {
+
+		List<String> suggestions = new ArrayList<String>();
+
+		try {
+
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			List<String> nameParts = new ArrayList<String>();
+
+			for (ResourceName name : group.getMembers()) {
+				nameParts.add(name.getNamePart());
+			}
+
+			QueryBuilder b = new QueryBuilder("User");
+			b.addFilter(FilterUtils.in("username", nameParts));
+			b.result(FilterUtils.property("id"));
+
+			List<Long> userIds = (List<Long>) modelRepository.searchObjects(
+					b.build(), false, false, false);
+
+			QueryBuilder builder = new QueryBuilder("UserProfile");
+			builder.addFilter(FilterUtils.like("firstName", query + "%", "%",
+					null, null, false));
+			builder.addFilter(FilterUtils.in("id", userIds));
+
+			builder.results(FilterUtils.properties("firstName"));
+			builder.groupBy(FilterUtils.properties("firstName"));
+			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
+					.property("firstName")));
+
+			List<String> voorNamen = (List<String>) modelRepository
+					.searchObjects(builder.build(), false, false, false);
+
+			suggestions.addAll(voorNamen);
+
+		} catch (IOException e) {
+			LOG.error("Can not search UserProfile", e);
+		}
+
+		return suggestions;
+	}
+
+	@SuppressWarnings("unchecked")
+	public List<String> completeLastName(String query) {
+
+		List<String> suggestions = new ArrayList<String>();
+
+		try {
+
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			List<String> nameParts = new ArrayList<String>();
+
+			for (ResourceName name : group.getMembers()) {
+				nameParts.add(name.getNamePart());
+			}
+
+			QueryBuilder b = new QueryBuilder("User");
+			b.addFilter(FilterUtils.in("username", nameParts));
+			b.result(FilterUtils.property("id"));
+
+			List<Long> userIds = (List<Long>) modelRepository.searchObjects(
+					b.build(), false, false, false);
+
+			QueryBuilder builder = new QueryBuilder("UserProfile");
+			builder.addFilter(FilterUtils.like("lastName", query + "%", "%",
+					null, null, false));
+			builder.addFilter(FilterUtils.in("id", userIds));
+
+			builder.results(FilterUtils.properties("lastName"));
+			builder.groupBy(FilterUtils.properties("lastName"));
+			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
+					.property("lastName")));
+
+			List<String> familieNamen = (List<String>) modelRepository
+					.searchObjects(builder.build(), false, false, false);
+
+			suggestions.addAll(familieNamen);
+
+		} catch (IOException e) {
+			LOG.error("Can not search UserProfile", e);
+		}
+
+		return suggestions;
 	}
 }

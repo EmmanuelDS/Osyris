@@ -3,6 +3,7 @@ package be.gim.tov.osyris.form;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -14,7 +15,6 @@ import javax.inject.Named;
 
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.RandomStringUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.document.Document;
@@ -36,9 +36,7 @@ import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
-import be.gim.commons.localization.DefaultInternationalString;
 import be.gim.commons.resource.ResourceName;
-import be.gim.tov.osyris.model.codes.PeterMeterNaamCode;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
@@ -62,6 +60,11 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	private static final String PERIODE_HERFST = "3";
 
 	// VARIABLES
+	protected String firstName;
+	protected String lastName;
+	protected Date datumSinds;
+	protected Date datumTot;
+
 	@Inject
 	protected UserRepository userRepository;
 	@Inject
@@ -77,6 +80,38 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	@PostConstruct
 	public void init() throws IOException {
 		search();
+	}
+
+	public String getFirstName() {
+		return firstName;
+	}
+
+	public void setFirstName(String firstName) {
+		this.firstName = firstName;
+	}
+
+	public String getLastName() {
+		return lastName;
+	}
+
+	public void setLastName(String lastName) {
+		this.lastName = lastName;
+	}
+
+	public Date getDatumSinds() {
+		return datumSinds;
+	}
+
+	public void setDatumSinds(Date datumSinds) {
+		this.datumSinds = datumSinds;
+	}
+
+	public Date getDatumTot() {
+		return datumTot;
+	}
+
+	public void setDatumTot(Date datumTot) {
+		this.datumTot = datumTot;
 	}
 
 	public boolean isHasErrors() {
@@ -111,6 +146,43 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						PeterMeterStatus.KANDIDAAT), FilterUtils.equal(
 						"#PeterMeterProfiel/status", PeterMeterStatus.PASSIEF)));
 
+		try {
+
+			if (datumSinds != null) {
+				query.addFilter(FilterUtils.and(FilterUtils.greaterOrEqual(
+						"#PeterMeterProfiel/actiefSinds", datumSinds)));
+			}
+
+			if (datumTot != null) {
+				query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
+						"#PeterMeterProfiel/actiefTot", datumTot)));
+			}
+
+			if (firstName != null) {
+				query.addFilter(FilterUtils.like("#UserProfile/firstName",
+						firstName));
+			}
+
+			if (lastName != null) {
+				query.addFilter(FilterUtils.like("#UserProfile/lastName",
+						lastName));
+			}
+
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
+
+			List<String> nameParts = new ArrayList<String>();
+
+			for (ResourceName name : group.getMembers()) {
+				nameParts.add(name.getNamePart());
+			}
+
+			query.addFilter(FilterUtils.in("username", nameParts));
+
+		} catch (IOException e) {
+			LOG.error("Can not load group PetersMeters.", e);
+		}
+
 		return query;
 	}
 
@@ -131,26 +203,24 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				object.setPassword(password);
 
 				// Document
-				ResourceName name = UserUtils.getUserDocumentName(object
-						.getUsername());
-
-				Document<User> document = (Document<User>) modelRepository
-						.createObject("Document", name);
-				document.setName(name);
-				document.setSearchable(false);
-
-				String firstName = userProfile.getFirstName();
-				String lastName = userProfile.getLastName();
-				if (StringUtils.isNotBlank(firstName)
-						|| StringUtils.isNotBlank(lastName)) {
-					document.setTitle(new DefaultInternationalString(firstName
-							+ " " + lastName));
-				} else {
-					document.setTitle(new DefaultInternationalString(object
-							.getUsername()));
-				}
-				document.setOwner(name);
-				document.set("object", object);
+				/**
+				 * ResourceName name = UserUtils.getUserDocumentName(object
+				 * .getUsername());
+				 * 
+				 * Document<User> document = (Document<User>) modelRepository
+				 * .createObject("Document", name); document.setName(name);
+				 * document.setSearchable(false);
+				 * 
+				 * String firstName = userProfile.getFirstName(); String
+				 * lastName = userProfile.getLastName();
+				 * 
+				 * if (StringUtils.isNotBlank(firstName) ||
+				 * StringUtils.isNotBlank(lastName)) { document.setTitle(new
+				 * DefaultInternationalString(firstName + " " + lastName)); }
+				 * else { document.setTitle(new
+				 * DefaultInternationalString(object .getUsername())); }
+				 * document.setOwner(name); document.set("object", object);
+				 **/
 
 				// User
 				object.putAspect(userProfile);
@@ -162,12 +232,27 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				}
 				object.putAspect(profiel);
 
+				ResourceName resourceName = new ResourceName(User.USER_SPACE,
+						object.getUsername());
+
+				setHasErrors(false);
+
+				// Save Document
+				// modelRepository.saveDocument(document);
+
+				// Save User UserProfile PeterMeterProfiel and
+				// PeterMeterNaamCode via Listener
+				modelRepository.saveObject(object);
+
 				// Set permissions
+				ResourceName name = UserUtils.getUserDocumentName(object
+						.getUsername());
+
+				Document document = modelRepository.getDocument(object);
+
 				setDocumentPermissions(name, document);
 
 				// Assign to group
-				ResourceName resourceName = new ResourceName(User.USER_SPACE,
-						object.getUsername());
 				addUserToPeterMeterGroup(resourceName);
 
 				// Send mail
@@ -175,16 +260,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						object.getUsername(),
 						object.getAspect("UserProfile").get("email").toString(),
 						password);
-
-				setHasErrors(false);
-				modelRepository.saveDocument(document);
-				modelRepository.saveObject(object);
-
-				// Save new PM in codetabel
-				PeterMeterNaamCode code = new PeterMeterNaamCode();
-				code.setCode(resourceName.toString());
-				code.setLabel(lastName + " " + firstName);
-				modelRepository.saveObject(code);
 
 				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
 
@@ -225,16 +300,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 					"group", "PeterMeter"));
 			group.getMembers().remove(modelRepository.getResourceName(object));
 			modelRepository.saveObject(group);
-
-			// Search and delete PeterMeterNaamCode
-			QueryBuilder builder = new QueryBuilder("PeterMeterNaamCode");
-			builder.addFilter(FilterUtils.equal("code",
-					"user:" + object.getUsername()));
-
-			List<PeterMeterNaamCode> codes = (List<PeterMeterNaamCode>) modelRepository
-					.searchObjects(builder.build(), false, false);
-
-			modelRepository.deleteObject(codes.get(0));
 
 			// Delete user and document permissions
 			modelRepository.deleteObject(object);
@@ -432,23 +497,21 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 		try {
 
-			if (checkVoorkeuren()) {
+			checkVoorkeuren();
 
-				hasErrors = false;
-				modelRepository.saveObject(object);
+			hasErrors = false;
+			modelRepository.saveObject(object);
 
-				messages.info(documentMessages.documentSaveSuccess(ObjectUtils
-						.toString(modelRepository.getResourceIdentifier(object))));
+			messages.info(documentMessages.documentSaveSuccess(ObjectUtils
+					.toString(modelRepository.getResourceIdentifier(object))));
 
-				clear();
-				search();
+			clear();
+			search();
 
-			} else {
-				hasErrors = true;
-			}
 		} catch (IOException e) {
-			messages.error(documentMessages.documentSaveFailed(e.getMessage()));
-			LOG.error("Can not save model object.", e);
+			hasErrors = true;
+			// messages.error(documentMessages.documentSaveFailed(e.getMessage()));
+			LOG.error("Can not save PeterMeter.", e);
 		}
 	}
 
@@ -456,8 +519,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * Checken of Voorkeuren voldoen aan de voorwaarden voor opslag.
 	 * 
 	 * @return
+	 * @throws IOException
 	 */
-	private boolean checkVoorkeuren() {
+	private void checkVoorkeuren() throws IOException {
 
 		PeterMeterProfiel profiel = (PeterMeterProfiel) object
 				.getAspect("PeterMeterProfiel");
@@ -465,34 +529,48 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		int counterLente = 0;
 		int counterZomer = 0;
 		int counterHerfst = 0;
+		String message = "";
 
 		if (profiel.getVoorkeuren() != null
 				&& !profiel.getVoorkeuren().isEmpty()) {
 
 			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
 
-				if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-					counterLente++;
-				}
-				if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-					counterZomer++;
-				}
-				if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-					counterHerfst++;
+				if (voorkeur.getRegio() != null
+						&& voorkeur.getPeriode() != null
+						&& voorkeur.getTrajectType() != null) {
+
+					if (voorkeur.getTrajectType().toLowerCase()
+							.contains("netwerk")
+							&& voorkeur.getMaxAfstand() == 0) {
+
+						message = "Gelieve voor elke voorkeur van het type netwerk een maximale afstand groter dan 0 op te geven.";
+						messages.error(message);
+						throw new IOException(message);
+					}
+
+					if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+						counterLente++;
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+						counterZomer++;
+					}
+					if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+						counterHerfst++;
+					}
+				} else {
+					message = "Bewaren profiel niet gelukt: Gelieve voor elke voorkeur een periode, trajectype en regio op te geven.";
+					messages.error(message);
+					throw new IOException(message);
 				}
 
-				if (voorkeur.getTrajectType().contains("Route")
-						&& null == voorkeur.getTrajectNaam()) {
-					messages.error("Bewaren profiel niet gelukt: Indien een voorkeur van het type 'route' opgegeven is, moet ook een trajectnaam ingevuld worden.");
-					return false;
-				}
 			}
 
 			if (counterLente > 3 || counterZomer > 3 || counterHerfst > 3) {
-				messages.error("Bewaren profiel niet gelukt: Per periode zijn er maximaal 3 voorkeuren toegelaten.");
-				return false;
+				message = "Bewaren profiel niet gelukt: Per periode zijn er maximaal 3 voorkeuren toegelaten.";
+				messages.error(message);
+				throw new IOException(message);
 			}
 		}
-		return true;
 	}
 }

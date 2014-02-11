@@ -271,76 +271,88 @@ public class MeldingFormBase implements Serializable {
 	@SuppressWarnings("unchecked")
 	public void searchTraject() throws IOException {
 
-		MapViewer viewer = getViewer();
-		MapContext context = viewer.getConfiguration().getContext();
-		envelope = getEnvelopeProvincie();
-
-		getMelding().setProbleem(null);
-		probleemType = "";
-
-		// Itereren over de lagen en de correcte operaties uitvoeren
-		for (FeatureMapLayer layer : context.getFeatureLayers()) {
-			layer.setFilter(null);
-			layer.setHidden(true);
-			layer.set("selectable", false);
-			// Provincie altijd zichtbaar
-			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
-				layer.setHidden(false);
-			}
-
-			else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-				// Netwerk
-				if (trajectType.contains("Segment")) {
-					searchNetwerkLayer(layer);
-				}
-				// Route
-				else {
-					searchRouteLayer(layer);
-					envelope = viewer.getContentExtent(layer);
-				}
-			}
-			// RouteBord
-			else if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
-				searchRouteBordLayer(layer);
-			}
-			// NetwerkBord
-			// Filtering op de borden
-			else if (layer.getLayerId().equalsIgnoreCase(
-					trajectType.replace("Segment", "") + "Bord")) {
-				layer.setHidden(false);
-				searchNetwerkBordLayer(layer);
-			}
-			// WandelKnooppunt
-			else if (layer.getLayerId().contains("Knooppunt")
-					&& trajectType.contains("WandelNetwerk")) {
-				FeatureMapLayer mapLayer = (FeatureMapLayer) context
-						.getLayer("wandelNetwerkKnooppunt");
-				searchKnooppuntLayer(mapLayer);
-			}
-
-			// FietsKnooppunt
-			else if (layer.getLayerId().contains("Knooppunt")
-					&& trajectType.contains("FietsNetwerk")) {
-				FeatureMapLayer mapLayer = (FeatureMapLayer) context
-						.getLayer("fietsNetwerkKnooppunt");
-				searchKnooppuntLayer(mapLayer);
-			}
-
-			// Intekenen Punt
-			else if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
-				layer.setHidden(true);
-				((GeometryListFeatureMapLayer) layer)
-						.setGeometries(Collections.EMPTY_LIST);
-			} else {
-				layer.setHidden(true);
-				layer.setFilter(null);
-				layer.set("selectable", false);
-				layer.setSelection(Collections.EMPTY_LIST);
-			}
+		if (trajectType == null) {
+			messages.warn("Gelieve eerst een route- of netwerktype te selecteren alvorens te zoeken.");
 		}
 
-		viewer.updateCurrentExtent(envelope);
-		viewer.updateContext(null);
+		else if (trajectType.contains("Route") && trajectNaam == null) {
+			messages.warn("Gelieve bij het zoeken naar routes een trajectnaam te selecteren.");
+		}
+
+		else {
+			MapViewer viewer = getViewer();
+			MapContext context = viewer.getConfiguration().getContext();
+			envelope = getEnvelopeProvincie();
+
+			getMelding().setProbleem(null);
+			probleemType = "";
+
+			// Itereren over de lagen en de correcte operaties uitvoeren
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.set("selectable", false);
+				// Provincie altijd zichtbaar
+				if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+					layer.setHidden(false);
+				}
+
+				else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+					// Netwerk
+					if (trajectType.contains("Segment")) {
+						searchNetwerkLayer(layer);
+					}
+					// Route
+					else {
+						searchRouteLayer(layer);
+						envelope = viewer.getContentExtent(layer);
+					}
+				}
+				// RouteBord
+				else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType + "Bord")) {
+					searchRouteBordLayer(layer);
+				}
+				// NetwerkBord
+				// Filtering op de borden
+				else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType.replace("Segment", "") + "Bord")) {
+					layer.setHidden(false);
+					searchNetwerkBordLayer(layer);
+				}
+				// WandelKnooppunt
+				else if (layer.getLayerId().contains("Knooppunt")
+						&& trajectType.contains("WandelNetwerk")) {
+					FeatureMapLayer mapLayer = (FeatureMapLayer) context
+							.getLayer("wandelNetwerkKnooppunt");
+					searchKnooppuntLayer(mapLayer);
+				}
+
+				// FietsKnooppunt
+				else if (layer.getLayerId().contains("Knooppunt")
+						&& trajectType.contains("FietsNetwerk")) {
+					FeatureMapLayer mapLayer = (FeatureMapLayer) context
+							.getLayer("fietsNetwerkKnooppunt");
+					searchKnooppuntLayer(mapLayer);
+				}
+
+				// Intekenen Punt
+				else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
+					layer.setHidden(true);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(Collections.EMPTY_LIST);
+				} else {
+					layer.setHidden(true);
+					layer.setFilter(null);
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+
+			viewer.updateCurrentExtent(envelope);
+			viewer.updateContext(null);
+		}
 	}
 
 	/**
@@ -527,9 +539,6 @@ public class MeldingFormBase implements Serializable {
 		if (object.getProbleem() != null
 				&& object.getProbleem() instanceof NetwerkAnderProbleem) {
 
-			List<String> ids = (List<String>) event.getParams().get(
-					"featureIds");
-
 			String layerId = (String) event.getParams().get("layerId");
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
@@ -548,14 +557,11 @@ public class MeldingFormBase implements Serializable {
 		else if (object.getProbleem() != null
 				&& object.getProbleem() instanceof BordProbleem) {
 
-			List<String> ids = (List<String>) event.getParams().get(
-					"featureIds");
 			String layerId = (String) event.getParams().get("layerId");
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
 
 			if (layer.getSelection().size() == 1) {
-				String id = ids.iterator().next();
 				((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
 						"Bord", layer.getSelection().get(0)));
 
@@ -614,13 +620,10 @@ public class MeldingFormBase implements Serializable {
 	 * 
 	 * @param event
 	 */
-	@SuppressWarnings("unchecked")
 	public void onUpdateFeatures(ControllerEvent event) {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
-
-		List<String> ids = (List<String>) event.getParams().get("featureIds");
 
 		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);
@@ -810,7 +813,9 @@ public class MeldingFormBase implements Serializable {
 
 		if (regio != null && trajectNaam == null) {
 			layer.setFilter(FilterUtils.equal("regio", regio));
-		} else if (trajectNaam != null) {
+		}
+
+		else if (trajectNaam != null) {
 			layer.setFilter(FilterUtils.like("naam", trajectNaam));
 		}
 
@@ -941,11 +946,6 @@ public class MeldingFormBase implements Serializable {
 		try {
 
 			return "view";
-			// String contextPath = FacesContext.getCurrentInstance()
-			// .getExternalContext().getRequestContextPath();
-			//
-			// FacesContext.getCurrentInstance().getExternalContext()
-			// .redirect(contextPath + "/web/view/form:MeldingForm");
 
 		} catch (Exception e1) {
 			LOG.error("Can not redirect to MeldingForm.", e1);
@@ -1000,7 +1000,9 @@ public class MeldingFormBase implements Serializable {
 		if (context != null) {
 			Map<String, Object> requestCookieMap = context.getExternalContext()
 					.getRequestCookieMap();
+
 			return (Cookie) requestCookieMap.get(COOKIE_NAME);
+
 		} else {
 			return null;
 		}
@@ -1022,7 +1024,9 @@ public class MeldingFormBase implements Serializable {
 			Provincie provincie = (Provincie) modelRepository
 					.getUniqueResult(modelRepository.searchObjects(
 							new DefaultQuery("Provincie"), true, true));
+
 			return GeometryUtils.getEnvelope(provincie.getGeom());
+
 		} catch (IOException e) {
 			LOG.error("Can not search Provincie.", e);
 		}

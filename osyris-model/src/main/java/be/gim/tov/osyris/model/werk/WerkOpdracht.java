@@ -17,6 +17,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Search;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
@@ -59,6 +60,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Uitvoerder')}")
+	@Target("_blank")
 	private ResourceIdentifier uitvoerder;
 
 	@Edit(type = "table")
@@ -68,6 +70,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	@Target("_blank")
 	private ResourceIdentifier medewerker;
 
 	@NotEditable
@@ -93,6 +96,20 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@FileSize(2 * 1024 * 1024)
 	@Width(150)
 	private byte[] foto;
+
+	@View(type = "image")
+	@NotSearchable
+	@ContentType("image/*")
+	@FileSize(2 * 1024 * 1024)
+	@Width(150)
+	private byte[] foto2;
+
+	@View(type = "image")
+	@NotSearchable
+	@ContentType("image/*")
+	@FileSize(2 * 1024 * 1024)
+	@Width(150)
+	private byte[] foto3;
 
 	@NotSearchable
 	@NotEditable
@@ -131,11 +148,13 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotEditable
 	@NotViewable
 	@ModelClassName("Traject")
+	@Target("_blank")
 	private ResourceIdentifier traject;
 
 	@NotSearchable
 	@Edit(type = "table")
-	@View(type = "table")
+	// @View(type = "table")
+	@NotViewable
 	private List<GebruiktMateriaal> materialen;
 
 	@NotViewable
@@ -146,6 +165,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@NotViewable
 	@NotSearchable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier regioId;
 
 	@NotViewable
@@ -214,6 +234,22 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setFoto(byte[] foto) {
 		this.foto = foto;
+	}
+
+	public byte[] getFoto2() {
+		return foto2;
+	}
+
+	public void setFoto2(byte[] foto2) {
+		this.foto2 = foto2;
+	}
+
+	public byte[] getFoto3() {
+		return foto3;
+	}
+
+	public void setFoto3(byte[] foto3) {
+		this.foto3 = foto3;
 	}
 
 	public Date getDatumGeannuleerd() {

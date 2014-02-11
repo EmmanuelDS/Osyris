@@ -11,6 +11,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -39,9 +40,11 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier _for;
 
 	@ModelClassName("UitvoerderBedrijf")
+	@Target("_blank")
 	private ResourceIdentifier bedrijf;
 
 	// GETTERS AND SETTERS

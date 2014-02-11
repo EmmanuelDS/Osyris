@@ -13,6 +13,7 @@ import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.core.model.AbstractModelObject;
@@ -43,6 +44,7 @@ public class MedewerkerProfiel extends AbstractModelObject implements
 	@NotSearchable
 	@NotViewable
 	@NotEditable
+	@Target("_blank")
 	private ResourceIdentifier _for;
 
 	@Type(value = ModelPropertyType.ENUM)

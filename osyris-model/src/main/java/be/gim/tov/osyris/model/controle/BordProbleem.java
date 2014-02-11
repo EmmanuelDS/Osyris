@@ -6,6 +6,7 @@ import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 
@@ -28,6 +29,7 @@ public abstract class BordProbleem extends Probleem {
 	@NotViewable
 	@NotEditable
 	@ModelClassName("Bord")
+	@Target("_blank")
 	private ResourceIdentifier bord;
 
 	// GETTERS AND SETTERS
