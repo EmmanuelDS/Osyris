@@ -21,13 +21,16 @@ public class TrajectSearchListener {
 
 	public void processEvent(ModelEvent event) throws IOException {
 
-		Filter filter = (Filter) getQuery(event).getFilter().accept(
-				new TrajectVisitor(), event.getModelObject());
+		if (getQuery(event).getFilter() != null) {
+			Filter filter = (Filter) getQuery(event).getFilter().accept(
+					new TrajectVisitor(), event.getModelObject());
 
-		getQuery(event).setFilter(filter);
+			getQuery(event).setFilter(filter);
+		}
 	}
 
 	protected Query getQuery(ModelEvent event) {
+
 		if (event instanceof SearchModelEvent) {
 			return ((SearchModelEvent) event).getQuery();
 		}

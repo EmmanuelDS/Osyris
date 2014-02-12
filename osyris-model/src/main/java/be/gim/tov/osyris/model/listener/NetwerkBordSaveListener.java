@@ -20,6 +20,7 @@ import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.RichtingEnum;
 import be.gim.tov.osyris.model.traject.WandelNetwerkBord;
 
 import com.ocpsoft.pretty.faces.util.StringUtils;
@@ -43,14 +44,6 @@ public class NetwerkBordSaveListener {
 
 		NetwerkBord netwerkBord = (NetwerkBord) event.getModelObject();
 
-		// Automatically set Regio
-		if (netwerkBord.getRegio() == null) {
-
-			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
-					.getRegioForBord(netwerkBord);
-			netwerkBord.setRegio(modelRepository.getResourceKey(regio));
-		}
-
 		// Automatically set Gemeente
 		if (netwerkBord.getGemeente() == null) {
 
@@ -71,6 +64,18 @@ public class NetwerkBordSaveListener {
 			netwerkBord.getSegmenten().addAll(segmentIds);
 		}
 
+		// Automatically set Regio
+		if (netwerkBord.getBordType() != null) {
+			if (netwerkBord.getBordType().equals("doorverwijs")
+					&& !netwerkBord.getSegmenten().isEmpty()) {
+
+				// Doorverwijsbord set regio van bijhorend segment
+				NetwerkSegment seg = (NetwerkSegment) modelRepository
+						.loadObject(netwerkBord.getSegmenten().get(0));
+				netwerkBord.setRegio(seg.getRegio());
+			}
+		}
+
 		// KnooppuntNrs
 		if (netwerkBord.getKpid0() != null) {
 
@@ -78,6 +83,33 @@ public class NetwerkBordSaveListener {
 				NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 						.loadObject(netwerkBord.getKpid0());
 				netwerkBord.setKpnr0(knooppunt.getNummer());
+
+				if (netwerkBord.getBordType() != null
+						&& netwerkBord.getBordType().equals("knooppunt")) {
+
+					// Knooppuntbord set regio van bijhorend KP0
+					netwerkBord.setRegio(knooppunt.getRegio());
+
+					// Bepalen richting doorverwijsbord
+					NetwerkSegment seg = (NetwerkSegment) modelRepository
+							.loadObject(netwerkBord.getSegmenten().get(0));
+
+					NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+							.loadObject(seg.getNaarKnooppunt());
+
+					if (netwerkBord.getBordType() != null
+							&& netwerkBord.getBordType().equals("knooppunt")) {
+
+						if (naarKp.getNummer().equals(knooppunt.getNummer())) {
+							netwerkBord.setRichting(RichtingEnum.FT);
+						}
+
+						else {
+							netwerkBord.setRichting(RichtingEnum.TF);
+						}
+					}
+				}
+
 			} else {
 				netwerkBord.setKpnr0(null);
 				netwerkBord.setKpid0(null);
@@ -89,6 +121,26 @@ public class NetwerkBordSaveListener {
 				NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 						.loadObject(netwerkBord.getKpid1());
 				netwerkBord.setKpnr1(knooppunt.getNummer());
+
+				// Bepalen richting doorverwijsbord
+				NetwerkSegment seg = (NetwerkSegment) modelRepository
+						.loadObject(netwerkBord.getSegmenten().get(0));
+
+				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getNaarKnooppunt());
+
+				if (netwerkBord.getBordType() != null
+						&& netwerkBord.getBordType().equals("doorverwijs")) {
+
+					if (naarKp.getNummer().equals(knooppunt.getNummer())) {
+						netwerkBord.setRichting(RichtingEnum.FT);
+					}
+
+					else {
+						netwerkBord.setRichting(RichtingEnum.TF);
+					}
+				}
+
 			} else {
 				netwerkBord.setKpnr1(null);
 				netwerkBord.setKpid1(null);

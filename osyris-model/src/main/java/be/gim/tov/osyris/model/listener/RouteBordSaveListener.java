@@ -16,7 +16,6 @@ import org.conscientia.core.search.QueryBuilder;
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
-import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 
@@ -43,9 +42,10 @@ public class RouteBordSaveListener {
 		// Automatically set Regio
 		if (routeBord.getRegio() == null) {
 
-			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
-					.getRegioForBord(routeBord);
-			routeBord.setRegio(modelRepository.getResourceKey(regio));
+			// Ophalen regio van de gekoppelde route
+			Traject traject = Beans.getReference(OsyrisModelFunctions.class)
+					.getRouteForRouteBord(routeBord);
+			routeBord.setRegio(traject.getRegio());
 		}
 
 		// Set route voor RouteBord indien niet aanwezig
@@ -60,7 +60,6 @@ public class RouteBordSaveListener {
 			routeBord.setRoute(modelRepository.getResourceIdentifier(route));
 		}
 
-		// TODO zoeken welk traject het dichtste bij ligt
 		if (routeBord.getRoute() == null && routeBord.getNaam() == null) {
 
 			Traject traject = Beans.getReference(OsyrisModelFunctions.class)
@@ -68,6 +67,5 @@ public class RouteBordSaveListener {
 
 			routeBord.setRoute(modelRepository.getResourceKey(traject));
 		}
-
 	}
 }
