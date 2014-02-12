@@ -13,7 +13,6 @@ import org.conscientia.api.repository.ModelRepository;
 
 import be.gim.commons.bean.Beans;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
-import be.gim.tov.osyris.model.traject.Regio;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 
@@ -36,21 +35,6 @@ public class RouteBordCreateListener {
 		RouteBord routeBord = (RouteBord) event.getModelObject();
 
 		routeBord.setActief("1");
-		// Automatically set Regio
-		if (routeBord.getRegio() == null) {
-
-			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
-					.getRegioForBord(routeBord);
-			routeBord.setRegio(modelRepository.getResourceKey(regio));
-		}
-
-		// Automatically set Gemeente
-		if (routeBord.getGemeente() == null) {
-
-			String gemeente = Beans.getReference(OsyrisModelFunctions.class)
-					.getGemeenteForBord(routeBord);
-			routeBord.setGemeente(gemeente);
-		}
 
 		Traject traject = null;
 		if (routeBord.getRoute() == null && routeBord.getNaam() == null) {
@@ -63,6 +47,19 @@ public class RouteBordCreateListener {
 
 		if (routeBord.getRoute() != null && routeBord.getNaam() == null) {
 			routeBord.setNaam(traject.getNaam());
+		}
+
+		// Automatically set Regio
+		if (routeBord.getRegio() == null) {
+			routeBord.setRegio(traject.getRegio());
+		}
+
+		// Automatically set Gemeente
+		if (routeBord.getGemeente() == null) {
+
+			String gemeente = Beans.getReference(OsyrisModelFunctions.class)
+					.getGemeenteForBord(routeBord);
+			routeBord.setGemeente(gemeente);
 		}
 	}
 }

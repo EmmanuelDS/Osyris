@@ -1510,7 +1510,6 @@ public class OsyrisModelFunctions {
 		DefaultQuery query = new DefaultQuery();
 		query.setModelClassName(bord.getModelClass().getName()
 				.replace("Bord", ""));
-		query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
 
 		List<Route> routes = (List<Route>) modelRepository.searchObjects(query,
 				false, false);
