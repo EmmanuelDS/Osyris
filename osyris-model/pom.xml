@@ -14,5 +14,15 @@
 			<artifactId>specto-model-base</artifactId>
 			<version>${specto.version}</version>
 		</dependency>
-	</dependencies>
+		<dependency>
+			<groupId>be.gim.specto</groupId>
+			<artifactId>specto-topology</artifactId>
+			<version>${specto.version}</version>
+		</dependency>
+				<dependency>
+			<groupId>be.gim.conscientia</groupId>
+			<artifactId>conscientia-model-user</artifactId>
+			<version>${conscientia.version}</version>
+		</dependency>
+			</dependencies>
 </project>
