@@ -36,21 +36,25 @@ public class RouteBordCreateListener {
 
 		routeBord.setActief("1");
 
-		Traject traject = null;
+		Traject traject;
 		if (routeBord.getRoute() == null && routeBord.getNaam() == null) {
-
 			traject = Beans.getReference(OsyrisModelFunctions.class)
 					.getRouteForRouteBord(routeBord);
 
-			routeBord.setRoute(modelRepository.getResourceKey(traject));
+			if (traject != null)
+				routeBord.setRoute(modelRepository.getResourceKey(traject));
+		} else {
+			traject = (Traject) modelRepository
+					.loadObject(routeBord.getRegio());
 		}
 
-		if (routeBord.getRoute() != null && routeBord.getNaam() == null) {
+		if (traject != null && routeBord.getRoute() != null
+				&& routeBord.getNaam() == null) {
 			routeBord.setNaam(traject.getNaam());
 		}
 
 		// Automatically set Regio
-		if (routeBord.getRegio() == null) {
+		if (traject != null && routeBord.getRegio() == null) {
 			routeBord.setRegio(traject.getRegio());
 		}
 

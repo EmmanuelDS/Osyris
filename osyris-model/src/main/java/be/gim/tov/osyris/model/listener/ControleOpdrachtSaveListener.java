@@ -12,7 +12,6 @@ import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.jboss.seam.international.status.Messages;
-import org.jboss.seam.security.Identity;
 
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
@@ -40,8 +39,6 @@ public class ControleOpdrachtSaveListener {
 	private static final Log LOG = LogFactory
 			.getLog(ControleOpdrachtSaveListener.class);
 
-	@Inject
-	private Identity identity;
 	@Inject
 	private ModelRepository modelRepository;
 	@Inject

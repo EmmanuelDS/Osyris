@@ -11,10 +11,12 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.store.ModelStore;
 import org.conscientia.core.search.DefaultQuery;
 
+import be.gim.commons.collections.CollectionUtils;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.Regio;
 
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
 
 /**
@@ -46,30 +48,30 @@ public class NetwerkKnooppuntSaveListener {
 		}
 
 		// Indien regio bij het aanmaken leeg is automatisch regio zoeken
-		if (knooppunt.getRegio() == null) {
-
+		Geometry geom = knooppunt.getGeom();
+		if (knooppunt.getRegio() == null && geom != null) {
 			DefaultQuery query = new DefaultQuery();
 			query.setModelClassName("Regio");
-			query.addFilter(FilterUtils.intersects("geom", knooppunt.getGeom()));
+			query.addFilter(FilterUtils.intersects("geom", geom));
 
-			Regio regio = (Regio) modelRepository.searchObjects(query, false,
-					false).get(0);
-			knooppunt.setRegio(modelRepository.getResourceIdentifier(regio));
-
+			Regio regio = (Regio) CollectionUtils.first(modelRepository
+					.searchObjects(query, false, false));
+			if (regio != null)
+				knooppunt
+						.setRegio(modelRepository.getResourceIdentifier(regio));
 		}
 
 		// Indien naam bij aanmaken leeg is automatisch invullen naam regio
 		if (knooppunt.getNaam() == null || knooppunt.getNaam().isEmpty()) {
-
 			Regio regio = (Regio) modelRepository.loadObject(knooppunt
 					.getRegio());
-			knooppunt.setNaam(regio.getNaam());
-
+			if (regio != null)
+				knooppunt.setNaam(regio.getNaam());
 		}
 
 		// Automatically set X Y coordinates indien niet aanwezig
-		if (knooppunt.getGeom() != null && knooppunt.getGeom() instanceof Point) {
-			Point p = (Point) knooppunt.getGeom();
+		if (geom != null && geom instanceof Point) {
+			Point p = (Point) geom;
 			knooppunt.setX(p.getX());
 			knooppunt.setY(p.getY());
 		}

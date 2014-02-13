@@ -47,17 +47,17 @@ public class UserSaveListener {
 
 		UserProfile userProfile = (UserProfile) user.getAspect("UserProfile");
 
-		PeterMeterProfiel profiel = (PeterMeterProfiel) user
+		PeterMeterProfiel pmProfiel = (PeterMeterProfiel) user
 				.getAspect("PeterMeterProfiel");
 
-		if (profiel != null) {
+		if (pmProfiel != null) {
 
-			if (profiel.getVoorkeuren() != null
-					&& !profiel.getVoorkeuren().isEmpty()) {
+			if (pmProfiel.getVoorkeuren() != null
+					&& !pmProfiel.getVoorkeuren().isEmpty()) {
 
-				checkVoorkeuren(profiel);
+				checkVoorkeuren(pmProfiel);
 
-				for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+				for (PeterMeterVoorkeur voorkeur : pmProfiel.getVoorkeuren()) {
 
 					// Indien trajectType een Route is, set maxAfstand op 0
 					if (voorkeur.getTrajectType().contains("Route")) {
@@ -73,13 +73,13 @@ public class UserSaveListener {
 			}
 
 			// Current date indien actiefSinds leeg
-			if (profiel.getActiefSinds() == null) {
-				profiel.setActiefSinds(new Date());
+			if (pmProfiel.getActiefSinds() == null) {
+				pmProfiel.setActiefSinds(new Date());
 			}
 
 			// Status ACTIEF indien leeg
-			if (profiel.getStatus() == null) {
-				profiel.setStatus(PeterMeterStatus.ACTIEF);
+			if (pmProfiel.getStatus() == null) {
+				pmProfiel.setStatus(PeterMeterStatus.ACTIEF);
 			}
 
 			// indien naamcode reeds bestaat, updaten

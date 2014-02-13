@@ -5,7 +5,6 @@ import java.util.List;
 
 import javax.inject.Inject;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.model.annotation.Listener;
@@ -17,6 +16,7 @@ import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
@@ -47,25 +47,24 @@ public class NetwerkSegmentSaveListener {
 
 			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
 					.getRegioForSegment(segment);
-
-			segment.setRegio(modelRepository.getResourceKey(regio));
+			if (regio != null)
+				segment.setRegio(modelRepository.getResourceKey(regio));
 		}
 
 		// Automatisch setten VanKpNr
-		if (segment.getVanKnooppunt() != null
-				&& StringUtils.isNotBlank(segment.getVanKnooppunt().toString())) {
+		if (ResourceIdentifier.isNotEmpty(segment.getVanKnooppunt())) {
 			NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 					.loadObject(segment.getVanKnooppunt());
-			segment.setVanKpNr(knooppunt.getNummer());
+			if (knooppunt != null)
+				segment.setVanKpNr(knooppunt.getNummer());
 		}
 
 		// Automatisch setten NaarKpNr
-		if (segment.getNaarKnooppunt() != null
-				&& StringUtils
-						.isNotBlank(segment.getNaarKnooppunt().toString())) {
+		if (ResourceIdentifier.isNotEmpty(segment.getNaarKnooppunt())) {
 			NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 					.loadObject(segment.getNaarKnooppunt());
-			segment.setNaarKpNr(knooppunt.getNummer());
+			if (knooppunt != null)
+				segment.setNaarKpNr(knooppunt.getNummer());
 		}
 
 		event.addAfterEvent(new AfterModelEvent() {

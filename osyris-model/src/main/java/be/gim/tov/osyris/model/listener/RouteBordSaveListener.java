@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
-import java.util.List;
 
 import javax.inject.Inject;
 
@@ -14,6 +13,7 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
+import be.gim.commons.collections.CollectionUtils;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.RouteBord;
@@ -45,27 +45,33 @@ public class RouteBordSaveListener {
 			// Ophalen regio van de gekoppelde route
 			Traject traject = Beans.getReference(OsyrisModelFunctions.class)
 					.getRouteForRouteBord(routeBord);
-			routeBord.setRegio(traject.getRegio());
+			if (traject != null)
+				routeBord.setRegio(traject.getRegio());
 		}
 
 		// Set route voor RouteBord indien niet aanwezig
-		if (routeBord.getRoute() == null && routeBord.getNaam() != null) {
+		if (routeBord.getRoute() == null) {
+			if (routeBord.getNaam() != null) {
 
-			QueryBuilder builder = new QueryBuilder("Traject");
-			builder.addFilter(FilterUtils.equal("naam", routeBord.getNaam()));
-			builder.maxResults(1);
-			List<Traject> result = (List<Traject>) modelRepository
-					.searchObjects(builder.build(), false, false);
-			Traject route = result.get(0);
-			routeBord.setRoute(modelRepository.getResourceIdentifier(route));
-		}
+				QueryBuilder builder = new QueryBuilder("Traject");
+				builder.addFilter(FilterUtils.equal("naam", routeBord.getNaam()));
+				builder.maxResults(1);
+				Traject traject = (Traject) CollectionUtils
+						.first(modelRepository.searchObjects(builder.build(),
+								false, false));
+				if (traject != null)
+					routeBord.setRoute(modelRepository
+							.getResourceIdentifier(traject));
+			}
 
-		if (routeBord.getRoute() == null && routeBord.getNaam() == null) {
+			if (routeBord.getNaam() == null) {
 
-			Traject traject = Beans.getReference(OsyrisModelFunctions.class)
-					.getRouteForRouteBord(routeBord);
-
-			routeBord.setRoute(modelRepository.getResourceKey(traject));
+				Traject traject = Beans
+						.getReference(OsyrisModelFunctions.class)
+						.getRouteForRouteBord(routeBord);
+				if (traject != null)
+					routeBord.setRoute(modelRepository.getResourceKey(traject));
+			}
 		}
 	}
 }

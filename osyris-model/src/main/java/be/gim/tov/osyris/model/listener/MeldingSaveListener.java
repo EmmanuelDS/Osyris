@@ -108,8 +108,9 @@ public class MeldingSaveListener {
 			Traject traject = (Traject) modelRepository.loadObject(melding
 					.getTraject());
 
-			werkOpdracht.setUitvoerder(osyrisModelFunctions
-					.zoekUitvoerder(traject.getRegio()));
+			if (traject != null)
+				werkOpdracht.setUitvoerder(osyrisModelFunctions
+						.zoekUitvoerder(traject.getRegio()));
 
 			modelRepository.saveObject(werkOpdracht);
 			messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
