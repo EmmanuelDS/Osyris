@@ -13,6 +13,18 @@
 		name="fileupload/fileupload.css"
 		library="primefaces" />
 
+	<div>
+		<ol>
+			<li>Zoek de route of het netwerk waarover je een probleem wil melden. </li>
+			<li>Zoom op de kaart in op de plaats waarover je een probleem wil melden </li>
+			<li>Kies het type probleem en selecteer vervolgens met het pijltje de exacte locatie </li>
+			<li>Beschrijf het probleem via het veld 'type' </li>
+			<li>Vul je gegevens in </li>
+			<li>Klik op verzenden </li>
+		</ol>
+		<br />
+	<div>Een uitgebreidere handleiding vind je rechts bovenaan, onder ?</div>
+	</div>
 	<br/>
 	<table width="100%">
 	<tr>
@@ -68,32 +80,9 @@
 		</d:buttons>
 	</r:panel>
 	
-	<r:panel id="gegevensPanel" header="Uw gegevens">
-		<d:fields>
-			<d:propertyField id="voornaam" 
-					modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
-					value="#{form.melding.voornaam}" 
-					mode="EDIT" />
-			<d:propertyField id="naam" 
-					modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
-					value="#{form.melding.naam}" 
-					mode="EDIT" />
-			<d:propertyField id="telefoon" 
-					modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
-					value="#{form.melding.telefoon}" 
-					mode="EDIT" />
-			<d:propertyField id="email"
-			 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
-					value="#{form.melding.email}"
-					mode="EDIT" />
-			<d:propertyField id="datumVaststelling" 
-					modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
-					value="#{form.melding.datumVaststelling}" 
-					mode="EDIT" />
-		</d:fields>
-	</r:panel>
+
 	
-	<r:panel header="Probleem">
+	<r:panel header="Selecteer en beschrijf het probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
 		<h:outputText value="Kies het type probleem" />
 		<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
@@ -199,6 +188,42 @@
 		</j:renderPanel>
 	</j:renderPanel>		
 	</r:panel>
+	
+		<r:panel id="gegevensPanel" header="Uw gegevens">
+		<d:fields>
+			<d:propertyField id="voornaam" 
+					modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
+					value="#{form.melding.voornaam}" 
+					mode="EDIT" />
+			<d:propertyField id="naam" 
+					modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
+					value="#{form.melding.naam}" 
+					mode="EDIT" />
+			<d:propertyField id="telefoon" 
+					modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
+					value="#{form.melding.telefoon}" 
+					mode="EDIT" />
+			<d:propertyField id="email"
+			 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
+					value="#{form.melding.email}"
+					mode="EDIT" />
+			<d:propertyField id="datumVaststelling" 
+					modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
+					value="#{form.melding.datumVaststelling}" 
+					mode="EDIT" />
+		</d:fields>
+		
+		<d:buttons>
+			<j:commandButton value="Verzenden"
+				image="#{resource['core/images/actions/12x12/apply.png']}"
+				type="button"
+				action="#{form.saveMelding()}"
+				render="searchTrajectPanel, gegevensPanel, problemPanel">
+			</j:commandButton>
+		</d:buttons>
+		
+	</r:panel>
+	
 	</td>
 	<td width="60%" valign="top">
 	<r:panel>

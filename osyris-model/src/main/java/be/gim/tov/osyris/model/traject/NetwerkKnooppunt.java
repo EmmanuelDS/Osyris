@@ -37,7 +37,7 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	@LabelProperty
 	@Required
 	@Minimum(1)
-	@Maximum(99)
+	@Maximum(999)
 	private Integer nummer;
 
 	@Edit(type = "suggestions")

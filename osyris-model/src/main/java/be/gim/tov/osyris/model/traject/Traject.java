@@ -22,6 +22,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
@@ -53,6 +54,7 @@ public abstract class Traject extends AbstractModelObject implements
 	private static final Log LOG = LogFactory.getLog(Traject.class);
 
 	// VARIABLES
+	@Required
 	@Edit(type = "suggestions")
 	@LabelProperty
 	@Search(type = "suggestions:like-wildcard-nocase")

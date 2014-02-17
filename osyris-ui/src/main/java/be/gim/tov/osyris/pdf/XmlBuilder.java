@@ -402,6 +402,35 @@ public class XmlBuilder {
 							.getKp3ImageCode())));
 				}
 				bord.appendChild(pijlkp3);
+
+				Element kp0 = doc.createElement("kp0");
+				Element kp1 = doc.createElement("kp1");
+				Element kp2 = doc.createElement("kp2");
+				Element kp3 = doc.createElement("kp3");
+
+				if (nwb.getKpnr0() != null) {
+					kp0.appendChild(doc.createTextNode(nwb.getKpnr0()
+							.toString()));
+				}
+				bord.appendChild(kp0);
+
+				if (nwb.getKpnr1() != null) {
+					kp1.appendChild(doc.createTextNode(nwb.getKpnr1()
+							.toString()));
+				}
+				bord.appendChild(kp1);
+
+				if (nwb.getKpnr2() != null) {
+					kp2.appendChild(doc.createTextNode(nwb.getKpnr2()
+							.toString()));
+				}
+				bord.appendChild(kp2);
+
+				if (nwb.getKpnr3() != null) {
+					kp3.appendChild(doc.createTextNode(nwb.getKpnr3()
+							.toString()));
+				}
+				bord.appendChild(kp3);
 			}
 
 			if (b instanceof RouteBord) {
@@ -982,9 +1011,11 @@ public class XmlBuilder {
 		FeatureMapLayer layer = (FeatureMapLayer) viewer.getContext().getLayer(
 				LabelUtils.lowerCamelCase(traject.getModelClass().getName()));
 
+		Envelope env = viewer.getContentExtent(layer);
+		env.expandBy(200);
+
 		RenderedImage mapImage = viewer.getMap(
-				viewer.getContext().getSrsName(),
-				viewer.getContentExtent(layer), null, width, height,
+				viewer.getContext().getSrsName(), env, null, width, height,
 				viewer.getCurrentScale());
 
 		Graphics2D g2d = ((BufferedImage) mapImage).createGraphics();

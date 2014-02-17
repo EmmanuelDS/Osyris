@@ -8,6 +8,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.TreeMap;
 
 import javax.faces.context.FacesContext;
 import javax.inject.Inject;
@@ -46,6 +47,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Gemeente;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
+import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
 import be.gim.tov.osyris.model.traject.Regio;
@@ -61,6 +63,9 @@ import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
 import com.vividsolutions.jts.geom.Geometry;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.linearref.LinearLocation;
+import com.vividsolutions.jts.linearref.LocationIndexedLine;
 
 /**
  * 
@@ -1298,8 +1303,10 @@ public class OsyrisModelFunctions {
 													false, false);
 
 									if (subset != null && !subset.isEmpty()) {
+
 										Collections.sort(subset,
 												new AlphanumericSorting());
+
 										result.addAll(subset);
 									}
 								}
@@ -1578,8 +1585,8 @@ public class OsyrisModelFunctions {
 
 	/**
 	 * Bepalen van de Regio waarin een segment zich bevindt. Indien een segment
-	 * meerdere regios doorkruist, wordt de regio genomen waar de intersectie
-	 * oppervlakte het grootst is.
+	 * meerdere regios doorkruist, wordt de regio genomen waar de lijn
+	 * intersectie het grootst is.
 	 * 
 	 * @param segment
 	 * @return
@@ -1609,6 +1616,60 @@ public class OsyrisModelFunctions {
 				for (Regio r : regios) {
 
 					Geometry g1 = r.getGeom().intersection(segment.getGeom());
+					intersections.put(r, g1.getLength());
+				}
+
+				double maxValueInMap = (Collections.max(intersections.values()));
+				for (Entry<Regio, Double> entry : intersections.entrySet()) {
+					if (entry.getValue() == maxValueInMap) {
+
+						regio = entry.getKey();
+					}
+				}
+			}
+
+			return regio;
+
+		} catch (IOException e) {
+			LOG.error("Can not search Regio", e);
+		}
+
+		return null;
+	}
+
+	/**
+	 * Bepalen van de Regio waarin een traject zich bevindt. Indien een traject
+	 * meerdere regios doorkruist, wordt de regio genomen waar de lijn
+	 * intersectie het grootst is.
+	 * 
+	 * @param segment
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Regio getRegioForTraject(Traject traject) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+			query.addFilter(FilterUtils.intersects("geom", traject.getGeom()));
+
+			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
+					query, true, true);
+
+			Regio regio = null;
+
+			// Indien 1 regio
+			if (regios.size() == 1) {
+				regio = (Regio) modelRepository.getUniqueResult(regios);
+			}
+
+			// Indien intersectie met meerdere regios
+			else if (regios.size() > 1) {
+				Map<Regio, Double> intersections = new HashMap<Regio, Double>();
+
+				for (Regio r : regios) {
+
+					Geometry g1 = r.getGeom().intersection(traject.getGeom());
 					intersections.put(r, g1.getLength());
 				}
 
@@ -1718,5 +1779,162 @@ public class OsyrisModelFunctions {
 		}
 
 		return suggestions;
+	}
+
+	/**
+	 * DEBUG
+	 * 
+	 * @param lus
+	 * @return
+	 */
+	public List<Bord> testNetwerkBord(NetwerkLus lus) {
+		try {
+
+			if (lus != null) {
+				List<Bord> result = new ArrayList<Bord>();
+
+				// StartSegment in de lus
+				NetwerkSegment start = (NetwerkSegment) modelRepository
+						.loadObject(lus.getSegmenten().get(0));
+
+				// ---------------
+				for (int i = 0; i < lus.getSegmenten().size(); i++) {
+
+					int nextIndex = i + 1;
+
+					NetwerkSegment current = (NetwerkSegment) modelRepository
+							.loadObject(lus.getSegmenten().get(i));
+
+					NetwerkSegment next = null;
+
+					if (nextIndex < lus.getSegmenten().size()) {
+
+						next = (NetwerkSegment) modelRepository.loadObject(lus
+								.getSegmenten().get(nextIndex));
+					} else {
+						next = start;
+					}
+
+					String richting = null;
+
+					if (current.getNaarKpNr().equals(next.getVanKpNr())) {
+						richting = RichtingEnum.FT.toString();
+
+					}
+
+					else if (current.getNaarKpNr().equals(next.getNaarKpNr())) {
+						richting = RichtingEnum.FT.toString();
+					}
+
+					else {
+						richting = RichtingEnum.TF.toString();
+					}
+
+					QueryBuilder builder = new QueryBuilder("NetwerkBord");
+					List<Bord> subset = new ArrayList<Bord>();
+
+					List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
+							1);
+					ids.add(modelRepository.getResourceIdentifier(current));
+
+					builder.addFilter(FilterUtils.in("segmenten", ids));
+
+					builder.addFilter(FilterUtils.equal("richting", richting));
+
+					subset = (List<Bord>) modelRepository.searchObjects(
+							builder.build(), false, false);
+
+					LineString line = (LineString) current.getGeom();
+
+					NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+							.loadObject(current.getNaarKnooppunt());
+
+					// if (line.getStartPoint().intersects(
+					// naarKp.getGeom().buffer(20))) {
+					// line.reverse();
+					// }
+
+					// LineString line = (LineString) current.getGeom();
+					LocationIndexedLine lil = new LocationIndexedLine(line);
+					LinearLocation ll = new LinearLocation();
+
+					// Sorteren borden in het segment ahv de
+					// fractie
+					if (subset != null && !subset.isEmpty()) {
+
+						Map<Double, Bord> fracties = new HashMap<Double, Bord>();
+
+						for (Bord bord : subset) {
+							ll = lil.project(bord.getGeom().getCoordinate());
+
+							double fractie = ll.getSegmentFraction();
+							double totalFractie = fractie;
+							Integer segIndex = ll.getSegmentIndex();
+
+							int startIndex = lil.getStartIndex()
+									.getSegmentIndex();
+
+							// int endIndex =
+							// lil.getEndIndex().getSegmentIndex();
+
+							for (int a = startIndex; a < segIndex; a++) {
+								totalFractie += line.getGeometryN(a)
+										.getLength();
+							}
+
+							fracties.put(new Double(totalFractie), bord);
+						}
+
+						for (Entry<Double, Bord> entry : fracties.entrySet()) {
+							System.out.println("---> NORMAL MAP:"
+									+ entry.getKey() + " -- "
+									+ entry.getValue().getId().toString()
+									+ " -- " + entry.getValue().getVolg());
+						}
+
+						TreeMap<Double, Bord> sorted = new TreeMap<Double, Bord>(
+								fracties);
+
+						List<Bord> testList = new ArrayList<Bord>();
+
+						// Switch sorting order if richting TF?
+						if (richting.equals(RichtingEnum.TF.toString())) {
+
+							for (Entry<Double, Bord> entry : sorted
+									.descendingMap().entrySet()) {
+
+								testList.add(entry.getValue());
+								System.out.println("---> REVERSED TREEMAP:"
+										+ entry.getKey() + " -- "
+										+ entry.getValue().getId().toString()
+										+ " -- " + entry.getValue().getVolg());
+							}
+						}
+
+						else {
+
+							for (Entry<Double, Bord> entry : sorted.entrySet()) {
+
+								testList.add(entry.getValue());
+								System.out.println("---> TREEMAP:"
+										+ entry.getKey() + " -- "
+										+ entry.getValue().getId().toString()
+										+ " -- " + entry.getValue().getVolg());
+							}
+						}
+
+						result.addAll(testList);
+					}
+				}
+
+				return result;
+			}
+			// ----------------
+
+		} catch (IOException e) {
+			LOG.error("Can not search segmenten.", e);
+		}
+
+		return Collections.emptyList();
 	}
 }

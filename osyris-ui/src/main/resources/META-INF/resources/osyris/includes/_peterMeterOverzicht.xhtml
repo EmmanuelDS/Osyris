@@ -28,23 +28,31 @@
 								path="#UserProfile/firstName" mode="SEARCH" />
 							<d:propertyField id="lastName"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
-								path="#UserProfile/lastName" mode="SEARCH" />													
+								path="#UserProfile/lastName" mode="SEARCH" />	
+								
+							<d:field for="actiefSinds" label="Sinds">
+							<q:or>
+							<q:lessThanOrEqualTo value="#{peterMeterOverzichtFormBase.actiefSinds}" propertyName="#PeterMeterProfiel/actiefTot">
+								<p:calendar id="actiefSinds"
+									value="#{peterMeterOverzichtFormBase.actiefSinds}" navigator="true" display="inline" effect="slide"
+									inputStyle="width:60px"
+		    						pattern="yyyy-MM-dd">
+								</p:calendar>
+								</q:lessThanOrEqualTo>
+								<q:null propertyName="actiefTot"/>
+								</q:or>
+							</d:field>												
                         		
-							<d:field for="datumSinds" label="Sinds">
-								<p:calendar id="datumSinds"
-									value="#{peterMeterOverzichtFormBase.datumSinds}" navigator="true" display="inline" effect="slide"
+							<d:field for="actiefTot" label="Tot">
+							<q:greaterThanOrEqualTo value="#{peterMeterOverzichtFormBase.actiefTot}" propertyName="#PeterMeterProfiel/actiefSinds">
+								<p:calendar id="actiefTot"
+									value="#{peterMeterOverzichtFormBase.actiefTot}" navigator="true" display="inline" effect="slide"
 									inputStyle="width:60px"
 		    						pattern="yyyy-MM-dd">
 								</p:calendar>
+								</q:greaterThanOrEqualTo>
 							</d:field>
-													 					
-							<d:field for="datumTot" label="Tot" path="#PeterMeterProfiel/actiefTot">
-								<p:calendar id="datumTot"
-									value="#{peterMeterOverzichtFormBase.datumTot}" navigator="true" display="inline" effect="slide"
-									inputStyle="width:60px"
-		    						pattern="yyyy-MM-dd">
-								</p:calendar>
-							</d:field>					
+																					 									
 						</d:fields>			
 						<d:aspect id="peterMeterProfiel"
 							modelClass="#{d:modelClass('PeterMeterProfiel')}"

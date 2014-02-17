@@ -529,6 +529,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 				bewegwijzering = Beans.getReference(OsyrisModelFunctions.class)
 						.getNetwerkBordVolgordeLus(lus);
 
+				// DEBUG netwerkbord volgorde
+				// bewegwijzering =
+				// Beans.getReference(OsyrisModelFunctions.class)
+				// .testNetwerkBord(lus);
+
 			}
 		} catch (IOException e) {
 			messages.error("Fout bij het aanmaken van bewegwijzeringsverslag: "

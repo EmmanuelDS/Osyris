@@ -60,10 +60,8 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	private static final String PERIODE_HERFST = "3";
 
 	// VARIABLES
-	protected String firstName;
-	protected String lastName;
-	protected Date datumSinds;
-	protected Date datumTot;
+	protected Date actiefSinds;
+	protected Date actiefTot;
 
 	@Inject
 	protected UserRepository userRepository;
@@ -82,36 +80,20 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		search();
 	}
 
-	public String getFirstName() {
-		return firstName;
+	public Date getActiefSinds() {
+		return actiefSinds;
 	}
 
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
+	public void setActiefSinds(Date actiefSinds) {
+		this.actiefSinds = actiefSinds;
 	}
 
-	public String getLastName() {
-		return lastName;
+	public Date getActiefTot() {
+		return actiefTot;
 	}
 
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public Date getDatumSinds() {
-		return datumSinds;
-	}
-
-	public void setDatumSinds(Date datumSinds) {
-		this.datumSinds = datumSinds;
-	}
-
-	public Date getDatumTot() {
-		return datumTot;
-	}
-
-	public void setDatumTot(Date datumTot) {
-		this.datumTot = datumTot;
+	public void setActiefTot(Date actiefTot) {
+		this.actiefTot = actiefTot;
 	}
 
 	public boolean isHasErrors() {
@@ -147,26 +129,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						"#PeterMeterProfiel/status", PeterMeterStatus.PASSIEF)));
 
 		try {
-
-			if (datumSinds != null) {
-				query.addFilter(FilterUtils.and(FilterUtils.greaterOrEqual(
-						"#PeterMeterProfiel/actiefSinds", datumSinds)));
-			}
-
-			if (datumTot != null) {
-				query.addFilter(FilterUtils.and(FilterUtils.lessOrEqual(
-						"#PeterMeterProfiel/actiefTot", datumTot)));
-			}
-
-			if (firstName != null) {
-				query.addFilter(FilterUtils.like("#UserProfile/firstName",
-						firstName));
-			}
-
-			if (lastName != null) {
-				query.addFilter(FilterUtils.like("#UserProfile/lastName",
-						lastName));
-			}
 
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
 					"group", "PeterMeter"));
