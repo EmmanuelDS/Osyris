@@ -24,6 +24,7 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.api.model.annotation.Width;
+import org.conscientia.api.model.select.Level;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -93,17 +94,19 @@ public abstract class Bord extends AbstractModelObject implements
 	private String bordConst;
 
 	@External
-	@View(type = "image")
+	@View(type = "image", level = Level.LONG)
 	@Width(150)
 	@NotSearchable
 	@ModelClassName("File")
 	@Target("_blank")
 	private ResourceIdentifier foto;
 
+	@View(level = Level.LONG)
 	@NotSearchable
 	@NotEditable
 	private double x;
 
+	@View(level = Level.LONG)
 	@NotSearchable
 	@NotEditable
 	private double y;
