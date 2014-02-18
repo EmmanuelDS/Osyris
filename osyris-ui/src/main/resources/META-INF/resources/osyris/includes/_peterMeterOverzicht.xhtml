@@ -24,33 +24,42 @@
 						modelClassName="#{peterMeterOverzichtFormBase.modelClass.getName()}">
 						<d:fields>
 							<d:propertyField id="firstName"
+								modelClass="#{d:modelClass('UserProfile')}"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('firstName')}"
 								path="#UserProfile/firstName" mode="SEARCH" />
 							<d:propertyField id="lastName"
+								modelClass="#{d:modelClass('UserProfile')}"
 								modelProperty="#{d:modelClass('UserProfile').getProperty('lastName')}"
-								path="#UserProfile/lastName" mode="SEARCH" />	
-								
+								path="#UserProfile/lastName" mode="SEARCH" />
 							<d:field for="actiefSinds" label="Sinds">
-							<q:or>
-							<q:lessThanOrEqualTo value="#{peterMeterOverzichtFormBase.actiefSinds}" propertyName="#PeterMeterProfiel/actiefTot">
-								<p:calendar id="actiefSinds"
-									value="#{peterMeterOverzichtFormBase.actiefSinds}" navigator="true" display="inline" effect="slide"
-									inputStyle="width:60px"
-		    						pattern="yyyy-MM-dd">
-								</p:calendar>
-								</q:lessThanOrEqualTo>
-								<q:null propertyName="actiefTot"/>
+								<q:or>
+									<q:greaterThanOrEqualTo value="#{peterMeterOverzichtFormBase.actiefSinds}"
+										propertyName="#PeterMeterProfiel/actiefTot">
+										<p:calendar id="actiefSinds"
+											value="#{peterMeterOverzichtFormBase.actiefSinds}"
+											navigator="true"
+											display="inline"
+											effect="slide"
+											inputStyle="width:60px"
+				    						pattern="yyyy-MM-dd">
+										</p:calendar>
+									</q:greaterThanOrEqualTo>
+									<q:null propertyName="actiefTot"
+										active="#{peterMeterOverzichtFormBase.actiefSinds != null}"/>
 								</q:or>
-							</d:field>												
-                        		
+							</d:field>
 							<d:field for="actiefTot" label="Tot">
-							<q:greaterThanOrEqualTo value="#{peterMeterOverzichtFormBase.actiefTot}" propertyName="#PeterMeterProfiel/actiefSinds">
-								<p:calendar id="actiefTot"
-									value="#{peterMeterOverzichtFormBase.actiefTot}" navigator="true" display="inline" effect="slide"
-									inputStyle="width:60px"
-		    						pattern="yyyy-MM-dd">
-								</p:calendar>
-								</q:greaterThanOrEqualTo>
+								<q:lessThanOrEqualTo value="#{peterMeterOverzichtFormBase.actiefTot}"
+									propertyName="#PeterMeterProfiel/actiefSinds">
+									<p:calendar id="actiefTot"
+										value="#{peterMeterOverzichtFormBase.actiefTot}"
+										navigator="true"
+										display="inline"
+										effect="slide"
+										inputStyle="width:60px"
+			    						pattern="yyyy-MM-dd">
+									</p:calendar>
+								</q:lessThanOrEqualTo>
 							</d:field>
 																					 									
 						</d:fields>			

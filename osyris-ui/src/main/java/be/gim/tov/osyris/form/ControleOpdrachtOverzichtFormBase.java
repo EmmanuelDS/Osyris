@@ -566,15 +566,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 				result = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(result, new AlphanumericSorting());
-			}
-
-			else if (t instanceof NetwerkLus) {
-
+			} else if (t instanceof NetwerkLus) {
 				NetwerkLus lus = ((NetwerkLus) t);
 
 				result = Beans.getReference(OsyrisModelFunctions.class)
 						.getNetwerkBordVolgordeLus(lus);
-
 			} else {
 				result = Collections.emptyList();
 			}

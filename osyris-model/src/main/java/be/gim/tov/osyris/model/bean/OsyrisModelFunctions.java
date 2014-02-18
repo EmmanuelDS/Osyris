@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +16,8 @@ import javax.inject.Inject;
 import javax.inject.Named;
 
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.collections.comparators.ComparableComparator;
+import org.apache.commons.collections.comparators.ReverseComparator;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.cache.CacheProducer;
@@ -35,6 +38,7 @@ import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
@@ -58,7 +62,6 @@ import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
-import be.gim.tov.osyris.model.utils.AlphanumericSorting;
 import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
@@ -1226,102 +1229,107 @@ public class OsyrisModelFunctions {
 	@SuppressWarnings("unchecked")
 	public List<Bord> getNetwerkBordVolgordeLus(NetwerkLus lus) {
 
-		return (List<Bord>) cacheProducer.getCache("NetwerkBordVolgordeLus",
-				new Transformer() {
+		if (lus != null) {
+			return (List<Bord>) cacheProducer.getCache(
+					"NetwerkBordVolgordeLus", new Transformer() {
 
-					@Override
-					public Object transform(Object lus) {
+						@Override
+						public Object transform(Object lus) {
 
-						try {
+							try {
+								List<ResourceIdentifier> segmenten = ((NetwerkLus) lus)
+										.getSegmenten();
 
-							if (lus != null) {
-								List<Bord> result = new ArrayList<Bord>();
-
-								// StartSegment in de lus
-								NetwerkSegment start = (NetwerkSegment) modelRepository
-										.loadObject(((NetwerkLus) lus)
-												.getSegmenten().get(0));
+								List<Bord> result = new ArrayList<Bord>(
+										segmenten.size() * 6);
 
 								// ---------------
-								for (int i = 0; i < ((NetwerkLus) lus)
-										.getSegmenten().size(); i++) {
-
-									int nextIndex = i + 1;
-
+								for (int i = 0; i < segmenten.size(); i++) {
 									NetwerkSegment current = (NetwerkSegment) modelRepository
-											.loadObject(((NetwerkLus) lus)
-													.getSegmenten().get(i));
+											.loadObject(segmenten.get(i));
+									NetwerkSegment next = (NetwerkSegment) modelRepository.loadObject(segmenten.get(i != segmenten
+											.size() - 1 ? i + 1 : 0));
 
-									NetwerkSegment next = null;
+									ResourceIdentifier naarKpId = current
+											.getNaarKnooppunt();
 
-									if (nextIndex < ((NetwerkLus) lus)
-											.getSegmenten().size()) {
-
-										next = (NetwerkSegment) modelRepository
-												.loadObject(((NetwerkLus) lus)
-														.getSegmenten().get(
-																nextIndex));
-									} else {
-										next = start;
-									}
-
-									String richting = null;
-									if (current.getNaarKpNr().equals(
-											next.getVanKpNr())) {
-
-										richting = RichtingEnum.FT.toString();
-
-									}
-
-									else if (current.getNaarKpNr().equals(
-											next.getNaarKpNr())) {
-
-										richting = RichtingEnum.FT.toString();
-									}
-
-									else {
-										richting = RichtingEnum.TF.toString();
-									}
+									RichtingEnum richting = naarKpId
+											.equals(next.getVanKnooppunt())
+											|| naarKpId.equals(next
+													.getNaarKnooppunt()) ? RichtingEnum.FT
+											: RichtingEnum.TF;
 
 									QueryBuilder builder = new QueryBuilder(
 											"NetwerkBord");
-									List<Bord> subset = new ArrayList<Bord>();
-
-									List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
-											1);
-									ids.add(modelRepository
-											.getResourceIdentifier(current));
-
-									builder.addFilter(FilterUtils.in(
-											"segmenten", ids));
 
 									builder.addFilter(FilterUtils.equal(
-											"richting", richting));
+											"segmenten",
+											modelRepository
+													.getResourceIdentifier(current)));
+									builder.addFilter(FilterUtils.equal(
+											"richting", richting.toString()));
 
-									subset = (List<Bord>) modelRepository
+									List<Bord> borden = (List<Bord>) modelRepository
 											.searchObjects(builder.build(),
 													false, false);
 
-									if (subset != null && !subset.isEmpty()) {
+									if (borden != null && !borden.isEmpty()) {
+										Geometry geom = current.getGeom();
 
-										Collections.sort(subset,
-												new AlphanumericSorting());
+										boolean reverse = richting == RichtingEnum.TF;
 
-										result.addAll(subset);
+										// Controleren of het segment omgekeerd
+										// is ingetekend.
+										NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+												.loadObject(naarKpId);
+										if (naarKp != null
+												&& naarKp.getGeom() != null) {
+											Geometry naarKpGeom = naarKp
+													.getGeom();
+											if (naarKpGeom.distance(GeometryUtils
+													.getFirstPoint((LineString) geom)) < naarKpGeom.distance(GeometryUtils
+													.getLastPoint((LineString) geom)))
+												reverse = !reverse;
+										}
+
+										LocationIndexedLine indexedLine = new LocationIndexedLine(
+												geom);
+
+										Comparator<Double> comparator = new ComparableComparator();
+										if (reverse) {
+											comparator = new ReverseComparator(
+													comparator);
+										}
+
+										Map<Double, Bord> bordByFractie = new TreeMap<Double, Bord>(
+												comparator);
+
+										for (Bord bord : borden) {
+											LinearLocation localion = indexedLine
+													.project(bord.getGeom()
+															.getCoordinate());
+											double fractie = localion
+													.getSegmentIndex()
+													+ localion
+															.getSegmentFraction();
+											bordByFractie.put(fractie, bord);
+										}
+
+										result.addAll(bordByFractie.values());
 									}
 								}
 
 								return result;
+							} catch (IOException e) {
+								LOG.error("Can not search segmenten.", e);
 							}
-							// ----------------
 
-						} catch (IOException e) {
-							LOG.error("Can not search segmenten.", e);
+							return Collections.emptyList();
 						}
-
-						return Collections.emptyList();
-					}
-				}).get(lus);
+					}).get(lus);
+		} else {
+			return null;
+		}
 	}
 
 	/**
@@ -1779,162 +1787,5 @@ public class OsyrisModelFunctions {
 		}
 
 		return suggestions;
-	}
-
-	/**
-	 * DEBUG
-	 * 
-	 * @param lus
-	 * @return
-	 */
-	public List<Bord> testNetwerkBord(NetwerkLus lus) {
-		try {
-
-			if (lus != null) {
-				List<Bord> result = new ArrayList<Bord>();
-
-				// StartSegment in de lus
-				NetwerkSegment start = (NetwerkSegment) modelRepository
-						.loadObject(lus.getSegmenten().get(0));
-
-				// ---------------
-				for (int i = 0; i < lus.getSegmenten().size(); i++) {
-
-					int nextIndex = i + 1;
-
-					NetwerkSegment current = (NetwerkSegment) modelRepository
-							.loadObject(lus.getSegmenten().get(i));
-
-					NetwerkSegment next = null;
-
-					if (nextIndex < lus.getSegmenten().size()) {
-
-						next = (NetwerkSegment) modelRepository.loadObject(lus
-								.getSegmenten().get(nextIndex));
-					} else {
-						next = start;
-					}
-
-					String richting = null;
-
-					if (current.getNaarKpNr().equals(next.getVanKpNr())) {
-						richting = RichtingEnum.FT.toString();
-
-					}
-
-					else if (current.getNaarKpNr().equals(next.getNaarKpNr())) {
-						richting = RichtingEnum.FT.toString();
-					}
-
-					else {
-						richting = RichtingEnum.TF.toString();
-					}
-
-					QueryBuilder builder = new QueryBuilder("NetwerkBord");
-					List<Bord> subset = new ArrayList<Bord>();
-
-					List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>(
-							1);
-					ids.add(modelRepository.getResourceIdentifier(current));
-
-					builder.addFilter(FilterUtils.in("segmenten", ids));
-
-					builder.addFilter(FilterUtils.equal("richting", richting));
-
-					subset = (List<Bord>) modelRepository.searchObjects(
-							builder.build(), false, false);
-
-					LineString line = (LineString) current.getGeom();
-
-					NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
-							.loadObject(current.getNaarKnooppunt());
-
-					// if (line.getStartPoint().intersects(
-					// naarKp.getGeom().buffer(20))) {
-					// line.reverse();
-					// }
-
-					// LineString line = (LineString) current.getGeom();
-					LocationIndexedLine lil = new LocationIndexedLine(line);
-					LinearLocation ll = new LinearLocation();
-
-					// Sorteren borden in het segment ahv de
-					// fractie
-					if (subset != null && !subset.isEmpty()) {
-
-						Map<Double, Bord> fracties = new HashMap<Double, Bord>();
-
-						for (Bord bord : subset) {
-							ll = lil.project(bord.getGeom().getCoordinate());
-
-							double fractie = ll.getSegmentFraction();
-							double totalFractie = fractie;
-							Integer segIndex = ll.getSegmentIndex();
-
-							int startIndex = lil.getStartIndex()
-									.getSegmentIndex();
-
-							// int endIndex =
-							// lil.getEndIndex().getSegmentIndex();
-
-							for (int a = startIndex; a < segIndex; a++) {
-								totalFractie += line.getGeometryN(a)
-										.getLength();
-							}
-
-							fracties.put(new Double(totalFractie), bord);
-						}
-
-						for (Entry<Double, Bord> entry : fracties.entrySet()) {
-							System.out.println("---> NORMAL MAP:"
-									+ entry.getKey() + " -- "
-									+ entry.getValue().getId().toString()
-									+ " -- " + entry.getValue().getVolg());
-						}
-
-						TreeMap<Double, Bord> sorted = new TreeMap<Double, Bord>(
-								fracties);
-
-						List<Bord> testList = new ArrayList<Bord>();
-
-						// Switch sorting order if richting TF?
-						if (richting.equals(RichtingEnum.TF.toString())) {
-
-							for (Entry<Double, Bord> entry : sorted
-									.descendingMap().entrySet()) {
-
-								testList.add(entry.getValue());
-								System.out.println("---> REVERSED TREEMAP:"
-										+ entry.getKey() + " -- "
-										+ entry.getValue().getId().toString()
-										+ " -- " + entry.getValue().getVolg());
-							}
-						}
-
-						else {
-
-							for (Entry<Double, Bord> entry : sorted.entrySet()) {
-
-								testList.add(entry.getValue());
-								System.out.println("---> TREEMAP:"
-										+ entry.getKey() + " -- "
-										+ entry.getValue().getId().toString()
-										+ " -- " + entry.getValue().getVolg());
-							}
-						}
-
-						result.addAll(testList);
-					}
-				}
-
-				return result;
-			}
-			// ----------------
-
-		} catch (IOException e) {
-			LOG.error("Can not search segmenten.", e);
-		}
-
-		return Collections.emptyList();
 	}
 }

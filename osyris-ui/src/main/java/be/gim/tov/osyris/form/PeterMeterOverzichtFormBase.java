@@ -13,6 +13,7 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
@@ -35,12 +36,12 @@ import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.security.Identity;
 
+import be.gim.commons.collections.CollectionUtils;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
-import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
 /**
  * 
@@ -122,25 +123,18 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 		query = new DefaultQuery(query);
 
-		query.addFilter(FilterUtils.or(FilterUtils.equal(
-				"#PeterMeterProfiel/status", PeterMeterStatus.ACTIEF),
-				FilterUtils.equal("#PeterMeterProfiel/status",
-						PeterMeterStatus.KANDIDAAT), FilterUtils.equal(
-						"#PeterMeterProfiel/status", PeterMeterStatus.PASSIEF)));
-
 		try {
-
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
 					"group", "PeterMeter"));
 
-			List<String> nameParts = new ArrayList<String>();
+			query.addFilter(FilterUtils.in("username", CollectionUtils
+					.transform(group.getMembers(), new Transformer() {
 
-			for (ResourceName name : group.getMembers()) {
-				nameParts.add(name.getNamePart());
-			}
-
-			query.addFilter(FilterUtils.in("username", nameParts));
-
+						@Override
+						public Object transform(Object member) {
+							return ((ResourceName) member).getNamePart();
+						}
+					})));
 		} catch (IOException e) {
 			LOG.error("Can not load group PetersMeters.", e);
 		}

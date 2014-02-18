@@ -58,11 +58,9 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private PeterMeterStatus status;
 
-	@NotSearchable
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private Date actiefSinds;
 
-	@NotSearchable
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin" })
 	private Date actiefTot;
 
