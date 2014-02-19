@@ -22,6 +22,8 @@ import be.gim.commons.resource.ResourceIdentifier;
 public class RouteBord extends Bord {
 
 	// VARIABLES
+	private String volg;
+
 	@NotSearchable
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.imageCodes}")
@@ -34,6 +36,14 @@ public class RouteBord extends Bord {
 	private ResourceIdentifier route;
 
 	// GETTERS AND SETTERS
+	public String getVolg() {
+		return volg;
+	}
+
+	public void setVolg(String volg) {
+		this.volg = volg;
+	}
+
 	public String getImageCode() {
 		return imageCode;
 	}

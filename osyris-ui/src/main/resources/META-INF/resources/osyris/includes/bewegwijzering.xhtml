@@ -40,7 +40,7 @@
 			</f:facet>
 			<h:outputText value="#{d:modelObject(bord).getId()}" />
 		</p:column>
-		<p:column>
+		<p:column rendered="#{form.isRouteBord(bord)}">
 			<f:facet name="header">
 				<h:outputText value="VolgNr"/>
 			</f:facet>

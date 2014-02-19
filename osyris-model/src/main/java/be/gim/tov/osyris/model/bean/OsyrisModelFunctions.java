@@ -698,7 +698,10 @@ public class OsyrisModelFunctions {
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 
-			return bord.getVolg();
+			if (bord instanceof RouteBord) {
+
+				return ((RouteBord) bord).getVolg();
+			}
 
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
@@ -1288,8 +1291,9 @@ public class OsyrisModelFunctions {
 													.getGeom();
 											if (naarKpGeom.distance(GeometryUtils
 													.getFirstPoint((LineString) geom)) < naarKpGeom.distance(GeometryUtils
-													.getLastPoint((LineString) geom)))
+													.getLastPoint((LineString) geom))) {
 												reverse = !reverse;
+											}
 										}
 
 										LocationIndexedLine indexedLine = new LocationIndexedLine(

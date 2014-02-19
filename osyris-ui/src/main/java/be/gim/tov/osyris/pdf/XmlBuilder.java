@@ -363,12 +363,6 @@ public class XmlBuilder {
 			Element bord = doc.createElement("bord");
 			rootElement.appendChild(bord);
 
-			Element volgNr = doc.createElement("bordnr");
-			if (b.getVolg() != null) {
-				volgNr.appendChild(doc.createTextNode(b.getVolg()));
-			}
-			bord.appendChild(volgNr);
-
 			Element id = doc.createElement("id");
 			id.appendChild(doc.createTextNode(b.getId().toString()));
 			bord.appendChild(id);
@@ -437,6 +431,12 @@ public class XmlBuilder {
 
 				RouteBord rb = (RouteBord) b;
 
+				Element volgNr = doc.createElement("bordnr");
+				if (rb.getVolg() != null) {
+					volgNr.appendChild(doc.createTextNode(rb.getVolg()));
+				}
+				bord.appendChild(volgNr);
+
 				Element pijl = doc.createElement("pijl");
 				if (rb.getImageCode() != null) {
 					pijl.appendChild(doc.createTextNode(getPijlBord(rb
@@ -446,15 +446,21 @@ public class XmlBuilder {
 			}
 
 			Element gemeente = doc.createElement("gemeente");
-			gemeente.appendChild(doc.createTextNode(b.getGemeente()));
+			if (b.getGemeente() != null) {
+				gemeente.appendChild(doc.createTextNode(b.getGemeente()));
+			}
 			bord.appendChild(gemeente);
 
 			Element straat = doc.createElement("straatnaam");
-			straat.appendChild(doc.createTextNode(b.getStraatnaam()));
+			if (b.getStraatnaam() != null) {
+				straat.appendChild(doc.createTextNode(b.getStraatnaam()));
+			}
 			bord.appendChild(straat);
 
 			Element paalType = doc.createElement("paaltype");
-			paalType.appendChild(doc.createTextNode(b.getPaalConst()));
+			if (b.getPaalConst() != null) {
+				paalType.appendChild(doc.createTextNode(b.getPaalConst()));
+			}
 			bord.appendChild(paalType);
 		}
 

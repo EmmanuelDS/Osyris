@@ -59,8 +59,6 @@ public abstract class Bord extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.gemeentes}")
 	private String gemeente;
 
-	private String volg;
-
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
 	private String actief;
@@ -152,14 +150,6 @@ public abstract class Bord extends AbstractModelObject implements
 
 	public void setGemeente(String gemeente) {
 		this.gemeente = gemeente;
-	}
-
-	public String getVolg() {
-		return volg;
-	}
-
-	public void setVolg(String volg) {
-		this.volg = volg;
 	}
 
 	public String getActief() {

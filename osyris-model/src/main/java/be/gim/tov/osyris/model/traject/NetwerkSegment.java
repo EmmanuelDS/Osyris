@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.ModelPropertyType;
-import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -40,13 +39,15 @@ public abstract class NetwerkSegment extends Traject {
 	private Integer naarKpNr;
 
 	@ModelClassName("NetwerkKnooppunt")
-	@Edit(type = "suggestions")
+	@NotEditable
+	// @Edit(type = "suggestions")
 	@NotSearchable
 	@Target("_blank")
 	private ResourceIdentifier vanKnooppunt;
 
 	@ModelClassName("NetwerkKnooppunt")
-	@Edit(type = "suggestions")
+	@NotEditable
+	// @Edit(type = "suggestions")
 	@NotSearchable
 	@Target("_blank")
 	private ResourceIdentifier naarKnooppunt;

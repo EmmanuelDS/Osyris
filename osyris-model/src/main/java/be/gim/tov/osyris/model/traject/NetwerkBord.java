@@ -92,6 +92,7 @@ public abstract class NetwerkBord extends Bord {
 	@Target("_blank")
 	private ResourceIdentifier kpid3;
 
+	@NotEditable
 	private RichtingEnum richting;
 
 	@NotSearchable

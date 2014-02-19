@@ -3,6 +3,7 @@ package be.gim.tov.osyris.model.utils;
 import java.util.Comparator;
 
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.RouteBord;
 
 /**
  * @author Kushal Paudyal www.sanjaal.com/java Last Modified On 16th July 2009
@@ -19,8 +20,16 @@ public class AlphanumericSorting implements Comparator<Bord> {
 	@Override
 	public int compare(Bord firstObjToCompare, Bord secondObjToCompare) {
 
-		String firstString = firstObjToCompare.getVolg();
-		String secondString = secondObjToCompare.getVolg();
+		String firstString = null;
+		String secondString = null;
+
+		if (firstObjToCompare instanceof RouteBord) {
+			firstString = ((RouteBord) firstObjToCompare).getVolg();
+		}
+
+		if (secondObjToCompare instanceof RouteBord) {
+			secondString = ((RouteBord) secondObjToCompare).getVolg();
+		}
 
 		if (secondString == null || firstString == null) {
 			return 0;
