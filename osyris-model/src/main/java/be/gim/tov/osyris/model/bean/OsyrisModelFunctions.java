@@ -34,6 +34,7 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.security.annotation.RunPrivileged;
+import org.conscientia.core.util.ModelUtils;
 import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
@@ -354,7 +355,7 @@ public class OsyrisModelFunctions {
 	 * @return
 	 */
 	@RunPrivileged
-	public List<ResourceName> getUsersInGroup(String groupName) {
+	public List<ResourceIdentifier> getUsersInGroup(String groupName) {
 
 		try {
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
@@ -384,34 +385,19 @@ public class OsyrisModelFunctions {
 					@Override
 					public Object transform(Object key) {
 						List<Object[]> suggestions = new ArrayList<Object[]>();
-						try {
 
-							List<User> users = getUserObjectsInGroup(groupName);
+						List<User> users = getUserObjectsInGroup(groupName);
 
-							for (User user : users) {
+						for (User user : users) {
+							suggestions.add(new Object[] {
+									modelRepository.getResourceName(user),
+									ModelUtils.toLabel(user) });
 
-								UserProfile profiel = (UserProfile) user
-										.getAspect("UserProfile",
-												modelRepository, false);
-
-								Object[] object = {
-										"user:" + user.getUsername(),
-										profiel.getLastName() + " "
-												+ profiel.getFirstName() };
-								suggestions.add(object);
-
-								// Sorteren suggesties
-								Collections.sort(suggestions,
-										new DropdownListSorting());
-							}
-
-						} catch (IOException e) {
-							LOG.error("Can not load user.", e);
-						} catch (InstantiationException e) {
-							LOG.error("Can not instantiate UserProfile.", e);
-						} catch (IllegalAccessException e) {
-							LOG.error("Illegal access at UserProfile.", e);
+							// Sorteren suggesties
+							Collections.sort(suggestions,
+									new DropdownListSorting());
 						}
+
 						return suggestions;
 
 					}
@@ -875,27 +861,29 @@ public class OsyrisModelFunctions {
 			Group group = (Group) ModelRepository.getUniqueResult(groups);
 
 			// Users uit medewerker group halen
-			for (ResourceName name : group.getMembers()) {
-				DefaultQuery q = new DefaultQuery("User");
-				q.addFilter(FilterUtils.equal("username", name.getNamePart()));
-				User medewerker = (User) modelRepository.searchObjects(q,
-						false, false).get(0);
+			for (ResourceIdentifier id : group.getMembers()) {
+				User medewerker = (User) modelRepository.loadDocument(id);
 
-				// Check welke Medewerker verantwoordelijk is voor het gekozen
-				// trajectType
-				MedewerkerProfiel profiel = (MedewerkerProfiel) medewerker
-						.getAspect("MedewerkerProfiel", modelRepository, true);
-				if (profiel != null) {
-					for (String trajectType : profiel.getTrajectType()) {
-						if (t.getModelClass().getName().contains("Lus")) {
-							String className = t.getModelClass().getName()
-									.replace("Lus", "Segment");
-							if (className.equals(trajectType)) {
-								return name;
+				if (medewerker != null) {
+					// Check welke Medewerker verantwoordelijk is voor het
+					// gekozen trajectType
+					MedewerkerProfiel profiel = (MedewerkerProfiel) medewerker
+							.getAspect("MedewerkerProfiel", modelRepository,
+									true);
+					if (profiel != null) {
+						for (String trajectType : profiel.getTrajectType()) {
+							if (t.getModelClass().getName().contains("Lus")) {
+								String className = t.getModelClass().getName()
+										.replace("Lus", "Segment");
+								if (className.equals(trajectType)) {
+									return modelRepository
+											.getResourceName(medewerker);
+								}
+							} else if (trajectType.equals(t.getModelClass()
+									.getName())) {
+								return modelRepository
+										.getResourceName(medewerker);
 							}
-						} else if (trajectType.equals(t.getModelClass()
-								.getName())) {
-							return name;
 						}
 					}
 				}
@@ -1201,21 +1189,7 @@ public class OsyrisModelFunctions {
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
 					"group", groupName));
 
-			List<String> nameParts = new ArrayList<String>();
-
-			for (ResourceName name : group.getMembers()) {
-
-				nameParts.add(name.getNamePart());
-			}
-
-			DefaultQuery query = new DefaultQuery("User");
-
-			query.addFilter(FilterUtils.in("username", nameParts));
-
-			List<User> result = (List<User>) modelRepository.searchObjects(
-					query, true, true);
-
-			return result;
+			return (List) modelRepository.loadObjects(group.getMembers());
 
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -1701,95 +1675,5 @@ public class OsyrisModelFunctions {
 		}
 
 		return null;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> completeFirstName(String query) {
-
-		List<String> suggestions = new ArrayList<String>();
-
-		try {
-
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-
-			List<String> nameParts = new ArrayList<String>();
-
-			for (ResourceName name : group.getMembers()) {
-				nameParts.add(name.getNamePart());
-			}
-
-			QueryBuilder b = new QueryBuilder("User");
-			b.addFilter(FilterUtils.in("username", nameParts));
-			b.result(FilterUtils.property("id"));
-
-			List<Long> userIds = (List<Long>) modelRepository.searchObjects(
-					b.build(), false, false, false);
-
-			QueryBuilder builder = new QueryBuilder("UserProfile");
-			builder.addFilter(FilterUtils.like("firstName", query + "%", "%",
-					null, null, false));
-			builder.addFilter(FilterUtils.in("id", userIds));
-
-			builder.results(FilterUtils.properties("firstName"));
-			builder.groupBy(FilterUtils.properties("firstName"));
-			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
-					.property("firstName")));
-
-			List<String> voorNamen = (List<String>) modelRepository
-					.searchObjects(builder.build(), false, false, false);
-
-			suggestions.addAll(voorNamen);
-
-		} catch (IOException e) {
-			LOG.error("Can not search UserProfile", e);
-		}
-
-		return suggestions;
-	}
-
-	@SuppressWarnings("unchecked")
-	public List<String> completeLastName(String query) {
-
-		List<String> suggestions = new ArrayList<String>();
-
-		try {
-
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-
-			List<String> nameParts = new ArrayList<String>();
-
-			for (ResourceName name : group.getMembers()) {
-				nameParts.add(name.getNamePart());
-			}
-
-			QueryBuilder b = new QueryBuilder("User");
-			b.addFilter(FilterUtils.in("username", nameParts));
-			b.result(FilterUtils.property("id"));
-
-			List<Long> userIds = (List<Long>) modelRepository.searchObjects(
-					b.build(), false, false, false);
-
-			QueryBuilder builder = new QueryBuilder("UserProfile");
-			builder.addFilter(FilterUtils.like("lastName", query + "%", "%",
-					null, null, false));
-			builder.addFilter(FilterUtils.in("id", userIds));
-
-			builder.results(FilterUtils.properties("lastName"));
-			builder.groupBy(FilterUtils.properties("lastName"));
-			builder.orderBy(new DefaultQueryOrderBy(FilterUtils
-					.property("lastName")));
-
-			List<String> familieNamen = (List<String>) modelRepository
-					.searchObjects(builder.build(), false, false, false);
-
-			suggestions.addAll(familieNamen);
-
-		} catch (IOException e) {
-			LOG.error("Can not search UserProfile", e);
-		}
-
-		return suggestions;
 	}
 }

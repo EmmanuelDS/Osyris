@@ -67,20 +67,7 @@ public class PeterMeterToewijzingBean {
 		try {
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
 					"group", "PeterMeter"));
-
-			DefaultQuery q = new DefaultQuery("User");
-			List<Filter> filters = new ArrayList<Filter>();
-
-			for (ResourceName name : group.getMembers()) {
-				Filter filter = FilterUtils.equal("username",
-						name.getNamePart());
-				filters.add(filter);
-			}
-			// Ophalen Users binnen de groep PeterMeter
-			q.addFilter(FilterUtils.or(filters));
-			List<User> petersMeters = (List<User>) modelRepository
-					.searchObjects(q, false, false);
-			return petersMeters;
+			return (List) modelRepository.loadObjects(group.getMembers());
 
 		} catch (IOException e) {
 			LOG.error("Can not get search results.", e);
@@ -96,7 +83,6 @@ public class PeterMeterToewijzingBean {
 	 * @throws InstantiationException
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	public void kenPetersMetersToe() throws InstantiationException,
 			IllegalAccessException {
 

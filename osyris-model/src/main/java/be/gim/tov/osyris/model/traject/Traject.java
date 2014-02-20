@@ -170,7 +170,7 @@ public abstract class Traject extends AbstractModelObject implements
 					public Object transform(Object key) {
 
 						try {
-							for (ResourceName user : Beans.getReference(
+							for (ResourceIdentifier user : Beans.getReference(
 									OsyrisModelFunctions.class)
 									.getUsersInGroup("Medewerker")) {
 

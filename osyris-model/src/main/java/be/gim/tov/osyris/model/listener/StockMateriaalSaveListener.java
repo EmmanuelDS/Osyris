@@ -18,6 +18,7 @@ import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.UserProfile;
 
+import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
@@ -76,10 +77,10 @@ public class StockMateriaalSaveListener {
 			variables.put("max", stockMateriaal.getMax());
 
 			// Ophalen emailadres Routedokters
-			List<ResourceName> users = osyrisModelFunctions
+			List<ResourceIdentifier> users = osyrisModelFunctions
 					.getUsersInGroup("RouteDokter");
 
-			for (ResourceName user : users) {
+			for (ResourceIdentifier user : users) {
 				UserProfile profiel = (UserProfile) modelRepository.loadAspect(
 						modelRepository.getModelClass("UserProfile"),
 						modelRepository.loadObject(user));
