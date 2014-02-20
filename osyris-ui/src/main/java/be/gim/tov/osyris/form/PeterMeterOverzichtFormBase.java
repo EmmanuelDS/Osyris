@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -18,22 +17,15 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.conscientia.api.document.Document;
 import org.conscientia.api.group.Group;
 import org.conscientia.api.mail.MailSender;
-import org.conscientia.api.permission.Permission;
-import org.conscientia.api.permission.Permissions;
 import org.conscientia.api.preferences.Preferences;
-import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.User;
-import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.core.permission.DefaultPermission;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
-import org.conscientia.core.user.UserUtils;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.collections.CollectionUtils;
@@ -146,82 +138,36 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * Bewaren van nieuw aangemaakte PeterMeter.
 	 * 
 	 */
-	@SuppressWarnings("unchecked")
 	public void saveNewPeterMeter() {
+
 		try {
-			UserProfile userProfile = (UserProfile) object
-					.getAspect("UserProfile");
+			User object = getObject();
 
 			if (!checkUsernameExists(object.getUsername())) {
-
 				// Generate password
 				String password = RandomStringUtils.randomAlphanumeric(8);
 				object.setPassword(password);
 
-				// Document
-				/**
-				 * ResourceName name = UserUtils.getUserDocumentName(object
-				 * .getUsername());
-				 * 
-				 * Document<User> document = (Document<User>) modelRepository
-				 * .createObject("Document", name); document.setName(name);
-				 * document.setSearchable(false);
-				 * 
-				 * String firstName = userProfile.getFirstName(); String
-				 * lastName = userProfile.getLastName();
-				 * 
-				 * if (StringUtils.isNotBlank(firstName) ||
-				 * StringUtils.isNotBlank(lastName)) { document.setTitle(new
-				 * DefaultInternationalString(firstName + " " + lastName)); }
-				 * else { document.setTitle(new
-				 * DefaultInternationalString(object .getUsername())); }
-				 * document.setOwner(name); document.set("object", object);
-				 **/
-
-				// User
-				object.putAspect(userProfile);
-
-				PeterMeterProfiel profiel = (PeterMeterProfiel) object
-						.getAspect("PeterMeterProfiel");
-				if (profiel.getVoorkeuren().isEmpty()) {
-					profiel.setVoorkeuren(null);
-				}
-				object.putAspect(profiel);
-
-				ResourceName resourceName = new ResourceName(User.USER_SPACE,
-						object.getUsername());
-
 				setHasErrors(false);
 
-				// Save Document
-				// modelRepository.saveDocument(document);
+				object.getAspect("PeterMeterProfiel", modelRepository, true);
 
 				// Save User UserProfile PeterMeterProfiel and
 				// PeterMeterNaamCode via Listener
 				modelRepository.saveObject(object);
 
-				// Set permissions
-				ResourceName name = UserUtils.getUserDocumentName(object
-						.getUsername());
-
-				Document document = modelRepository.getDocument(object);
-
-				setDocumentPermissions(name, document);
-
 				// Assign to group
-				addUserToPeterMeterGroup(resourceName);
+				addUserToPeterMeterGroup(modelRepository
+						.getResourceName(object));
 
 				// Send mail
-				sendCredentailsMail(
-						object.getUsername(),
-						object.getAspect("UserProfile").get("email").toString(),
-						password);
+				sendCredentailsMail(object.getUsername(), (String) object
+						.getAspect("UserProfile").get("email"), password);
 
 				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
 
 				clear();
 				search();
-
 			} else {
 				setHasErrors(true);
 				messages.error("Gebruikersnaam bestaat al. Gelieve een andere gebruikersnaam te kiezen.");
@@ -240,16 +186,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * 
 	 */
 	@Override
-	@SuppressWarnings("unchecked")
 	public void delete() {
 		try {
 			// Delete trajectToewijzingen PM
 			deleteToewijzingen();
-
-			Permissions permissions = (Permissions) modelRepository.loadAspect(
-					modelRepository.getModelClass("Permissions"),
-					new ResourceName("user", object.getUsername()),
-					FilterUtils.equal("scope", "document"));
 
 			// Delete user from PM group
 			Group group = (Group) modelRepository.loadObject(new ResourceName(
@@ -260,14 +200,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			// Delete user and document permissions
 			modelRepository.deleteObject(object);
 
-			if (permissions != null) {
-				modelRepository.deleteAspect(permissions);
-			}
-
 			clear();
 			search();
 			messages.info("Peter/Meter succesvol verwijderd.");
-
 		} catch (IOException e) {
 			messages.error("Fout bij het verwijderen van Peter/Meter: "
 					+ e.getMessage());
@@ -317,8 +252,8 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 		} catch (IOException e) {
 			LOG.error("Can not count objects.", e);
 		}
-		return true;
 
+		return true;
 	}
 
 	/**
@@ -326,84 +261,16 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * 
 	 * @param resourceName
 	 */
-	@SuppressWarnings("unchecked")
 	private void addUserToPeterMeterGroup(ResourceName resourceName) {
 
 		try {
-			Query query = new DefaultQuery("Group");
-			query.addFilter(FilterUtils.equal("groupname", "PeterMeter"));
-			List<Group> groups = new ArrayList<Group>();
-			groups = (List<Group>) modelRepository.searchObjects(query, false,
-					false);
-
-			Group group = (Group) ModelRepository.getUniqueResult(groups);
+			Group group = (Group) modelRepository.loadObject(new ResourceName(
+					"group", "PeterMeter"));
 			group.getMembers().add(resourceName);
 			modelRepository.saveObject(group);
-
 		} catch (IOException e) {
 			LOG.error("Can not search objects.", e);
 		}
-	}
-
-	/**
-	 * Zetten van de juiste permissies op het PeterMeter document.
-	 * 
-	 * @param name
-	 * @param document
-	 */
-	@SuppressWarnings("rawtypes")
-	private void setDocumentPermissions(ResourceName name, Document document) {
-
-		try {
-
-			Permissions permissions = (Permissions) modelRepository.loadAspect(
-					modelRepository.getModelClass("Permissions"), name,
-					FilterUtils.equal("scope", "document"));
-
-			if (permissions == null) {
-				permissions = (Permissions) modelRepository.createAspect(
-						modelRepository.getModelClass("Permissions"), name);
-			}
-			// Set scope
-			permissions.set("scope", "document");
-
-			// Add necessary permissions
-			permissions.getPermissions().addAll(getAllowedPermissions(name));
-
-			// Save permissions
-			modelRepository.saveAspect(permissions);
-
-		} catch (IOException e) {
-			LOG.error("Can not load aspect.", e);
-		} catch (InstantiationException e) {
-			LOG.error("Can not instantiate aspect.", e);
-		} catch (IllegalAccessException e) {
-			LOG.error("Can not access aspect.", e);
-		}
-	}
-
-	/**
-	 * Ophalen toegelaten permissies.
-	 * 
-	 * @param name
-	 * @return
-	 */
-	private List<Permission> getAllowedPermissions(ResourceName name) {
-
-		List<Permission> permissions = new ArrayList<Permission>();
-
-		permissions.add(new DefaultPermission(name, "view", true));
-		permissions.add(new DefaultPermission(name, "edit", true));
-		permissions.add(new DefaultPermission(new ResourceName("group",
-				"Routedokter"), "view", true));
-		permissions.add(new DefaultPermission(new ResourceName("group",
-				"Routedokter"), "edit", true));
-		permissions.add(new DefaultPermission(new ResourceName("group",
-				"Medewerker"), "view", true));
-		permissions.add(new DefaultPermission(new ResourceName("group",
-				"Medewerker"), "edit", true));
-
-		return permissions;
 	}
 
 	/**
@@ -452,10 +319,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	public void save() {
 
 		try {
-
 			checkVoorkeuren();
 
 			hasErrors = false;
+
 			modelRepository.saveObject(object);
 
 			messages.info(documentMessages.documentSaveSuccess(ObjectUtils
@@ -463,7 +330,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 			clear();
 			search();
-
 		} catch (IOException e) {
 			hasErrors = true;
 			// messages.error(documentMessages.documentSaveFailed(e.getMessage()));

@@ -15,6 +15,8 @@ import org.conscientia.api.model.annotation.Length;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Pattern;
+import org.conscientia.api.model.annotation.Permission;
+import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.api.model.select.Level;
@@ -22,6 +24,18 @@ import org.conscientia.api.user.Gender;
 import org.conscientia.core.user.DefaultUserProfile;
 
 @Specializes
+@Permissions({
+		@Permission(profile = "group:Medewerker", action = "search", allow = true),
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "create", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+		@Permission(profile = "group:Medewerker", action = "delete", allow = true),
+
+		@Permission(profile = "group:Routedokter", action = "search", allow = true),
+		@Permission(profile = "group:Routedokter", action = "view", allow = true),
+		@Permission(profile = "group:Routedokter", action = "create", allow = true),
+		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
+		@Permission(profile = "group:Routedokter", action = "delete", allow = true) })
 public class OsyrisUserProfile extends DefaultUserProfile {
 
 	protected Gender gender;

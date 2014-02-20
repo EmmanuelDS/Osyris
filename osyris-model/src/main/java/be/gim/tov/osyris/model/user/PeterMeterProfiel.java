@@ -33,14 +33,17 @@ import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 @For("User")
 @Edit(type = "peterMeterProfiel")
 @Permissions({
+		@Permission(profile = "group:Medewerker", action = "search", allow = true),
+		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "create", allow = true),
+		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+		@Permission(profile = "group:Medewerker", action = "delete", allow = true),
+
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "create", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
 		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
-
-		@Permission(profile = "group:Medewerker", action = "view", allow = true),
-		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
 
 		@Permission(profile = "group:PeterMeter", action = "view", allow = true),
 		@Permission(profile = "group:PeterMeter", action = "edit", allow = true) })
