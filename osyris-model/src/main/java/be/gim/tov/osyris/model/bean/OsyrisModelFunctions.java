@@ -34,7 +34,6 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.security.annotation.RunPrivileged;
-import org.conscientia.core.util.ModelUtils;
 import org.jboss.seam.international.status.Messages;
 import org.jboss.seam.security.Identity;
 
@@ -386,20 +385,34 @@ public class OsyrisModelFunctions {
 					public Object transform(Object key) {
 						List<Object[]> suggestions = new ArrayList<Object[]>();
 
-						List<User> users = getUserObjectsInGroup(groupName);
+						try {
+							List<User> users = getUserObjectsInGroup(groupName);
 
-						for (User user : users) {
-							suggestions.add(new Object[] {
-									modelRepository.getResourceName(user),
-									ModelUtils.toLabel(user) });
+							for (User user : users) {
 
-							// Sorteren suggesties
-							Collections.sort(suggestions,
-									new DropdownListSorting());
+								UserProfile profiel = (UserProfile) user
+										.getAspect("UserProfile",
+												modelRepository, false);
+
+								suggestions.add(new Object[] {
+										modelRepository.getResourceName(user),
+										profiel.getLastName() + " "
+												+ profiel.getFirstName() });
+
+								// Sorteren suggesties
+								Collections.sort(suggestions,
+										new DropdownListSorting());
+							}
+
+						} catch (IOException e) {
+							LOG.error("Can not load user.", e);
+						} catch (InstantiationException e) {
+							LOG.error("Can not instantiate UserProfile.", e);
+						} catch (IllegalAccessException e) {
+							LOG.error("Illegal access at UserProfile.", e);
 						}
 
 						return suggestions;
-
 					}
 				}).get(null);
 	}
@@ -1182,6 +1195,7 @@ public class OsyrisModelFunctions {
 	 * 
 	 * @return
 	 */
+	@RunPrivileged
 	@SuppressWarnings("unchecked")
 	public List<User> getUserObjectsInGroup(String groupName) {
 

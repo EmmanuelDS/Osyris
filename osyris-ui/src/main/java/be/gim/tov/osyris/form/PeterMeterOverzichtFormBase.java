@@ -26,6 +26,7 @@ import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
+import org.conscientia.core.security.annotation.RunPrivileged;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.collections.CollectionUtils;
@@ -138,6 +139,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * Bewaren van nieuw aangemaakte PeterMeter.
 	 * 
 	 */
+	@RunPrivileged
 	public void saveNewPeterMeter() {
 
 		try {
@@ -185,6 +187,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * Verwijderen van PeterMeter.
 	 * 
 	 */
+	@RunPrivileged
 	@Override
 	public void delete() {
 		try {
@@ -261,6 +264,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	 * 
 	 * @param resourceName
 	 */
+	@RunPrivileged
 	private void addUserToPeterMeterGroup(ResourceName resourceName) {
 
 		try {
