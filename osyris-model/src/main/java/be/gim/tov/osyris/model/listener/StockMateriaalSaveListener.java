@@ -17,9 +17,9 @@ import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.UserProfile;
+import org.conscientia.core.configuration.DefaultConfiguration;
 
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
 
@@ -50,8 +50,14 @@ public class StockMateriaalSaveListener {
 		StockMateriaal stockMateriaal = (StockMateriaal) event.getModelObject();
 		// Check of StockMateriaal onder minimum aantal zit
 		if (stockMateriaal.getInStock() <= stockMateriaal.getMin()) {
+
 			// Stuur email naar Routedokters
-			sendMail(stockMateriaal);
+			String mailServiceStatus = DefaultConfiguration.instance()
+					.getString("service.mail.stockMateriaal");
+
+			if (mailServiceStatus.equalsIgnoreCase("on")) {
+				sendMail(stockMateriaal);
+			}
 		}
 	}
 
@@ -85,17 +91,11 @@ public class StockMateriaalSaveListener {
 						modelRepository.getModelClass("UserProfile"),
 						modelRepository.loadObject(user));
 
-				// mailSender.sendMail(preferences.getNoreplyEmail(),
-				// Collections.singleton(profiel.getEmail()),
-				// "/META-INF/resources/core/mails/stockAlert.fmt",
-				// variables);
+				mailSender.sendMail(preferences.getNoreplyEmail(),
+						Collections.singleton(profiel.getEmail()),
+						"/META-INF/resources/core/mails/stockAlert.fmt",
+						variables);
 			}
-
-			// DEBUG ONLY
-			String testEmail = "kristof.spiessens@gim.be";
-			mailSender.sendMail(preferences.getNoreplyEmail(),
-					Collections.singleton(testEmail),
-					"/META-INF/resources/core/mails/stockAlert.fmt", variables);
 
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);

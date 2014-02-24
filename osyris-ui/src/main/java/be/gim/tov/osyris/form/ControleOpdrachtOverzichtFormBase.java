@@ -39,6 +39,7 @@ import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
@@ -113,6 +114,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private static final String PERIODE_ZOMER = "2";
 	private static final String PERIODE_HERFST = "3";
 
+	private static final String OVERVIEW_MAP = "/META-INF/resources/osyris/xslts/overviewMap.xsl";
 	private static final String CO_PDF = "/META-INF/resources/osyris/xslts/controleOpdrachtPdf.xsl";
 	private static final String BORDFICHE_PDF = "/META-INF/resources/osyris/xslts/bordFichePdf.xsl";
 
@@ -844,7 +846,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 				modelRepository.saveObject(object);
 
 				// Send confirmatie mail naar peterMeter
-				// sendConfirmationMail();
+				String mailServiceStatus = DefaultConfiguration.instance()
+						.getString("service.mail.controleOpdracht");
+
+				if (mailServiceStatus.equalsIgnoreCase("on")) {
+					sendConfirmationMail();
+				}
 
 				clear();
 				search();
@@ -1369,6 +1376,43 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
+	 * Printen van een PDF bestand met een overzichtskaart van het te
+	 * controleren traject.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Content printOverviewMap() throws Exception {
+
+		// Opbouwen XML
+		List<Bord> borden = createBewegwijzering(object.getTraject());
+		Traject traject = (Traject) modelRepository.loadObject(object
+				.getTraject());
+
+		XmlBuilder xmlBuilder = new XmlBuilder();
+		Document doc = xmlBuilder.buildOverviewMap(bordLayer, getViewer(),
+				traject, object, borden);
+
+		ByteArrayOutputStream out = new ByteArrayOutputStream();
+		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+				FopFactory.newInstance().newFOUserAgent(), out);
+
+		// xslt
+		Source xslt = new StreamSource(getClass().getResourceAsStream(
+				OVERVIEW_MAP));
+
+		// Transform source
+		Transformer transformer = TransformerFactory.newInstance()
+				.newTransformer(xslt);
+		Result res = new SAXResult(fop.getDefaultHandler());
+
+		transformer.transform(new DOMSource(doc), res);
+
+		// return pdf
+		return new ByteArrayContent("application/pdf", out.toByteArray());
+	}
+
+	/**
 	 * Printen van een PDF bestand met overzichtskaart en bewegwijzergsverslag
 	 * in tabelvorm met betrekking tot het Traject uit de gekozen
 	 * ControleOpdracht.
@@ -1773,6 +1817,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 				bordLayer.setFilter(FilterUtils.in("segmenten",
 						((NetwerkLus) traject).getSegmenten()));
+
+				// New
+				List<String> bordIds = new ArrayList<String>();
+
+				for (Bord b : createBewegwijzering(object.getTraject())) {
+
+					bordIds.add(b.getId().toString());
+				}
+
+				bordLayer.setFilter(FilterUtils.id(bordIds));
 
 				bordLayer.setHidden(false);
 				bordLayer.set("selectable", true);

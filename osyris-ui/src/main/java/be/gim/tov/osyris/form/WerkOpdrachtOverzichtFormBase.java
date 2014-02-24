@@ -38,6 +38,7 @@ import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.resource.ByteArrayContent;
 import org.conscientia.core.search.DefaultQuery;
@@ -352,8 +353,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 				try {
 
 					modelRepository.saveObject(object);
-					// send confirmatie mail naar Uitvoerder
-					// sendConfirmationMail();
+
+					// Send confirmatie mail naar Uitvoerder
+					String mailServiceStatus = DefaultConfiguration.instance()
+							.getString("service.mail.werkOpdracht");
+
+					if (mailServiceStatus.equalsIgnoreCase("on")) {
+						sendConfirmationMail();
+					}
 
 					clear();
 					search();

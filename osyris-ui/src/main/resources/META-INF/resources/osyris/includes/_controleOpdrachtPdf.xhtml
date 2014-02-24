@@ -8,19 +8,31 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf">
 
-	<div>Voor een controleopdracht kan er een PDF bestand gegenereerd worden met overzichtskaart en bewegwijzering in tabelvorm.</div>
+	<div>Voor een controleopdracht kunnen er 3 PDF bestanden gegenereerd worden.</div>
 	<br/>
-	<div>Daarnaast kan een tweede PDF aangemaakt worden met de individuele bordfiches uit het bewegwijzeringsverslag.</div>
+	<div>1. Een overzichtskaart van het traject gesplitst in 4 pagina's (A4 formaat).</div>
+	<br/>
+	<div>2. Bewegwijzeringsverslag van het traject in tabelvorm.</div>
+	<br/>
+	<div>3. Individuele bordfiches van de borden behorend aan het traject.</div>
 	<br/>
 	<div><b>Opmerking: gelieve er rekening mee te houden dat het genereren van de PDF met bordfiches (afhankelijk van het aantal borden) enkele minuten in beslag kan nemen.</b></div>
     <br />
     <d:buttons>
-		<d:fileDownload fileName="OSYRIS Kaart en Bewegwijzering"
+    	<d:fileDownload fileName="OSYRIS Overzichtskaart"
+					type="button"
+					image="#{resource['core/images/actions/12x12/print.png']}"
+					contentType="application/pdf"
+					content="#{form.printOverviewMap()}"
+					value="Printen overzichtskaart"
+					eventsQueue="pdfQueue" />
+					
+		<d:fileDownload fileName="OSYRIS Bewegwijzeringsverslag"
 					type="button"
 					image="#{resource['core/images/actions/12x12/print.png']}"
 					contentType="application/pdf"
 					content="#{form.printControleOpdracht()}"
-					value="Printen kaart met bewegwijzeringsverslag"
+					value="Printen bewegwijzeringsverslag"
 					eventsQueue="pdfQueue" />
 					
 		<d:fileDownload fileName="OSYRIS Bordfiches"

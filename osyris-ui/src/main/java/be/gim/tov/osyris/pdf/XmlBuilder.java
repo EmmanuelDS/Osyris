@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 
 import javax.faces.application.Resource;
@@ -35,6 +36,7 @@ import be.gim.commons.label.LabelUtils;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.specto.ui.component.Position;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
@@ -52,12 +54,16 @@ import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.RuiterRoute;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.traject.WandelNetwerkBord;
+import be.gim.tov.osyris.model.traject.WandelNetwerkLus;
 import be.gim.tov.osyris.model.traject.WandelRoute;
 import be.gim.tov.osyris.model.werk.WerkHandeling;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.GeometryFactory;
+import com.vividsolutions.jts.geom.LineString;
+import com.vividsolutions.jts.geom.Point;
 
 /**
  * 
@@ -318,6 +324,157 @@ public class XmlBuilder {
 	}
 
 	/**
+	 * Opbouwen van de overzichtskaart van een traject. De kaart wordt
+	 * aangeleverd in 4 delen A4 formaat met vaste schaal.
+	 * 
+	 * @param viewer
+	 * @param traject
+	 * @param object
+	 * @param borden
+	 * @return
+	 * @throws ParserConfigurationException
+	 * @throws DOMException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public Document buildOverviewMap(FeatureMapLayer bordLayer,
+			MapViewer viewer, Traject traject, ControleOpdracht object,
+			List<Bord> borden) throws ParserConfigurationException,
+			DOMException, InstantiationException, IllegalAccessException {
+
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+		// root element
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("map");
+		doc.appendChild(rootElement);
+
+		FeatureMapLayer layer = (FeatureMapLayer) viewer.getContext().getLayer(
+				LabelUtils.lowerCamelCase(traject.getModelClass().getName()));
+
+		Envelope env = viewer.getContentExtent(layer);
+		Coordinate center = env.centre();
+		Coordinate[] coordinates = null;
+		GeometryFactory factory = new GeometryFactory();
+		LineString line = null;
+		Point p = null;
+
+		// Default FR FNW en RR
+		Double expandBy = 3000.0;
+
+		if (traject instanceof WandelRoute) {
+			expandBy = 1000.0;
+		}
+
+		if (traject instanceof WandelNetwerkLus) {
+			expandBy = 950.0;
+		}
+
+		if (traject instanceof AutoRoute) {
+			expandBy = 4050.0;
+		}
+
+		Integer width = 550;
+		Integer height = 550;
+
+		// Selecteer eerste bord in verslag
+		Bord firstBord = borden.get(0);
+		List<String> selectedBord = new ArrayList<String>();
+		selectedBord.add(firstBord.getId().toString());
+		bordLayer.setSelection(selectedBord);
+
+		// TOP LEFT
+		Position topLeft = new Position();
+		topLeft.setX(env.getMinX());
+		topLeft.setY(env.getMaxY());
+
+		coordinates = new Coordinate[] { topLeft.toCoordinate(), center };
+
+		line = factory.createLineString(coordinates);
+
+		p = line.getCentroid();
+
+		Envelope envelope1 = new Envelope(p.getCoordinate());
+
+		viewer.setCurrentExtent(envelope1);
+		envelope1.expandBy(expandBy);
+
+		Element overviewMap1 = doc.createElement("overviewMap1");
+		overviewMap1.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
+				envelope1, width, height)));
+		rootElement.appendChild(overviewMap1);
+
+		// TOP RIGHT
+		Position topRight = new Position();
+		topRight.setX(env.getMaxX());
+		topRight.setY(env.getMaxY());
+
+		coordinates = new Coordinate[] { topRight.toCoordinate(), center };
+
+		line = factory.createLineString(coordinates);
+
+		p = line.getCentroid();
+
+		Envelope envelope2 = new Envelope(p.getCoordinate());
+
+		viewer.setCurrentExtent(envelope2);
+		envelope2.expandBy(expandBy);
+
+		Element overviewMap2 = doc.createElement("overviewMap2");
+		overviewMap2.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
+				envelope2, width, height)));
+		rootElement.appendChild(overviewMap2);
+
+		// BOTTOM LEFT
+		Position bottomLeft = new Position();
+		bottomLeft.setX(env.getMinX());
+		bottomLeft.setY(env.getMinY());
+
+		coordinates = new Coordinate[] { bottomLeft.toCoordinate(), center };
+
+		line = factory.createLineString(coordinates);
+
+		p = line.getCentroid();
+
+		Envelope envelope3 = new Envelope(p.getCoordinate());
+
+		viewer.setCurrentExtent(envelope3);
+		envelope3.expandBy(expandBy);
+
+		Element overviewMap3 = doc.createElement("overviewMap3");
+		overviewMap3.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
+				envelope3, width, height)));
+		rootElement.appendChild(overviewMap3);
+
+		// BOTTOM RIGHT
+		Position bottomRight = new Position();
+		bottomRight.setX(env.getMaxX());
+		bottomRight.setY(env.getMinY());
+
+		coordinates = new Coordinate[] { bottomRight.toCoordinate(), center };
+
+		line = factory.createLineString(coordinates);
+
+		p = line.getCentroid();
+
+		Envelope envelope4 = new Envelope(p.getCoordinate());
+
+		viewer.setCurrentExtent(envelope4);
+		envelope4.expandBy(expandBy);
+		Element overviewMap4 = doc.createElement("overviewMap4");
+		overviewMap4.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
+				envelope4, width, height)));
+		rootElement.appendChild(overviewMap4);
+
+		viewer.setCurrentExtent(env);
+		bordLayer.setSelection(Collections.EMPTY_LIST);
+
+		return doc;
+	}
+
+	/**
 	 * Opbouwen bewegwijzeringtabel in XML
 	 * 
 	 * @param object
@@ -343,10 +500,10 @@ public class XmlBuilder {
 		Element rootElement = doc.createElement("verslag");
 		doc.appendChild(rootElement);
 
-		Element overviewMap = doc.createElement("overviewMap");
-		overviewMap.appendChild(doc.createTextNode(getOverviewMap(viewer,
-				traject)));
-		rootElement.appendChild(overviewMap);
+		// Element overviewMap = doc.createElement("overviewMap");
+		// overviewMap.appendChild(doc.createTextNode(getOverviewMap(viewer,
+		// traject)));
+		// rootElement.appendChild(overviewMap);
 
 		Element trajectNaam = doc.createElement("trajectnaam");
 		trajectNaam.appendChild(doc.createTextNode(traject.getNaam()));
@@ -998,6 +1155,34 @@ public class XmlBuilder {
 	}
 
 	/**
+	 * Ophalen van een deel van de overzichtskaart.
+	 * 
+	 * @param viewer
+	 * @param traject
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	private String getPartOverviewMap(MapViewer viewer, Envelope envelope,
+			int width, int height) throws InstantiationException,
+			IllegalAccessException {
+
+		viewer.setBaseLayerId("navstreet");
+
+		RenderedImage mapImage = viewer.getMap(
+				viewer.getContext().getSrsName(), envelope, null, width,
+				height, viewer.getCurrentScale());
+
+		Graphics2D g2d = ((BufferedImage) mapImage).createGraphics();
+
+		addNorthArrow(viewer, g2d, width, height);
+
+		viewer.setBaseLayerId("tms");
+
+		return storeImage(mapImage);
+	}
+
+	/**
 	 * Ophalen van de overzichtskaart bij het bewegwijzeringsverslag.
 	 * 
 	 * @param viewer
@@ -1011,8 +1196,8 @@ public class XmlBuilder {
 
 		viewer.setBaseLayerId("navstreet");
 
-		int width = 1024;
-		int height = 780;
+		int width = 800;
+		int height = 600;
 
 		FeatureMapLayer layer = (FeatureMapLayer) viewer.getContext().getLayer(
 				LabelUtils.lowerCamelCase(traject.getModelClass().getName()));

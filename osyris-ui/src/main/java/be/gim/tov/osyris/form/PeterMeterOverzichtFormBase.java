@@ -23,6 +23,7 @@ import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
@@ -163,8 +164,13 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 						.getResourceName(object));
 
 				// Send mail
-				sendCredentailsMail(object.getUsername(), (String) object
-						.getAspect("UserProfile").get("email"), password);
+				String mailServiceStatus = DefaultConfiguration.instance()
+						.getString("service.mail.peterMeter");
+
+				if (mailServiceStatus.equalsIgnoreCase("on")) {
+					sendCredentailsMail(object.getUsername(), (String) object
+							.getAspect("UserProfile").get("email"), password);
+				}
 
 				messages.info("Nieuwe peter/meter succesvol aangemaakt.");
 

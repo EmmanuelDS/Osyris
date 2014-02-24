@@ -29,6 +29,7 @@ import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.functions.ModelFunctions;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
@@ -875,7 +876,7 @@ public class OsyrisModelFunctions {
 
 			// Users uit medewerker group halen
 			for (ResourceIdentifier id : group.getMembers()) {
-				User medewerker = (User) modelRepository.loadDocument(id);
+				User medewerker = (User) modelRepository.loadObject(id);
 
 				if (medewerker != null) {
 					// Check welke Medewerker verantwoordelijk is voor het
@@ -1343,13 +1344,19 @@ public class OsyrisModelFunctions {
 			variables.put("problem", melding.getProbleem());
 
 			// Mail naar melder
-			mailSender.sendMail(preferences.getNoreplyEmail(),
-					Collections.singleton(melding.getEmail()),
-					"/META-INF/resources/core/mails/confirmMelding.fmt",
-					variables);
+			String mailServiceStatusMelder = DefaultConfiguration.instance()
+					.getString("service.mail.melding.melder");
 
-			messages.info("Er is een bevestigingsmail gestuurd naar "
-					+ melding.getEmail() + ".");
+			if (mailServiceStatusMelder.equalsIgnoreCase("on")) {
+
+				mailSender.sendMail(preferences.getNoreplyEmail(),
+						Collections.singleton(melding.getEmail()),
+						"/META-INF/resources/core/mails/confirmMelding.fmt",
+						variables);
+
+				messages.info("Er is een bevestigingsmail gestuurd naar "
+						+ melding.getEmail() + ".");
+			}
 
 			// Ophalen emailadres Medewerker
 			UserProfile profiel = (UserProfile) modelRepository.loadAspect(
@@ -1357,17 +1364,32 @@ public class OsyrisModelFunctions {
 					modelRepository.loadObject(melding.getMedewerker()));
 			String medewerkerEmail = profiel.getEmail();
 
-			// DEBUG ONLY
-			String testEmail = "kristof.spiessens@gim.be";
-
 			// Mail naar Medewerker TOV
-			mailSender.sendMail(preferences.getNoreplyEmail(),
-					Collections.singleton(testEmail),
-					"/META-INF/resources/core/mails/confirmMelding.fmt",
-					variables);
+			String mailServiceStatusMedewerker = DefaultConfiguration
+					.instance().getString("service.mail.melding.medewerker");
 
-			messages.info("Er is een bevestigingsmail gestuurd de verantwoordelijke TOV "
-					+ medewerkerEmail + ".");
+			if (mailServiceStatusMedewerker.equalsIgnoreCase("on")) {
+
+				mailSender.sendMail(preferences.getNoreplyEmail(),
+						Collections.singleton(medewerkerEmail),
+						"/META-INF/resources/core/mails/confirmMelding.fmt",
+						variables);
+
+				messages.info("Er is een bevestigingsmail gestuurd naar de verantwoordelijke TOV "
+						+ medewerkerEmail + ".");
+			}
+
+			// Testmail
+			if (mailServiceStatusMedewerker.equalsIgnoreCase("off")) {
+
+				String testEmail = DefaultConfiguration.instance().getString(
+						"service.mail.testEmail");
+
+				mailSender.sendMail(preferences.getNoreplyEmail(),
+						Collections.singleton(testEmail),
+						"/META-INF/resources/core/mails/confirmMelding.fmt",
+						variables);
+			}
 
 		} catch (IOException e) {
 

@@ -21,16 +21,16 @@
       </fo:layout-master-set>
       
       <!-- OVERVIEW MAP A3 -->
-      <fo:page-sequence master-reference="A3-landscape">     
-       <fo:static-content flow-name="footer">
-    	<fo:block text-align="center" font-size="10pt" color="#000000">
-      	<fo:inline><fo:page-number/></fo:inline>
-    	</fo:block>
-   	   </fo:static-content> 
-        <fo:flow flow-name="xsl-region-body">
-        <xsl:call-template name="overviewMap" />
-        </fo:flow>
-      </fo:page-sequence>
+<!--       <fo:page-sequence master-reference="A3-landscape">      -->
+<!--        <fo:static-content flow-name="footer"> -->
+<!--     	<fo:block text-align="center" font-size="10pt" color="#000000"> -->
+<!--       	<fo:inline><fo:page-number/></fo:inline> -->
+<!--     	</fo:block> -->
+<!--    	   </fo:static-content>  -->
+<!--         <fo:flow flow-name="xsl-region-body"> -->
+<!--         <xsl:call-template name="overviewMap" /> -->
+<!--         </fo:flow> -->
+<!--       </fo:page-sequence> -->
         
       
       <!-- BEWEGWIJZERINGSTABEL A4 -->

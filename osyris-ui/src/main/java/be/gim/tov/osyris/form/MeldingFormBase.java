@@ -468,7 +468,6 @@ public class MeldingFormBase implements Serializable {
 				// Email bevestiging sturen naar melder en medewerker
 				Beans.getReference(OsyrisModelFunctions.class)
 						.sendConfirmationMailMelding(object);
-				// sendConfirmationMail(object);
 
 				return reset();
 			}
