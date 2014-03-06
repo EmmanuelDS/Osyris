@@ -44,8 +44,10 @@ public class BordSaveListener {
 					.get(0);
 			Long newId = maxId + 1;
 			bord.setId(newId);
-			bord.setLabelId(newId.toString());
+			// bord.setLabelId(newId.toString());
 		}
+		// Set LabelId for SLD
+		bord.setLabelId(bord.getId().toString());
 
 		// Automatically set X Y coordinates indien niet aanwezig
 		if (bord.getGeom() != null && bord.getGeom() instanceof Point) {

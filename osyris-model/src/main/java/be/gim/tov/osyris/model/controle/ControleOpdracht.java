@@ -119,18 +119,18 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@NotSearchable
 	private List<Probleem> problemen;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	private String trajectType;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	@Target("_blank")
 	private ResourceIdentifier regioId;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	@Type(ModelPropertyType.DATE)

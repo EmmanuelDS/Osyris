@@ -34,36 +34,41 @@ public class RouteBordCreateListener {
 			InstantiationException, IllegalAccessException {
 		RouteBord routeBord = (RouteBord) event.getModelObject();
 
-		routeBord.setActief("1");
+		if (routeBord.getGeom() != null) {
 
-		Traject traject;
-		if (routeBord.getRoute() == null && routeBord.getNaam() == null) {
-			traject = Beans.getReference(OsyrisModelFunctions.class)
-					.getRouteForRouteBord(routeBord);
+			routeBord.setActief("1");
 
-			if (traject != null)
-				routeBord.setRoute(modelRepository.getResourceKey(traject));
-		} else {
-			traject = (Traject) modelRepository
-					.loadObject(routeBord.getRegio());
-		}
+			Traject traject;
+			if (routeBord.getRoute() == null && routeBord.getNaam() == null) {
+				traject = Beans.getReference(OsyrisModelFunctions.class)
+						.getRouteForRouteBord(routeBord);
 
-		if (traject != null && routeBord.getRoute() != null
-				&& routeBord.getNaam() == null) {
-			routeBord.setNaam(traject.getNaam());
-		}
+				if (traject != null) {
+					routeBord.setRoute(modelRepository.getResourceKey(traject));
+				}
+			} else {
+				traject = (Traject) modelRepository.loadObject(routeBord
+						.getRegio());
+			}
 
-		// Automatically set Regio
-		if (traject != null && routeBord.getRegio() == null) {
-			routeBord.setRegio(traject.getRegio());
-		}
+			if (traject != null && routeBord.getRoute() != null
+					&& routeBord.getNaam() == null) {
+				routeBord.setNaam(traject.getNaam());
+			}
 
-		// Automatically set Gemeente
-		if (routeBord.getGemeente() == null) {
+			// Automatically set Regio
+			if (traject != null && routeBord.getRegio() == null) {
+				routeBord.setRegio(traject.getRegio());
+			}
 
-			String gemeente = Beans.getReference(OsyrisModelFunctions.class)
-					.getGemeenteForBord(routeBord);
-			routeBord.setGemeente(gemeente);
+			// Automatically set Gemeente
+			if (routeBord.getGemeente() == null) {
+
+				String gemeente = Beans
+						.getReference(OsyrisModelFunctions.class)
+						.getGemeenteForBord(routeBord);
+				routeBord.setGemeente(gemeente);
+			}
 		}
 	}
 }

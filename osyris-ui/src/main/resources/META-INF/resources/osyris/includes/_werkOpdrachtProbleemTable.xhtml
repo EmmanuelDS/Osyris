@@ -29,7 +29,7 @@
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToProbleem(form.object.probleem)}" />
 	   		</p:column>
-	   		<p:column>
+	   		<p:column rendered="#{form.isRouteBordProbleem(bordProbleem)}">
 				<f:facet name="header">
 				<h:outputText value="Volgnr" />
 				</f:facet>

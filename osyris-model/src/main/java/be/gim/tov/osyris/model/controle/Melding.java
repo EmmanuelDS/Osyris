@@ -97,6 +97,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(ModelPropertyType.TIMESTAMP)
 	private Date datumGevalideerd;
 
+	@NotViewable
 	@EditableInStatus({ "", "GEMELD" })
 	@Required
 	@NotSearchable
@@ -107,18 +108,18 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaar;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	private String trajectType;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	@Target("_blank")
 	private ResourceIdentifier regioId;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	@Type(ModelPropertyType.DATE)

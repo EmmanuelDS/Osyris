@@ -581,7 +581,7 @@ public class MeldingFormBase implements Serializable {
 			}
 
 			else {
-				messages.error("Er zijn meerdere borden geselecteerd. Mogelijk bevinden deze borden zich op dezelfde locatie. Gelieve in dit geval de 'Tonen attributen' knop te gebruiken om uw selectie te verfijnen.");
+				messages.error("Er zijn meerdere borden geselecteerd. Mogelijk bevinden deze borden zich op dezelfde locatie. Gelieve in dit geval de 'Tonen informatie' knop te gebruiken om uw selectie te verfijnen.");
 				layer.setSelection(new ArrayList<String>(1));
 			}
 		}

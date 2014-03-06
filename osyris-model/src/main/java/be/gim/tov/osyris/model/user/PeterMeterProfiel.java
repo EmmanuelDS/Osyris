@@ -68,7 +68,6 @@ public class PeterMeterProfiel extends AbstractModelObject implements
 	private Date actiefTot;
 
 	@EditableInGroup({ "Medewerker", "Routedokter", "admin", "PeterMeter" })
-	// @Edit(type = "table")
 	@View(type = "table")
 	private List<PeterMeterVoorkeur> voorkeuren;
 

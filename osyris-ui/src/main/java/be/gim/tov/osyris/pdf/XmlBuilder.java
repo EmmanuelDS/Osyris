@@ -163,12 +163,16 @@ public class XmlBuilder {
 
 			// BORD GEMEENTE
 			Element gemeente = doc.createElement("gemeente");
-			gemeente.appendChild(doc.createTextNode(b.getGemeente()));
+			if (b.getGemeente() != null) {
+				gemeente.appendChild(doc.createTextNode(b.getGemeente()));
+			}
 			bord.appendChild(gemeente);
 
 			// BORD STRAAT
 			Element straat = doc.createElement("straat");
-			straat.appendChild(doc.createTextNode(b.getStraatnaam()));
+			if (b.getStraatnaam() != null) {
+				straat.appendChild(doc.createTextNode(b.getStraatnaam()));
+			}
 			bord.appendChild(straat);
 
 			// X COORDINAAT
@@ -185,7 +189,9 @@ public class XmlBuilder {
 
 			// WEGBEVOEGD
 			Element wegBevoegd = doc.createElement("wegbevoegd");
-			wegBevoegd.appendChild(doc.createTextNode(b.getWegBevoegd()));
+			if (b.getWegBevoegd() != null) {
+				wegBevoegd.appendChild(doc.createTextNode(b.getWegBevoegd()));
+			}
 			bord.appendChild(wegBevoegd);
 
 			// PIJL ROUTEBORD
@@ -193,8 +199,10 @@ public class XmlBuilder {
 			if (b instanceof RouteBord) {
 
 				RouteBord rb = (RouteBord) b;
-				pijl.appendChild(doc.createTextNode(getPijlBord(rb
-						.getImageCode())));
+				if (rb.getImageCode() != null) {
+					pijl.appendChild(doc.createTextNode(getPijlBord(rb
+							.getImageCode())));
+				}
 
 			}
 			bord.appendChild(pijl);
@@ -302,7 +310,9 @@ public class XmlBuilder {
 
 			// URL BORDFOTO
 			Element bordFoto = doc.createElement("bordfoto");
-			bordFoto.appendChild(doc.createTextNode(b.getFoto().toString()));
+			if (b.getFoto() != null) {
+				bordFoto.appendChild(doc.createTextNode(b.getFoto().toString()));
+			}
 			bord.appendChild(bordFoto);
 
 			// ORTHOKAART
@@ -529,7 +539,9 @@ public class XmlBuilder {
 				NetwerkBord nwb = (NetwerkBord) b;
 
 				Element bordType = doc.createElement("bordtype");
-				bordType.appendChild(doc.createTextNode(nwb.getBordType()));
+				if (nwb.getBordType() != null) {
+					bordType.appendChild(doc.createTextNode(nwb.getBordType()));
+				}
 				bord.appendChild(bordType);
 
 				Element pijlkp1 = doc.createElement("pijlkp1");
@@ -698,14 +710,18 @@ public class XmlBuilder {
 
 		// GEMEENTE OPDRACHT
 		Element gemeente = doc.createElement("gemeente");
-		gemeente.appendChild(doc.createTextNode(object.getGemeente()));
+		if (object.getGemeente() != null) {
+			gemeente.appendChild(doc.createTextNode(object.getGemeente()));
+		}
 		rootElement.appendChild(gemeente);
 
 		// NAAM TRAJECT
 		if (traject instanceof Route || traject instanceof NetwerkLus) {
 
 			Element trajectNaam = doc.createElement("trajectnaam");
-			trajectNaam.appendChild(doc.createTextNode(traject.getNaam()));
+			if (traject.getNaam() != null) {
+				trajectNaam.appendChild(doc.createTextNode(traject.getNaam()));
+			}
 			rootElement.appendChild(trajectNaam);
 		}
 
@@ -714,11 +730,17 @@ public class XmlBuilder {
 			NetwerkSegment seg = (NetwerkSegment) traject;
 
 			Element vanKp = doc.createElement("vankp");
-			vanKp.appendChild(doc.createTextNode(seg.getVanKpNr().toString()));
+			if (seg.getVanKpNr().toString() != null) {
+				vanKp.appendChild(doc.createTextNode(seg.getVanKpNr()
+						.toString()));
+			}
 			rootElement.appendChild(vanKp);
 
 			Element naarKp = doc.createElement("naarkp");
-			naarKp.appendChild(doc.createTextNode(seg.getNaarKpNr().toString()));
+			if (seg.getNaarKpNr().toString() != null) {
+				naarKp.appendChild(doc.createTextNode(seg.getNaarKpNr()
+						.toString()));
+			}
 			rootElement.appendChild(naarKp);
 		}
 
@@ -755,25 +777,29 @@ public class XmlBuilder {
 			rootElement.setAttribute("bordProbleem", Boolean.TRUE.toString());
 		}
 		// WERKHANDELINGEN
-		for (WerkHandeling h : object.getHandelingen()) {
+		if (!object.getHandelingen().isEmpty()) {
+			for (WerkHandeling h : object.getHandelingen()) {
 
-			Element handeling = doc.createElement("handeling");
-			rootElement.appendChild(handeling);
+				Element handeling = doc.createElement("handeling");
+				rootElement.appendChild(handeling);
 
-			Element nummer = doc.createElement("nummer");
-			nummer.appendChild(doc.createTextNode(String.valueOf(counter)));
-			handeling.appendChild(nummer);
-			counter++;
+				Element nummer = doc.createElement("nummer");
+				nummer.appendChild(doc.createTextNode(String.valueOf(counter)));
+				handeling.appendChild(nummer);
+				counter++;
 
-			Element type = doc.createElement("type");
-			type.appendChild(doc.createTextNode(h.getType()));
-			handeling.appendChild(type);
+				Element type = doc.createElement("type");
+				type.appendChild(doc.createTextNode(h.getType()));
+				handeling.appendChild(type);
+			}
 		}
 
 		// COMMENTAAR TOV
 		Element commentaar = doc.createElement("commentaar");
-		commentaar.appendChild(doc.createTextNode(object
-				.getCommentaarMedewerker()));
+		if (object.getCommentaarMedewerker() != null) {
+			commentaar.appendChild(doc.createTextNode(object
+					.getCommentaarMedewerker()));
+		}
 		rootElement.appendChild(commentaar);
 
 		// FOTO PROBLEEM
@@ -788,14 +814,19 @@ public class XmlBuilder {
 
 		// REGIO
 		Element regio = doc.createElement("regio");
-		regio.appendChild(doc.createTextNode(Beans.getReference(
-				OsyrisModelFunctions.class)
-				.getTrajectRegio(object.getTraject())));
+		String regioNaam = Beans.getReference(OsyrisModelFunctions.class)
+				.getTrajectRegio(object.getTraject());
+		if (regioNaam != null) {
+			regio.appendChild(doc.createTextNode(regioNaam));
+		}
 		rootElement.appendChild(regio);
 
 		// TYPE TRAJECT
 		Element trajectType = doc.createElement("trajecttype");
-		trajectType.appendChild(doc.createTextNode(object.getTrajectType()));
+		if (object.getTrajectType() != null) {
+			trajectType
+					.appendChild(doc.createTextNode(object.getTrajectType()));
+		}
 		rootElement.appendChild(trajectType);
 
 		// BORD ID
@@ -805,12 +836,16 @@ public class XmlBuilder {
 
 		// GEMEENTE BORD
 		Element bordGemeente = doc.createElement("bordGemeente");
-		bordGemeente.appendChild(doc.createTextNode(bord.getGemeente()));
+		if (bord.getGemeente() != null) {
+			bordGemeente.appendChild(doc.createTextNode(bord.getGemeente()));
+		}
 		bordElement.appendChild(bordGemeente);
 
 		// STRAAT BORD
 		Element bordStraat = doc.createElement("bordStraat");
-		bordStraat.appendChild(doc.createTextNode(bord.getStraatnaam()));
+		if (bord.getStraatnaam() != null) {
+			bordStraat.appendChild(doc.createTextNode(bord.getStraatnaam()));
+		}
 		bordElement.appendChild(bordStraat);
 
 		// X
@@ -827,7 +862,9 @@ public class XmlBuilder {
 
 		// WEGBEVOEGD
 		Element wegBevoegd = doc.createElement("wegbevoegd");
-		wegBevoegd.appendChild(doc.createTextNode(bord.getWegBevoegd()));
+		if (bord.getWegBevoegd() != null) {
+			wegBevoegd.appendChild(doc.createTextNode(bord.getWegBevoegd()));
+		}
 		bordElement.appendChild(wegBevoegd);
 
 		// PIJL ROUTEBORD
@@ -835,7 +872,10 @@ public class XmlBuilder {
 		if (bord instanceof RouteBord) {
 
 			RouteBord rb = (RouteBord) bord;
-			pijl.appendChild(doc.createTextNode(getPijlBord(rb.getImageCode())));
+			if (rb.getImageCode() != null) {
+				pijl.appendChild(doc.createTextNode(getPijlBord(rb
+						.getImageCode())));
+			}
 		}
 		bordElement.appendChild(pijl);
 
@@ -972,27 +1012,35 @@ public class XmlBuilder {
 			NetwerkSegment seg = (NetwerkSegment) traject;
 
 			Element vanKp = doc.createElement("vankp");
-			vanKp.appendChild(doc.createTextNode(seg.getVanKpNr().toString()));
+			if (seg.getVanKpNr() != null) {
+				vanKp.appendChild(doc.createTextNode(seg.getVanKpNr()
+						.toString()));
+			}
 			rootElement.appendChild(vanKp);
 
 			Element naarKp = doc.createElement("naarkp");
-			naarKp.appendChild(doc.createTextNode(seg.getNaarKpNr().toString()));
+			if (seg.getNaarKpNr() != null) {
+				naarKp.appendChild(doc.createTextNode(seg.getNaarKpNr()
+						.toString()));
+			}
 			rootElement.appendChild(naarKp);
 		}
 
-		for (WerkHandeling h : object.getHandelingen()) {
+		if (!object.getHandelingen().isEmpty()) {
+			for (WerkHandeling h : object.getHandelingen()) {
 
-			Element handeling = doc.createElement("handeling");
-			rootElement.appendChild(handeling);
+				Element handeling = doc.createElement("handeling");
+				rootElement.appendChild(handeling);
 
-			Element nummer = doc.createElement("nummer");
-			nummer.appendChild(doc.createTextNode(String.valueOf(counter)));
-			handeling.appendChild(nummer);
-			counter++;
+				Element nummer = doc.createElement("nummer");
+				nummer.appendChild(doc.createTextNode(String.valueOf(counter)));
+				handeling.appendChild(nummer);
+				counter++;
 
-			Element type = doc.createElement("type");
-			type.appendChild(doc.createTextNode(h.getType()));
-			handeling.appendChild(type);
+				Element type = doc.createElement("type");
+				type.appendChild(doc.createTextNode(h.getType()));
+				handeling.appendChild(type);
+			}
 		}
 
 		// COMMENTAAR TOV
@@ -1005,27 +1053,37 @@ public class XmlBuilder {
 
 		// REGIO
 		Element regio = doc.createElement("regio");
-		regio.appendChild(doc.createTextNode(Beans.getReference(
-				OsyrisModelFunctions.class)
-				.getTrajectRegio(object.getTraject())));
+		String regioNaam = Beans.getReference(OsyrisModelFunctions.class)
+				.getTrajectRegio(object.getTraject());
+		if (regioNaam != null) {
+			regio.appendChild(doc.createTextNode(regioNaam));
+		}
 		rootElement.appendChild(regio);
 
 		// GEMEENTE
 		Element gemeente = doc.createElement("gemeente");
-		gemeente.appendChild(doc.createTextNode(Beans.getReference(
-				OsyrisModelFunctions.class).getWerkOpdrachtGemeente(
-				object.getProbleem())));
+		String gemeenteWO = Beans.getReference(OsyrisModelFunctions.class)
+				.getWerkOpdrachtGemeente(object.getProbleem());
+		if (gemeenteWO != null) {
+			gemeente.appendChild(doc.createTextNode(gemeenteWO));
+		}
 		rootElement.appendChild(gemeente);
 
 		// TYPE TRAJECT
 		Element trajectType = doc.createElement("trajecttype");
-		trajectType.appendChild(doc.createTextNode(object.getTrajectType()));
+		if (object.getTrajectType() != null) {
+			trajectType
+					.appendChild(doc.createTextNode(object.getTrajectType()));
+		}
 		rootElement.appendChild(trajectType);
 
 		// FOTO PROBLEEM
 		Element foto = doc.createElement("probleemfoto");
-		foto.appendChild(doc.createTextNode(Base64.encode(object.getProbleem()
-				.getFoto())));
+		if (object.getProbleem().getFoto() != null) {
+
+			foto.appendChild(doc.createTextNode(Base64.encode(object
+					.getProbleem().getFoto())));
+		}
 		rootElement.appendChild(foto);
 
 		// ORTHO KAART
@@ -1043,6 +1101,8 @@ public class XmlBuilder {
 				.createTextNode(getMapAnderProbleem(viewer,
 						object.getProbleem(), false)));
 		rootElement.appendChild(mapTopoAnderProbleem);
+
+		viewer.setBaseLayerId("tms");
 
 		return doc;
 	}
@@ -1096,7 +1156,7 @@ public class XmlBuilder {
 
 		// Terugzetten naar tms baseLayer
 		viewer.unselectFeatures(layer, ids);
-		// viewer.setBaseLayerId("tms");
+		viewer.setBaseLayerId("tms");
 
 		return storeImage(mapImage);
 	}

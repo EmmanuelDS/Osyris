@@ -64,6 +64,7 @@ import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.controle.RouteBordProbleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
@@ -224,6 +225,20 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 */
 	public boolean isBordProbleem(Probleem probleem) {
 		if (probleem instanceof BordProbleem) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
+	 * Bepalen of het probleem bij de WerkOpdracht een RouteBordProbleem is.
+	 * 
+	 * @param probleem
+	 * @return
+	 */
+	public boolean isRouteBordProbleem(Probleem probleem) {
+		if (probleem instanceof RouteBordProbleem) {
 			return true;
 		} else {
 			return false;
@@ -537,7 +552,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 					&& (identity.inGroup("admin", "CUSTOM")
 							|| identity.inGroup("Medewerker", "CUSTOM") || identity
 								.inGroup("Routedokter", "CUSTOM"))) {
-				sendWerkOpdrachtEditedMail();
+
+				String mailServiceStatus = DefaultConfiguration.instance()
+						.getString("service.mail.werkOpdracht");
+
+				if (mailServiceStatus.equalsIgnoreCase("on")) {
+					sendWerkOpdrachtEditedMail();
+				}
 			}
 			// clear();
 			search();
@@ -1073,13 +1094,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 		variables.put("medewerker",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
-		// TODO: enable profile adres
-		// modelRepository
-		// .loadObject(object.getUitvoerder())
-		// .getAspect("UserProfile").get("email").toString())
+		String uitvoerderEmail = modelRepository
+				.loadObject(object.getUitvoerder()).getAspect("UserProfile")
+				.get("email").toString();
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
-				Collections.singleton("kristof.spiessens@gim.be"),
+				Collections.singleton(uitvoerderEmail),
 				"/META-INF/resources/core/mails/confirmWerkOpdracht.fmt",
 				variables);
 
@@ -1108,13 +1128,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 		variables.put("editor",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
-		// TODO: enable profile adres
-		// modelRepository
-		// .loadObject(object.getUitvoerder())
-		// .getAspect("UserProfile").get("email").toString())
+		String uitvoerderEmail = modelRepository
+				.loadObject(object.getUitvoerder()).getAspect("UserProfile")
+				.get("email").toString();
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
-				Collections.singleton("kristof.spiessens@gim.be"),
+				Collections.singleton(uitvoerderEmail),
 				"/META-INF/resources/core/mails/editedWerkOpdracht.fmt",
 				variables);
 

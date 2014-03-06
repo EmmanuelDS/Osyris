@@ -1479,16 +1479,24 @@ public class OsyrisModelFunctions {
 	public String getGemeenteForBord(Bord bord) {
 
 		try {
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName("Gemeente");
-			query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
 
-			List<Gemeente> gemeentes = (List<Gemeente>) modelRepository
-					.searchObjects(query, true, true);
-			Gemeente gemeente = (Gemeente) modelRepository
-					.getUniqueResult(gemeentes);
+			if (bord.getGeom() != null) {
 
-			return gemeente.getNaam();
+				DefaultQuery query = new DefaultQuery();
+				query.setModelClassName("Gemeente");
+				query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
+
+				List<Gemeente> gemeentes = (List<Gemeente>) modelRepository
+						.searchObjects(query, true, true);
+
+				if (gemeentes.size() == 1) {
+					Gemeente gemeente = (Gemeente) modelRepository
+							.getUniqueResult(gemeentes);
+					if (gemeente != null) {
+						return gemeente.getNaam();
+					}
+				}
+			}
 
 		} catch (IOException e) {
 			LOG.error("Can not search Gemeente", e);
@@ -1507,15 +1515,17 @@ public class OsyrisModelFunctions {
 	public Regio getRegioForBord(Bord bord) {
 
 		try {
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName("Regio");
-			query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
+			if (bord.getGeom() != null) {
+				DefaultQuery query = new DefaultQuery();
+				query.setModelClassName("Regio");
+				query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));
 
-			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
-					query, true, true);
-			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+				List<Regio> regios = (List<Regio>) modelRepository
+						.searchObjects(query, true, true);
+				Regio regio = (Regio) modelRepository.getUniqueResult(regios);
 
-			return regio;
+				return regio;
+			}
 
 		} catch (IOException e) {
 			LOG.error("Can not search Regio", e);
@@ -1576,33 +1586,37 @@ public class OsyrisModelFunctions {
 
 		List<ResourceIdentifier> segmentIds = new ArrayList<ResourceIdentifier>();
 
-		DefaultQuery query = new DefaultQuery();
-		query.setModelClassName(bord.getModelClass().getName()
-				.replace("Bord", "Segment"));
-		query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+		if (bord.getRegio() != null && bord.getGeom() != null) {
 
-		List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
-				.searchObjects(query, false, false);
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName(bord.getModelClass().getName()
+					.replace("Bord", "Segment"));
+			query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
 
-		Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
+			List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
+					.searchObjects(query, false, false);
 
-		for (NetwerkSegment s : segmenten) {
+			Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
 
-			double distance = bord.getGeom().distance(s.getGeom());
-			distances.put(modelRepository.getResourceIdentifier(s), distance);
-		}
+			for (NetwerkSegment s : segmenten) {
 
-		double minValueInMap = (Collections.min(distances.values()));
+				double distance = bord.getGeom().distance(s.getGeom());
+				distances.put(modelRepository.getResourceIdentifier(s),
+						distance);
+			}
 
-		for (Entry<ResourceIdentifier, Double> entry : distances.entrySet()) {
-			if (entry.getValue() == minValueInMap) {
+			double minValueInMap = (Collections.min(distances.values()));
 
-				ResourceIdentifier minSegmentId = entry.getKey();
-				segmentIds.add(minSegmentId);
+			for (Entry<ResourceIdentifier, Double> entry : distances.entrySet()) {
+				if (entry.getValue() == minValueInMap) {
+
+					ResourceIdentifier minSegmentId = entry.getKey();
+					segmentIds.add(minSegmentId);
+				}
 			}
 		}
-
 		return segmentIds;
+
 	}
 
 	/**

@@ -72,6 +72,13 @@ public class Uitvoeringsronde extends AbstractModelObject implements
 	private List<ResourceIdentifier> opdrachten;
 
 	// GETTERS AND SETTERS
+	@Override
+	@NotSearchable
+	@NotEditable
+	public Long getId() {
+		return (Long) super.getId();
+	}
+
 	public UitvoeringsrondeStatus getStatus() {
 		return status;
 	}

@@ -59,6 +59,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
+	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Uitvoerder')}")
 	@Target("_blank")
 	private ResourceIdentifier uitvoerder;
@@ -141,45 +142,52 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(ModelPropertyType.DATE)
 	private Date datumLaterUitTeVoeren;
 
+	@NotViewable
 	@NotSearchable
 	private Probleem probleem;
 
 	@NotSearchable
 	@NotEditable
-	@NotViewable
+	// @NotViewable
 	@ModelClassName("Traject")
 	@Target("_blank")
 	private ResourceIdentifier traject;
 
 	@NotSearchable
 	@Edit(type = "table")
-	// @View(type = "table")
 	@NotViewable
 	private List<GebruiktMateriaal> materialen;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	private String trajectType;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	@Target("_blank")
 	private ResourceIdentifier regioId;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	private String gemeente;
 
-	@NotViewable
+	// @NotViewable
 	@NotSearchable
 	@NotEditable
 	@Type(ModelPropertyType.DATE)
 	private Date datumLaatsteWijziging;
 
 	// GETTERS AND SETTERS
+	@Override
+	@NotSearchable
+	@NotEditable
+	public Long getId() {
+		return (Long) super.getId();
+	}
+
 	public String getInRonde() {
 		return inRonde;
 	}

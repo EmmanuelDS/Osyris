@@ -19,20 +19,26 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.group.Group;
 import org.conscientia.api.mail.MailSender;
+import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.model.DefaultModelObjectList;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.security.annotation.RunPrivileged;
 import org.jboss.seam.security.Identity;
 
 import be.gim.commons.collections.CollectionUtils;
+import be.gim.commons.encoder.api.Encoder;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceName;
+import be.gim.peritia.codec.EncodableContent;
+import be.gim.peritia.io.content.Content;
+import be.gim.tov.osyris.model.encoder.PeterMeterCSVModelEncoder;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
@@ -404,5 +410,19 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 				throw new IOException(message);
 			}
 		}
+	}
+
+	/**
+	 * Custom PeterMeter CSV export
+	 * 
+	 */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Content<?> report() {
+
+		DefaultModelObjectList objectList = new DefaultModelObjectList<User>(
+				getModelClass(), getResults());
+		return new EncodableContent<ModelObjectList>(
+				(Encoder) new PeterMeterCSVModelEncoder(), objectList);
 	}
 }

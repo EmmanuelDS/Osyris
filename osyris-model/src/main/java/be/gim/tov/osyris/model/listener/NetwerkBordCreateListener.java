@@ -54,7 +54,10 @@ public class NetwerkBordCreateListener {
 
 			String gemeente = Beans.getReference(OsyrisModelFunctions.class)
 					.getGemeenteForBord(netwerkBord);
-			netwerkBord.setGemeente(gemeente);
+
+			if (gemeente != null) {
+				netwerkBord.setGemeente(gemeente);
+			}
 		}
 
 		if (netwerkBord.getSegmenten() == null
@@ -68,34 +71,39 @@ public class NetwerkBordCreateListener {
 		}
 
 		// Set BordBase = naam Regio van bord
+
 		Regio regio = (Regio) Beans.getReference(ModelRepository.class)
 				.loadObject(netwerkBord.getRegio());
-		netwerkBord.setBordBase(regio.getNaam());
 
-		// FNW Bord regioNaam is naam
-		if (netwerkBord instanceof FietsNetwerkBord) {
-			((FietsNetwerkBord) netwerkBord).setNaam(regio.getNaam());
-		}
+		if (regio != null) {
+			netwerkBord.setBordBase(regio.getNaam());
 
-		// WNW Bord naam van gekoppeld segment is naam
-		if (netwerkBord instanceof WandelNetwerkBord) {
-
-			WandelNetwerkBord wnwBord = (WandelNetwerkBord) netwerkBord;
-
-			if (wnwBord.getSegmenten().size() > 0) {
-				ResourceIdentifier segmentId = wnwBord.getSegmenten().get(0);
-
-				if (segmentId != null) {
-					NetwerkSegment segment = (NetwerkSegment) modelRepository
-							.loadObject(segmentId);
-					((WandelNetwerkBord) netwerkBord)
-							.setNaam(segment.getNaam());
-				}
+			// FNW Bord regioNaam is naam
+			if (netwerkBord instanceof FietsNetwerkBord) {
+				((FietsNetwerkBord) netwerkBord).setNaam(regio.getNaam());
 			}
 
-			// Indien geen segment gekoppeld gebruik Regionaam
-			else {
-				wnwBord.setNaam(regio.getNaam());
+			// WNW Bord naam van gekoppeld segment is naam
+			if (netwerkBord instanceof WandelNetwerkBord) {
+
+				WandelNetwerkBord wnwBord = (WandelNetwerkBord) netwerkBord;
+
+				if (wnwBord.getSegmenten().size() > 0) {
+					ResourceIdentifier segmentId = wnwBord.getSegmenten()
+							.get(0);
+
+					if (segmentId != null) {
+						NetwerkSegment segment = (NetwerkSegment) modelRepository
+								.loadObject(segmentId);
+						((WandelNetwerkBord) netwerkBord).setNaam(segment
+								.getNaam());
+					}
+				}
+
+				// Indien geen segment gekoppeld gebruik Regionaam
+				else {
+					wnwBord.setNaam(regio.getNaam());
+				}
 			}
 		}
 	}

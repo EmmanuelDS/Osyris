@@ -44,7 +44,7 @@
 				    						pattern="yyyy-MM-dd">
 										</p:calendar>
 									</q:greaterThanOrEqualTo>
-									<q:null propertyName="actiefTot"
+									<q:null propertyName="#PeterMeterProfiel/actiefTot"
 										active="#{peterMeterOverzichtFormBase.actiefSinds != null}"/>
 								</q:or>
 							</d:field>
@@ -61,12 +61,22 @@
 									</p:calendar>
 								</q:lessThanOrEqualTo>
 							</d:field>
-																					 									
-						</d:fields>			
-						<d:aspect id="peterMeterProfiel"
-							modelClass="#{d:modelClass('PeterMeterProfiel')}"
-							path="#PeterMeterProfiel"
-							mode="SEARCH" />
+																					 																							
+						<d:propertyField id="status"
+								modelClass="#{d:modelClass('PeterMeterProfiel')}"
+								modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('status')}"
+								path="#PeterMeterProfiel/status" mode="SEARCH" />
+								
+						<d:propertyField id="voorkeuren"
+								modelClass="#{d:modelClass('PeterMeterProfiel')}"
+								modelProperty="#{d:modelClass('PeterMeterProfiel').getProperty('voorkeuren')}"
+								path="#PeterMeterProfiel/voorkeuren" mode="SEARCH" />
+					</d:fields>	
+							
+<!-- 						<d:aspect id="peterMeterProfiel" -->
+<!-- 							modelClass="#{d:modelClass('PeterMeterProfiel')}" -->
+<!-- 							path="#PeterMeterProfiel" -->
+<!-- 							mode="SEARCH" /> -->
 					</q:query>																										
 					<d:buttons>
 						<j:commandButton rendered="true"
