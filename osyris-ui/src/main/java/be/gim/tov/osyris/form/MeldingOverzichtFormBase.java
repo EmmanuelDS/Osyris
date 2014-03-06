@@ -285,6 +285,12 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
 	@Override
 	public void delete() {
 		try {
+
+			// Loskoppelen van het probleem aan een melding.
+			// Probleem kan nog wel gekoppeld zijn aan een Werkopdracht.
+			object.setProbleem(null);
+			modelRepository.saveObject(object);
+
 			modelRepository.deleteObject(object);
 			messages.info("Melding succesvol verwijderd.");
 			clear();

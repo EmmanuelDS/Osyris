@@ -29,6 +29,12 @@
 		</d:fields>
 	</r:panel>
 	<br/>
+	<!-- Probleem tabel -->
+		<u:decorate
+			template="/resources/osyris/includes/_werkOpdrachtProbleemTable.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+	<br/>
 	<r:panel id="handelingenPanel">
 	<d:fields>
 		<d:propertyField id="handelingen"

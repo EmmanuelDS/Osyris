@@ -60,18 +60,21 @@ public class MeldingSaveListener {
 		}
 
 		// Indien probleem met status Melding gevalideerd
-		if (melding.getProbleem().getStatus() != null) {
 
-			melding.setStatus(MeldingStatus.GEVALIDEERD);
-			melding.setDatumGevalideerd(new Date());
-			melding.setDatumLaatsteWijziging(new Date());
-			melding.setTrajectType(osyrisModelFunctions.getTrajectType(melding
-					.getTraject()));
+		if (melding.getProbleem() != null) {
+			if (melding.getProbleem().getStatus() != null) {
 
-			// Aanmaken werkopdracht indien status probleem werkopdracht
-			if (melding.getProbleem().getStatus()
-					.equals(ProbleemStatus.WERKOPDRACHT)) {
-				createWerkOpdracht(melding);
+				melding.setStatus(MeldingStatus.GEVALIDEERD);
+				melding.setDatumGevalideerd(new Date());
+				melding.setDatumLaatsteWijziging(new Date());
+				melding.setTrajectType(osyrisModelFunctions
+						.getTrajectType(melding.getTraject()));
+
+				// Aanmaken werkopdracht indien status probleem werkopdracht
+				if (melding.getProbleem().getStatus()
+						.equals(ProbleemStatus.WERKOPDRACHT)) {
+					createWerkOpdracht(melding);
+				}
 			}
 		}
 	}
@@ -108,9 +111,10 @@ public class MeldingSaveListener {
 			Traject traject = (Traject) modelRepository.loadObject(melding
 					.getTraject());
 
-			if (traject != null)
+			if (traject != null) {
 				werkOpdracht.setUitvoerder(osyrisModelFunctions
 						.zoekUitvoerder(traject.getRegio()));
+			}
 
 			modelRepository.saveObject(werkOpdracht);
 			messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
