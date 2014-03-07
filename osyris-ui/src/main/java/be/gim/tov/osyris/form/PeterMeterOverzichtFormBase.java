@@ -17,6 +17,7 @@ import org.apache.commons.lang.ObjectUtils;
 import org.apache.commons.lang.RandomStringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.conscientia.api.document.Document;
 import org.conscientia.api.group.Group;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelObjectList;
@@ -159,6 +160,10 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 				setHasErrors(false);
 
+				Document<User> document = (Document<User>) object.getAspect(
+						"Document", modelRepository, true);
+				document.setOwner(modelRepository.getResourceName(object));
+
 				object.getAspect("PeterMeterProfiel", modelRepository, true);
 
 				// Save User UserProfile PeterMeterProfiel and
@@ -171,7 +176,7 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 				// Send mail
 				String mailServiceStatus = DefaultConfiguration.instance()
-						.getString("service.mail.peterMeter");
+						.getString("service.mail.peterMeter", "on");
 
 				if (mailServiceStatus.equalsIgnoreCase("on")) {
 					sendCredentailsMail(object.getUsername(), (String) object

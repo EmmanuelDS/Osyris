@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.ModelPropertyType;
-import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Default;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Model;
@@ -30,8 +29,7 @@ import be.gim.commons.resource.ResourceIdentifier;
 		@Permission(profile = "group:PeterMeter", action = "search", allow = true),
 		@Permission(profile = "group:PeterMeter", action = "view", allow = true) })
 @Edit(type = "peterMeterVoorkeur")
-public class PeterMeterVoorkeur extends AbstractModelObject implements
-		StorableObject {
+public class PeterMeterVoorkeur extends AbstractModelObject {
 
 	// VARIABLES
 	@ModelClassName("Regio")
