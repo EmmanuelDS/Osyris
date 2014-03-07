@@ -1605,13 +1605,17 @@ public class OsyrisModelFunctions {
 						distance);
 			}
 
-			double minValueInMap = (Collections.min(distances.values()));
+			if (!segmenten.isEmpty()) {
 
-			for (Entry<ResourceIdentifier, Double> entry : distances.entrySet()) {
-				if (entry.getValue() == minValueInMap) {
+				double minValueInMap = (Collections.min(distances.values()));
 
-					ResourceIdentifier minSegmentId = entry.getKey();
-					segmentIds.add(minSegmentId);
+				for (Entry<ResourceIdentifier, Double> entry : distances
+						.entrySet()) {
+					if (entry.getValue() == minValueInMap) {
+
+						ResourceIdentifier minSegmentId = entry.getKey();
+						segmentIds.add(minSegmentId);
+					}
 				}
 			}
 		}

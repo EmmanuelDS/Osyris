@@ -17,7 +17,6 @@ import org.conscientia.api.user.User;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.jboss.seam.international.status.Messages;
-import org.opengis.filter.Filter;
 
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.resource.ResourceName;
@@ -109,11 +108,16 @@ public class PeterMeterToewijzingBean {
 					ResourceName resourceName = modelRepository
 							.getResourceName(peterMeter);
 
-					PeterMeterVoorkeur voorkeur = profiel.getVoorkeuren()
-							.get(0);
+					if (profiel != null) {
 
-					if (voorkeur.getTrajectType().contains(type)) {
-						processToekenning(voorkeur, resourceName);
+						PeterMeterVoorkeur voorkeur = profiel.getVoorkeuren()
+								.get(0);
+
+						if (voorkeur != null) {
+							if (voorkeur.getTrajectType().contains(type)) {
+								processToekenning(voorkeur, resourceName);
+							}
+						}
 					}
 				}
 			}
@@ -129,10 +133,16 @@ public class PeterMeterToewijzingBean {
 					ResourceName resourceName = modelRepository
 							.getResourceName(peterMeter);
 
-					for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+					if (profiel != null) {
 
-						if (voorkeur.getTrajectType().contains(type)) {
-							processToekenning(voorkeur, resourceName);
+						for (PeterMeterVoorkeur voorkeur : profiel
+								.getVoorkeuren()) {
+
+							if (voorkeur != null) {
+								if (voorkeur.getTrajectType().contains(type)) {
+									processToekenning(voorkeur, resourceName);
+								}
+							}
 						}
 					}
 				}
@@ -250,17 +260,20 @@ public class PeterMeterToewijzingBean {
 								.loadObject(compareToPeterMeter).getAspect(
 										"PeterMeterProfiel");
 
-						Calendar cal1 = Calendar.getInstance();
-						Calendar cal2 = Calendar.getInstance();
-						cal1.setTime(profielPM1.getActiefSinds());
-						cal2.setTime(profielPM2.getActiefSinds());
+						if (profielPM1 != null && profielPM2 != null) {
 
-						// Degene met de langste staat van dienst wordt
-						// toegekend
-						if (cal1.before(cal2)) {
-							assignedPeterMeter = peterMeter;
-						} else {
-							assignedPeterMeter = compareToPeterMeter;
+							Calendar cal1 = Calendar.getInstance();
+							Calendar cal2 = Calendar.getInstance();
+							cal1.setTime(profielPM1.getActiefSinds());
+							cal2.setTime(profielPM2.getActiefSinds());
+
+							// Degene met de langste staat van dienst wordt
+							// toegekend
+							if (cal1.before(cal2)) {
+								assignedPeterMeter = peterMeter;
+							} else {
+								assignedPeterMeter = compareToPeterMeter;
+							}
 						}
 					} else {
 						assignedPeterMeter = peterMeter;
@@ -316,7 +329,7 @@ public class PeterMeterToewijzingBean {
 						vrijeRoute.setPeterMeter1(peterMeter);
 					}
 					if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-						vrijeRoute.setPeterMeter1(peterMeter);
+						vrijeRoute.setPeterMeter2(peterMeter);
 					}
 					if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
 						vrijeRoute.setPeterMeter3(peterMeter);
@@ -372,37 +385,40 @@ public class PeterMeterToewijzingBean {
 									.loadObject(compareToPeterMeter).getAspect(
 											"PeterMeterProfiel");
 
-							// Enkel checken indien actiefSinds is ingevuld.
-							if (profielPM1.getActiefSinds() != null
-									&& profielPM2.getActiefSinds() != null) {
+							if (profielPM1 != null && profielPM2 != null) {
+								// Enkel checken indien actiefSinds is ingevuld.
+								if (profielPM1.getActiefSinds() != null
+										&& profielPM2.getActiefSinds() != null) {
 
-								Calendar cal1 = Calendar.getInstance();
-								Calendar cal2 = Calendar.getInstance();
-								cal1.setTime(profielPM1.getActiefSinds());
-								cal2.setTime(profielPM2.getActiefSinds());
+									Calendar cal1 = Calendar.getInstance();
+									Calendar cal2 = Calendar.getInstance();
+									cal1.setTime(profielPM1.getActiefSinds());
+									cal2.setTime(profielPM2.getActiefSinds());
 
-								// Degene met de langste staat van dienst wordt
-								// toegekend
-								if (cal1.before(cal2)) {
-									assignedPeterMeter = peterMeter;
+									// Degene met de langste staat van dienst
+									// wordt
+									// toegekend
+									if (cal1.before(cal2)) {
+										assignedPeterMeter = peterMeter;
+									} else {
+										assignedPeterMeter = compareToPeterMeter;
+									}
 								} else {
-									assignedPeterMeter = compareToPeterMeter;
+									assignedPeterMeter = peterMeter;
 								}
-							} else {
-								assignedPeterMeter = peterMeter;
-							}
 
-							// Bewaren toewijzing
-							if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-								r.setPeterMeter1(assignedPeterMeter);
-							} else if (voorkeur.getPeriode().equals(
-									PERIODE_ZOMER)) {
-								r.setPeterMeter2(assignedPeterMeter);
-							} else if (voorkeur.getPeriode().equals(
-									PERIODE_HERFST)) {
-								r.setPeterMeter3(assignedPeterMeter);
+								// Bewaren toewijzing
+								if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+									r.setPeterMeter1(assignedPeterMeter);
+								} else if (voorkeur.getPeriode().equals(
+										PERIODE_ZOMER)) {
+									r.setPeterMeter2(assignedPeterMeter);
+								} else if (voorkeur.getPeriode().equals(
+										PERIODE_HERFST)) {
+									r.setPeterMeter3(assignedPeterMeter);
+								}
+								modelRepository.saveObject(r);
 							}
-							modelRepository.saveObject(r);
 						}
 					}
 				}
@@ -448,7 +464,7 @@ public class PeterMeterToewijzingBean {
 						vrijeLus.setPeterMeter1(peterMeter);
 					}
 					if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-						vrijeLus.setPeterMeter1(peterMeter);
+						vrijeLus.setPeterMeter2(peterMeter);
 					}
 					if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
 						vrijeLus.setPeterMeter3(peterMeter);
@@ -521,16 +537,24 @@ public class PeterMeterToewijzingBean {
 							PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
 									.loadObject(compareToPeterMeter).getAspect(
 											"PeterMeterProfiel");
-							for (PeterMeterVoorkeur pref : profielPM2
-									.getVoorkeuren()) {
-								if (pref.getTrajectType().equals(
-										voorkeur.getTrajectType())
-										&& voorkeur.getMaxAfstand() < pref
-												.getMaxAfstand()) {
-									assignedPeterMeter = peterMeter;
-									break;
-								} else {
-									assignedPeterMeter = compareToPeterMeter;
+
+							if (profielPM2 != null) {
+								for (PeterMeterVoorkeur pref : profielPM2
+										.getVoorkeuren()) {
+
+									if (pref != null) {
+
+										if (pref.getTrajectType().equals(
+												voorkeur.getTrajectType())
+												&& voorkeur.getMaxAfstand() < pref
+														.getMaxAfstand()) {
+											assignedPeterMeter = peterMeter;
+											break;
+										}
+
+									} else {
+										assignedPeterMeter = compareToPeterMeter;
+									}
 								}
 							}
 						}
@@ -725,10 +749,10 @@ public class PeterMeterToewijzingBean {
 			if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
 				builder.addFilter(FilterUtils.equal("peterMeter1", null));
 			}
-			if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+			if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
 				builder.addFilter(FilterUtils.equal("peterMeter2", null));
 			}
-			if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+			if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
 				builder.addFilter(FilterUtils.equal("peterMeter3", null));
 			}
 			vrijeLussen = (List<NetwerkLus>) modelRepository.searchObjects(
@@ -745,10 +769,10 @@ public class PeterMeterToewijzingBean {
 			if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
 				builder.addFilter(FilterUtils.equal("peterMeter1", null));
 			}
-			if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+			if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
 				builder.addFilter(FilterUtils.equal("peterMeter2", null));
 			}
-			if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+			if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
 				builder.addFilter(FilterUtils.equal("peterMeter3", null));
 			}
 			vrijeLussen = (List<NetwerkLus>) modelRepository.searchObjects(
@@ -771,10 +795,10 @@ public class PeterMeterToewijzingBean {
 		if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
 			builder.addFilter(FilterUtils.equal("peterMeter1", null));
 		}
-		if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+		if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
 			builder.addFilter(FilterUtils.equal("peterMeter2", null));
 		}
-		if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+		if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
 			builder.addFilter(FilterUtils.equal("peterMeter3", null));
 		}
 		vrijeRoutes = (List<Route>) modelRepository.searchObjects(
@@ -804,19 +828,21 @@ public class PeterMeterToewijzingBean {
 			PeterMeterProfiel profiel = (PeterMeterProfiel) peterMeter
 					.getAspect("PeterMeterProfiel", modelRepository, true);
 
-			if (profiel.getStatus().equals(PeterMeterStatus.ACTIEF)) {
+			if (profiel != null) {
+				if (profiel.getStatus().equals(PeterMeterStatus.ACTIEF)) {
 
-				if (singleVoorkeur) {
-					if (profiel.getVoorkeuren() != null
-							&& profiel.getVoorkeuren().size() == 1) {
-						result.add(peterMeter);
+					if (singleVoorkeur) {
+						if (profiel.getVoorkeuren() != null
+								&& profiel.getVoorkeuren().size() == 1) {
+							result.add(peterMeter);
+						}
 					}
-				}
 
-				else {
-					if (profiel.getVoorkeuren() != null
-							&& profiel.getVoorkeuren().size() > 1) {
-						result.add(peterMeter);
+					else {
+						if (profiel.getVoorkeuren() != null
+								&& profiel.getVoorkeuren().size() > 1) {
+							result.add(peterMeter);
+						}
 					}
 				}
 			}
@@ -860,33 +886,44 @@ public class PeterMeterToewijzingBean {
 			PeterMeterProfiel profiel = (PeterMeterProfiel) u
 					.getAspect("PeterMeterProfiel");
 
-			// Ophalen van een trajectNaam ter referentie, trajectNaam is uniek
-			// voor een route
-			String compareNaam = null;
-			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+			if (profiel != null) {
+				// Ophalen van een trajectNaam ter referentie, trajectNaam is
+				// uniek
+				// voor een route
+				String compareNaam = null;
+				for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
 
-				if (voorkeur.getTrajectNaam() != null) {
-					compareNaam = voorkeur.getTrajectNaam();
-					break;
+					if (voorkeur != null) {
+						if (voorkeur.getTrajectNaam() != null) {
+							compareNaam = voorkeur.getTrajectNaam();
+							break;
+						}
+
+						// Route zonder naam gespecifieerd wordt beschouwd als
+						// willen
+						// controleren van meerdere routes
+						else {
+							return false;
+						}
+					}
 				}
 
-				// Route zonder naam gespecifieerd wordt beschouwd als willen
-				// controleren van meerdere routes
-				else {
-					return false;
+				// Check of er nog andere trajectNaam voorkomt, zoja wil
+				// PeterMeter
+				// meerdere routes controleren
+				for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
+
+					if (voorkeur != null) {
+						if (voorkeur.getTrajectNaam() != null
+								&& !voorkeur.getTrajectNaam().equals(
+										compareNaam)) {
+							flag = false;
+						}
+					}
 				}
+
+				return flag;
 			}
-
-			// Check of er nog andere trajectNaam voorkomt, zoja wil PeterMeter
-			// meerdere routes controleren
-			for (PeterMeterVoorkeur voorkeur : profiel.getVoorkeuren()) {
-				if (voorkeur.getTrajectNaam() != null
-						&& !voorkeur.getTrajectNaam().equals(compareNaam)) {
-					flag = false;
-				}
-			}
-
-			return flag;
 
 		} catch (IOException e) {
 			LOG.error("Can not load PeterMeter.", e);

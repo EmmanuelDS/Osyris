@@ -9,12 +9,7 @@ import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.store.ModelStore;
-import org.conscientia.core.search.DefaultQuery;
-import org.jboss.seam.international.status.Messages;
 
-import be.gim.commons.bean.Beans;
-import be.gim.commons.filter.FilterUtils;
-import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
 
 /**
@@ -46,17 +41,17 @@ public class TrajectSaveListener {
 			traject.setId(newId);
 		}
 
-		if (traject instanceof Route) {
-			DefaultQuery query = new DefaultQuery();
-			query.setModelClassName(traject.getModelClass().getName());
-			query.setFilter(FilterUtils.equal("naam", traject.getNaam()));
-			Integer count = modelRepository.countObjects(query, false);
-			if (count > 0) {
-				String message = "De naam van een route moet uniek zijn.";
-				Beans.getReference(Messages.class).error(message);
-				throw new IOException(message);
-			}
-		}
+		// if (traject instanceof Route) {
+		// DefaultQuery query = new DefaultQuery();
+		// query.setModelClassName(traject.getModelClass().getName());
+		// query.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+		// Integer count = modelRepository.countObjects(query, false);
+		// if (count >= 1) {
+		// String message = "De naam van een route moet uniek zijn.";
+		// Beans.getReference(Messages.class).error(message);
+		// throw new IOException(message);
+		// }
+		// }
 
 		// Indien geen PeterMeter opgegeven veld op nulll zetten
 		if (traject.getPeterMeter1() != null
