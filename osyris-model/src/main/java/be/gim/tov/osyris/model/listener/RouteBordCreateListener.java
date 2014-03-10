@@ -67,7 +67,9 @@ public class RouteBordCreateListener {
 				String gemeente = Beans
 						.getReference(OsyrisModelFunctions.class)
 						.getGemeenteForBord(routeBord);
-				routeBord.setGemeente(gemeente);
+				if (gemeente != null) {
+					routeBord.setGemeente(gemeente);
+				}
 			}
 		}
 	}

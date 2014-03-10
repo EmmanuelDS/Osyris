@@ -46,7 +46,9 @@ public class NetwerkBordCreateListener {
 
 			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
 					.getRegioForBord(netwerkBord);
-			netwerkBord.setRegio(modelRepository.getResourceKey(regio));
+			if (regio != null) {
+				netwerkBord.setRegio(modelRepository.getResourceKey(regio));
+			}
 		}
 
 		// Automatically set Gemeente
@@ -67,7 +69,9 @@ public class NetwerkBordCreateListener {
 					OsyrisModelFunctions.class).getSegmentenForNetwerkBord(
 					netwerkBord);
 
-			netwerkBord.getSegmenten().addAll(segmentIds);
+			if (!segmentIds.isEmpty()) {
+				netwerkBord.getSegmenten().addAll(segmentIds);
+			}
 		}
 
 		// Set BordBase = naam Regio van bord

@@ -41,18 +41,6 @@ public class TrajectSaveListener {
 			traject.setId(newId);
 		}
 
-		// if (traject instanceof Route) {
-		// DefaultQuery query = new DefaultQuery();
-		// query.setModelClassName(traject.getModelClass().getName());
-		// query.setFilter(FilterUtils.equal("naam", traject.getNaam()));
-		// Integer count = modelRepository.countObjects(query, false);
-		// if (count >= 1) {
-		// String message = "De naam van een route moet uniek zijn.";
-		// Beans.getReference(Messages.class).error(message);
-		// throw new IOException(message);
-		// }
-		// }
-
 		// Indien geen PeterMeter opgegeven veld op nulll zetten
 		if (traject.getPeterMeter1() != null
 				&& traject.getPeterMeter1().equals(GEEN_PETER_METER)) {

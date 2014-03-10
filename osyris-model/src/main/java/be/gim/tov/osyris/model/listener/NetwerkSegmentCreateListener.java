@@ -41,8 +41,9 @@ public class NetwerkSegmentCreateListener {
 
 			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
 					.getRegioForSegment(segment);
-			if (regio != null)
+			if (regio != null) {
 				segment.setRegio(modelRepository.getResourceKey(regio));
+			}
 		}
 
 		// FNW Segment naam is regioNaam
@@ -50,8 +51,9 @@ public class NetwerkSegmentCreateListener {
 
 			Regio regio = (Regio) Beans.getReference(ModelRepository.class)
 					.loadObject(segment.getRegio());
-			if (regio != null)
+			if (regio != null) {
 				((FietsNetwerkSegment) segment).setNaam(regio.getNaam());
+			}
 		}
 	}
 }

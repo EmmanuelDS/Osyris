@@ -48,9 +48,10 @@ public class NetwerkKnooppuntCreateListener {
 
 			Regio regio = (Regio) CollectionUtils.first(modelRepository
 					.searchObjects(query, false, false));
-			if (regio != null)
+			if (regio != null) {
 				knooppunt
 						.setRegio(modelRepository.getResourceIdentifier(regio));
+			}
 
 		}
 
@@ -58,8 +59,9 @@ public class NetwerkKnooppuntCreateListener {
 		if (knooppunt.getNaam() == null || knooppunt.getNaam().isEmpty()) {
 			Regio regio = (Regio) modelRepository.loadObject(knooppunt
 					.getRegio());
-			if (regio != null)
+			if (regio != null) {
 				knooppunt.setNaam(regio.getNaam());
+			}
 		}
 
 		// Automatically set X Y coordinates indien niet aanwezig
