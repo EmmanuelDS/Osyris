@@ -160,15 +160,17 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 
 				setHasErrors(false);
 
-				Document<User> document = (Document<User>) object.getAspect(
-						"Document", modelRepository, true);
-				document.setOwner(modelRepository.getResourceName(object));
-
 				object.getAspect("PeterMeterProfiel", modelRepository, true);
 
 				// Save User UserProfile PeterMeterProfiel and
 				// PeterMeterNaamCode via Listener
 				modelRepository.saveObject(object);
+
+				// Set Document owner naar nieuwe PM
+				Document<User> document = (Document<User>) object.getAspect(
+						"Document", modelRepository, true);
+				document.setOwner(modelRepository.getResourceName(object));
+				modelRepository.saveDocument(document);
 
 				// Assign to group
 				addUserToPeterMeterGroup(modelRepository
