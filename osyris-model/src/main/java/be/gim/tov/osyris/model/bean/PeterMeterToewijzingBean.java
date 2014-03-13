@@ -280,14 +280,17 @@ public class PeterMeterToewijzingBean {
 					}
 
 					// Bewaren toewijzing
-					if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-						route.setPeterMeter1(assignedPeterMeter);
-					} else if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-						route.setPeterMeter2(assignedPeterMeter);
-					} else if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-						route.setPeterMeter3(assignedPeterMeter);
+					if (assignedPeterMeter == peterMeter) {
+
+						if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+							route.setPeterMeter1(assignedPeterMeter);
+						} else if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
+							route.setPeterMeter2(assignedPeterMeter);
+						} else if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
+							route.setPeterMeter3(assignedPeterMeter);
+						}
+						modelRepository.saveObject(route);
 					}
-					modelRepository.saveObject(route);
 				}
 			}
 
@@ -408,16 +411,21 @@ public class PeterMeterToewijzingBean {
 								}
 
 								// Bewaren toewijzing
-								if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-									r.setPeterMeter1(assignedPeterMeter);
-								} else if (voorkeur.getPeriode().equals(
-										PERIODE_ZOMER)) {
-									r.setPeterMeter2(assignedPeterMeter);
-								} else if (voorkeur.getPeriode().equals(
-										PERIODE_HERFST)) {
-									r.setPeterMeter3(assignedPeterMeter);
+								if (assignedPeterMeter == peterMeter) {
+
+									if (voorkeur.getPeriode().equals(
+											PERIODE_LENTE)) {
+										r.setPeterMeter1(assignedPeterMeter);
+									} else if (voorkeur.getPeriode().equals(
+											PERIODE_ZOMER)) {
+										r.setPeterMeter2(assignedPeterMeter);
+									} else if (voorkeur.getPeriode().equals(
+											PERIODE_HERFST)) {
+										r.setPeterMeter3(assignedPeterMeter);
+									}
+									modelRepository.saveObject(r);
+									break;
 								}
-								modelRepository.saveObject(r);
 							}
 						}
 					}
@@ -532,6 +540,8 @@ public class PeterMeterToewijzingBean {
 						if (compareToPeterMeter != null
 								&& compareToPeterMeter != peterMeter) {
 
+							assignedPeterMeter = compareToPeterMeter;
+
 							// Opzoeken maxafstand van reeds toegewezen
 							// PeterMeter
 							PeterMeterProfiel profielPM2 = (PeterMeterProfiel) modelRepository
@@ -551,22 +561,26 @@ public class PeterMeterToewijzingBean {
 											assignedPeterMeter = peterMeter;
 											break;
 										}
-
-									} else {
-										assignedPeterMeter = compareToPeterMeter;
 									}
 								}
 							}
 						}
 
-						if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
-							lus.setPeterMeter1(assignedPeterMeter);
-						} else if (voorkeur.getPeriode().equals(PERIODE_ZOMER)) {
-							lus.setPeterMeter2(assignedPeterMeter);
-						} else if (voorkeur.getPeriode().equals(PERIODE_HERFST)) {
-							lus.setPeterMeter3(assignedPeterMeter);
+						// Enkel saven als de nieuwe peterMeter is toegewezen
+						if (assignedPeterMeter == peterMeter) {
+
+							if (voorkeur.getPeriode().equals(PERIODE_LENTE)) {
+								lus.setPeterMeter1(assignedPeterMeter);
+							} else if (voorkeur.getPeriode().equals(
+									PERIODE_ZOMER)) {
+								lus.setPeterMeter2(assignedPeterMeter);
+							} else if (voorkeur.getPeriode().equals(
+									PERIODE_HERFST)) {
+								lus.setPeterMeter3(assignedPeterMeter);
+							}
+							modelRepository.saveObject(lus);
+							break;
 						}
-						modelRepository.saveObject(lus);
 					}
 				}
 			}
