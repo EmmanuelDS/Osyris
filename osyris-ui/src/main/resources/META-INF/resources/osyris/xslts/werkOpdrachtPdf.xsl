@@ -149,7 +149,10 @@
             <fo:table-cell border="solid">
             	 <fo:block margin-left="0.1cm">
 					<xsl:variable name="mapTopoAnderProbleem_url" select="/opdracht/mapTopoAnderProbleem" />
-					<fo:external-graphic src="'{$mapTopoAnderProbleem_url}'"
+<!-- 				<fo:external-graphic src="'{$mapTopoAnderProbleem_url}'" -->
+<!-- 						content-width="137mm" -->
+<!-- 		            	content-height="100mm" /> -->
+					<fo:external-graphic src="url(file:/{$mapTopoAnderProbleem_url})"
 							content-width="137mm"
 		            		content-height="100mm" />
 	             </fo:block>	
@@ -158,9 +161,12 @@
              <fo:table-cell border="solid">
               <fo:block margin-left="0.1cm">
 				<xsl:variable name="mapOrthoAnderProbleem_url" select="/opdracht/mapOrthoAnderProbleem" />
-				<fo:external-graphic src="'{$mapOrthoAnderProbleem_url}'"
-						content-width="137mm"
-	            		content-height="100mm" />
+<!-- 				<fo:external-graphic src="'{$mapOrthoAnderProbleem_url}'" -->
+<!-- 						content-width="137mm" -->
+<!-- 	            		content-height="100mm" /> -->
+					<fo:external-graphic src="url(file:/{$mapOrthoAnderProbleem_url})"
+							content-width="137mm"
+		            		content-height="100mm" />
 		      </fo:block>		
              </fo:table-cell>       
            </fo:table-row>            
@@ -400,7 +406,10 @@
             <fo:table-cell border="solid">
             	 <fo:block margin-left="0.1cm">
 					<xsl:variable name="mapTopo_url" select="/opdracht/bord/mapTopo" />
-					<fo:external-graphic src="'{$mapTopo_url}'"
+<!-- 					<fo:external-graphic src="'{$mapTopo_url}'" -->
+<!-- 							content-width="137mm" -->
+<!-- 		            		content-height="100mm" /> -->
+					<fo:external-graphic src="url(file:/{$mapTopo_url})"
 							content-width="137mm"
 		            		content-height="100mm" />
 	             </fo:block>	
@@ -409,9 +418,12 @@
              <fo:table-cell border="solid">
               <fo:block margin-left="0.1cm">
 				<xsl:variable name="mapOrtho_url" select="/opdracht/bord/mapOrtho" />
-				<fo:external-graphic src="'{$mapOrtho_url}'"
-						content-width="137mm"
-	            		content-height="100mm" />
+<!-- 				<fo:external-graphic src="'{$mapOrtho_url}'" -->
+<!-- 						content-width="137mm" -->
+<!-- 	            		content-height="100mm" /> -->
+					<fo:external-graphic src="url(file:/{$mapOrtho_url})"
+							content-width="137mm"
+		            		content-height="100mm" />
 		      </fo:block>		
              </fo:table-cell>       
            </fo:table-row>

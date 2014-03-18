@@ -1,7 +1,9 @@
 package be.gim.tov.osyris.form;
 
-import java.io.ByteArrayOutputStream;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -10,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -25,6 +28,7 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Fop;
@@ -40,7 +44,7 @@ import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
-import org.conscientia.core.resource.ByteArrayContent;
+import org.conscientia.core.resource.FileResource;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.jsf.component.ComponentUtils;
@@ -1148,44 +1152,78 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 */
 	public Content printWerkOpdracht() throws Exception {
 
-		// Opbouwen XML
-		Traject traject = (Traject) modelRepository.loadObject(object
-				.getTraject());
+		FileOutputStream out = null;
+		File file = null;
+		InputStream in = null;
 
-		Document doc = null;
-		XmlBuilder xmlBuilder = new XmlBuilder();
+		try {
 
-		if (object.getProbleem() instanceof BordProbleem) {
+			// Opbouwen XML
+			Traject traject = (Traject) modelRepository.loadObject(object
+					.getTraject());
 
-			BordProbleem bordProbleem = (BordProbleem) object.getProbleem();
-			Bord bord = (Bord) modelRepository.loadObject(bordProbleem
-					.getBord());
+			Document doc = null;
+			XmlBuilder xmlBuilder = new XmlBuilder();
 
-			doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(getViewer(),
-					traject, object, bord);
+			if (object.getProbleem() instanceof BordProbleem) {
+
+				BordProbleem bordProbleem = (BordProbleem) object.getProbleem();
+				Bord bord = (Bord) modelRepository.loadObject(bordProbleem
+						.getBord());
+
+				doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(
+						getViewer(), traject, object, bord);
+			}
+
+			else if (object.getProbleem() instanceof AnderProbleem) {
+
+				doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(
+						getViewer(), traject, object);
+			}
+
+			Random randomGenerator = new Random();
+			Integer randomInt = randomGenerator.nextInt(1000000000);
+			String fileName = "traject" + traject.getId().toString() + "_"
+					+ randomInt.toString() + ".pdf";
+
+			String location = DefaultConfiguration.instance().getString(
+					"osyris.location.temp.pdf.wo.fiche");
+
+			file = new File(location + fileName);
+			out = new FileOutputStream(file);
+
+			// ByteArrayOutputStream out = new ByteArrayOutputStream();
+			Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+					FopFactory.newInstance().newFOUserAgent(), out);
+
+			// xslt
+			Source xslt = new StreamSource(getClass().getResourceAsStream(
+					WO_PDF));
+			in = getClass().getResourceAsStream(WO_PDF);
+
+			// Transform source
+			Transformer transformer = TransformerFactory.newInstance()
+					.newTransformer(xslt);
+			Result res = new SAXResult(fop.getDefaultHandler());
+
+			transformer.transform(new DOMSource(doc), res);
+
+			String contentStr = IOUtils.toString(in, "UTF-8");
+
+			// File aanmaken indien niet bestaand
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			out.write(contentStr.getBytes());
+			contentStr = null;
+
+			return new FileResource(file);
+			// return new ByteArrayContent("application/pdf",
+			// out.toByteArray());
+
+		} finally {
+			in.close();
+			out.close();
 		}
-
-		else if (object.getProbleem() instanceof AnderProbleem) {
-
-			doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(getViewer(),
-					traject, object);
-		}
-
-		ByteArrayOutputStream out = new ByteArrayOutputStream();
-		Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
-				FopFactory.newInstance().newFOUserAgent(), out);
-
-		// xslt
-		Source xslt = new StreamSource(getClass().getResourceAsStream(WO_PDF));
-
-		// Transform source
-		Transformer transformer = TransformerFactory.newInstance()
-				.newTransformer(xslt);
-		Result res = new SAXResult(fop.getDefaultHandler());
-
-		transformer.transform(new DOMSource(doc), res);
-
-		// return pdf
-		return new ByteArrayContent("application/pdf", out.toByteArray());
 	}
 }

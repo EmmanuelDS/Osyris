@@ -3,12 +3,15 @@ package be.gim.tov.osyris.pdf;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.awt.image.RenderedImage;
+import java.io.File;
+import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Random;
 
 import javax.faces.application.Resource;
 import javax.faces.context.FacesContext;
@@ -145,10 +148,7 @@ public class XmlBuilder {
 
 		// NAAM TRAJECT
 		Element trajectNaam = doc.createElement("trajectnaam");
-		trajectNaam
-				.appendChild(doc.createTextNode(Beans.getReference(
-						OsyrisModelFunctions.class).getTrajectNaam(
-						object.getTraject())));
+		trajectNaam.appendChild(doc.createTextNode(traject.getNaam()));
 		rootElement.appendChild(trajectNaam);
 
 		for (Bord b : borden) {
@@ -412,8 +412,8 @@ public class XmlBuilder {
 		envelope1.expandBy(expandBy);
 
 		Element overviewMap1 = doc.createElement("overviewMap1");
-		overviewMap1.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
-				envelope1, width, height)));
+		overviewMap1.appendChild(doc.createTextNode(getPartOverviewMap(traject,
+				viewer, envelope1, width, height)));
 		rootElement.appendChild(overviewMap1);
 
 		// TOP RIGHT
@@ -433,8 +433,8 @@ public class XmlBuilder {
 		envelope2.expandBy(expandBy);
 
 		Element overviewMap2 = doc.createElement("overviewMap2");
-		overviewMap2.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
-				envelope2, width, height)));
+		overviewMap2.appendChild(doc.createTextNode(getPartOverviewMap(traject,
+				viewer, envelope2, width, height)));
 		rootElement.appendChild(overviewMap2);
 
 		// BOTTOM LEFT
@@ -454,8 +454,8 @@ public class XmlBuilder {
 		envelope3.expandBy(expandBy);
 
 		Element overviewMap3 = doc.createElement("overviewMap3");
-		overviewMap3.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
-				envelope3, width, height)));
+		overviewMap3.appendChild(doc.createTextNode(getPartOverviewMap(traject,
+				viewer, envelope3, width, height)));
 		rootElement.appendChild(overviewMap3);
 
 		// BOTTOM RIGHT
@@ -474,8 +474,8 @@ public class XmlBuilder {
 		viewer.setCurrentExtent(envelope4);
 		envelope4.expandBy(expandBy);
 		Element overviewMap4 = doc.createElement("overviewMap4");
-		overviewMap4.appendChild(doc.createTextNode(getPartOverviewMap(viewer,
-				envelope4, width, height)));
+		overviewMap4.appendChild(doc.createTextNode(getPartOverviewMap(traject,
+				viewer, envelope4, width, height)));
 		rootElement.appendChild(overviewMap4);
 
 		viewer.setCurrentExtent(env);
@@ -1158,7 +1158,7 @@ public class XmlBuilder {
 		viewer.unselectFeatures(layer, ids);
 		viewer.setBaseLayerId("tms");
 
-		return storeImage(mapImage);
+		return getImage(bord, mapImage);
 	}
 
 	/**
@@ -1211,7 +1211,7 @@ public class XmlBuilder {
 		// Terugzetten naar tms baseLayer
 		viewer.setBaseLayerId("tms");
 
-		return storeImage(mapImage);
+		return getImage(probleem, mapImage);
 	}
 
 	/**
@@ -1223,9 +1223,9 @@ public class XmlBuilder {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	private String getPartOverviewMap(MapViewer viewer, Envelope envelope,
-			int width, int height) throws InstantiationException,
-			IllegalAccessException {
+	private String getPartOverviewMap(Traject traject, MapViewer viewer,
+			Envelope envelope, int width, int height)
+			throws InstantiationException, IllegalAccessException {
 
 		viewer.setBaseLayerId("navstreet");
 
@@ -1239,7 +1239,7 @@ public class XmlBuilder {
 
 		viewer.setBaseLayerId("tms");
 
-		return storeImage(mapImage);
+		return getImage(traject, mapImage);
 	}
 
 	/**
@@ -1297,6 +1297,99 @@ public class XmlBuilder {
 		imageKeys.add(key);
 
 		return Beans.getReference(InterchangeStore.class).getURL(key);
+	}
+
+	/**
+	 * Opslaan van de kaartafbeelding op harde schijf en aanbieden locatie.
+	 * 
+	 * @param image
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	protected String getImage(Bord bord, RenderedImage image)
+			throws InstantiationException, IllegalAccessException {
+
+		try {
+
+			Random randomGenerator = new Random();
+			Integer randomInt = randomGenerator.nextInt(1000000000);
+			String fileName = "bord" + bord.getId() + "_"
+					+ randomInt.toString() + ".png";
+
+			String location = DefaultConfiguration.instance().getString(
+					"osyris.location.temp.image.fiche");
+
+			File outputfile = new File(location + fileName);
+			ImageIO.write(image, "png", outputfile);
+			return location + fileName;
+
+		} catch (IOException e) {
+			LOG.error("Can not save image to disk.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Opslaan van de kaartafbeelding op harde schijf en aanbieden locatie.
+	 * 
+	 * @param image
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	protected String getImage(Traject traject, RenderedImage image)
+			throws InstantiationException, IllegalAccessException {
+
+		try {
+
+			Random randomGenerator = new Random();
+			Integer randomInt = randomGenerator.nextInt(1000000000);
+			String fileName = "traject" + traject.getId() + "_"
+					+ randomInt.toString() + ".png";
+
+			String location = DefaultConfiguration.instance().getString(
+					"osyris.location.temp.image.kaart");
+
+			File outputfile = new File(location + fileName);
+			ImageIO.write(image, "png", outputfile);
+			return location + fileName;
+
+		} catch (IOException e) {
+			LOG.error("Can not save image to disk.", e);
+		}
+		return null;
+	}
+	
+	/**
+	 * Opslaan van de kaartafbeelding op harde schijf en aanbieden locatie.
+	 * 
+	 * @param image
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	protected String getImage(Probleem probleem, RenderedImage image)
+			throws InstantiationException, IllegalAccessException {
+
+		try {
+
+			Random randomGenerator = new Random();
+			Integer randomInt = randomGenerator.nextInt(1000000000);
+			String fileName = "probleem" + probleem.getId() + "_"
+					+ randomInt.toString() + ".png";
+
+			String location = DefaultConfiguration.instance().getString(
+					"osyris.location.temp.image.anderProbleem");
+
+			File outputfile = new File(location + fileName);
+			ImageIO.write(image, "png", outputfile);
+			return location + fileName;
+
+		} catch (IOException e) {
+			LOG.error("Can not save image to disk.", e);
+		}
+		return null;
 	}
 
 	/**

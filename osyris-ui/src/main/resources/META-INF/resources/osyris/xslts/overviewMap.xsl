@@ -44,7 +44,8 @@
 					<fo:table-cell>
 						<fo:block text-align="center">
 							<xsl:variable name="overviewMap_url1" select="/map/overviewMap1" />
-							<fo:external-graphic src="'{$overviewMap_url1}'"/> 
+<!-- 							<fo:external-graphic src="'{$overviewMap_url1}'"/>  -->
+							<fo:external-graphic src="url(file:/{$overviewMap_url1})"/>
 						</fo:block>
 
 					</fo:table-cell>
@@ -60,7 +61,8 @@
 					<fo:table-cell>
 						<fo:block text-align="center">
 							<xsl:variable name="overviewMap_url2" select="/map/overviewMap2" />
-							<fo:external-graphic src="'{$overviewMap_url2}'"/>
+<!-- 							<fo:external-graphic src="'{$overviewMap_url2}'"/> -->
+								<fo:external-graphic src="url(file:/{$overviewMap_url2})"/>
 						</fo:block>
 
 					</fo:table-cell>
@@ -76,7 +78,8 @@
 					<fo:table-cell>
 						<fo:block text-align="center">
 							<xsl:variable name="overviewMap_url3" select="/map/overviewMap3" />
-							<fo:external-graphic src="'{$overviewMap_url3}'"/>
+<!-- 							<fo:external-graphic src="'{$overviewMap_url3}'"/> -->
+							<fo:external-graphic src="url(file:/{$overviewMap_url3})"/>
 						</fo:block>
 
 					</fo:table-cell>
@@ -92,7 +95,8 @@
 					<fo:table-cell>
 						<fo:block text-align="center">
 							<xsl:variable name="overviewMap_url4" select="/map/overviewMap4" />
-							<fo:external-graphic src="'{$overviewMap_url4}'"/>
+<!-- 							<fo:external-graphic src="'{$overviewMap_url4}'"/> -->
+								<fo:external-graphic src="url(file:/{$overviewMap_url4})"/>
 						</fo:block>
 
 					</fo:table-cell>

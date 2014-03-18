@@ -224,18 +224,24 @@
             <fo:table-cell border="solid">
             	 <fo:block>
 					<xsl:variable name="mapTopo_url" select="./mapTopo" />
-					<fo:external-graphic src="'{$mapTopo_url}'"
+			<fo:external-graphic src="url(file:/{$mapTopo_url})"
 							content-width="137mm"
 		            		content-height="100mm" />
+<!-- 					<fo:external-graphic src="'{$mapTopo_url}'" -->
+<!-- 							content-width="137mm" -->
+<!-- 		            		content-height="100mm" /> -->
 	             </fo:block>	
 	          </fo:table-cell>
 	          	
              <fo:table-cell border="solid">
               <fo:block>
 				<xsl:variable name="mapOrtho_url" select="./mapOrtho" />
-				<fo:external-graphic src="'{$mapOrtho_url}'"
+				<fo:external-graphic src="url(file:/{$mapOrtho_url})"
 						content-width="137mm"
 	            		content-height="100mm" />
+<!-- 				<fo:external-graphic src="'{$mapOrtho_url}'" -->
+<!-- 						content-width="137mm" -->
+<!-- 	            		content-height="100mm" /> -->
 		      </fo:block>		
              </fo:table-cell>       
            </fo:table-row>
@@ -246,23 +252,5 @@
       </fo:page-sequence>
       </xsl:for-each>
     </fo:root>
-  </xsl:template>
-
-  <xsl:template name="header_left">
-  </xsl:template>
-  
-  <xsl:template name="header_right">
-  </xsl:template>
-  
-   <xsl:template name="bordProperties_left">
-  </xsl:template>
-  
-   <xsl:template name="bordProperties_right">
-  </xsl:template>
-  
-   <xsl:template name="map_left">
-  </xsl:template>
-  
-   <xsl:template name="map_right">
   </xsl:template>
 </xsl:stylesheet>
