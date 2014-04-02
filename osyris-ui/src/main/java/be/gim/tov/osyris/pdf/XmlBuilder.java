@@ -802,6 +802,13 @@ public class XmlBuilder {
 		}
 		rootElement.appendChild(commentaar);
 
+		// URL BORDFOTO
+		Element bordFoto = doc.createElement("bordfoto");
+		if (bord.getFoto() != null) {
+			bordFoto.appendChild(doc.createTextNode(bord.getFoto().toString()));
+		}
+		rootElement.appendChild(bordFoto);
+
 		// FOTO PROBLEEM
 		Element probleemFoto = doc.createElement("probleemfoto");
 		if (object.getProbleem().getFoto() != null) {
@@ -1360,7 +1367,7 @@ public class XmlBuilder {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * Opslaan van de kaartafbeelding op harde schijf en aanbieden locatie.
 	 * 

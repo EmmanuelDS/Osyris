@@ -33,7 +33,6 @@ import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
-import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 

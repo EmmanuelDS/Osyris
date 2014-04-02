@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
+import org.conscientia.api.model.annotation.GeometryType;
 import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Maximum;
@@ -62,6 +63,7 @@ public abstract class NetwerkKnooppunt extends AbstractModelObject implements
 	@NotViewable
 	@NotSearchable
 	@NotEditable
+	@GeometryType("POINT")
 	@SrsName("EPSG:31370")
 	@Index
 	private Geometry geom;

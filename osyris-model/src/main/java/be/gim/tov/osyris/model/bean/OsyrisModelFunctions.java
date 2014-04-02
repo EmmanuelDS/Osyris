@@ -1375,8 +1375,9 @@ public class OsyrisModelFunctions {
 						"/META-INF/resources/core/mails/confirmMelding.fmt",
 						variables);
 
-				messages.info("Er is een bevestigingsmail gestuurd naar de verantwoordelijke TOV "
-						+ medewerkerEmail + ".");
+				// Debug
+				// messages.info("Er is een bevestigingsmail gestuurd naar de verantwoordelijke TOV "
+				// + medewerkerEmail + ".");
 			}
 
 			// Testmail

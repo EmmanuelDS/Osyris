@@ -325,22 +325,31 @@
             </fo:table-cell>
                     
             <fo:table-cell>
-            <fo:block-container>												
+             <fo:block-container>												
              	<fo:block margin-left="0.1cm">
-            		<xsl:if test="//@hasFoto='true'">
-	               <xsl:variable name="foto" select="/opdracht/probleemfoto" />
-	               <fo:external-graphic src="data:image/jpeg;base64,{$foto}" 
+	               <xsl:variable name="url_bordfoto" select="/opdracht/bordfoto" />
+	                <fo:external-graphic src="'{$url_bordfoto}'" 
 	               	content-width="60mm"
             		content-height="90mm" />
-	              </xsl:if>
-				   <xsl:if test="//@hasFoto='false'">
-	          		<xsl:variable name="url_geen_foto" select="/opdracht/probleemfoto" />	
-		            <fo:external-graphic src="'{$url_geen_foto}'"
-		            content-width="60mm"
-            		content-height="90mm" />
-	               </xsl:if>
        			 </fo:block>
              </fo:block-container>
+             
+<!--             <fo:block-container>												 -->
+<!--              	<fo:block margin-left="0.1cm"> -->
+<!--             		<xsl:if test="//@hasFoto='true'"> -->
+<!-- 	               <xsl:variable name="foto" select="/opdracht/probleemfoto" /> -->
+<!-- 	               <fo:external-graphic src="data:image/jpeg;base64,{$foto}"  -->
+<!-- 	               	content-width="60mm" -->
+<!--             		content-height="90mm" /> -->
+<!-- 	              </xsl:if> -->
+<!-- 				   <xsl:if test="//@hasFoto='false'"> -->
+<!-- 	          		<xsl:variable name="url_geen_foto" select="/opdracht/probleemfoto" />	 -->
+<!-- 		            <fo:external-graphic src="'{$url_geen_foto}'" -->
+<!-- 		            content-width="60mm" -->
+<!--             		content-height="90mm" /> -->
+<!-- 	               </xsl:if> -->
+<!--        			 </fo:block> -->
+<!--              </fo:block-container> -->
            
           <fo:block-container position="absolute">
            <fo:block font-size="8pt" margin-top="0.3cm" margin-bottom="0.1cm" margin-left="7cm">

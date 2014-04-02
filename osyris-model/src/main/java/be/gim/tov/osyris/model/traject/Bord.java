@@ -9,6 +9,7 @@ import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.External;
+import org.conscientia.api.model.annotation.GeometryType;
 import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -113,6 +114,7 @@ public abstract class Bord extends AbstractModelObject implements
 	@NotSearchable
 	@NotEditable
 	@SrsName("EPSG:31370")
+	@GeometryType("POINT")
 	@Index
 	private Geometry geom;
 

@@ -707,9 +707,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
 						.loadObject(seg.getNaarKnooppunt());
 
-				knooppuntFilterIds.add(vanKp.getId());
+				if (vanKp != null) {
+					knooppuntFilterIds.add(vanKp.getId());
+				}
 
-				knooppuntFilterIds.add(naarKp.getId());
+				if (naarKp != null) {
+					knooppuntFilterIds.add(naarKp.getId());
+				}
 			}
 			layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
 
@@ -1923,7 +1927,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					bordIds.add(b.getId().toString());
 				}
 
-				bordLayer.setFilter(FilterUtils.id(bordIds));
+				bordLayer.setFilter(FilterUtils.in("id", bordIds));
 
 				bordLayer.setHidden(false);
 				bordLayer.set("selectable", true);
