@@ -95,10 +95,7 @@ public class StockMateriaalOverzichtFormBase extends
 					&& profiel.getBedrijf() != null) {
 				UitvoerderBedrijf bedrijf = (UitvoerderBedrijf) modelRepository
 						.loadObject(profiel.getBedrijf());
-				if (!bedrijf.getNaam().equals("TOV")) {
-					query.addFilter(FilterUtils.equal("magazijn",
-							bedrijf.getNaam()));
-				}
+				query.addFilter(FilterUtils.equal("magazijn", bedrijf.getNaam()));
 			}
 		} catch (IOException e) {
 			LOG.error("Can not load aspect.", e);

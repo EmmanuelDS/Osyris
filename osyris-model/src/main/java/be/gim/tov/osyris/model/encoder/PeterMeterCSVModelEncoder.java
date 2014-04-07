@@ -9,6 +9,7 @@ import java.util.List;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.conscientia.api.model.ManagedObject;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.model.ModelObject;
 import org.conscientia.api.model.ModelObjectList;
@@ -20,12 +21,14 @@ import org.conscientia.core.encoder.CSVModelEncoder;
 import org.conscientia.core.model.property.EnumModelProperty;
 import org.conscientia.core.model.property.ObjectModelProperty;
 import org.conscientia.core.model.property.ResourceIdentifierModelProperty;
+import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.util.ModelUtils;
 import org.supercsv.io.CsvListWriter;
 import org.supercsv.prefs.CsvPreference;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.encoder.api.EncoderException;
+import be.gim.commons.filter.FilterUtils;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
@@ -103,6 +106,9 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 		labels.add("Status");
 		labels.add("Actief sinds");
 		labels.add("Actief tot");
+		labels.add("Toewijzing Lente");
+		labels.add("Toewijzing Zomer");
+		labels.add("Toewijzing Herfst");
 
 		return labels;
 	}
@@ -174,6 +180,28 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 						.getProperty("actiefTot");
 				values.add(getString(propActiefTot, peterMeterProfiel,
 						actiefTot));
+
+				// Toegewezen trajecten Lente
+				ModelProperty propTrajectLente = Beans
+						.getReference(ModelRepository.class)
+						.getModelClass("Traject").getProperty("naam");
+				values.add(getString(propTrajectLente, peterMeterProfiel,
+						getToewijzingen(peterMeterProfiel, "peterMeter1")));
+
+				// Toegewezen trajecten Zomer
+				ModelProperty propTrajectZomer = Beans
+						.getReference(ModelRepository.class)
+						.getModelClass("Traject").getProperty("naam");
+				values.add(getString(propTrajectZomer, peterMeterProfiel,
+						getToewijzingen(peterMeterProfiel, "peterMeter2")));
+
+				// Toegewezen trajecten Herfst
+				ModelProperty propTrajectHerfst = Beans
+						.getReference(ModelRepository.class)
+						.getModelClass("Traject").getProperty("naam");
+				values.add(getString(propTrajectHerfst, peterMeterProfiel,
+						getToewijzingen(peterMeterProfiel, "peterMeter3")));
+
 			}
 
 		} catch (IOException e) {
@@ -227,5 +255,23 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 	@Override
 	protected CsvListWriter getCsvWriter(Writer writer) {
 		return new CsvListWriter(writer, new CsvPreference('\"', ';', "\n"));
+	}
+
+	private String getToewijzingen(PeterMeterProfiel peterMeterProfiel,
+			String periode) throws IOException {
+
+		QueryBuilder builder = new QueryBuilder("Traject");
+		builder.addFilter(FilterUtils.equal(
+				periode,
+				Beans.getReference(ModelRepository.class).getResourceName(
+						(ManagedObject) Beans.getReference(
+								ModelRepository.class).loadObject(
+								peterMeterProfiel.getFor()))));
+		builder.result(FilterUtils.property("naam"));
+		List<String> trajectToewijzingen = (List<String>) Beans.getReference(
+				ModelRepository.class).searchObjects(builder.build(), false,
+				false);
+
+		return trajectToewijzingen.toString().replace("[", "").replace("]", "");
 	}
 }

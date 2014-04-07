@@ -103,7 +103,7 @@
 						value="#{messages['page.actions.report.label']}" />
 				</d:buttons>
 			</div>
-			<r:panel id="automatischeControleOpdrachtPanel" rendered="#{identity.inGroup('admin','CUSTOM')}">
+			<r:panel id="automatischeControleOpdrachtPanel" rendered="#{identity.inGroup('admin','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') }">
 				<div>Maak automatisch controleopdrachten aan voor routes en lussen:</div>
 				<br />
 				<j:commandButton rendered="true" value="Uitvoeren algoritme"

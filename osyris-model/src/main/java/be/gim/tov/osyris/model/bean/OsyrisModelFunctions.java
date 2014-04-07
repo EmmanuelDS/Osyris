@@ -676,13 +676,15 @@ public class OsyrisModelFunctions {
 								Gemeente gemeente = (Gemeente) modelRepository
 										.getUniqueResult(gemeentes);
 
-								return gemeente.getNaam();
+								if (gemeente != null) {
+									return gemeente.getNaam();
+								}
 							}
 
 						} catch (IOException e) {
 							LOG.error("Can not load traject.", e);
 						}
-						return null;
+						return "Onbekend";
 					}
 				}).get(probleem);
 	}
@@ -760,15 +762,22 @@ public class OsyrisModelFunctions {
 		try {
 			Regio regio = (Regio) modelRepository.loadObject(regioID);
 			ResourceIdentifier identifier = regio.getUitvoerder();
+
 			DefaultQuery query = new DefaultQuery("UitvoerderProfiel");
-			query.addFilter(FilterUtils.equal("bedrijf", identifier));
 
-			List<UitvoerderProfiel> profiel = (List<UitvoerderProfiel>) modelRepository
-					.searchObjects(query, false, false);
-			User uitvoerder = (User) modelRepository.loadObject(profiel.get(0)
-					.getFor());
+			if (identifier != null) {
+				query.addFilter(FilterUtils.equal("bedrijf", identifier));
 
-			return modelRepository.getResourceName(uitvoerder);
+				List<UitvoerderProfiel> profiel = (List<UitvoerderProfiel>) modelRepository
+						.searchObjects(query, false, false);
+				User uitvoerder = (User) modelRepository.loadObject(profiel
+						.get(0).getFor());
+
+				return modelRepository.getResourceName(uitvoerder);
+
+			} else {
+				return new ResourceName("user", "tdtoerisme");
+			}
 
 		} catch (IOException e) {
 			LOG.error("Can not load Traject.", e);
@@ -1056,21 +1065,26 @@ public class OsyrisModelFunctions {
 						.getAspect(modelRepository
 								.getModelClass("UitvoerderProfiel"), user, true);
 
-				QueryBuilder builder = new QueryBuilder("Regio");
-				builder.addFilter(FilterUtils.equal("uitvoerder",
-						profiel.getBedrijf()));
-				builder.results(FilterUtils.properties("naam"));
-				builder.groupBy(FilterUtils.properties("naam"));
-				List<String> regios = (List<String>) modelRepository
-						.searchObjects(builder.build(), true, true, true);
+				if (!profiel.getBedrijf().equals(
+						new ResourceKey("UitvoerderBedrijf", "3"))) {
 
-				for (String regio : regios) {
-					Object[] object = { new ResourceKey("Regio", regio), regio };
-					uitvoerderRegios.add(object);
+					QueryBuilder builder = new QueryBuilder("Regio");
+					builder.addFilter(FilterUtils.equal("uitvoerder",
+							profiel.getBedrijf()));
+					builder.results(FilterUtils.properties("naam"));
+					builder.groupBy(FilterUtils.properties("naam"));
+					List<String> regios = (List<String>) modelRepository
+							.searchObjects(builder.build(), false, false);
+
+					for (String regio : regios) {
+						Object[] object = { new ResourceKey("Regio", regio),
+								regio };
+						uitvoerderRegios.add(object);
+					}
 				}
 			}
 
-			else {
+			if (uitvoerderRegios.isEmpty()) {
 				uitvoerderRegios = getRegiosOostVlaanderen();
 			}
 

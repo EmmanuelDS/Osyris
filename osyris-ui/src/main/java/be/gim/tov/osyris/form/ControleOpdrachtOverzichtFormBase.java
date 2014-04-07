@@ -1287,13 +1287,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 			routeQuery.setModelClassName("Route");
 			routeQuery.addFilter(filter);
 			List<Traject> routes = (List<Traject>) modelRepository
-					.searchObjects(routeQuery, true, true, true);
+					.searchObjects(routeQuery, false, false);
 
 			DefaultQuery lusQuery = new DefaultQuery();
 			lusQuery.addFilter(filter);
 			lusQuery.setModelClassName("NetwerkLus");
 			List<Traject> lussen = (List<Traject>) modelRepository
-					.searchObjects(lusQuery, true, true, true);
+					.searchObjects(lusQuery, false, false);
 
 			List<Traject> trajecten = new ArrayList<Traject>();
 			trajecten.addAll(routes);
@@ -1303,22 +1303,32 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// waar een peterMeter is
 			// toegekend een controleOpdracht aangemaakt
 			for (Traject traject : trajecten) {
+
 				if (traject instanceof Route || traject instanceof NetwerkLus) {
+
 					if (traject.getPeterMeter1() != null) {
-						ControleOpdracht opdrachtlente = buildControleOpdracht(
-								traject, PERIODE_LENTE);
-						modelRepository.saveObject(opdrachtlente);
-						counter++;
+
+						if (!isExistingCO(traject, PERIODE_LENTE.toString())) {
+							ControleOpdracht opdrachtlente = buildControleOpdracht(
+									traject, PERIODE_LENTE);
+							modelRepository.saveObject(opdrachtlente);
+							counter++;
+						}
+
 					} else if (traject.getPeterMeter2() != null) {
-						ControleOpdracht opdrachtZomer = buildControleOpdracht(
-								traject, PERIODE_ZOMER);
-						modelRepository.saveObject(opdrachtZomer);
-						counter++;
+						if (!isExistingCO(traject, PERIODE_ZOMER.toString())) {
+							ControleOpdracht opdrachtZomer = buildControleOpdracht(
+									traject, PERIODE_ZOMER);
+							modelRepository.saveObject(opdrachtZomer);
+							counter++;
+						}
 					} else if (traject.getPeterMeter3() != null) {
-						ControleOpdracht opdrachtHerfst = buildControleOpdracht(
-								traject, PERIODE_HERFST);
-						modelRepository.saveObject(opdrachtHerfst);
-						counter++;
+						if (!isExistingCO(traject, PERIODE_HERFST.toString())) {
+							ControleOpdracht opdrachtHerfst = buildControleOpdracht(
+									traject, PERIODE_HERFST);
+							modelRepository.saveObject(opdrachtHerfst);
+							counter++;
+						}
 					}
 				}
 			}
@@ -1357,6 +1367,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 			// Set properties
 			opdracht.setDatumTeControleren(new Date());
+			opdracht.setDatumLaatsteWijziging(new Date());
+			opdracht.setTrajectType(Beans.getReference(
+					OsyrisModelFunctions.class).getTrajectType(
+					modelRepository.getResourceIdentifier(traject)));
 			opdracht.setPeriode(periode);
 			opdracht.setMedewerker(Beans.getReference(
 					OsyrisModelFunctions.class).zoekVerantwoordelijke(
@@ -1370,6 +1384,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				opdracht.setPeterMeter(traject.getPeterMeter3());
 			}
 
+			opdracht.setRegioId(traject.getRegio());
 			opdracht.setStatus(ControleOpdrachtStatus.TE_CONTROLEREN);
 			opdracht.setTraject(modelRepository.getResourceIdentifier(traject));
 
@@ -1980,5 +1995,32 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public void switchBaseLayers() {
 		getViewer().setBaseLayerId(baseLayerName);
+	}
+
+	/**
+	 * Zoeken of een ControleOpdracht voor een bepaald traject en periode reeds
+	 * bestaat.
+	 * 
+	 * @param traject
+	 * @param periode
+	 * @return
+	 * @throws IOException
+	 */
+	public boolean isExistingCO(Traject traject, String periode)
+			throws IOException {
+
+		DefaultQuery query = new DefaultQuery("ControleOpdracht");
+		query.addFilter(FilterUtils.and(
+				FilterUtils.equal("traject",
+						modelRepository.getResourceIdentifier(traject)),
+				FilterUtils.equal("periode", periode)));
+
+		List<Traject> existingLenteCO = (List<Traject>) modelRepository
+				.searchObjects(query, false, false);
+
+		if (existingLenteCO.isEmpty()) {
+			return false;
+		}
+		return true;
 	}
 }
