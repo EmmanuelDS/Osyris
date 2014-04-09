@@ -25,7 +25,13 @@
 			<d:propertyValue id="periode" 
 					modelProperty="#{d:modelClass('ControleOpdracht').getProperty('periode')}" 
 					value="#{form.object.periode}" 
-					mode="VIEW" />
+					mode="EDIT" />
+		</d:field>
+		<d:field label="Jaar" for="jaar">	 
+			<d:propertyValue id="jaar" 
+					modelProperty="#{d:modelClass('ControleOpdracht').getProperty('jaar')}" 
+					value="#{form.object.jaar}" 
+					mode="EDIT" />
 		</d:field>
 		<d:field label="Status" for="status">	 
 			<d:propertyValue id="status" 

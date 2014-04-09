@@ -7,9 +7,30 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf">
-	<h3><h:outputText value="Voor elke peter en meter die op dit moment aan een route of lus toegewezen is, wordt er automatisch een controleopdracht aangemaakt." /></h3>
+	<h3><h:outputText value="Kies het jaar: " /></h3>
+	<h:selectOneMenu id="controleOpdrachtJaar"
+		value="#{form.jaar}">
+		<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.jaren)}" />
+		<a:ajax event="change" execute="@this" />
+	</h:selectOneMenu>
 	<br/>
-	<h3><h:outputText value="Bent u zeker dat u deze controleopdrachten automatisch wilt aanmaken?" /></h3>
+	<br/>
+	<h3><h:outputText value="Kies een periode: " /></h3>
+	<h:selectOneMenu id="controleOpdrachtPeriode"
+		value="#{form.periode}">
+		<f:selectItem itemValue="1"
+			itemLabel="Lente" />
+		<f:selectItem itemValue="2"
+			itemLabel="Zomer" />
+		<f:selectItem itemValue="3"
+			itemLabel="Herfst" />
+		<a:ajax event="change" execute="@this" />
+	</h:selectOneMenu>
+	<br/>
+	<br/>
+	<h3><h:outputText value="Voor elke peter en meter die op dit moment aan een route of lus toegewezen is, wordt er voor de gekozen periode automatisch een controleopdracht aangemaakt." /></h3>
+	<br/>
+	<h3><h:outputText value="Bent u zeker dat u de controleopdrachten voor de gekozen periode automatisch wilt aanmaken?" /></h3>
 	<br/>
 	<d:buttons>
 		<j:commandButton value="Bevestigen uitvoeren algoritme"

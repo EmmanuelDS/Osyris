@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
+import java.util.Calendar;
 import java.util.Date;
 
 import javax.inject.Inject;
@@ -55,6 +56,13 @@ public class ControleOpdrachtSaveListener {
 		if (null == controleOpdracht.getMedewerker()) {
 			controleOpdracht.setMedewerker(osyrisModelFunctions
 					.zoekVerantwoordelijke(controleOpdracht.getTraject()));
+		}
+
+		if (controleOpdracht.getJaar() == null) {
+			Calendar c = Calendar.getInstance();
+			Integer jaar = c.get(Calendar.YEAR);
+			c.getTime();
+			controleOpdracht.setJaar(jaar.toString());
 		}
 
 		// Een nieuw aangemaakte ControleOpdracht krijgt status te controleren

@@ -247,6 +247,17 @@
 							value="#{controleOpdracht.datumLaatsteWijziging }"
 							mode="VIEW" /> 
 					</p:column>
+					<p:column label="Jaar"
+						sortBy="#{controleOpdracht.jaar }" 
+						style="width:80px;">
+						<f:facet name="header">
+							<h:outputText value="Jaar" />
+						</f:facet>
+						<d:propertyValue id="jaarColumn"
+							modelProperty="#{d:modelClass('ControleOpdracht').getProperty('jaar')}"
+							value="#{controleOpdracht.jaar }"
+							mode="VIEW" /> 
+					</p:column>
 				</p:dataTable>
 			</a:outputPanel>
 

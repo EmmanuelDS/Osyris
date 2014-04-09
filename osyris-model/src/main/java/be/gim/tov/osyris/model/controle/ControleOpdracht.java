@@ -59,6 +59,11 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('PeriodeCode')}")
 	private String periode;
 
+	@EditableInGroup({ "Medewerker", "Routedokter" })
+	@Type(value = ModelPropertyType.ENUM)
+	@ValuesExpression("#{osyrisModelFunctions.getJaren()}")
+	private String jaar;
+
 	private ControleOpdrachtStatus status;
 
 	@NotSearchable
@@ -143,6 +148,14 @@ public abstract class ControleOpdracht extends AbstractModelObject implements
 
 	public void setPeriode(String periode) {
 		this.periode = periode;
+	}
+
+	public String getJaar() {
+		return jaar;
+	}
+
+	public void setJaar(String jaar) {
+		this.jaar = jaar;
 	}
 
 	public ControleOpdrachtStatus getStatus() {

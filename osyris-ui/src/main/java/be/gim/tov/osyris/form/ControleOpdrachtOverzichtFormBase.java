@@ -55,7 +55,6 @@ import org.geotools.feature.FeatureCollection;
 import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
-import org.opengis.filter.Filter;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.w3c.dom.Document;
@@ -149,6 +148,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected ResourceIdentifier trajectId;
 	protected Collection<String> imageKeys = new ArrayList<String>();
 	protected String baseLayerName;
+	protected String periode;
+	protected String jaar;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -256,6 +257,22 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	public void setBaseLayerName(String baseLayerName) {
 		this.baseLayerName = baseLayerName;
+	}
+
+	public String getPeriode() {
+		return periode;
+	}
+
+	public void setPeriode(String periode) {
+		this.periode = periode;
+	}
+
+	public String getJaar() {
+		return jaar;
+	}
+
+	public void setJaar(String jaar) {
+		this.jaar = jaar;
 	}
 
 	// METHODS
@@ -1268,8 +1285,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Automatisch aanmaken van controleOpdrachten voor de toegewezen
-	 * PetersMeters aan een traject.
+	 * Automatisch aanmaken van controleOpdrachten voor een gekozen peridoe voor
+	 * de toegewezen PetersMeters aan een traject.
 	 * 
 	 */
 	@SuppressWarnings("unchecked")
@@ -1277,21 +1294,33 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		try {
 			int counter = 0;
-			// Filter trajecten waar een PeterMeter is aan toegekend.
-			Filter filter = FilterUtils.or(
-					FilterUtils.notEqual("peterMeter1", null),
-					FilterUtils.notEqual("peterMeter2", null),
-					FilterUtils.notEqual("peterMeter3", null));
 
+			// Filter trajecten waar een PeterMeter is aan toegekend voor de
+			// gekozen periode.
 			DefaultQuery routeQuery = new DefaultQuery();
 			routeQuery.setModelClassName("Route");
-			routeQuery.addFilter(filter);
+
+			DefaultQuery lusQuery = new DefaultQuery();
+			lusQuery.setModelClassName("NetwerkLus");
+
+			if (periode.equals(PERIODE_LENTE.toString())) {
+				routeQuery.addFilter(FilterUtils.notEqual("peterMeter1", null));
+				lusQuery.addFilter(FilterUtils.notEqual("peterMeter1", null));
+			}
+
+			else if (periode.equals(PERIODE_ZOMER.toString())) {
+				routeQuery.addFilter(FilterUtils.notEqual("peterMeter2", null));
+				lusQuery.addFilter(FilterUtils.notEqual("peterMeter2", null));
+			}
+
+			else if (periode.equals(PERIODE_HERFST.toString())) {
+				routeQuery.addFilter(FilterUtils.notEqual("peterMeter3", null));
+				lusQuery.addFilter(FilterUtils.notEqual("peterMeter3", null));
+			}
+
 			List<Traject> routes = (List<Traject>) modelRepository
 					.searchObjects(routeQuery, false, false);
 
-			DefaultQuery lusQuery = new DefaultQuery();
-			lusQuery.addFilter(filter);
-			lusQuery.setModelClassName("NetwerkLus");
 			List<Traject> lussen = (List<Traject>) modelRepository
 					.searchObjects(lusQuery, false, false);
 
@@ -1299,33 +1328,39 @@ public class ControleOpdrachtOverzichtFormBase extends
 			trajecten.addAll(routes);
 			trajecten.addAll(lussen);
 
-			// Voor Routes en NetwerkLussen trajecttypes wordt voor elke periode
+			// Voor Routes en NetwerkLussen trajecttypes wordt voor de gekozen
+			// periode
 			// waar een peterMeter is
 			// toegekend een controleOpdracht aangemaakt
 			for (Traject traject : trajecten) {
 
 				if (traject instanceof Route || traject instanceof NetwerkLus) {
 
-					if (traject.getPeterMeter1() != null) {
-
-						if (!isExistingCO(traject, PERIODE_LENTE.toString())) {
+					if (periode.equals(PERIODE_LENTE.toString())
+							&& traject.getPeterMeter1() != null) {
+						if (!isExistingCO(traject, PERIODE_LENTE.toString(),
+								jaar)) {
 							ControleOpdracht opdrachtlente = buildControleOpdracht(
-									traject, PERIODE_LENTE);
+									traject, PERIODE_LENTE, jaar);
 							modelRepository.saveObject(opdrachtlente);
 							counter++;
 						}
 
-					} else if (traject.getPeterMeter2() != null) {
-						if (!isExistingCO(traject, PERIODE_ZOMER.toString())) {
+					} else if (periode.equals(PERIODE_ZOMER.toString())
+							&& traject.getPeterMeter2() != null) {
+						if (!isExistingCO(traject, PERIODE_ZOMER.toString(),
+								jaar)) {
 							ControleOpdracht opdrachtZomer = buildControleOpdracht(
-									traject, PERIODE_ZOMER);
+									traject, PERIODE_ZOMER, jaar);
 							modelRepository.saveObject(opdrachtZomer);
 							counter++;
 						}
-					} else if (traject.getPeterMeter3() != null) {
-						if (!isExistingCO(traject, PERIODE_HERFST.toString())) {
+					} else if (periode.equals(PERIODE_HERFST.toString())
+							&& traject.getPeterMeter3() != null) {
+						if (!isExistingCO(traject, PERIODE_HERFST.toString(),
+								jaar)) {
 							ControleOpdracht opdrachtHerfst = buildControleOpdracht(
-									traject, PERIODE_HERFST);
+									traject, PERIODE_HERFST, jaar);
 							modelRepository.saveObject(opdrachtHerfst);
 							counter++;
 						}
@@ -1352,7 +1387,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 */
 	public ControleOpdracht buildControleOpdracht(Traject traject,
-			String periode) {
+			String periode, String jaar) {
 
 		try {
 			ControleOpdracht opdracht = null;
@@ -1375,6 +1410,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			opdracht.setMedewerker(Beans.getReference(
 					OsyrisModelFunctions.class).zoekVerantwoordelijke(
 					modelRepository.getResourceIdentifier(traject)));
+			opdracht.setJaar(jaar);
 
 			if (periode.equals(PERIODE_LENTE)) {
 				opdracht.setPeterMeter(traject.getPeterMeter1());
@@ -2006,14 +2042,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @return
 	 * @throws IOException
 	 */
-	public boolean isExistingCO(Traject traject, String periode)
+	public boolean isExistingCO(Traject traject, String periode, String jaar)
 			throws IOException {
 
 		DefaultQuery query = new DefaultQuery("ControleOpdracht");
 		query.addFilter(FilterUtils.and(
 				FilterUtils.equal("traject",
 						modelRepository.getResourceIdentifier(traject)),
-				FilterUtils.equal("periode", periode)));
+				FilterUtils.equal("periode", periode),
+				FilterUtils.equal("jaar", jaar)));
 
 		List<Traject> existingLenteCO = (List<Traject>) modelRepository
 				.searchObjects(query, false, false);

@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.bean;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -1744,5 +1745,25 @@ public class OsyrisModelFunctions {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Ophalen van de beschikbare jaren uit configuration.properties
+	 * 
+	 * @return
+	 */
+	public List<Object[]> getJaren() {
+
+		String years = DefaultConfiguration.instance().getString(
+				"osyris.controleOpdracht.jaar");
+
+		List<String> yearList = Arrays.asList(years.split(","));
+		List<Object[]> jaren = new ArrayList<Object[]>();
+
+		for (String year : yearList) {
+			Object[] code1 = { year, year };
+			jaren.add(code1);
+		}
+		return jaren;
 	}
 }

@@ -13,7 +13,6 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.cache.CacheProducer;
@@ -262,31 +261,33 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	public List<WerkOpdracht> getWerkOpdrachtenInUitvoeringsronde(
 			Uitvoeringsronde ronde) {
 
-		return (List<WerkOpdracht>) cacheProducer.getCache(
-				"WerkOpdrachtInRondeCache", new Transformer() {
+		// return (List<WerkOpdracht>) cacheProducer.getCache(
+		// "WerkOpdrachtInRondeCache", new Transformer() {
 
-					@Override
-					public Object transform(Object ronde) {
+		// @Override
+		// public Object transform(Object ronde) {
 
-						try {
-							if (ronde != null) {
-								List<WerkOpdracht> opdrachten = new ArrayList<WerkOpdracht>();
+		try {
+			if (ronde != null) {
+				List<WerkOpdracht> opdrachten = new ArrayList<WerkOpdracht>();
 
-								for (ResourceIdentifier id : ((Uitvoeringsronde) ronde)
-										.getOpdrachten()) {
-									WerkOpdracht opdracht = (WerkOpdracht) modelRepository
-											.loadObject(id);
-									opdrachten.add(opdracht);
-								}
-								return opdrachten;
+				for (ResourceIdentifier id : ronde.getOpdrachten()) {
+					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+							.loadObject(id);
 
-							}
-						} catch (IOException e) {
-							LOG.error("Can not load WerkOpdracht", e);
-						}
-						return Collections.emptyList();
+					if (opdracht != null) {
+						opdrachten.add(opdracht);
 					}
-				}).get(ronde);
+				}
+				return opdrachten;
+
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load WerkOpdracht", e);
+		}
+		return Collections.emptyList();
+		// }
+		// }).get(ronde);
 	}
 
 	@Override
