@@ -6,12 +6,9 @@
 		<div>U bent geregistreerd als peter/meter voor OSYRIS.</div>
 		<div>U kan inloggen met onderstaande gegevens:</div>
 		<dl>
-			<dt>Gebruikersnaam:</dt>
-			<dd>${username}</dd>
-			<dt>Paswoord:</dt>
-			<dd>${password}</dd>
-			<dt>Groep:</dt>
-			<dd>${group}</dd>
+			<dt>Gebruikersnaam: <b> ${username} </b></dt>
+			<dt>Paswoord: <b> ${password} </b></dt>
+			<dt>Groep: <b> ${group} </b></dt>
 		</dl>
 		<div>U kan uw gegevens, paswoord en voorkeuren wijzigen op uw profielpagina.</div>
 	</body>

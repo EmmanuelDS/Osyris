@@ -16,6 +16,7 @@ import org.conscientia.api.model.annotation.Rule;
 import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
+import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
 import org.conscientia.core.configuration.DefaultConfiguration;
 
@@ -87,9 +88,10 @@ public class StockMateriaalSaveListener {
 					.getUsersInGroup("RouteDokter");
 
 			for (ResourceIdentifier user : users) {
-				UserProfile profiel = (UserProfile) modelRepository.loadAspect(
-						modelRepository.getModelClass("UserProfile"),
-						modelRepository.loadObject(user));
+
+				User routeDokter = (User) modelRepository.loadObject(user);
+				UserProfile profiel = (UserProfile) routeDokter.getAspect(
+						"UserProfile", modelRepository, true);
 
 				mailSender.sendMail(preferences.getNoreplyEmail(),
 						Collections.singleton(profiel.getEmail()),

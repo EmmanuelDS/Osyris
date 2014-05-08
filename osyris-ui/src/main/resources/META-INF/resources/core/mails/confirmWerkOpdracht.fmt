@@ -5,16 +5,11 @@
 	<body>
 		<div>Toerisme Oost-Vlaanderen heeft volgende werkopdracht naar U verzonden:</div>
 		<dl>
-			<dt>Werkopdracht identificatie:</dt>
-			<dd>${id}</dd>
-			<dt>Type traject:</dt>
-			<dd>${typeTraject}</dd>
-			<dt>Gemeente:</dt>
-			<dd>${gemeente}</dd>
-			<dt>Regio:</dt>
-			<dd>${regio}</dd>
-			<dt>Medewerker TOV:</dt>
-			<dd>${medewerker}</dd>
+			<dt>Werkopdracht identificatie: <b> ${id} </b></dt>
+			<dt>Type traject: <b> ${typeTraject} </b></dt>
+			<dt>Gemeente: <b> ${gemeente} </b></dt>
+			<dt>Regio: <b> ${regio} </b></dt>
+			<dt>Medewerker Toerisme Oost-Vlaanderen: <b> ${medewerker} </b></dt>
 		</dl>
 		<div>Gelieve via OSYRIS het overzicht van Uw werkopdrachten te raadplegen.</div>
 	</body>

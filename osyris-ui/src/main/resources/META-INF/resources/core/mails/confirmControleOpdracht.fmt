@@ -1,20 +1,17 @@
 <#assign subject>
-[${preferences.title?string}] Nieuwe controleopdracht
+[${preferences.title?string}] Nieuwe toegewezen controleopdracht
 </#assign>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<body>
 		<div>Toerisme Oost-Vlaanderen heeft een controleopdracht naar U verzonden.</div>
 		<dl>
-			<dt>Controleopdracht identificatie:</dt>
-			<dd>${id}</dd>
-			<dt>Type traject:</dt>
-			<dd>${typeTraject</dd>
-			<dt>Gemeente:</dt>
-			<dd>${gemeente}</dd>
-			<dt>Regio:</dt>
-			<dd>${regio}</dd>
-			<dt>Medewerker TOV:</dt>
-			<dd>${medewerker}</dd>
+			<dt>Controleopdracht identificatie: <b> ${id} </b></dt>
+			<dt>Periode: <b> ${periode} </b></dt>
+			<dt>Jaar: <b> ${jaar} </b></dt>
+			<dt>Type traject: <b> ${trajectType} </b></dt>
+			<dt>Traject: <b> ${traject} </b></dt>
+			<dt>Regio: <b> ${regio} </b></dt>
+			<dt>Medewerker Toerisme Oost-Vlaanderen: <b> ${medewerker} </b></dt>
 		</dl>
 		<div>Gelieve via OSYRIS het overzicht van Uw controleopdrachten te raadplegen.</div>
 	</body>

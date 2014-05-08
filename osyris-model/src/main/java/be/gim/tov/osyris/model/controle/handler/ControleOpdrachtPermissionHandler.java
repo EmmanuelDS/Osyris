@@ -41,8 +41,9 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 			ControleOpdracht controleOpdracht = (ControleOpdracht) modelRepository
 					.loadObject(identifier);
 
-			// Get status
 			if (controleOpdracht != null) {
+
+				// Get status
 				ControleOpdrachtStatus status = controleOpdracht.getStatus();
 
 				if (!identity.inGroup("PeterMeter", "CUSTOM")
@@ -52,13 +53,26 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 				}
 
 				// PETER EN METER
-				if (identity.inGroup("PeterMeter", "CUSTOM")
-						&& status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
+				// Disallow view and edit permissions when controleOpdracht not
+				// assigned to logged in peterMeter
+				String peterMeterName = modelRepository
+						.getObjectName(controleOpdracht.getPeterMeter());
 
-					// Override permissions on action
-					if (action.equals(Permission.EDIT_ACTION)
-							|| action.equals(Permission.VIEW_ACTION)) {
-						return true;
+				if (identity.inGroup("PeterMeter", "CUSTOM")) {
+					if (!peterMeterName.equals(identity.getUser().getId())) {
+						if (action.equals(Permission.EDIT_ACTION)
+								|| action.equals(Permission.VIEW_ACTION)) {
+							return false;
+						}
+					}
+
+					if (status.equals(ControleOpdrachtStatus.UIT_TE_VOEREN)) {
+
+						// Override permissions on action
+						if (action.equals(Permission.EDIT_ACTION)
+								|| action.equals(Permission.VIEW_ACTION)) {
+							return true;
+						}
 					}
 				}
 
@@ -68,6 +82,19 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 					if (action.equals(Permission.CREATE_ACTION)) {
 						return true;
 					}
+
+					// Disallow view and edit permissions when controleOpdracht
+					// not assigned to logged in medewerker
+					String medewerkerName = modelRepository
+							.getObjectName(controleOpdracht.getMedewerker());
+
+					if (!medewerkerName.equals(identity.getUser().getId())) {
+						if (action.equals(Permission.EDIT_ACTION)
+								|| action.equals(Permission.VIEW_ACTION)) {
+							return false;
+						}
+					}
+
 					if (status.equals(ControleOpdrachtStatus.TE_CONTROLEREN)
 							|| status
 									.equals(ControleOpdrachtStatus.GEANNULEERD)
@@ -86,7 +113,6 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 				}
 			}
 		}
-
 		return super.hasPermission(action, identifier, modelClass, isOwner);
 	}
 }

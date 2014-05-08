@@ -317,8 +317,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			// Medewerker moet gevalideerd en geannuleerd status niet kunnen
 			// zien
-			if (identity.inGroup("Medewerker", "CUSTOM")) {
-
+			if (identity.inGroup("Routedokter", "CUSTOM")) {
+				return query;
+			} else if (identity.inGroup("Medewerker", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
@@ -326,10 +327,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
 						ControleOpdrachtStatus.GEVALIDEERD), FilterUtils
 						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
-			} else
-			// PeterMeter kan enkel status uit te voeren en gevalideerd zien
-			if (identity.inGroup("PeterMeter", "CUSTOM")) {
-
+			} else if (identity.inGroup("PeterMeter", "CUSTOM")) {
+				// PeterMeter kan enkel status uit te voeren en gevalideerd zien
 				query.addFilter(FilterUtils.equal("peterMeter", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
@@ -941,18 +940,32 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		Map<String, Object> variables = new HashMap<String, Object>();
 		variables.put("preferences", preferences);
+
+		if (object.getPeriode().equals(PERIODE_LENTE)) {
+			variables.put("periode", "Lente");
+		} else if (object.getPeriode().equals(PERIODE_ZOMER)) {
+			variables.put("periode", "Zomer");
+		} else if (object.getPeriode().equals(PERIODE_HERFST)) {
+			variables.put("periode", "Herfst");
+		}
+
+		variables.put("jaar", object.getJaar());
 		variables.put("id", object.get("id"));
 		variables.put("trajectType", object.getTrajectType());
+		variables.put("traject",
+				modelRepository.getObjectLabel(object.getTraject()));
 		variables.put("regio", Beans.getReference(OsyrisModelFunctions.class)
 				.getTrajectRegio(object.getTraject()));
 		variables.put("medewerker",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
-		mailSender.sendMail(
-				preferences.getNoreplyEmail(),
-				Collections.singleton(modelRepository
-						.loadObject(object.getPeterMeter())
-						.getAspect("UserProfile").get("email").toString()),
+		User peterMeter = (User) modelRepository.loadObject(object
+				.getPeterMeter());
+		UserProfile pmProfiel = (UserProfile) peterMeter.getAspect(
+				"UserProfile", modelRepository, true);
+
+		mailSender.sendMail(preferences.getNoreplyEmail(),
+				Collections.singleton(pmProfiel.getEmail()),
 				"/META-INF/resources/core/mails/confirmControleOpdracht.fmt",
 				variables);
 
@@ -1380,10 +1393,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Opbouwen ControleOpdracht aan de hand van een Traject en periode.
+	 * Opbouwen ControleOpdracht aan de hand van een Traject periode en jaar.
 	 * 
 	 * @param traject
 	 * @param periode
+	 * @param jaar
 	 * @return
 	 */
 	public ControleOpdracht buildControleOpdracht(Traject traject,

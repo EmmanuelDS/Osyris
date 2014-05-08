@@ -279,7 +279,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 		}
 
 		try {
-			if (identity.inGroup("Uitvoerder", "CUSTOM")) {
+			if (identity.inGroup("Routedokter", "CUSTOM")) {
+				return query;
+			} else if (identity.inGroup("Uitvoerder", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
@@ -1098,9 +1100,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 		variables.put("medewerker",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
-		String uitvoerderEmail = modelRepository
-				.loadObject(object.getUitvoerder()).getAspect("UserProfile")
-				.get("email").toString();
+		User uitvoerder = (User) modelRepository.loadObject(object
+				.getMedewerker());
+
+		UserProfile uitvoerderProfiel = (UserProfile) uitvoerder.getAspect(
+				"UserProfile", modelRepository, true);
+
+		String uitvoerderEmail = uitvoerderProfiel.getEmail();
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
 				Collections.singleton(uitvoerderEmail),
@@ -1132,9 +1138,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 		variables.put("editor",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
-		String uitvoerderEmail = modelRepository
-				.loadObject(object.getUitvoerder()).getAspect("UserProfile")
-				.get("email").toString();
+		User uitvoerder = (User) modelRepository.loadObject(object
+				.getMedewerker());
+
+		UserProfile uitvoerderProfiel = (UserProfile) uitvoerder.getAspect(
+				"UserProfile", modelRepository, true);
+
+		String uitvoerderEmail = uitvoerderProfiel.getEmail();
 
 		mailSender.sendMail(preferences.getNoreplyEmail(),
 				Collections.singleton(uitvoerderEmail),

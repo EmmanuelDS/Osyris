@@ -5,10 +5,8 @@
 	<body>
 		<div>Toerisme Oost-Vlaanderen heeft volgende werkopdracht gewijzigd:</div>
 		<dl>
-			<dt>Werkopdracht identificatie:</dt>
-			<dd>${id}</dd>
-			<dt>Gewijzigd door:</dt>
-			<dd>${editor}</dd>
+			<dt>Werkopdracht identificatie: <b> ${id} </b></dt>
+			<dt>Gewijzigd door: <b> ${editor} </b></dt>
 		</dl>
 		<div>Gelieve via OSYRIS het overzicht van Uw werkopdrachten te raadplegen.</div>
 	</body>

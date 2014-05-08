@@ -71,6 +71,7 @@ import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.linearref.LinearLocation;
 import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import com.vividsolutions.jts.operation.distance.DistanceOp;
 
 /**
  * 
@@ -282,6 +283,7 @@ public class OsyrisModelFunctions {
 
 		if (controleOpdrachtType != null
 				&& controleOpdrachtType.contains("route")) {
+
 			Collection<ModelClass> subClassesRoute = Collections.emptyList();
 			subClassesRoute = modelRepository.getModelClass("Route")
 					.getSubClasses();
@@ -777,7 +779,11 @@ public class OsyrisModelFunctions {
 				return modelRepository.getResourceName(uitvoerder);
 
 			} else {
-				return new ResourceName("user", "tdtoerisme");
+				User technischeDienst = userRepository.loadUser("tdtoerisme");
+
+				if (technischeDienst != null) {
+					return modelRepository.getResourceName(technischeDienst);
+				}
 			}
 
 		} catch (IOException e) {
@@ -1615,8 +1621,8 @@ public class OsyrisModelFunctions {
 			Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
 
 			for (NetwerkSegment s : segmenten) {
-
-				double distance = bord.getGeom().distance(s.getGeom());
+				double distance = DistanceOp.distance(bord.getGeom(),
+						s.getGeom());
 				distances.put(modelRepository.getResourceIdentifier(s),
 						distance);
 			}

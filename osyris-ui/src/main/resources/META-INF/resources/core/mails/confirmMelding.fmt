@@ -5,16 +5,11 @@
 	<body>
 		<div>Uw melding is succesvol verzonden naar toerisme Oost-Vlaanderen via ${preferences.title?string} routedokter.</div>
 		<dl>
-			<dt>Voornaam:</dt>
-			<dd>${firstname}</dd>
-			<dt>Naam:</dt>
-			<dd>${lastname}</dd>
-			<dt>Telefoon:</dt>
-			<dd>${phone}</dd>
-			<dt>Status melding:</dt>
-			<dd>${status}</dd>
-			<dt>Probleem:</dt>
-			<dd>${problem}</dd>
+			<dt>Voornaam: <b> ${firstname} </b></dt>
+			<dt>Naam: <b> ${lastname} </b></dt>
+			<dt>Telefoon: <b> ${phone}</b></dt>
+			<dt>Status melding: <b> ${status} </b></dt>
+			<dt>Probleem: <b> ${problem} </b></dt>
 		</dl>
 	</body>
 </html>

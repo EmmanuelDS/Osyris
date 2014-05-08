@@ -3,24 +3,16 @@
 </#assign>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<body>
-		<div>Een item uit magazijn ${magazijn} heeft de minimum limiet overschreden.</div>
+		<div>Een item uit magazijn <b>${magazijn}</b>  heeft de minimum limiet overschreden.</div>
 		<dl>
-			<dt>Categorie:</dt>
-			<dd>${categorie}</dd>
-			<dt>Subcategorie:</dt>
-			<dd>${subCategorie}</dd>
-			<dt>Type:</dt>
-			<dd>${type}</dd>
-			<dt>Item:</dt>
-			<dd>${naam}</dd>
-			<dt>Nummer:</dt>
-			<dd>${nummer}</dd>
-			<dt>Aantal in stock:</dt>
-			<dd>${inStock}</dd>
-			<dt>Minimum aantal:</dt>
-			<dd>${min}</dd>
-			<dt>Maximum aantal:</dt>
-			<dd>${max}</dd>
+			<dt>Categorie: <b> ${categorie} </b></dt>
+			<dt>Subcategorie: <b> ${subCategorie} </b></dt>
+			<dt>Type: <b> ${type} </b></dt>
+			<dt>Item: <b> ${naam} </b></dt>
+			<dt>Nummer: <b> ${nummer} </b></dt>
+			<dt>Aantal in stock: <b> ${inStock} </b></dt>
+			<dt>Minimum aantal: <b> ${min} </b></dt>
+			<dt>Maximum aantal: <b> ${max} </b></dt>
 		</dl>
 	</body>
 </html>
