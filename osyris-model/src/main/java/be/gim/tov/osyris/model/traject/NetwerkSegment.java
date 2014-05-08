@@ -1,7 +1,6 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.ModelPropertyType;
-import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -54,7 +53,7 @@ public abstract class NetwerkSegment extends Traject {
 
 	// GETTERS AND SETTERS
 	@Override
-	@LabelProperty
+	// @LabelProperty
 	@NotEditable
 	public Long getId() {
 		return (Long) super.getId();

@@ -15,7 +15,6 @@ import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
-import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -55,7 +54,7 @@ public abstract class Traject extends AbstractModelObject implements
 	// VARIABLES
 	@Required
 	@Edit(type = "suggestions")
-	@LabelProperty
+	// @LabelProperty
 	@Search(type = "suggestions:like-wildcard-nocase")
 	private String naam;
 
