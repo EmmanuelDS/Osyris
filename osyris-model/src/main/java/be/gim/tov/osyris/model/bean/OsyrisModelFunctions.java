@@ -85,6 +85,7 @@ public class OsyrisModelFunctions {
 			.getLog(OsyrisModelFunctions.class);
 
 	protected static final String GEEN_PETER_METER = "Geen PeterMeter toegewezen";
+	protected static final Double BUFFER_BORD_METER = 3000.0;
 
 	@Inject
 	protected ModelRepository modelRepository;
@@ -1572,6 +1573,10 @@ public class OsyrisModelFunctions {
 		query.setModelClassName(bord.getModelClass().getName()
 				.replace("Bord", ""));
 
+		// Query op buffer 3km rond bord
+		query.addFilter(FilterUtils.intersects(bord.getGeom().buffer(
+				BUFFER_BORD_METER)));
+
 		List<Route> routes = (List<Route>) modelRepository.searchObjects(query,
 				false, false);
 
@@ -1579,7 +1584,7 @@ public class OsyrisModelFunctions {
 
 		for (Route r : routes) {
 
-			double distance = bord.getGeom().distance(r.getGeom());
+			double distance = DistanceOp.distance(bord.getGeom(), r.getGeom());
 			distances.put(r, distance);
 		}
 
@@ -1613,7 +1618,13 @@ public class OsyrisModelFunctions {
 			DefaultQuery query = new DefaultQuery();
 			query.setModelClassName(bord.getModelClass().getName()
 					.replace("Bord", "Segment"));
-			query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+
+			// Query op buffer 3km rond bord
+			query.addFilter(FilterUtils.intersects(bord.getGeom().buffer(
+					BUFFER_BORD_METER)));
+
+			// Alternatief Query op regio
+			// query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
 
 			List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
 					.searchObjects(query, false, false);

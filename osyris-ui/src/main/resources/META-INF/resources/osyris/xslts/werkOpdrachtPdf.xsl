@@ -223,10 +223,21 @@
             
              <fo:block-container>												
              	<fo:block margin-left="0.1cm">
+             	<xsl:if test="//@netwerkbord='false'">		
             		<xsl:variable name="url_voorbeeldFoto" select="/opdracht/voorbeeldFoto" />	
 		            <fo:external-graphic src="'{$url_voorbeeldFoto}'"
-		            content-width="60mm"
-            		content-height="90mm" />
+		            content-width="55mm"
+            		content-height="79mm" />
+            	</xsl:if>
+            	
+            	<xsl:if test="//@netwerkbord='true'">											
+	             	<fo:block margin-left="0.1cm" margin-top="0.1cm">
+	            		<xsl:variable name="url_voorbeeld_kp_bord" select="/opdracht/voorbeeld_kp_bord" />	
+			            <fo:external-graphic src="'{$url_voorbeeld_kp_bord}'"
+			           	  content-width="55mm"
+	            		  content-height="79mm" />
+	       			 </fo:block>
+       			 </xsl:if>
        			 </fo:block>
              </fo:block-container>
              
@@ -388,7 +399,7 @@
 		       	<fo:inline font-weight="bold"><xsl:text>Opdracht: </xsl:text></fo:inline>
 		      </fo:block>    
 		       <xsl:for-each select="/opdracht/handeling">
-		        <fo:block margin-left="20px" margin-bottom="20px">
+		        <fo:block margin-left="20px" margin-bottom="8px">
 		        	<xsl:value-of
 		        		select="./nummer">
 		        	</xsl:value-of>

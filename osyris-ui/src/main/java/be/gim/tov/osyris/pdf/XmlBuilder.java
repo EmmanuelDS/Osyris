@@ -673,23 +673,6 @@ public class XmlBuilder {
 		id.appendChild(doc.createTextNode(object.getId().toString()));
 		rootElement.appendChild(id);
 
-		// VOORBEELD FOTO ROUTEBORD
-		Element voorbeeldFoto = doc.createElement("voorbeeldFoto");
-		if (bord instanceof RouteBord) {
-
-			voorbeeldFoto.appendChild(doc
-					.createTextNode(getVoorbeeldRouteBord(traject)));
-		}
-		// VOORBEELD FOTO NETWERKBORD
-		if (bord instanceof NetwerkBord) {
-
-			NetwerkBord nwb = (NetwerkBord) bord;
-			voorbeeldFoto.appendChild(doc
-					.createTextNode(getVoorbeeldNetwerkBord(nwb)));
-
-		}
-		rootElement.appendChild(voorbeeldFoto);
-
 		// Attribute checks
 		rootElement.setAttribute("segment", Boolean.FALSE.toString());
 		rootElement.setAttribute("hasFoto", Boolean.FALSE.toString());
@@ -706,6 +689,23 @@ public class XmlBuilder {
 
 		if (object.getProbleem().getFoto() != null) {
 			rootElement.setAttribute("hasFoto", Boolean.TRUE.toString());
+		}
+
+		// VOORBEELD FOTO ROUTEBORD
+		if (bord instanceof RouteBord) {
+			Element voorbeeldFoto = doc.createElement("voorbeeldFoto");
+			voorbeeldFoto.appendChild(doc
+					.createTextNode(getVoorbeeldRouteBord(traject)));
+			rootElement.appendChild(voorbeeldFoto);
+		}
+		// VOORBEELD FOTO NETWERKBORD
+		if (bord instanceof NetwerkBord) {
+			Element voorbeeldFotoKp = doc.createElement("voorbeeld_kp_bord");
+			NetwerkBord nwb = (NetwerkBord) bord;
+			voorbeeldFotoKp.appendChild(doc
+					.createTextNode(getVoorbeeldNetwerkBord(nwb)));
+
+			rootElement.appendChild(voorbeeldFotoKp);
 		}
 
 		// GEMEENTE OPDRACHT

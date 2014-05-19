@@ -75,7 +75,6 @@ public class NetwerkBordCreateListener {
 		}
 
 		// Set BordBase = naam Regio van bord
-
 		Regio regio = (Regio) Beans.getReference(ModelRepository.class)
 				.loadObject(netwerkBord.getRegio());
 

@@ -16,7 +16,6 @@ import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.model.ModelProperty;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
-import org.conscientia.api.user.UserProfile;
 import org.conscientia.core.encoder.CSVModelEncoder;
 import org.conscientia.core.model.property.EnumModelProperty;
 import org.conscientia.core.model.property.ObjectModelProperty;
@@ -29,6 +28,7 @@ import org.supercsv.prefs.CsvPreference;
 import be.gim.commons.bean.Beans;
 import be.gim.commons.encoder.api.EncoderException;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.tov.osyris.model.user.OsyrisUserProfile;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.status.PeterMeterStatus;
 
@@ -89,8 +89,8 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 			}
 		}
 
-		// Add extra UserProfile property labels for PeterMeter CSV export
-		ModelClass userProfile = Beans.getReference(UserProfile.class)
+		// Add extra OsyrisUserProfile property labels for PeterMeter CSV export
+		ModelClass userProfile = Beans.getReference(OsyrisUserProfile.class)
 				.getModelClass();
 
 		ModelProperty propFirstName = userProfile.getProperty("firstName");
@@ -101,6 +101,24 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 
 		ModelProperty propEmail = userProfile.getProperty("email");
 		labels.add(propEmail.getLabel().toString());
+
+		ModelProperty propPhone = userProfile.getProperty("phone");
+		labels.add(propPhone.getLabel().toString());
+
+		ModelProperty propCellPhone = userProfile.getProperty("cellPhone");
+		labels.add(propCellPhone.getLabel().toString());
+
+		ModelProperty propAddress = userProfile.getProperty("address");
+		labels.add(propAddress.getLabel().toString());
+
+		ModelProperty propPostalCode = userProfile.getProperty("postalCode");
+		labels.add(propPostalCode.getLabel().toString());
+
+		ModelProperty propCity = userProfile.getProperty("city");
+		labels.add(propCity.getLabel().toString());
+
+		ModelProperty propCountry = userProfile.getProperty("country");
+		labels.add(propCountry.getLabel().toString());
 
 		// Add extra PeterMeterProfiel property labels for PeterMeter CSV export
 		labels.add("Status");
@@ -136,8 +154,9 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 			User user = (User) object;
 
 			// Add UserProfile info to PeterMeter CSV export
-			UserProfile profile = (UserProfile) user.getAspect("UserProfile",
-					Beans.getReference(ModelRepository.class), true);
+			OsyrisUserProfile profile = (OsyrisUserProfile) user.getAspect(
+					"UserProfile", Beans.getReference(ModelRepository.class),
+					true);
 
 			if (profile != null) {
 
@@ -155,6 +174,36 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 				ModelProperty propEmail = profile.getModelClass().getProperty(
 						"email");
 				values.add(getString(propEmail, profile, email));
+
+				String phone = profile.getPhone();
+				ModelProperty propPhone = profile.getModelClass().getProperty(
+						"phone");
+				values.add(getString(propPhone, profile, phone));
+
+				String cellPhone = profile.getCellPhone();
+				ModelProperty propCellPhone = profile.getModelClass()
+						.getProperty("cellPhone");
+				values.add(getString(propCellPhone, profile, cellPhone));
+
+				String address = profile.getAddress();
+				ModelProperty propAddress = profile.getModelClass()
+						.getProperty("address");
+				values.add(getString(propAddress, profile, address));
+
+				String postalCode = profile.getPostalCode();
+				ModelProperty propPostalCode = profile.getModelClass()
+						.getProperty("postalCode");
+				values.add(getString(propPostalCode, profile, postalCode));
+
+				String city = profile.getCity();
+				ModelProperty propCity = profile.getModelClass().getProperty(
+						"city");
+				values.add(getString(propCity, profile, city));
+
+				String country = profile.getCountry();
+				ModelProperty propCountry = profile.getModelClass()
+						.getProperty("country");
+				values.add(getString(propCountry, profile, country));
 			}
 
 			// Add PeterMeterProfiel info to PeterMeter CSV export

@@ -76,7 +76,13 @@ public class NetwerkBordSaveListener {
 			}
 		}
 
-		// KnooppuntNrs
+		// Reset KPnrs
+		netwerkBord.setKpnr0(null);
+		netwerkBord.setKpnr1(null);
+		netwerkBord.setKpnr2(null);
+		netwerkBord.setKpnr3(null);
+
+		// Set KnooppuntNrs if KPid is not null
 		if (netwerkBord.getKpid0() != null) {
 
 			if (StringUtils.isNotBlank(netwerkBord.getKpid0().toString())) {
