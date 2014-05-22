@@ -64,15 +64,13 @@ public class NetwerkBordSaveListener {
 			netwerkBord.getSegmenten().addAll(segmentIds);
 		}
 
-		// Automatically set Regio
-		if (netwerkBord.getBordType() != null) {
-			if (netwerkBord.getBordType().equals("doorverwijs")
-					&& !netwerkBord.getSegmenten().isEmpty()) {
+		// Automatically set Regio if empty
+		if (netwerkBord.getRegio() == null) {
 
-				// Doorverwijsbord set regio van bijhorend segment
-				NetwerkSegment seg = (NetwerkSegment) modelRepository
-						.loadObject(netwerkBord.getSegmenten().get(0));
-				netwerkBord.setRegio(seg.getRegio());
+			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
+					.getRegioForBord(netwerkBord);
+			if (regio != null) {
+				netwerkBord.setRegio(modelRepository.getResourceKey(regio));
 			}
 		}
 

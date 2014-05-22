@@ -846,6 +846,9 @@ public class OsyrisModelFunctions {
 
 	/**
 	 * Zoekt de regio waarmee het aangeduide probleem een intersectie heeft.
+	 * Indien de geometrie van een AnderProbleem een LineString is die met
+	 * meerdere regios een intersectie heeft, wordt de regio genomen met de
+	 * grootste intersectie.
 	 * 
 	 * @param geometry
 	 * @return
@@ -859,7 +862,32 @@ public class OsyrisModelFunctions {
 			query.addFilter(FilterUtils.intersects("geom", geometry));
 			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
 					query, true, true);
-			Regio regio = (Regio) modelRepository.getUniqueResult(regios);
+
+			Regio regio = null;
+
+			// Indien 1 regio
+			if (regios.size() == 1) {
+				regio = (Regio) modelRepository.getUniqueResult(regios);
+			}
+
+			// Indien intersectie met meerdere regios
+			else if (regios.size() > 1) {
+				Map<Regio, Double> intersections = new HashMap<Regio, Double>();
+
+				for (Regio r : regios) {
+
+					Geometry g1 = r.getGeom().intersection(geometry);
+					intersections.put(r, g1.getLength());
+				}
+
+				double maxValueInMap = (Collections.max(intersections.values()));
+				for (Entry<Regio, Double> entry : intersections.entrySet()) {
+					if (entry.getValue() == maxValueInMap) {
+
+						regio = entry.getKey();
+					}
+				}
+			}
 
 			return modelRepository.getResourceIdentifier(regio);
 
@@ -1539,6 +1567,21 @@ public class OsyrisModelFunctions {
 
 		try {
 			if (bord.getGeom() != null) {
+
+				if (bord instanceof NetwerkBord) {
+					NetwerkBord netwerkBord = (NetwerkBord) bord;
+
+					if (netwerkBord.getBordType() != null) {
+						if (netwerkBord.getBordType().equals("knooppunt")
+								&& netwerkBord.getKpid0() != null) {
+							NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
+									.loadObject(netwerkBord.getKpid0());
+							return (Regio) modelRepository.loadObject(knooppunt
+									.getRegio());
+						}
+					}
+				}
+
 				DefaultQuery query = new DefaultQuery();
 				query.setModelClassName("Regio");
 				query.addFilter(FilterUtils.intersects("geom", bord.getGeom()));

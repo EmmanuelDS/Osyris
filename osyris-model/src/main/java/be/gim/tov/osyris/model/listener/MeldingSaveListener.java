@@ -16,9 +16,12 @@ import org.jboss.seam.international.status.Messages;
 
 import be.gim.commons.resource.ResourceName;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
+import be.gim.tov.osyris.model.controle.AnderProbleem;
+import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.status.MeldingStatus;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
+import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
@@ -111,9 +114,24 @@ public class MeldingSaveListener {
 			Traject traject = (Traject) modelRepository.loadObject(melding
 					.getTraject());
 
-			if (traject != null) {
+			// Voor BordProbleem uitvoerder zoeken via RegioID van het
+			// Bord
+			if (melding.getProbleem() instanceof BordProbleem) {
+				Bord b = (Bord) modelRepository
+						.loadObject(((BordProbleem) melding.getProbleem())
+								.getBord());
 				werkOpdracht.setUitvoerder(osyrisModelFunctions
-						.zoekUitvoerder(traject.getRegio()));
+						.zoekUitvoerder(b.getRegio()));
+			}
+
+			// Voor AnderProbleem uitvoerder zoeken via intersect geometrie
+			// met regio
+			if (melding.getProbleem() instanceof AnderProbleem) {
+				werkOpdracht
+						.setUitvoerder(osyrisModelFunctions.zoekUitvoerder(osyrisModelFunctions
+								.searchRegioForProbleem(((AnderProbleem) melding
+										.getProbleem()).getGeom())));
+
 			}
 
 			modelRepository.saveObject(werkOpdracht);
