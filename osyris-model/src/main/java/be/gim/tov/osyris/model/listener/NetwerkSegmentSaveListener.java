@@ -16,6 +16,7 @@ import org.conscientia.core.search.QueryBuilder;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
@@ -42,29 +43,37 @@ public class NetwerkSegmentSaveListener {
 
 		NetwerkSegment segment = (NetwerkSegment) event.getModelObject();
 
+		// Conversie MultiLineString naar LineString indien van toepassing
+		if (segment.getGeom() != null) {
+			segment.setGeom(GeometryUtils.connect(segment.getGeom()));
+		}
+
 		// Automatisch setten Regio
 		if (segment.getRegio() == null) {
 
 			Regio regio = Beans.getReference(OsyrisModelFunctions.class)
 					.getRegioForSegment(segment);
-			if (regio != null)
+			if (regio != null) {
 				segment.setRegio(modelRepository.getResourceKey(regio));
+			}
 		}
 
 		// Automatisch setten VanKpNr
 		if (ResourceIdentifier.isNotEmpty(segment.getVanKnooppunt())) {
 			NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 					.loadObject(segment.getVanKnooppunt());
-			if (knooppunt != null)
+			if (knooppunt != null) {
 				segment.setVanKpNr(knooppunt.getNummer());
+			}
 		}
 
 		// Automatisch setten NaarKpNr
 		if (ResourceIdentifier.isNotEmpty(segment.getNaarKnooppunt())) {
 			NetwerkKnooppunt knooppunt = (NetwerkKnooppunt) modelRepository
 					.loadObject(segment.getNaarKnooppunt());
-			if (knooppunt != null)
+			if (knooppunt != null) {
 				segment.setNaarKpNr(knooppunt.getNummer());
+			}
 		}
 
 		event.addAfterEvent(new AfterModelEvent() {

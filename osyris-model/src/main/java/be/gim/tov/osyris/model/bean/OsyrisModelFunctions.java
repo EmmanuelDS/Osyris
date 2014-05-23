@@ -1316,7 +1316,8 @@ public class OsyrisModelFunctions {
 													false, false);
 
 									if (borden != null && !borden.isEmpty()) {
-										Geometry geom = current.getGeom();
+										Geometry geom = GeometryUtils
+												.connect(current.getGeom());
 
 										boolean reverse = richting == RichtingEnum.TF;
 
