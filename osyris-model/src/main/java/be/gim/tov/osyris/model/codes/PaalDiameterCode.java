@@ -20,7 +20,7 @@ import org.conscientia.core.model.AbstractModelObject;
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
-		@Permission(profile = "group:Medewerker", action = "view", allow = true), })
+		@Permission(profile = "group:Medewerker", action = "view", allow = true) })
 public class PaalDiameterCode extends AbstractModelObject implements
 		StorableObject {
 
