@@ -166,9 +166,9 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="materialenPanel">
+<!-- 	<r:panel id="materialenPanel"> -->
 		<p:dataTable id="stockMaterialen"
 			value="#{form.selectedWerkOpdracht.materialen}"
 			mode="RESULT"
@@ -236,9 +236,9 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-	</r:panel>
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="CommentaarTOVPanel">
+<!-- 	<r:panel id="CommentaarTOVPanel"> -->
 	<d:fields>
 		<d:field for="commentaarMedewerker" label="Commentaar TOV">
 			<d:propertyValue id="commentaarMedewerker"
@@ -247,9 +247,9 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="CommentaarUitvoerderPanel">
+<!-- 	<r:panel id="CommentaarUitvoerderPanel"> -->
 	<d:fields>
 		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
 			<d:propertyValue id="commentaarUitvoerder"
@@ -259,6 +259,39 @@
 		</d:field>
 	</d:fields>
 	</r:panel>
+	<br/>
+<!-- 	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}"> -->
+<!-- 	<d:fields> -->
+	
+<!-- 			<d:propertyField id="foto" -->
+<!-- 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}" -->
+<!-- 					value="#{form.selectedWerkOpdracht.foto}" -->
+<!-- 					mode="VIEW" /> -->
+		
+<!-- 			<d:propertyField id="foto2" -->
+<!-- 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}" -->
+<!-- 					value="#{form.selectedWerkOpdracht.foto2}" -->
+<!-- 					mode="VIEW" /> -->
+		
+<!-- 			<d:propertyField id="foto3" -->
+<!-- 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}" -->
+<!-- 					value="#{form.selectedWerkOpdracht.foto3}" -->
+<!-- 					mode="VIEW" /> -->
+<!-- 	</d:fields> -->
+<!-- 	</r:panel> -->
+	
+	</td>
+	<td width="50%" valign="top">
+		<r:panel>
+			<div style="height: 500px">
+				<m:mapViewer id="viewer"
+					configuration="#{form.configuration}">
+				</m:mapViewer>
+			</div>
+		</r:panel>
+	</td>
+	</tr>
+	</table>
 	<br/>
 	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}">
 	<d:fields>
@@ -279,17 +312,4 @@
 					mode="VIEW" />
 	</d:fields>
 	</r:panel>
-	
-	</td>
-	<td width="50%" valign="top">
-		<r:panel>
-			<div style="height: 500px">
-				<m:mapViewer id="viewer"
-					configuration="#{form.configuration}">
-				</m:mapViewer>
-			</div>
-		</r:panel>
-	</td>
-	</tr>
-	</table>
 </u:composition>

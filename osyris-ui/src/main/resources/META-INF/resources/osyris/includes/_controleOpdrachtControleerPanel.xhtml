@@ -77,7 +77,7 @@
 			type="button"
 			action="#{form.save()}"
 			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('controleerPopup')}).hide();" />
+			oncomplete="conscientia.widget(#{r:element('controleerPopup')}).hide(); conscientia.widget(#{r:element('viewPopup')}).show();" />
 		<j:commandButton rendered="#{form.object.status != 'GEANNULEERD'}"
 			value="Opdracht annuleren"
 			type="button"

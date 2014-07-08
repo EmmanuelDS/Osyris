@@ -8,7 +8,7 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
-	
+
 	<r:panel id="uitvoeringsrondePanel">
 		<d:fields>
 			<d:field for="rondeId" label="Uitvoeringsronde">
@@ -37,14 +37,16 @@
 	<br/>
 	<r:panel id="handelingenPanel">
 	<d:fields>
-		<d:propertyField id="handelingen"
+		<d:field for="handelingen" label="Handelingen">
+		<d:propertyValue id="handelingen"
 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
 				value="#{form.object.handelingen}"
 				mode="VIEW" />
+		</d:field>
 	</d:fields>
-	</r:panel>
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="materialenPanel">
+<!-- 	<r:panel id="materialenPanel"> -->
 		<p:dataTable id="stockMaterialen"
 			value="#{form.object.materialen}"
 			mode="RESULT"
@@ -112,26 +114,26 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-	</r:panel>
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="fotoPanel">
-	<d:fields>
-		<d:propertyField id="foto"
-		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
-				value="#{form.object.foto}"
-				mode="VIEW" />
-		<d:propertyField id="foto2"
-		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
-				value="#{form.object.foto2}"
-				mode="VIEW" />
-		<d:propertyField id="foto3"
-		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
-				value="#{form.object.foto3}"
-				mode="VIEW" />
-	</d:fields>
-	</r:panel>
+<!-- 	<r:panel id="fotoPanel"> -->
+<!-- 	<d:fields> -->
+<!-- 		<d:propertyField id="foto" -->
+<!-- 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}" -->
+<!-- 				value="#{form.object.foto}" -->
+<!-- 				mode="VIEW" /> -->
+<!-- 		<d:propertyField id="foto2" -->
+<!-- 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}" -->
+<!-- 				value="#{form.object.foto2}" -->
+<!-- 				mode="VIEW" /> -->
+<!-- 		<d:propertyField id="foto3" -->
+<!-- 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}" -->
+<!-- 				value="#{form.object.foto3}" -->
+<!-- 				mode="VIEW" /> -->
+<!-- 	</d:fields> -->
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="statusPanel" rendered="#{form.object.validatie != null}">
+	<a:outputPanel id="statusPanel" rendered="#{form.object.validatie != null}">
 	<d:fields>
 		<d:field for="status" label="Status validatie">
 			<d:propertyValue id="status"
@@ -148,9 +150,9 @@
 			</d:field>
 		</a:outputPanel>
 	</d:fields>
-	</r:panel>
+	</a:outputPanel>
 	<br/>
-	<r:panel id="commentaarMedewerkerPanel">
+<!-- 	<r:panel id="commentaarMedewerkerPanel"> -->
 	<d:fields>
 		<d:field for="commentaarMedewerker" label="Commentaar TOV">
 			<d:propertyValue id="commentaarMedewerker"
@@ -159,9 +161,9 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+<!-- 	</r:panel> -->
 	<br/>
-	<r:panel id="commentaarUitvoerderPanel">
+<!-- 	<r:panel id="commentaarUitvoerderPanel"> -->
 	<d:fields>
 		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
 			<d:propertyValue id="commentaarUitvoerder"

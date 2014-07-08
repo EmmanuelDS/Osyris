@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 
@@ -45,7 +46,8 @@ import com.vividsolutions.jts.geom.Point;
  */
 @Named
 @ViewScoped
-public class MeldingOverzichtFormBase extends AbstractListForm<Melding> {
+public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
+		implements Serializable {
 	private static final long serialVersionUID = -3077755833706449795L;
 
 	private static final Log LOG = LogFactory

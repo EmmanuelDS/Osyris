@@ -14,9 +14,9 @@
 		
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
-	<table width="100%">
-			<tr>
-			<td width="50%" valign="top">
+	<table width="1050px">
+	<tr>
+	<td width="525px" valign="top">
 	<r:panel id="ProblemenPanel" header="Problemen">	
 	<j:renderPanel id="problemPanel">
 	Kies type probleem:<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
@@ -132,7 +132,7 @@
 	</d:fields>
 	</r:panel>
 	</td>
-	<td width="50%" valign="top">
+	<td width="525px" valign="top">
 		<r:panel>
 			<div style="height: 500px">
 				<m:mapViewer id="viewer"

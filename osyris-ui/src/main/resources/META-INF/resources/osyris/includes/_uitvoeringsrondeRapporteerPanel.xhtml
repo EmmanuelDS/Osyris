@@ -58,7 +58,7 @@
 			action="#{form.save()}"
 			render="#{render}"
 			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
-						<j:commandButton
+			<j:commandButton
 			rendered="#{(identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin', 'CUSTOM')) and form.object.status == 'AANGEMAAKT' }"
 			value="Verzenden"
 			image="#{resource['core/images/actions/12x12/next.png']}"

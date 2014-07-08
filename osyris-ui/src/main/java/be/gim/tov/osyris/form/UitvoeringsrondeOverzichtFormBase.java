@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -13,6 +14,7 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 
+import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.cache.CacheProducer;
@@ -65,7 +67,7 @@ import com.vividsolutions.jts.geom.Point;
 @Named
 @ViewScoped
 public class UitvoeringsrondeOverzichtFormBase extends
-		AbstractListForm<Uitvoeringsronde> {
+		AbstractListForm<Uitvoeringsronde> implements Serializable {
 	private static final long serialVersionUID = 3771393152252852618L;
 
 	private static final Log LOG = LogFactory
@@ -230,7 +232,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			Query query = transformQuery(getQuery());
 
 			List<Uitvoeringsronde> list = (List<Uitvoeringsronde>) modelRepository
-					.searchObjects(query, true, true, true);
+					.searchObjects(query, false, false, true);
 
 			if (uitvoerder == null && medewerker == null && trajectType == null
 					&& regio == null && trajectNaam == null) {
@@ -244,7 +246,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				query.addFilter(FilterUtils.id(getSubQueryIds(list)));
 
 				results = (List<Uitvoeringsronde>) modelRepository
-						.searchObjects(query, true, true, true);
+						.searchObjects(query, false, false, true);
 			}
 		} catch (IOException e) {
 			LOG.error("Can not search Uitvoeringsronde.", e);
@@ -261,33 +263,34 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	public List<WerkOpdracht> getWerkOpdrachtenInUitvoeringsronde(
 			Uitvoeringsronde ronde) {
 
-		// return (List<WerkOpdracht>) cacheProducer.getCache(
-		// "WerkOpdrachtInRondeCache", new Transformer() {
+		return (List<WerkOpdracht>) cacheProducer.getCache(
+				"WerkOpdrachtInRondeCache", new Transformer() {
 
-		// @Override
-		// public Object transform(Object ronde) {
+					@Override
+					public Object transform(Object ronde) {
 
-		try {
-			if (ronde != null) {
-				List<WerkOpdracht> opdrachten = new ArrayList<WerkOpdracht>();
+						try {
+							if (ronde != null) {
+								List<WerkOpdracht> opdrachten = new ArrayList<WerkOpdracht>();
 
-				for (ResourceIdentifier id : ronde.getOpdrachten()) {
-					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
-							.loadObject(id);
+								for (ResourceIdentifier id : ((Uitvoeringsronde) ronde)
+										.getOpdrachten()) {
+									WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+											.loadObject(id);
 
-					if (opdracht != null) {
-						opdrachten.add(opdracht);
+									if (opdracht != null) {
+										opdrachten.add(opdracht);
+									}
+								}
+								return opdrachten;
+
+							}
+						} catch (IOException e) {
+							LOG.error("Can not load WerkOpdracht", e);
+						}
+						return Collections.emptyList();
 					}
-				}
-				return opdrachten;
-
-			}
-		} catch (IOException e) {
-			LOG.error("Can not load WerkOpdracht", e);
-		}
-		return Collections.emptyList();
-		// }
-		// }).get(ronde);
+				}).get(ronde);
 	}
 
 	@Override

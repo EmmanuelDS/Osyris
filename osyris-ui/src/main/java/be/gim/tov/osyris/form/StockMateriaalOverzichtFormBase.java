@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.io.Serializable;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -29,7 +30,7 @@ import be.gim.tov.osyris.model.werk.WerkOpdracht;
 @Named
 @ViewScoped
 public class StockMateriaalOverzichtFormBase extends
-		AbstractListForm<StockMateriaal> {
+		AbstractListForm<StockMateriaal> implements Serializable {
 	private static final long serialVersionUID = -2212073755366628143L;
 
 	private static final Log LOG = LogFactory
