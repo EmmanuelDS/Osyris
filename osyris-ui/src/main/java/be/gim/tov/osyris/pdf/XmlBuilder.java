@@ -1033,10 +1033,11 @@ public class XmlBuilder {
 			rootElement.appendChild(naarKp);
 		}
 
-		if (!object.getHandelingen().isEmpty()) {
+		Element handeling = doc.createElement("handeling");
+		if (object.getHandelingen() != null
+				&& !object.getHandelingen().isEmpty()) {
 			for (WerkHandeling h : object.getHandelingen()) {
 
-				Element handeling = doc.createElement("handeling");
 				rootElement.appendChild(handeling);
 
 				Element nummer = doc.createElement("nummer");
@@ -1090,6 +1091,10 @@ public class XmlBuilder {
 
 			foto.appendChild(doc.createTextNode(Base64.encode(object
 					.getProbleem().getFoto())));
+		}
+
+		else {
+			foto.appendChild(doc.createTextNode(getUrlGeenFoto()));
 		}
 		rootElement.appendChild(foto);
 

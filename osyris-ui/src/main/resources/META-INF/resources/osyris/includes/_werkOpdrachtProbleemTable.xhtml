@@ -21,7 +21,7 @@
 			<f:facet name="header">
 				<h:outputText value="Bordprobleem" />
 			</f:facet>
-			<p:column style="width:2%">
+			<p:column style="width:2%" rendered="#{bordProbleem.geom != null}">
 				<j:commandButton
 					value="Zoom naar Probleem"
 					src="#{resource['core/images/actions/16x16/zoom.png']}"

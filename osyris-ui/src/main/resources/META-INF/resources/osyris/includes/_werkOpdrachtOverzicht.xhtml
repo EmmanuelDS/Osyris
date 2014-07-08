@@ -117,7 +117,7 @@
 		<a:outputPanel id="result">
 				<p:dataTable id="objects"
 					value="#{werkOpdrachtOverzichtFormBase.dataModel}"
-					lazy="true"
+					lazy="false"
 					var="werkOpdracht"
 					style="width: 100%;"
 					styleClass="blue"
@@ -129,11 +129,11 @@
 					resizableColumns="true"
 					tableStyle="min-width: 850px"
 					emptyMessage="#{messages['ui.dataTable.empty']}"
-					rowKey="#{d:modelObject(werkOpdracht).getId()}" 
+					rowKey="#{werkOpdracht.getId()}" 
 					selection="#{werkOpdrachtOverzichtFormBase.selectedOpdrachten}">
 					<j:layoutContent />
-					<j:bindAttribute var="werkOpdracht"
-						name="rowData" />
+					<!-- <j:bindAttribute var="werkOpdracht"
+						name="rowData" /> -->
 					<p:column style="width:20px;" >
 						<p:rowToggler />
 					</p:column>

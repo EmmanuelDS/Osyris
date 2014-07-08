@@ -12,10 +12,13 @@ import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.search.DefaultQuery;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.collections.CollectionUtils;
 import be.gim.commons.filter.FilterUtils;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.traject.WandelNetwerkKnooppunt;
 
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.Point;
@@ -55,12 +58,24 @@ public class NetwerkKnooppuntCreateListener {
 
 		}
 
-		// Indien naam bij aanmaken leeg is automatisch invullen naam regio
+		// Indien naam bij aanmaken leeg is automatisch invullen naam
 		if (knooppunt.getNaam() == null || knooppunt.getNaam().isEmpty()) {
-			Regio regio = (Regio) modelRepository.loadObject(knooppunt
-					.getRegio());
-			if (regio != null) {
-				knooppunt.setNaam(regio.getNaam());
+
+			String naam = Beans.getReference(OsyrisModelFunctions.class)
+					.getNaamForWandelNetwerkKnooppunt(knooppunt);
+
+			// Indien WNW knooppunt naam van het dichtsbijzijnde WNW segment,
+			// indien geen segment naam regio
+			if (knooppunt instanceof WandelNetwerkKnooppunt && naam != null) {
+				knooppunt.setNaam(naam);
+			}
+			// Naam regio
+			else {
+				Regio regio = (Regio) modelRepository.loadObject(knooppunt
+						.getRegio());
+				if (regio != null) {
+					knooppunt.setNaam(regio.getNaam());
+				}
 			}
 		}
 

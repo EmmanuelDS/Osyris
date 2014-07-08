@@ -86,6 +86,7 @@ public class OsyrisModelFunctions {
 
 	protected static final String GEEN_PETER_METER = "Geen PeterMeter toegewezen";
 	protected static final Double BUFFER_BORD_METER = 3000.0;
+	protected static final Double BUFFER_KNOOPPUNT_METER = 300.0;
 
 	@Inject
 	protected ModelRepository modelRepository;
@@ -726,7 +727,9 @@ public class OsyrisModelFunctions {
 		try {
 			Bord bord = (Bord) modelRepository.loadObject(BordId);
 
-			return bord.getStraatnaam();
+			if (bord != null) {
+				return bord.getStraatnaam();
+			}
 
 		} catch (IOException e) {
 			LOG.error("Can not load object.", e);
@@ -1311,6 +1314,9 @@ public class OsyrisModelFunctions {
 									builder.addFilter(FilterUtils.equal(
 											"richting", richting.toString()));
 
+									builder.addFilter(FilterUtils.equal(
+											"actief", "1"));
+
 									List<Bord> borden = (List<Bord>) modelRepository
 											.searchObjects(builder.build(),
 													false, false);
@@ -1698,6 +1704,60 @@ public class OsyrisModelFunctions {
 		}
 		return segmentIds;
 
+	}
+
+	/**
+	 * 
+	 * @param knooppunt
+	 * @return
+	 * @throws IOException
+	 */
+	public String getNaamForWandelNetwerkKnooppunt(NetwerkKnooppunt knooppunt)
+			throws IOException {
+
+		String naam = null;
+		if (knooppunt.getGeom() != null) {
+
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName(knooppunt.getModelClass().getName()
+					.replace("Knooppunt", "Segment"));
+
+			// Query op buffer 300m rond knooppunt
+			query.addFilter(FilterUtils.intersects(knooppunt.getGeom().buffer(
+					BUFFER_KNOOPPUNT_METER)));
+
+			// Alternatief Query op regio
+			// query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
+
+			List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
+					.searchObjects(query, false, false);
+
+			Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
+
+			for (NetwerkSegment s : segmenten) {
+				double distance = DistanceOp.distance(knooppunt.getGeom(),
+						s.getGeom());
+				distances.put(modelRepository.getResourceIdentifier(s),
+						distance);
+			}
+
+			if (!segmenten.isEmpty()) {
+
+				double minValueInMap = (Collections.min(distances.values()));
+
+				for (Entry<ResourceIdentifier, Double> entry : distances
+						.entrySet()) {
+					if (entry.getValue() == minValueInMap) {
+
+						ResourceIdentifier minSegmentId = entry.getKey();
+						NetwerkSegment segment = (NetwerkSegment) modelRepository
+								.loadObject(minSegmentId);
+						naam = segment.getNaam();
+					}
+				}
+			}
+		}
+		return naam;
 	}
 
 	/**

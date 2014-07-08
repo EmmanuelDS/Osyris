@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -96,7 +97,7 @@ import com.vividsolutions.jts.geom.Point;
 @Named
 @ViewScoped
 public class WerkOpdrachtOverzichtFormBase extends
-		AbstractListForm<WerkOpdracht> {
+		AbstractListForm<WerkOpdracht> implements Serializable {
 
 	private static final long serialVersionUID = -7478667205313972513L;
 
@@ -840,11 +841,19 @@ public class WerkOpdrachtOverzichtFormBase extends
 				Bord bord = (Bord) modelRepository
 						.loadObject(((BordProbleem) probleem).getBord());
 
-				Envelope envelope = GeometryUtils.getEnvelope(bord.getGeom());
-				GeometryUtils.expandEnvelope(envelope, 0.1,
-						context.getMaxBoundingBox());
+				if (bord != null) {
+					Envelope envelope = GeometryUtils.getEnvelope(bord
+							.getGeom());
+					GeometryUtils.expandEnvelope(envelope, 0.1,
+							context.getMaxBoundingBox());
+					return envelope;
+				} else {
+					// return envelope of segment of route
+					Traject traject = (Traject) modelRepository
+							.loadObject(object.getTraject());
+					return GeometryUtils.getEnvelope(traject.getGeom());
+				}
 
-				return envelope;
 			}
 
 			// AnderProbleem
@@ -1044,8 +1053,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 				Bord bord = (Bord) modelRepository
 						.loadObject(((BordProbleem) object.getProbleem())
 								.getBord());
-				bordSelection.add(bord.getId().toString());
-				bordLayer.setSelection(bordSelection);
+
+				if (bord != null) {
+					bordSelection.add(bord.getId().toString());
+					bordLayer.setSelection(bordSelection);
+				}
 				context.setBoundingBox(getEnvelopeProbleem(
 						object.getProbleem(), context));
 

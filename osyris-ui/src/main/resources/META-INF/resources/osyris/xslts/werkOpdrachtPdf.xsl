@@ -62,7 +62,7 @@
 				          			select="/opdracht/trajecttype">	
 				          		</xsl:value-of>
 				          		
-				          		<xsl:if test="//@netwerkbord='false'">
+				          		<xsl:if test="//@segment='false'">
 				          		     <xsl:text> </xsl:text>
 					          		 <xsl:value-of
 					          			select="/opdracht/trajectnaam">
