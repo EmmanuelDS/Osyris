@@ -1,10 +1,10 @@
 package be.gim.tov.osyris.form;
 
 import java.io.IOException;
+import java.io.Serializable;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import javax.annotation.PostConstruct;
@@ -29,7 +29,6 @@ import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.model.DefaultModelObjectList;
 import org.conscientia.core.search.DefaultQuery;
-import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.core.security.annotation.RunPrivileged;
 import org.jboss.seam.security.Identity;
 
@@ -40,7 +39,6 @@ import be.gim.commons.resource.ResourceName;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.peritia.io.content.Content;
 import be.gim.tov.osyris.model.encoder.PeterMeterCSVModelEncoder;
-import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.user.PeterMeterProfiel;
 import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
 
@@ -51,7 +49,8 @@ import be.gim.tov.osyris.model.user.PeterMeterVoorkeur;
  */
 @Named
 @ViewScoped
-public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
+public class PeterMeterOverzichtFormBase extends AbstractListForm<User>
+		implements Serializable {
 	private static final long serialVersionUID = 7761265026167905576L;
 
 	private static final Log LOG = LogFactory
@@ -210,15 +209,9 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 	@Override
 	public void delete() {
 		try {
-			// Delete trajectToewijzingen PM
-			deleteToewijzingen();
 
-			// Delete user from PM group
-			Group group = (Group) modelRepository.loadObject(new ResourceName(
-					"group", "PeterMeter"));
-			group.getMembers().remove(modelRepository.getResourceName(object));
-			modelRepository.saveObject(group);
-
+			// Delete trajectToewijzingen PM en delete uit groep gebeurt via
+			// UserDeleteListener
 			// Delete user and document permissions
 			modelRepository.deleteObject(object);
 
@@ -293,48 +286,6 @@ public class PeterMeterOverzichtFormBase extends AbstractListForm<User> {
 			modelRepository.saveObject(group);
 		} catch (IOException e) {
 			LOG.error("Can not search objects.", e);
-		}
-	}
-
-	/**
-	 * Verwijdert de trajectToewijzingen bij het deleten van PeterMeter.
-	 * 
-	 */
-	@SuppressWarnings("unchecked")
-	public void deleteToewijzingen() {
-
-		try {
-			ResourceName peterMeter = new ResourceName("user",
-					object.getUsername());
-
-			QueryBuilder builder = new QueryBuilder("Traject");
-			builder.addFilter(FilterUtils.or(
-					FilterUtils.equal("peterMeter1", peterMeter),
-					FilterUtils.equal("peterMeter2", peterMeter),
-					FilterUtils.equal("peterMeter3", peterMeter)));
-
-			List<Traject> result = (List<Traject>) modelRepository
-					.searchObjects(builder.build(), false, false);
-
-			for (Traject traject : result) {
-				if (traject.getPeterMeter1() != null
-						&& traject.getPeterMeter1().equals(peterMeter)) {
-					traject.setPeterMeter1(null);
-				}
-				if (traject.getPeterMeter2() != null
-						&& traject.getPeterMeter2().equals(peterMeter)) {
-					traject.setPeterMeter2(null);
-				}
-				if (traject.getPeterMeter3() != null
-						&& traject.getPeterMeter3().equals(peterMeter)) {
-					traject.setPeterMeter3(null);
-				}
-
-				modelRepository.saveObject(traject);
-			}
-
-		} catch (IOException e) {
-			LOG.error("Can not search Trajecten.", e);
 		}
 	}
 

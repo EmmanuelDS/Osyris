@@ -21,7 +21,7 @@
 	<br/>
 	
 	<!-- Probleem tabellen -->
-	<a:outputPanel rendered="#{form.object.status == 'GEVALIDEERD'}">
+	<a:outputPanel rendered="#{form.object.status == 'GEVALIDEERD' or form.object.status == 'GERAPPORTEERD'}">
 	<u:decorate
 		template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
 		<u:param name="form" value="#{form}" />
@@ -64,7 +64,7 @@
 			type="button"
 			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show(); #{form.resetProbleem()}" />
 		<j:commandButton
-			rendered="#{form.object.status == 'GERAPPORTEERD' }"
+			rendered="#{form.object.status == 'GERAPPORTEERD' and not identity.inGroup('PeterMeter','CUSTOM')}"
 			value="Valideren"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"

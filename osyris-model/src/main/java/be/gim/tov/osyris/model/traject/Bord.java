@@ -96,7 +96,6 @@ public abstract class Bord extends AbstractModelObject implements
 	@View(type = "image", level = Level.LONG)
 	@Width(150)
 	@NotSearchable
-	@ModelClassName("File")
 	@Target("_blank")
 	private ResourceIdentifier foto;
 

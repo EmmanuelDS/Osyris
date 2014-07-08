@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -65,6 +66,7 @@ import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.commons.resource.ResourceName;
 import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
@@ -77,10 +79,13 @@ import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.ControleOpdracht;
+import be.gim.tov.osyris.model.controle.NetwerkAnderProbleem;
+import be.gim.tov.osyris.model.controle.NetwerkBordProbleem;
 import be.gim.tov.osyris.model.controle.NetwerkControleOpdracht;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
+import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
@@ -90,6 +95,8 @@ import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.utils.AlphanumericSorting;
+import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -105,7 +112,7 @@ import com.vividsolutions.jts.geom.Point;
 @Named
 @ViewScoped
 public class ControleOpdrachtOverzichtFormBase extends
-		AbstractListForm<ControleOpdracht> {
+		AbstractListForm<ControleOpdracht> implements Serializable {
 	private static final long serialVersionUID = -86881009141250710L;
 
 	private static final Log LOG = LogFactory
@@ -324,9 +331,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
 
-				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
-						ControleOpdrachtStatus.GEVALIDEERD), FilterUtils
-						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
+				query.addFilter(FilterUtils.notEqual("status",
+						ControleOpdrachtStatus.GEANNULEERD));
+
 			} else if (identity.inGroup("PeterMeter", "CUSTOM")) {
 				// PeterMeter kan enkel status uit te voeren en gevalideerd zien
 				query.addFilter(FilterUtils.equal("peterMeter", modelRepository
@@ -334,11 +341,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 								.getUser().getId()))));
 
 				query.addFilter(FilterUtils.and(FilterUtils.notEqual("status",
-						ControleOpdrachtStatus.TE_CONTROLEREN),
-						FilterUtils.notEqual("status",
-								ControleOpdrachtStatus.GEANNULEERD),
-						FilterUtils.notEqual("status",
-								ControleOpdrachtStatus.GERAPPORTEERD)));
+						ControleOpdrachtStatus.TE_CONTROLEREN), FilterUtils
+						.notEqual("status", ControleOpdrachtStatus.GEANNULEERD)));
 			}
 		} catch (IOException e) {
 			LOG.error("Can not load user.", e);
@@ -404,7 +408,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			if (object.getTraject() != null) {
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol bewaard.");
-				clear();
+				// clear();
 				search();
 			}
 		} catch (IOException e) {
@@ -527,7 +531,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// Routes filteren op trajectNaam
 			if (trajectType.contains("Route")) {
 				QueryBuilder builder = new QueryBuilder("Bord");
-				builder.addFilter(FilterUtils.equal("naam", trajectNaam));
+				// builder.addFilter(FilterUtils.equal("naam", trajectNaam));
+				builder.addFilter(FilterUtils.and(
+						FilterUtils.equal("naam", trajectNaam),
+						FilterUtils.equal("actief", "1")));
 
 				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
@@ -579,11 +586,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 				// Routes filteren op trajectNaam
 				QueryBuilder builder = new QueryBuilder("Bord");
-				builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
+				// builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
+				builder.addFilter(FilterUtils.and(
+						FilterUtils.equal("naam", t.getNaam()),
+						FilterUtils.equal("actief", "1")));
 
 				result = (List<Bord>) modelRepository.searchObjects(
 						builder.build(), true, true);
 				Collections.sort(result, new AlphanumericSorting());
+
 			} else if (t instanceof NetwerkLus) {
 				NetwerkLus lus = ((NetwerkLus) t);
 
@@ -1984,7 +1995,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 				bordLayer.setFilter(FilterUtils.in("segmenten",
 						((NetwerkLus) traject).getSegmenten()));
 
-				// New
 				List<String> bordIds = new ArrayList<String>();
 
 				for (Bord b : createBewegwijzering(object.getTraject())) {
@@ -2073,5 +2083,137 @@ public class ControleOpdrachtOverzichtFormBase extends
 			return false;
 		}
 		return true;
+	}
+
+	public void validerenControleOpdracht() {
+		// Indien alle problemen in een ControleOpdracht een status hebben is de
+		// ControleOpdracht gevalideerd
+		if (object != null) {
+			if (checkOpenstaandeProblemen(object) == 0) {
+
+				object.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
+				object.setDatumGevalideerd(new Date());
+				object.setDatumLaatsteWijziging(new Date());
+
+				// WerkOpdrachten aanmaken
+				createWerkOpdrachten(object);
+			}
+		}
+	}
+
+	/**
+	 * Check of problemen bij een controleOpdracht een status hebben
+	 * 
+	 * @param controleOpdracht
+	 * @return
+	 */
+	private int checkOpenstaandeProblemen(ControleOpdracht controleOpdracht) {
+
+		int probleemNotChecked = 0;
+
+		if (controleOpdracht.getProblemen() != null) {
+			for (Probleem p : controleOpdracht.getProblemen()) {
+				if (p.getStatus() == null || p.getStatus().toString().isEmpty()) {
+					probleemNotChecked = +1;
+				}
+			}
+		}
+		return probleemNotChecked;
+	}
+
+	/**
+	 * Aanmaken van werkopdrachten bij bepaalde problemen in een
+	 * controleOpdracht
+	 * 
+	 * @param controleOpdracht
+	 */
+	private void createWerkOpdrachten(ControleOpdracht controleOpdracht) {
+
+		if (controleOpdracht.getProblemen() != null) {
+			for (Probleem probleem : controleOpdracht.getProblemen()) {
+
+				if (probleem.getStatus().equals(ProbleemStatus.WERKOPDRACHT)) {
+					try {
+						String modelClassName = "WerkOpdracht";
+						WerkOpdracht werkOpdracht = (WerkOpdracht) modelRepository
+								.createObject(modelRepository
+										.getModelClass(modelClassName),
+										(ResourceName) ResourceName
+												.fromString(modelClassName));
+						werkOpdracht.setDatumTeControleren(new Date());
+						werkOpdracht.setInRonde("0");
+						werkOpdracht
+								.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
+						werkOpdracht.setMedewerker(controleOpdracht
+								.getMedewerker());
+						werkOpdracht.setProbleem(probleem);
+						werkOpdracht.setTraject(controleOpdracht.getTraject());
+						werkOpdracht.setTrajectType(Beans.getReference(
+								OsyrisModelFunctions.class).getTrajectType(
+								werkOpdracht.getTraject()));
+						werkOpdracht.setRegioId(Beans.getReference(
+								OsyrisModelFunctions.class).getTrajectRegioId(
+								werkOpdracht.getTraject()));
+						werkOpdracht.setDatumLaatsteWijziging(new Date());
+						werkOpdracht.setGemeente(Beans.getReference(
+								OsyrisModelFunctions.class)
+								.getWerkOpdrachtGemeente(probleem));
+
+						// Voor routes uitvoerder zoeken via RegioID van de
+						// route
+						Traject traject = (Traject) modelRepository
+								.loadObject(controleOpdracht.getTraject());
+						if (traject instanceof Route) {
+							werkOpdracht.setUitvoerder(Beans.getReference(
+									OsyrisModelFunctions.class).zoekUitvoerder(
+									traject.getRegio()));
+						}
+
+						// Voor netwerk uitvoerder zoeken via RegioID van het
+						// NetwerkBord indien bordprobleem
+						if (traject instanceof NetwerkLus
+								&& probleem instanceof NetwerkBordProbleem) {
+							Bord b = (Bord) modelRepository
+									.loadObject(((NetwerkBordProbleem) probleem)
+											.getBord());
+							werkOpdracht.setUitvoerder(Beans.getReference(
+									OsyrisModelFunctions.class).zoekUitvoerder(
+									b.getRegio()));
+						}
+
+						// Voor netwerk uitvoerder zoeken via geom anderprobleem
+						// en
+						// zoeken naar intersect met een bepaalde regio?
+						if (traject instanceof NetwerkLus
+								&& probleem instanceof NetwerkAnderProbleem) {
+							werkOpdracht
+									.setUitvoerder(Beans
+											.getReference(
+													OsyrisModelFunctions.class)
+											.zoekUitvoerder(
+													Beans.getReference(
+															OsyrisModelFunctions.class)
+															.searchRegioForProbleem(
+																	((NetwerkAnderProbleem) probleem)
+																			.getGeom())));
+
+						}
+						modelRepository.saveObject(werkOpdracht);
+						messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
+
+					} catch (IOException e) {
+						messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
+						LOG.error("Can not save WerkOpdracht", e);
+
+					} catch (InstantiationException e) {
+						messages.error("Fout bij het aanmaken van een nieuwe werkopdracht.");
+						LOG.error("Can not create WerkOpdracht.", e);
+
+					} catch (IllegalAccessException e) {
+						LOG.error("Can not access WerkOpdracht.", e);
+					}
+				}
+			}
+		}
 	}
 }
