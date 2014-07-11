@@ -95,7 +95,7 @@ public abstract class NetwerkBord extends Bord {
 	// @NotEditable
 	private RichtingEnum richting;
 
-	@NotSearchable
+	// @NotSearchable
 	@ModelClassName("Traject")
 	@Target("_blank")
 	private List<ResourceIdentifier> segmenten;
