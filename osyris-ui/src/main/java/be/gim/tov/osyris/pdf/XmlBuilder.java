@@ -92,6 +92,16 @@ public class XmlBuilder {
 
 	protected Collection<String> imageKeys = new ArrayList<String>();
 
+	private Bord nearestBord;
+
+	public Bord getNearestBord() {
+		return nearestBord;
+	}
+
+	public void setNearestBord(Bord nearestBord) {
+		this.nearestBord = nearestBord;
+	}
+
 	/**
 	 * Opbouwen van bordfiches in XML. Voor elk Bord wordt een individuele fiche
 	 * opgemaakt.
@@ -974,17 +984,25 @@ public class XmlBuilder {
 	 * @throws IllegalAccessException
 	 * @throws InstantiationException
 	 * @throws DOMException
+	 * @throws IOException
 	 */
 	public Document buildWerkOpdrachtFicheAnderProbleem(MapViewer viewer,
 			Traject traject, WerkOpdracht object)
 			throws ParserConfigurationException, TransformerException,
-			DOMException, InstantiationException, IllegalAccessException {
+			DOMException, InstantiationException, IllegalAccessException,
+			IOException {
 
 		DocumentBuilderFactory docFactory = DocumentBuilderFactory
 				.newInstance();
 		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
 		int counter = 1;
+		FeatureMapLayer layer = null;
+
+		AnderProbleem anderProbleem = null;
+		if (object.getProbleem() instanceof AnderProbleem) {
+			anderProbleem = (AnderProbleem) object.getProbleem();
+		}
 
 		// root element
 		Document doc = docBuilder.newDocument();
@@ -1077,6 +1095,25 @@ public class XmlBuilder {
 		}
 		rootElement.appendChild(gemeente);
 
+		// STRAAT
+		Element straat = doc.createElement("straat");
+		// Dichtsbijzijnde bord zoeken
+		nearestBord = Beans.getReference(OsyrisModelFunctions.class)
+				.getNearestBord(anderProbleem.getGeom(), object.getTraject());
+		if (nearestBord != null) {
+			String straatWO = nearestBord.getStraatnaam();
+			// Init BordLayer
+			layer = (FeatureMapLayer) viewer.getContext().getLayer(
+					LabelUtils.lowerCamelCase(nearestBord.getModelClass()
+							.getName()));
+			viewer.setLayerVisibility(layer, false);
+
+			if (straatWO != null) {
+				straat.appendChild(doc.createTextNode(straatWO));
+			}
+		}
+		rootElement.appendChild(straat);
+
 		// TYPE TRAJECT
 		Element trajectType = doc.createElement("trajecttype");
 		if (object.getTrajectType() != null) {
@@ -1091,9 +1128,7 @@ public class XmlBuilder {
 
 			foto.appendChild(doc.createTextNode(Base64.encode(object
 					.getProbleem().getFoto())));
-		}
-
-		else {
+		} else {
 			foto.appendChild(doc.createTextNode(getUrlGeenFoto()));
 		}
 		rootElement.appendChild(foto);
@@ -1101,20 +1136,24 @@ public class XmlBuilder {
 		// ORTHO KAART
 		Element mapOrthoAnderProbleem = doc
 				.createElement("mapOrthoAnderProbleem");
-		mapOrthoAnderProbleem.appendChild(doc
-				.createTextNode(getMapAnderProbleem(viewer,
-						object.getProbleem(), true)));
+		mapOrthoAnderProbleem
+				.appendChild(doc.createTextNode(getMapAnderProbleem(viewer,
+						anderProbleem, true)));
 		rootElement.appendChild(mapOrthoAnderProbleem);
 
 		// TOPO KAART
 		Element mapTopoAnderProbleem = doc
 				.createElement("mapTopoAnderProbleem");
 		mapTopoAnderProbleem.appendChild(doc
-				.createTextNode(getMapAnderProbleem(viewer,
-						object.getProbleem(), false)));
+				.createTextNode(getMapAnderProbleem(viewer, anderProbleem,
+						false)));
 		rootElement.appendChild(mapTopoAnderProbleem);
 
 		viewer.setBaseLayerId("tms");
+		if (nearestBord != null) {
+			viewer.setLayerVisibility(layer, true);
+		}
+		nearestBord = null;
 
 		return doc;
 	}
@@ -1185,25 +1224,33 @@ public class XmlBuilder {
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	private String getMapAnderProbleem(MapViewer viewer, Probleem probleem,
-			boolean hasOrthoBasemap) throws InstantiationException,
-			IllegalAccessException {
+	private String getMapAnderProbleem(MapViewer viewer,
+			AnderProbleem anderProbleem, boolean hasOrthoBasemap)
+			throws InstantiationException, IllegalAccessException {
 
-		double scale = SCALE_ORTHO;
+		double scale = SCALE_TOPO * 2;
+		Coordinate[] coordinates = null;
+		GeometryFactory factory = new GeometryFactory();
+		LineString line = null;
+		Coordinate centerPoint;
 
 		if (!hasOrthoBasemap) {
 			viewer.setBaseLayerId("navstreet");
-			scale = SCALE_TOPO;
+			scale = SCALE_TOPO * 3;
 		}
 
-		AnderProbleem anderProbleem = null;
-
-		if (probleem instanceof AnderProbleem) {
-
-			anderProbleem = (AnderProbleem) probleem;
+		// Map centreren op het punt tussen het anderProbleempunt en het
+		// dichtstbijzijnde bord indien aanwezig
+		if (nearestBord != null) {
+			coordinates = new Coordinate[] {
+					anderProbleem.getGeom().getCoordinate(),
+					nearestBord.getGeom().getCoordinate() };
+			line = factory.createLineString(coordinates);
+			centerPoint = line.getCentroid().getCoordinate();
+		} else {
+			centerPoint = anderProbleem.getGeom().getCoordinate();
 		}
 
-		Coordinate centerPoint = anderProbleem.getGeom().getCoordinate();
 		int width = 450;
 		int height = 300;
 
@@ -1211,7 +1258,6 @@ public class XmlBuilder {
 		double worldHeight = GeometryUtils.pixelsToWorld(height, scale, DPI);
 
 		CoordinateReferenceSystem crs = viewer.getContext().getCrs();
-
 		Envelope boundingBox = new ReferencedEnvelope(centerPoint.x
 				- worldWidth / 2, centerPoint.x + worldWidth / 2, centerPoint.y
 				- worldHeight / 2, centerPoint.y + worldHeight / 2, crs);
@@ -1223,7 +1269,7 @@ public class XmlBuilder {
 		// Terugzetten naar tms baseLayer
 		viewer.setBaseLayerId("tms");
 
-		return getImage(probleem, mapImage);
+		return getImage(anderProbleem, mapImage);
 	}
 
 	/**

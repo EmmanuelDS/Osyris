@@ -87,6 +87,13 @@
 						     select="/opdracht/gemeente">
 						</xsl:value-of>
 			    </fo:block>
+			   
+				<fo:block space-after="8pt">
+			        <fo:inline font-weight="bold"><xsl:text>Straat dichtstbijzijnde bord: </xsl:text></fo:inline>
+			          	<xsl:value-of
+						     select="/opdracht/straat">
+						</xsl:value-of>
+			    </fo:block>
 			        
 				<xsl:if test="//@segment='true'">
 			        <fo:block space-after="8pt">

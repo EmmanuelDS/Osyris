@@ -1673,9 +1673,6 @@ public class OsyrisModelFunctions {
 			query.addFilter(FilterUtils.intersects(bord.getGeom().buffer(
 					BUFFER_BORD_METER)));
 
-			// Alternatief Query op regio
-			// query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
-
 			List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
 					.searchObjects(query, false, false);
 
@@ -1707,6 +1704,8 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Zoeken van van de naam van het dichtsbijzijnde WNW NetwerkSegment bij een
+	 * NetwerkKnooppunt.
 	 * 
 	 * @param knooppunt
 	 * @return
@@ -1725,9 +1724,6 @@ public class OsyrisModelFunctions {
 			// Query op buffer 300m rond knooppunt
 			query.addFilter(FilterUtils.intersects(knooppunt.getGeom().buffer(
 					BUFFER_KNOOPPUNT_METER)));
-
-			// Alternatief Query op regio
-			// query.addFilter(FilterUtils.equal("regio", bord.getRegio()));
 
 			List<NetwerkSegment> segmenten = (List<NetwerkSegment>) modelRepository
 					.searchObjects(query, false, false);
@@ -1758,6 +1754,64 @@ public class OsyrisModelFunctions {
 			}
 		}
 		return naam;
+	}
+
+	public Bord getNearestBord(Geometry geom, ResourceIdentifier traject)
+			throws IOException {
+
+		if (geom != null) {
+			Traject t = (Traject) modelRepository.loadObject(traject);
+
+			DefaultQuery query = new DefaultQuery();
+
+			if (t instanceof Route) {
+				query.setModelClassName(t.getModelClass().getName()
+						.concat("Bord"));
+				query.addFilter(FilterUtils.equal("route", traject));
+			}
+
+			if (t instanceof NetwerkSegment) {
+				query.setModelClassName(t.getModelClass().getName()
+						.replace("Segment", "Bord"));
+				// query.addFilter(FilterUtils.in("segmenten", segmentIds));
+			}
+
+			if (t instanceof NetwerkLus) {
+				query.setModelClassName(t.getModelClass().getName()
+						.replace("Lus", "Bord"));
+				// query.addFilter(FilterUtils.in("segmenten", segmentIds));
+			}
+
+			// Query op buffer 3000m rond het AnderProbleem punt
+			query.addFilter(FilterUtils.intersects(geom
+					.buffer(BUFFER_BORD_METER)));
+
+			List<Bord> borden = (List<Bord>) modelRepository.searchObjects(
+					query, false, false);
+
+			Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
+
+			for (Bord bord : borden) {
+				double distance = DistanceOp.distance(geom, bord.getGeom());
+				distances.put(modelRepository.getResourceIdentifier(bord),
+						distance);
+			}
+
+			if (!borden.isEmpty()) {
+
+				double minValueInMap = (Collections.min(distances.values()));
+
+				for (Entry<ResourceIdentifier, Double> entry : distances
+						.entrySet()) {
+					if (entry.getValue() == minValueInMap) {
+
+						ResourceIdentifier minBordId = entry.getKey();
+						return (Bord) modelRepository.loadObject(minBordId);
+					}
+				}
+			}
+		}
+		return null;
 	}
 
 	/**
