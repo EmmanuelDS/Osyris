@@ -10,11 +10,15 @@ import org.conscientia.api.model.event.ModelEvent;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.search.QueryBuilder;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.collections.CollectionUtils;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
+import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
+import be.gim.tov.osyris.model.traject.Regio;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -36,6 +40,7 @@ public class NetwerkLusSaveListener {
 		builder.addFilter(FilterUtils.in("id", CollectionUtils.transform(
 				lus.getSegmenten(), new Transformer() {
 
+					@Override
 					public Object transform(Object input) {
 						return new Long(((ResourceKey) input).getIdPart());
 					}
@@ -45,5 +50,18 @@ public class NetwerkLusSaveListener {
 				builder.build(), false, false);
 
 		lus.setGeom(GeometryUtils.union(geoms));
+
+		// Automatisch setten Regio
+		Regio regio = Beans.getReference(OsyrisModelFunctions.class)
+				.getRegioForTraject(lus);
+		if (regio != null) {
+			lus.setRegio(modelRepository.getResourceKey(regio));
+		}
+
+		// Automatically set naam
+		String naam = LabelUtils.upperSpaced(lus.getModelClass().getName()
+				.replace("Netwerk", "").toLowerCase())
+				+ " " + regio.getNaam() + " " + lus.getId().toString();
+		lus.setNaam(naam);
 	}
 }
