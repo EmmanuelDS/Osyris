@@ -62,6 +62,7 @@ import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
+import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
@@ -128,6 +129,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected WerkOpdracht[] selectedOpdrachten;
 	protected ValidatieStatus validatieStatus;
 	protected ResourceIdentifier trajectId;
+	protected String baseLayerName;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -200,6 +202,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	public void setTrajectId(ResourceIdentifier trajectId) {
 		this.trajectId = trajectId;
+	}
+
+	public String getBaseLayerName() {
+		return baseLayerName;
+	}
+
+	public void setBaseLayerName(String baseLayerName) {
+		this.baseLayerName = baseLayerName;
 	}
 
 	// METHODS
@@ -823,6 +833,17 @@ public class WerkOpdrachtOverzichtFormBase extends
 				layer.setHidden(false);
 			}
 		}
+
+		// Ortho TMS als default achtergrondlaag
+		for (RasterMapLayer baseLayer : context.getBaseRasterLayers()) {
+
+			baseLayer.setHidden(true);
+
+			if (baseLayer.getLayerId().equalsIgnoreCase("tms")) {
+				baseLayer.setHidden(false);
+				baseLayerName = baseLayer.getLayerId();
+			}
+		}
 	}
 
 	/**
@@ -954,8 +975,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 			Bord bord = (Bord) modelRepository
 					.loadObject(((BordProbleem) object.getProbleem()).getBord());
 
-			bordSelection.add(bord.getId().toString());
-			bordLayer.setSelection(bordSelection);
+			// In geval dat bord verwijderd is
+			if (bord != null) {
+				bordSelection.add(bord.getId().toString());
+				bordLayer.setSelection(bordSelection);
+			}
 			context.setBoundingBox(getEnvelopeProbleem(object.getProbleem(),
 					context));
 
@@ -1026,6 +1050,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			trajectLayer.setHidden(false);
 
+			// Init BordLayer
+			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+							.getModelClass().getName().replace("Segment", "")
+							+ "Bord")));
+
 			// Tonen knooppunten bij segment
 			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
 					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
@@ -1038,12 +1068,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			// BordProbleem
 			if (object.getProbleem() instanceof BordProbleem) {
-
-				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
-						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
-								.getModelClass().getName()
-								.replace("Segment", "")
-								+ "Bord")));
 
 				bordLayer.setHidden(false);
 				bordLayer.setFilter(FilterUtils.equal("segmenten",
@@ -1067,6 +1091,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 				AnderProbleem anderProbleem = (AnderProbleem) object
 						.getProbleem();
 				anderProbleemGeoms.add(anderProbleem.getGeom());
+
+				// Toon borden bij segment
+				bordLayer.setFilter(FilterUtils.equal("segmenten",
+						modelRepository.getResourceIdentifier(traject)));
+				bordLayer.setHidden(false);
 
 				if (anderProbleem.getGeom() instanceof Point) {
 					geomLayer.setGeometries(anderProbleemGeoms);
@@ -1247,5 +1276,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 			in.close();
 			out.close();
 		}
+	}
+
+	/**
+	 * Switchen tussen basislagen
+	 * 
+	 */
+	public void switchBaseLayers() {
+		getViewer().setBaseLayerId(baseLayerName);
 	}
 }

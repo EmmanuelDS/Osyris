@@ -2,8 +2,10 @@ package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.List;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -34,6 +36,8 @@ import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkSegment;
+import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.Traject;
 
 import com.vividsolutions.jts.geom.Envelope;
@@ -222,6 +226,30 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 						traject.getNaam()));
 			}
 
+			// TonenNetwerkKnooppunten indien Segment
+			if (traject instanceof NetwerkSegment) {
+
+				NetwerkSegment segment = (NetwerkSegment) traject;
+				FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
+						.getLayer(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName()
+								.replace("Segment", "Knooppunt")));
+
+				if (knooppuntLayer != null) {
+
+					List<String> ids = new ArrayList<String>();
+
+					ids.add(segment.getVanKnooppunt().getIdPart());
+					ids.add(segment.getNaarKnooppunt().getIdPart());
+
+					knooppuntLayer.setHidden(false);
+					knooppuntLayer.setFilter(FilterUtils.and(FilterUtils
+							.id(ids)));
+
+					ids = null;
+				}
+			}
+
 			Probleem probleem = object.getProbleem();
 
 			if (probleem instanceof BordProbleem) {
@@ -229,26 +257,56 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 				Bord bord = (Bord) modelRepository
 						.loadObject(((BordProbleem) probleem).getBord());
 
-				FeatureMapLayer probleemLayer = (FeatureMapLayer) context
-						.getLayer(LabelUtils.lowerCamelCase(bord
-								.getModelClass().getName()));
-				if (probleemLayer != null) {
-					probleemLayer.setHidden(false);
-					probleemLayer.setFilter(FilterUtils.equal("naam",
-							bord.getNaam()));
+				Envelope envelope = null;
 
-					probleemLayer.setSelection(Collections.singletonList(bord
-							.getId().toString()));
+				// Checken of Bord niet verwijderd is
+				if (bord != null) {
+					FeatureMapLayer probleemLayer = (FeatureMapLayer) context
+							.getLayer(LabelUtils.lowerCamelCase(bord
+									.getModelClass().getName()));
+					if (probleemLayer != null) {
+						probleemLayer.setHidden(false);
+						probleemLayer.setFilter(FilterUtils.equal("naam",
+								bord.getNaam()));
 
-					Envelope envelope = GeometryUtils.getEnvelope(bord
-							.getGeom());
-					GeometryUtils.expandEnvelope(envelope, 0.1,
-							context.getMaxBoundingBox());
+						probleemLayer.setSelection(Collections
+								.singletonList(bord.getId().toString()));
+
+						envelope = GeometryUtils.getEnvelope(bord.getGeom());
+						GeometryUtils.expandEnvelope(envelope, 0.05,
+								context.getMaxBoundingBox());
+
+					} else {
+						envelope = GeometryUtils.getEnvelope(traject.getGeom());
+					}
 					context.setBoundingBox(envelope);
 				}
 			} else if (probleem instanceof AnderProbleem) {
 				// Ander Probleem
 				AnderProbleem anderProbleem = (AnderProbleem) probleem;
+
+				// Bepalen bordLayer voor Routes of Segmenten
+				String bordLayerName = null;
+
+				if (traject instanceof Route) {
+					bordLayerName = LabelUtils.lowerCamelCase(traject
+							.getModelClass().getName().concat("Bord"));
+				}
+
+				if (traject instanceof NetwerkSegment) {
+					bordLayerName = LabelUtils.lowerCamelCase(traject
+							.getModelClass().getName()
+							.replace("Segment", "Bord"));
+				}
+				// Tonen borden
+				FeatureMapLayer bordLayer = (FeatureMapLayer) context
+						.getLayer(bordLayerName);
+
+				if (bordLayer != null) {
+					bordLayer.setHidden(false);
+					bordLayer.setFilter(FilterUtils.equal("naam",
+							traject.getNaam()));
+				}
 
 				GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
 						.createGeometryLayer(configuration.getContext(),

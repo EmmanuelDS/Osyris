@@ -36,6 +36,7 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
+import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
@@ -98,6 +99,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected GebruiktMateriaal selectedMateriaal;
 	protected ResourceIdentifier trajectId;
 	protected boolean hasErrors;
+	protected String baseLayerName;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -178,6 +180,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public void setHasErrors(boolean hasErrors) {
 		this.hasErrors = hasErrors;
+	}
+
+	public String getBaseLayerName() {
+		return baseLayerName;
+	}
+
+	public void setBaseLayerName(String baseLayerName) {
+		this.baseLayerName = baseLayerName;
 	}
 
 	// METHODS
@@ -631,6 +641,17 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 				layer.setHidden(false);
 			}
+
+			// Ortho TMS als default achtergrondlaag
+			for (RasterMapLayer baseLayer : context.getBaseRasterLayers()) {
+
+				baseLayer.setHidden(true);
+
+				if (baseLayer.getLayerId().equalsIgnoreCase("tms")) {
+					baseLayer.setHidden(false);
+					baseLayerName = baseLayer.getLayerId();
+				}
+			}
 		}
 	}
 
@@ -716,12 +737,20 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			Bord bord = (Bord) modelRepository
 					.loadObject(((BordProbleem) selectedWerkOpdracht
 							.getProbleem()).getBord());
-			bordSelection.add(bord.getId().toString());
-			bordLayer.setSelection(bordSelection);
 
-			Envelope envelope = GeometryUtils.getEnvelope(bord.getGeom());
-			GeometryUtils.expandEnvelope(envelope, 0.1,
-					context.getMaxBoundingBox());
+			Envelope envelope = null;
+
+			// Checken of Bord niet verwijderd is
+			if (bord != null) {
+				bordSelection.add(bord.getId().toString());
+				bordLayer.setSelection(bordSelection);
+				envelope = GeometryUtils.getEnvelope(bord.getGeom());
+				GeometryUtils.expandEnvelope(envelope, 0.05,
+						context.getMaxBoundingBox());
+			} else {
+				envelope = GeometryUtils.getEnvelope(traject.getGeom());
+			}
+
 			context.setBoundingBox(envelope);
 
 		} else if (selectedWerkOpdracht.getProbleem() instanceof AnderProbleem) {
@@ -747,7 +776,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 			Envelope envelope = GeometryUtils.getEnvelope(anderProbleem
 					.getGeom());
-			GeometryUtils.expandEnvelope(envelope, 0.1,
+			GeometryUtils.expandEnvelope(envelope, 0.05,
 					context.getMaxBoundingBox());
 			context.setBoundingBox(envelope);
 		}
@@ -919,5 +948,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		}
 
 		return rondeIds;
+	}
+
+	/**
+	 * Switchen tussen basislagen
+	 * 
+	 */
+	public void switchBaseLayers() {
+		getViewer().setBaseLayerId(baseLayerName);
 	}
 }

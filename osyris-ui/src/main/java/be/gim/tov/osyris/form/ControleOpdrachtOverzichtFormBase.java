@@ -2019,7 +2019,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 				// Bord Probleem
 				Bord bord = (Bord) modelRepository
 						.loadObject(((BordProbleem) probleem).getBord());
-				bordSelection.add(bord.getId().toString());
+
+				if (bord != null) {
+					bordSelection.add(bord.getId().toString());
+				}
 
 			} else if (probleem instanceof AnderProbleem) {
 				// Ander Probleem
@@ -2050,7 +2053,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Switchen tussen basislagen voor PetersMeters.
+	 * Switchen tussen basislagen
 	 * 
 	 */
 	public void switchBaseLayers() {
@@ -2199,7 +2202,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 						}
 						modelRepository.saveObject(werkOpdracht);
-						messages.info("Nieuwe werkopdracht succesvol aangemaakt.");
+						messages.info("Nieuwe werkopdracht(en) succesvol aangemaakt.");
 
 					} catch (IOException e) {
 						messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
