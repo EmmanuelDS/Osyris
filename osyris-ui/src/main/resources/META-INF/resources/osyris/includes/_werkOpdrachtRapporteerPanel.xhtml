@@ -29,7 +29,7 @@
 	</d:fields>
 <!-- 	</r:panel> -->
 	<br/>
-<!-- 	<r:panel id="handelingenPanel"> -->
+	<a:outputPanel id="handelingenPanel">
 	<d:fields>
 		<d:field for="handelingen" label="Handelingen">
 			<d:propertyValue id="handelingen"
@@ -38,9 +38,9 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-<!-- 	</r:panel> -->
+	</a:outputPanel>
 	<br/>
-<!-- 	<r:panel id="commentaarTOVPanel"> -->
+	<a:outputPanel id="commentaarTOVPanel">
 	<d:fields>
 		<d:field for="commentaarTOV" label="Commentaar TOV">
 			<d:propertyValue id="commentaarTOV"
@@ -49,9 +49,16 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-<!-- 	</r:panel> -->
+	</a:outputPanel>
 	<br/>
-<!-- 	<r:panel id="commentaarPanel"> -->
+	
+<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
+		<u:decorate
+			template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+	<br/>
+	<a:outputPanel id="commentaarPanel">
 	<d:fields>
 		<d:field for="commentaar" label="Commentaar uitvoerder">
 			<d:propertyValue id="commentaar"
@@ -60,14 +67,9 @@
 					mode="EDIT" />
 		</d:field>
 	</d:fields>
-<!-- 	</r:panel> -->
-	<br/>
-<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
-		<u:decorate
-			template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
-			<u:param name="form" value="#{form}" />
-		</u:decorate>
+    </a:outputPanel>
 	</r:panel>
+	
 <!-- 	<br/> -->
 <!-- 	<r:panel id="fotoPanel"> -->
 <!-- 	<d:fields>				 -->
@@ -94,6 +96,10 @@
 				</m:mapViewer>
 			</div>
 		</r:panel>
+		<u:decorate
+			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
 	</td>
 	</tr>
 	</table>

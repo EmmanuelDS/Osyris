@@ -14,9 +14,9 @@
 		
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
-	<table width="1050px">
+	<table width="100%">
 	<tr>
-	<td width="525px" valign="top">
+	<td width="50%" valign="top">
 	<r:panel id="ProblemenPanel" header="Problemen">	
 	<j:renderPanel id="problemPanel">
 	Kies type probleem:<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
@@ -121,7 +121,7 @@
    	</j:renderPanel>
    	</r:panel>
    	<br/>
-   	<r:panel>
+   	<r:panel header="Terreinbezoek">
   		<d:fields>
    		<d:field label="Datum terreinbezoek" for="datumTerreinBezoek">	 
 		<d:propertyValue id="datumTerreinBezoek" 
@@ -132,9 +132,9 @@
 	</d:fields>
 	</r:panel>
 	</td>
-	<td width="525px" valign="top">
+	<td width="50%" valign="top">
 		<r:panel>
-			<div style="height: 500px">
+			<div style="height: 50%">
 				<m:mapViewer id="viewer"
 					configuration="#{form.configuration}">
 					<j:controllerListener name="selectedFeatures"
@@ -144,6 +144,7 @@
 				</m:mapViewer>
 			</div>
 		</r:panel>
+		<br/>
 		<u:decorate
 			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
 			<u:param name="form" value="#{form}" />

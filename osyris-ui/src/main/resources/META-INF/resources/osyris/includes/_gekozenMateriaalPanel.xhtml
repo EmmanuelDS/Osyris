@@ -70,7 +70,7 @@
 				value="Materiaal toevoegen aan Werkopdracht"
 				type="button"
 				title="#{messages['page.actions.view.label']}"
-				render="#{r:clientId('gebruiktMateriaalPanel')}"
+				render="#{r:clientId('stockMaterialen')}"
 				action="#{stockMateriaalOverzichtFormBase.createGebruiktMateriaal(form.selectedWerkOpdracht)}"
 				oncomplete="conscientia.widget(#{r:element('gekozenMateriaalPopup')}).hide(); conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).show();" />
 	</d:buttons>

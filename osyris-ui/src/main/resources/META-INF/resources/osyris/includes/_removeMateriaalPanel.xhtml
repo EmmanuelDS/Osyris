@@ -19,7 +19,7 @@
 				image="#{resource['core/images/actions/12x12/delete.png']}"
 				type="button" 
 				action="#{form.removeMateriaalFromWerkOpdracht()}"
-				render="#{r:clientId('gebruiktMateriaalPanel')}"
+				render="#{r:clientId('stockMaterialen')}"
 				oncomplete="conscientia.widget(#{r:element('removeMateriaalPopup')}).hide();" />
 			<j:commandButton value="#{messages['form.general.cancel.button']}"
 				type="button"

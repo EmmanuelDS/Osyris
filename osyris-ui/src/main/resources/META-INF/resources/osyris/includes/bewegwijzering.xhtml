@@ -10,7 +10,7 @@
 	xmlns:q="http://specto.gim.be/search"
 	xmlns:p="http://primefaces.org/ui">
 	
-	<r:panel>
+	<a:outputPanel>
 	<p:dataTable id="verslag"
 		value="#{form.createBewegwijzering(form.object.traject)}"
 		mode="RESULT" 
@@ -113,5 +113,5 @@
 				value="#{bord.paalConst }" mode="VIEW" />
 		</p:column>
 	</p:dataTable>
-	</r:panel>
+	</a:outputPanel>
 </u:composition>

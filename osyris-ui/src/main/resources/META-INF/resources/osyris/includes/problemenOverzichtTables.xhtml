@@ -10,7 +10,7 @@
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
 
-	<r:panel id="problemenOverzichtPanel">
+	<a:outputPanel id="problemenOverzichtPanel">
 		<p:dataTable id="bordProblemen"
 			value="#{form.bordProblemen}"
 			mode="RESULT"
@@ -27,13 +27,15 @@
 			<f:facet name="header">
 				<h:outputText value="Bordproblemen" />
 			</f:facet>
+			
 			<p:column style="width:55px;">
 				<j:commandButton
+					rendered="#{bordProbleem.bord != null}"
 					src="#{resource['core/images/actions/16x16/zoom.png']}"
 					type="image"
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToBordProbleem(bordProbleem)}" />
-				<j:commandButton rendered="#{form.object.status == 'UIT_TE_VOEREN'}"
+				<j:commandButton rendered="#{bordProbleem.bord != null and form.object.status == 'UIT_TE_VOEREN'}"
 					src="#{resource['core/images/actions/16x16/delete.png']}"
 					type="image"
 					title="Probleem verwijderen"
@@ -42,31 +44,34 @@
 								target="#{form.selectedProbleem}"
 								value="#{bordProbleem}" />
 							</j:commandButton>
-	   		</p:column>
-	   		<c:if test="#{form.isRouteBord(bordProbleem.bord)}">
-	   		<p:column style="width:30px;">
+	   		</p:column>	   		   		
+	   		<p:column style="width:30px;" rendered="#{form.object.trajectType.contains('route')}">
 				<f:facet name="header">
 				<h:outputText value="VolgNr" />
 				</f:facet>
-					<h:outputText value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
+					<h:outputText
+						rendered="#{bordProbleem.bord != null and form.isRouteBord(bordProbleem.bord)}"
+						value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
 			</p:column>
-			</c:if>
-			<c:if test="#{!form.isRouteBord(bordProbleem.bord)}">
-			<p:column>
+			<p:column style="width:35px;">
 				<f:facet name="header">
 				<h:outputText value="Bord ID" />
 				</f:facet>
-					<h:outputText value= "#{d:modelObject(bordProbleem.bord).getId()}" mode="VIEW" />
+					<h:outputText 
+						rendered="#{bordProbleem.bord != null}"
+						value= "#{d:modelObject(bordProbleem.bord).getId()}" mode="VIEW" />
 			</p:column>
-			</c:if>
+			
 			<p:column>
 				<f:facet name="header">
 				<h:outputText value="Type" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
 					value="#{bordProbleem.type}"
 					mode="VIEW" />
+					</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
@@ -177,5 +182,5 @@
 				</j:commandButton>
 			</p:column>
    		</p:dataTable>
-	</r:panel>
+	</a:outputPanel>
 </u:composition>

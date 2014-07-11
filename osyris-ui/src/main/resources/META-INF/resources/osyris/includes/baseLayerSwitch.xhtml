@@ -9,7 +9,7 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 
-	<r:panel id="backgroundLayerPanel" header="Achtergrondlaag" rendered="#{identity.inGroup('PeterMeter','CUSTOM') or identity.inGroup('admin', 'CUSTOM')}">
+	<r:panel id="backgroundLayerPanel" header="Achtergrondlaag">
 			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
         	<h:selectOneRadio id="options" value="#{form.baseLayerName}">  
 	            <f:selectItem itemLabel="Orthofoto" itemValue="tms" />  

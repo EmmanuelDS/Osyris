@@ -7,10 +7,11 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:j="http://conscientia.org/jsf" 
 	xmlns:m="http://specto.gim.be/map"
-	xmlns:p="http://primefaces.org/ui">
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	
-	<r:panel id="bordProbleemPanel" rendered="#{form.isBordProbleem(form.object.probleem)}">
-		<p:dataTable id="bordProbleem"
+	<a:outputPanel id="bordProbleemPanel" rendered="#{form.isBordProbleem(form.object.probleem)}">
+		<p:dataTable id="bordProbleemTable"
 			value="#{form.object.probleem}"
 			mode="RESULT"
 			var="bordProbleem"
@@ -21,7 +22,8 @@
 			<f:facet name="header">
 				<h:outputText value="Bordprobleem" />
 			</f:facet>
-			<p:column style="width:2%" rendered="#{bordProbleem.geom != null}">
+			<c:if test="#{bordProbleem.bord != null}">
+			<p:column style="width:2%">
 				<j:commandButton
 					value="Zoom naar Probleem"
 					src="#{resource['core/images/actions/16x16/zoom.png']}"
@@ -41,6 +43,7 @@
 				</f:facet>
 					<h:outputText value="#{osyrisModelFunctions.getBordStraat(bordProbleem.bord) }" mode="VIEW" />
 			</p:column>
+			</c:if>
 			<p:column>
 				<f:facet name="header">
 				<h:outputText value="Type" />
@@ -71,8 +74,8 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-	</r:panel>
-	<r:panel id="AnderProbleemPanel" rendered="#{!form.isBordProbleem(form.object.probleem)}" >
+	</a:outputPanel>
+	<a:outputPanel id="AnderProbleemPanel" rendered="#{!form.isBordProbleem(form.object.probleem)}" >
 	<p:dataTable id="AnderProbleem"
 			value="#{form.object.probleem}"
 			mode="RESULT"
@@ -121,5 +124,5 @@
 					value="#{anderProbleem.status}" mode="VIEW" />
 			</p:column>
    		</p:dataTable>
-   		</r:panel>
+   		</a:outputPanel>
 	</u:composition>
