@@ -13,10 +13,9 @@
 		icon="#{resources['core/images/actions/16x16/view.png']}"
 		modal="true"
 		resizable="false"
-		width="1100"
-		height="700"
 		onShow="#{r:component('viewInclude')}.show();"
-		onHide="#{r:component('viewInclude')}.hide();">
+		onHide="#{r:component('viewInclude')}.hide();"
+		style="max-height:100% !important; right:20% !important; left:20% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="viewInclude"
 			src="/resources/osyris/includes/_meldingViewPanel.xhtml">
@@ -28,11 +27,10 @@
 		header="Valideren #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
-		width="1100"
-		height="700"
 		resizable="false"
 		onShow="#{r:component('valideerInclude')}.show();"
-		onHide="#{r:component('valideerInclude')}.hide();">
+		onHide="#{r:component('valideerInclude')}.hide();"
+		style="max-height:100% !important; right:20% !important; left:20% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="valideerInclude"
 			src="/resources/osyris/includes/_meldingValideerPanel.xhtml">
@@ -46,9 +44,9 @@
 		icon="#{resources['core/images/actions/16x16/delete.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
 		onShow="#{r:component('deleteInclude')}.show();"
-		onHide="#{r:component('deleteInclude')}.hide();">
+		onHide="#{r:component('deleteInclude')}.hide();"
+		style="max-height:100% !important; right:30% !important; left:30% !important; top:10% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="deleteInclude"
 			src="/resources/core/includes/_deletePanel.xhtml">

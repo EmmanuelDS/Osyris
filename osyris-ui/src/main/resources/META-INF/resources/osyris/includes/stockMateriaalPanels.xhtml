@@ -14,10 +14,9 @@
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
-		height="400"
 		onShow="#{r:component('editVoorraadInclude')}.show();"
-		onHide="#{r:component('editVoorraadInclude')}.hide();">
+		onHide="#{r:component('editVoorraadInclude')}.hide();"
+		style="max-height:100% !important; right:30% !important; left:30% !important; top:20% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="editVoorraadInclude"
 			src="/resources/osyris/includes/_editVoorraadPanel.xhtml">

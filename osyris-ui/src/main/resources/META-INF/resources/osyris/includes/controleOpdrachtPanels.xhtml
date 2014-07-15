@@ -31,7 +31,7 @@
 		resizable="false"
 		onShow="#{r:component('createInclude2')}.show();"
 		onHide="#{r:component('createInclude2')}.hide();"
-		style="width:80% !important; bottom:5% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="createInclude2"
 			src="/resources/osyris/includes/_controleOpdrachtCreatePanel2.xhtml">
@@ -47,7 +47,7 @@
 		resizable="false"
 		onShow="#{r:component('viewInclude')}.show();"
 		onHide="#{r:component('viewInclude')}.hide();"
-		style="width:80% !important; bottom:5% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="viewInclude"
 			src="/resources/osyris/includes/_controleOpdrachtViewPanel.xhtml">
@@ -63,7 +63,7 @@
 		resizable="false"
 		onShow="#{r:component('controleerInclude')}.show();"
 		onHide="#{r:component('controleerInclude')}.hide();"
-		style="width:80% !important; bottom:5% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="controleerInclude"
 			src="/resources/osyris/includes/_controleOpdrachtControleerPanel.xhtml">
@@ -79,7 +79,7 @@
 		resizable="false"
 		onShow="#{r:component('rapporteerInclude')}.show();"
 		onHide="#{r:component('rapporteerInclude')}.hide();"
-		style="width:80% !important; bottom:5% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="rapporteerInclude"
 			src="/resources/osyris/includes/_controleOpdrachtRapporteerPanel.xhtml">
@@ -95,7 +95,7 @@
 		resizable="false"
 		onShow="#{r:component('valideerInclude')}.show();"
 		onHide="#{r:component('valideerInclude')}.hide();"
-		style="width:80% !important; bottom:5% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="valideerInclude"
 			src="/resources/osyris/includes/_controleOpdrachtValideerPanel.xhtml">
@@ -109,9 +109,9 @@
 		icon="#{resources['core/images/actions/16x16/delete.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
 		onShow="#{r:component('deleteInclude')}.show();"
-		onHide="#{r:component('deleteInclude')}.hide();">
+		onHide="#{r:component('deleteInclude')}.hide();"
+		style="max-height:90% !important; right:30% !important; left:30% !important; top:10% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="deleteInclude"
 			src="/resources/core/includes/_deletePanel.xhtml">
@@ -182,6 +182,22 @@
 			<j:lazyInclude id="confirmInclude"
 				src="/resources/osyris/includes/_confirmControleOpdrachtenPanel.xhtml">
 				<f:param name="form" value="#{form}" />
+			</j:lazyInclude>
+		</p:dialog>
+	<p:dialog id="confirmVerzendenPopup" 
+				header="Bevestigen verzenden controleopdracht"
+				icon="#{resources['core/images/actions/16x16/next.png']}"
+				show="true"
+				modal="true"
+				width="600"
+				resizable="false"
+				onShow="#{r:component('confirmVerzendenInclude')}.show();"
+				onHide="#{r:component('confirmVerzendenInclude')}.hide();">
+			<j:relocate />
+			<j:lazyInclude id="confirmVerzendenInclude"
+				src="/resources/osyris/includes/_confirmVerzendenPanel.xhtml">
+				<f:param name="form" value="#{form}" />
+				<f:param name="render" value="#{render}" />
 			</j:lazyInclude>
 		</p:dialog>
 </u:composition>

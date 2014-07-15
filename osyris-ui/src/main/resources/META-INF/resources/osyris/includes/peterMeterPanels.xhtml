@@ -13,11 +13,10 @@
 		header="#{messages['page.create.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/create.png']}"
 		modal="true"
-		height="500"
-		width="900"
 		resizable="false"
 		onShow="#{r:component('createInclude')}.show();"
-		onHide="#{r:component('createInclude')}.hide();">
+		onHide="#{r:component('createInclude')}.hide();"
+		style="max-height:100% !important; right:30% !important; left:30% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="createInclude"
 			src="/resources/osyris/includes/_peterMeterCreatePanel.xhtml">
@@ -30,10 +29,10 @@
 		header="#{messages['page.view.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/view.png']}"
 		modal="true"
-		height="500"
 		resizable="false"
 		onShow="#{r:component('viewInclude')}.show();"
-		onHide="#{r:component('viewInclude')}.hide();">
+		onHide="#{r:component('viewInclude')}.hide();"
+		style="max-height:100% !important; right:30% !important; left:30% !important; top:10% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="viewInclude"
 			src="/resources/core/includes/_viewPanel.xhtml">
@@ -45,11 +44,10 @@
 		header="#{messages['page.edit.title']} #{form.modelClass.label}"
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
-		height="500"
-		width="900"
 		resizable="false"
 		onShow="#{r:component('editInclude')}.show();"
-		onHide="#{r:component('editInclude')}.hide();">
+		onHide="#{r:component('editInclude')}.hide();"
+		style="max-height:100% !important; right:30% !important; left:30% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="editInclude"
 			src="/resources/osyris/includes/_editPanelPeterMeter.xhtml">
@@ -63,9 +61,9 @@
 		icon="#{resources['core/images/actions/16x16/delete.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
 		onShow="#{r:component('deleteInclude')}.show();"
-		onHide="#{r:component('deleteInclude')}.hide();">
+		onHide="#{r:component('deleteInclude')}.hide();"
+		style="max-height:100% !important; right:30% !important; left:30% !important; top:10% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="deleteInclude"
 			src="/resources/core/includes/_deletePanel.xhtml">
