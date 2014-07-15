@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.encoder.impl.raster.RasterEncoderFactory;
+import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.peritia.codec.EncodableContent;
@@ -1100,12 +1101,14 @@ public class XmlBuilder {
 		// Dichtsbijzijnde bord zoeken
 		nearestBord = Beans.getReference(OsyrisModelFunctions.class)
 				.getNearestBord(anderProbleem.getGeom(), object.getTraject());
+
 		if (nearestBord != null) {
 			String straatWO = nearestBord.getStraatnaam();
-			// Init BordLayer
+			// Init BordLayer en toon enkel dit bord
 			layer = (FeatureMapLayer) viewer.getContext().getLayer(
 					LabelUtils.lowerCamelCase(nearestBord.getModelClass()
 							.getName()));
+			layer.setFilter(FilterUtils.equal("id", nearestBord.getId()));
 			viewer.setLayerVisibility(layer, false);
 
 			if (straatWO != null) {
@@ -1151,6 +1154,14 @@ public class XmlBuilder {
 
 		viewer.setBaseLayerId("tms");
 		if (nearestBord != null) {
+
+			// Laat opnieuw de overige borden zien
+			if (nearestBord instanceof NetwerkBord) {
+				layer.setFilter(FilterUtils.equal("segmenten",
+						object.getTraject()));
+			} else {
+				layer.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+			}
 			viewer.setLayerVisibility(layer, true);
 		}
 		nearestBord = null;

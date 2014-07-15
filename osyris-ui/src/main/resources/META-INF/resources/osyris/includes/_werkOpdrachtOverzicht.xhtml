@@ -136,12 +136,12 @@
 					resizableColumns="true"
 					tableStyle="min-width: 850px"
 					emptyMessage="#{messages['ui.dataTable.empty']}"
-					rowKey="#{werkOpdracht.getId()}" 
+					rowKey="#{werkOpdracht.id}" 
 					selection="#{werkOpdrachtOverzichtFormBase.selectedOpdrachten}">
 					<j:layoutContent />
-					<!-- <j:bindAttribute var="werkOpdracht"
-						name="rowData" /> -->
-					<p:column style="width:20px;" >
+<!--  					<j:bindAttribute var="werkOpdracht"  -->
+<!-- 						name="rowData" /> -->
+					<p:column style="width:20px;">
 						<p:rowToggler />
 					</p:column>
 					<p:column selectionMode="multiple" style="width:50px; text-align:center;" rendered="#{werkOpdrachtOverzichtFormBase.canSelectRows()}" >
