@@ -133,14 +133,47 @@
 <!-- 	</d:fields> -->
 <!-- 	</r:panel> -->
 	<br/>
+<!-- 	<r:panel id="commentaarMedewerkerPanel"> -->
+	<d:fields>
+		<d:field for="status" label="Status">
+			<d:propertyValue id="status"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+					value="#{form.object.status}"
+					mode="VIEW" />
+		</d:field>
+		<d:field for="commentaarMedewerker" label="Commentaar TOV">
+			<d:propertyValue id="commentaarMedewerker"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+					value="#{form.object.commentaarMedewerker}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
+<!-- 	</r:panel> -->
+<!-- 	<r:panel id="commentaarUitvoerderPanel"> -->
+	<d:fields>
+		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
+			<d:propertyValue id="commentaarUitvoerder"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
+					value="#{form.object.commentaarUitvoerder}"
+					mode="VIEW" />
+		</d:field>
+	</d:fields>
 	<a:outputPanel id="statusPanel" rendered="#{form.object.validatie != null}">
 	<d:fields>
-		<d:field for="status" label="Status validatie">
-			<d:propertyValue id="status"
+		<d:field for="statusValidatie" label="Status validatie">
+			<d:propertyValue id="statusValidatie"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('validatie')}"
 					value="#{form.object.validatie}"
 					mode="VIEW" />
 		</d:field>
+
+		<d:field for="commentaarValidatie" label="Commentaar validatie" rendered="#{form.object.commentaarValidatie != null}">
+			<d:propertyValue id="commentaarValidatie"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarValidatie')}"
+					value="#{form.object.commentaarValidatie}"
+					mode="VIEW" />
+		</d:field>
+
 		<a:outputPanel rendered="#{form.object.validatie == 'LATER_OPNIEUW_UITVOEREN_VANAF'}">
 			<d:field for="datumLateruitTeVoeren" label="Later uit te voeren vanaf">
 			<d:propertyValue id="datumLateruitTeVoeren"
@@ -151,26 +184,5 @@
 		</a:outputPanel>
 	</d:fields>
 	</a:outputPanel>
-	<br/>
-<!-- 	<r:panel id="commentaarMedewerkerPanel"> -->
-	<d:fields>
-		<d:field for="commentaarMedewerker" label="Commentaar TOV">
-			<d:propertyValue id="commentaarMedewerker"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
-					value="#{form.object.commentaarMedewerker}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
-<!-- 	</r:panel> -->
-	<br/>
-<!-- 	<r:panel id="commentaarUitvoerderPanel"> -->
-	<d:fields>
-		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
-			<d:propertyValue id="commentaarUitvoerder"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarUitvoerder')}"
-					value="#{form.object.commentaarUitvoerder}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
 	</r:panel>
 </u:composition>

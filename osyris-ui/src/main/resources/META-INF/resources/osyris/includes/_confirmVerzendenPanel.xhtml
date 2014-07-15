@@ -1,0 +1,26 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	<h3><h:outputText value="Bent u zeker dat u deze controleopdracht wil verzenden naar Toerisme Oost-Vlaanderen?" /></h3>
+	<br/>
+	<h3><h:outputText value="Na het verzenden kunt U geen wijzingen meer aanbrengen aan deze controleopdracht." /></h3>
+	<br />
+	<d:buttons>
+		<j:commandButton value="Verzenden"
+			image="#{resource['core/images/actions/12x12/next.png']}"
+			type="button"
+			action="#{form.rapporterenControleOpdracht()}"
+			render="#{render}"
+			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide(); conscientia.widget(#{r:element('confirmVerzendenPopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

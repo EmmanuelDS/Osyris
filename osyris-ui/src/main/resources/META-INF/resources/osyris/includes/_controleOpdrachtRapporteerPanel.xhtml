@@ -144,7 +144,6 @@
 				</m:mapViewer>
 			</div>
 		</r:panel>
-		<br/>
 		<u:decorate
 			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
 			<u:param name="form" value="#{form}" />
@@ -159,11 +158,10 @@
 			action="#{form.save()}"
 			render="#{r:clientId('problemenOverzichtPanel')}"
 			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
-		<j:commandButton value="Verzenden"
+		<j:commandButton 
+			value="Verzenden"
 			image="#{resource['core/images/actions/12x12/next.png']}"
 			type="button"
-			action="#{form.rapporterenControleOpdracht()}"
-			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
+			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).show();" />
 	</d:buttons>
 </u:composition>

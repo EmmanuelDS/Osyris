@@ -28,12 +28,10 @@
 	</u:decorate>
 	</a:outputPanel>
 	<br/>
-	<r:panel id="controleOpdrachtInfo" header="Praktische Info">
-	<d:object mode="VIEW" 
-		modelClass="#{form.modelClass}"
-		value="#{form.object}">
-	</d:object>
-	</r:panel>
+	<u:decorate
+		template="/resources/osyris/includes/praktischeInfoCO.xhtml">
+		<u:param name="form" value="#{form}" />
+	</u:decorate>
 	</td>
 	<td width="50%">
 		<r:panel>

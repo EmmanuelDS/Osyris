@@ -65,6 +65,6 @@
 			type="button"
 			action="#{form.rapporteerUitvoeringsRonde()}"
 			render="#{render}"
-			oncomplete="if(!form.hasErrors) conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
 	</d:buttons>
 </u:composition>
