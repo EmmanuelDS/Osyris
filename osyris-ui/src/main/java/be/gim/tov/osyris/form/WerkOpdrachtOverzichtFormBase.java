@@ -49,6 +49,12 @@ import org.conscientia.core.resource.FileResource;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.conscientia.jsf.event.ControllerEvent;
+import org.geotools.feature.FeatureCollection;
+import org.geotools.feature.FeatureIterator;
+import org.opengis.feature.simple.SimpleFeature;
+import org.opengis.feature.simple.SimpleFeatureType;
+import org.opengis.filter.Filter;
 import org.quartz.xml.ValidationException;
 import org.w3c.dom.Document;
 
@@ -61,6 +67,7 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
+import be.gim.specto.api.context.FeatureSelectionMode;
 import be.gim.specto.api.context.MapContext;
 import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.context.MapFactory;
@@ -69,13 +76,19 @@ import be.gim.specto.ui.component.MapViewer;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
+import be.gim.tov.osyris.model.controle.NetwerkAnderProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.controle.RouteAnderProbleem;
 import be.gim.tov.osyris.model.controle.RouteBordProbleem;
+import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.NetwerkSegment;
+import be.gim.tov.osyris.model.traject.Provincie;
 import be.gim.tov.osyris.model.traject.Route;
+import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
@@ -120,6 +133,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 	@Inject
 	protected MailSender mailSender;
 
+	protected String probleemType;
+	protected Integer knooppuntNummer;
+	protected Envelope envelope = null;
+	protected boolean hasErrors;
 	protected ResourceIdentifier regio;
 	protected String trajectType;
 	protected String trajectNaam;
@@ -132,6 +149,46 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected String baseLayerName;
 
 	// GETTERS AND SETTERS
+	public WerkOpdracht getWerkOpdracht() {
+
+		if (object == null) {
+			object = createWerkOpdracht();
+		}
+		return object;
+	}
+
+	public String getProbleemType() {
+		return probleemType;
+	}
+
+	public void setProbleemType(String probleemType) {
+		this.probleemType = probleemType;
+	}
+
+	public Integer getKnooppuntNummer() {
+		return knooppuntNummer;
+	}
+
+	public void setKnooppuntNummer(Integer knooppuntNummer) {
+		this.knooppuntNummer = knooppuntNummer;
+	}
+
+	public Envelope getEnvelope() {
+		return envelope;
+	}
+
+	public void setEnvelope(Envelope envelope) {
+		this.envelope = envelope;
+	}
+
+	public boolean isHasErrors() {
+		return hasErrors;
+	}
+
+	public void setHasErrors(boolean hasErrors) {
+		this.hasErrors = hasErrors;
+	}
+
 	public ResourceIdentifier getRegio() {
 		return regio;
 	}
@@ -865,7 +922,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 				if (bord != null) {
 					Envelope envelope = GeometryUtils.getEnvelope(bord
 							.getGeom());
-					GeometryUtils.expandEnvelope(envelope, 0.1,
+					GeometryUtils.expandEnvelope(envelope, 0.04,
 							context.getMaxBoundingBox());
 					return envelope;
 				} else {
@@ -881,7 +938,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 			else if (probleem instanceof AnderProbleem) {
 				Envelope envelope = GeometryUtils
 						.getEnvelope(((AnderProbleem) probleem).getGeom());
-				GeometryUtils.expandEnvelope(envelope, 0.1,
+				GeometryUtils.expandEnvelope(envelope, 0.04,
 						context.getMaxBoundingBox());
 
 				return envelope;
@@ -1280,9 +1337,756 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	/**
 	 * Switchen tussen basislagen
-	 * 
 	 */
 	public void switchBaseLayers() {
 		getViewer().setBaseLayerId(baseLayerName);
+	}
+
+	/**
+	 * Manueel aanmaken WerkOpdracht.
+	 */
+	public WerkOpdracht createWerkOpdracht() {
+
+		try {
+			object = (WerkOpdracht) modelRepository.createObject(
+					modelRepository.getModelClass("WerkOpdracht"), null);
+
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate model object.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Illegal access at creation model object.", e);
+		}
+
+		return object;
+	}
+
+	/**
+	 * Doorzoekt de lagen van de kaartconfiguratie en voert de correcte
+	 * kaartoperaties uit.
+	 * 
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public void searchTraject() throws IOException {
+
+		if (trajectType == null) {
+			messages.warn("Gelieve eerst een route- of netwerktype te selecteren alvorens te zoeken.");
+		}
+
+		else if (trajectType.contains("Route") && trajectNaam == null) {
+			messages.warn("Gelieve bij het zoeken naar routes een trajectnaam te selecteren.");
+		}
+
+		else {
+			MapViewer viewer = getViewer();
+			MapContext context = viewer.getConfiguration().getContext();
+			envelope = getEnvelopeProvincie();
+
+			getWerkOpdracht().setProbleem(null);
+			probleemType = "";
+
+			// Itereren over de lagen en de correcte operaties uitvoeren
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.setFilter(null);
+				layer.setHidden(true);
+				layer.set("selectable", false);
+				// Provincie altijd zichtbaar
+				if (layer.getLayerId().equalsIgnoreCase("provincie")) {
+					layer.setHidden(false);
+				}
+
+				else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+					// Netwerk
+					if (trajectType.contains("Segment")) {
+						searchNetwerkLayer(layer);
+					}
+					// Route
+					else {
+						searchRouteLayer(layer);
+						envelope = viewer.getContentExtent(layer);
+					}
+				}
+				// RouteBord
+				else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType + "Bord")) {
+					searchRouteBordLayer(layer);
+				}
+				// NetwerkBord
+				// Filtering op de borden
+				else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType.replace("Segment", "") + "Bord")) {
+					layer.setHidden(false);
+					searchNetwerkBordLayer(layer);
+				}
+				// WandelKnooppunt
+				else if (layer.getLayerId().contains("Knooppunt")
+						&& trajectType.contains("WandelNetwerk")) {
+					FeatureMapLayer mapLayer = (FeatureMapLayer) context
+							.getLayer("wandelNetwerkKnooppunt");
+					searchKnooppuntLayer2(mapLayer);
+				}
+
+				// FietsKnooppunt
+				else if (layer.getLayerId().contains("Knooppunt")
+						&& trajectType.contains("FietsNetwerk")) {
+					FeatureMapLayer mapLayer = (FeatureMapLayer) context
+							.getLayer("fietsNetwerkKnooppunt");
+					searchKnooppuntLayer2(mapLayer);
+				}
+
+				// Intekenen Punt
+				else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
+					layer.setHidden(true);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(Collections.EMPTY_LIST);
+				} else {
+					layer.setHidden(true);
+					layer.setFilter(null);
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+
+			viewer.updateCurrentExtent(envelope);
+			viewer.updateContext(null);
+		}
+	}
+
+	/**
+	 * Haalt de kaartconfiguratie van de kleine kaart op bij het manueel
+	 * aanmaken van een WerkOpdracht.
+	 * 
+	 * @return
+	 * @throws IOException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public MapConfiguration getCreateWerkOpdrachtConfiguration()
+			throws IOException, InstantiationException, IllegalAccessException {
+
+		MapContext context = (MapContext) modelRepository
+				.loadObject(new ResourceKey("Form@12"));
+
+		if (context != null) {
+			MapConfiguration configuration = mapFactory
+					.getConfiguration(context);
+
+			// Retrieve context instance from configuration.
+			context = configuration.getContext();
+
+			// Reset context
+			configuration.setContext(context);
+
+			// Reset layers
+			resetLayers(context);
+			// for (FeatureMapLayer layer : context.getFeatureLayers()) {
+			// layer.setFilter(null);
+			// layer.setHidden(true);
+			// layer.setSelection(Collections.EMPTY_LIST);
+			// }
+
+			// Add edit layer to context
+			mapFactory.createGeometryLayer(context, GEOMETRY_LAYER_NAME, null,
+					Point.class, null, true, "single", null, null);
+
+			// Start configuratie zoomt naar Provincie OVL
+			FeatureMapLayer provincieLayer = (FeatureMapLayer) context
+					.getLayer("provincie");
+			provincieLayer.setHidden(false);
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+			Envelope envelope = GeometryUtils.getEnvelope(provincie.getGeom());
+			context.setBoundingBox(envelope);
+
+			setBaseLayerName("tms");
+			return configuration;
+		}
+
+		return null;
+	}
+
+	/**
+	 * Reset zoekvelden trajectNaam en knooppuntNummer bij het wijzigen van het
+	 * trajectType zoekveld.
+	 */
+	public void resetChildSearchParameters() {
+
+		setKnooppuntNummer(null);
+		setTrajectNaam(null);
+	}
+
+	/**
+	 * Ophalen envelope voor provincie OVL.
+	 * 
+	 * @param viewer
+	 * @return
+	 */
+	@SuppressWarnings("static-access")
+	public Envelope getEnvelopeProvincie() {
+
+		try {
+			FeatureMapLayer provincieLayer = (FeatureMapLayer) getViewer()
+					.getConfiguration().getContext().getLayer("provincie");
+			provincieLayer.setHidden(false);
+			Provincie provincie = (Provincie) modelRepository
+					.getUniqueResult(modelRepository.searchObjects(
+							new DefaultQuery("Provincie"), true, true));
+
+			return GeometryUtils.getEnvelope(provincie.getGeom());
+
+		} catch (IOException e) {
+			LOG.error("Can not search Provincie.", e);
+		}
+		return null;
+	}
+
+	/**
+	 * Operaties op de Routelagen.
+	 * 
+	 * @param layer
+	 * @param viewer
+	 */
+	private void searchRouteLayer(FeatureMapLayer layer) {
+
+		layer.setHidden(false);
+
+		if (regio != null && trajectNaam == null) {
+			layer.setFilter(FilterUtils.equal("regio", regio));
+		} else if (trajectNaam != null) {
+			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		}
+	}
+
+	/**
+	 * Operaties op de RouteBordlagen.
+	 * 
+	 * @param layer
+	 * @param viewer
+	 */
+	private void searchRouteBordLayer(FeatureMapLayer layer) {
+
+		layer.setHidden(false);
+		layer.setSelection(Collections.EMPTY_LIST);
+
+		if (regio != null && trajectNaam == null) {
+			layer.setFilter(FilterUtils.equal("regio", regio));
+		}
+
+		else if (trajectNaam != null) {
+			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		}
+
+		layer.set("selectionMode", FeatureSelectionMode.SINGLE);
+	}
+
+	/**
+	 * Operaties op de NetwerkBord lagen.
+	 * 
+	 * @param layer
+	 */
+	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+
+		layer.setFilter(null);
+		layer.setHidden(false);
+
+		// Filter met de borden die verbonden zijn met het opgegeven
+		// knooppuntNr
+		Filter knooppuntFilter = FilterUtils.or(
+				FilterUtils.equal("kpnr0", knooppuntNummer),
+				FilterUtils.equal("kpnr1", knooppuntNummer),
+				FilterUtils.equal("kpnr2", knooppuntNummer),
+				FilterUtils.equal("kpnr3", knooppuntNummer));
+
+		Filter filter = null;
+		if (regio != null) {
+			if (knooppuntNummer == null) {
+				filter = FilterUtils.and(FilterUtils.equal("regio", regio));
+			} else {
+				filter = FilterUtils.and(FilterUtils.equal("regio", regio),
+						knooppuntFilter);
+			}
+		}
+		if (trajectNaam != null) {
+			if (knooppuntNummer == null) {
+				filter = FilterUtils
+						.and(FilterUtils.equal("naam", trajectNaam),
+								knooppuntFilter);
+			} else {
+				filter = FilterUtils
+						.and(FilterUtils.equal("naam", trajectNaam));
+			}
+		}
+		layer.setFilter(filter);
+	}
+
+	/**
+	 * Operaties op de knooppuntlagen.
+	 * 
+	 * @param layer
+	 * @param viewer
+	 */
+	private void searchKnooppuntLayer2(FeatureMapLayer layer) {
+
+		layer.setHidden(false);
+		layer.setFilter(null);
+		layer.setSelection(Collections.EMPTY_LIST);
+		Filter filter = null;
+
+		if (knooppuntNummer == null) {
+			if (regio != null) {
+				filter = FilterUtils.equal("regio", regio);
+				layer.setFilter(filter);
+			}
+
+			if (trajectNaam != null) {
+				filter = FilterUtils.equal("naam", trajectNaam);
+				layer.setFilter(filter);
+			}
+		}
+
+		else if (knooppuntNummer != null) {
+			if (regio != null) {
+				filter = FilterUtils.and(FilterUtils.equal("regio", regio),
+						(FilterUtils.equal("nummer", knooppuntNummer)));
+				layer.setFilter(filter);
+			}
+
+			if (trajectNaam != null) {
+				filter = FilterUtils.and(
+						FilterUtils.equal("naam", trajectNaam),
+						(FilterUtils.equal("nummer", knooppuntNummer)));
+				layer.setFilter(filter);
+			}
+
+			if (trajectNaam == null && regio == null) {
+				filter = FilterUtils.equal("nummer", knooppuntNummer);
+				layer.setFilter(filter);
+			}
+			// Set Selectie enkel als specifiek knooppuntNr is opgegeven
+			layer.set("selectable", true);
+			List<String> ids = new ArrayList<String>();
+			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+					.getFeature(layer, getViewer().getContext().getSrsName(),
+							getViewer().getContext().getBoundingBox(), null,
+							filter, null, null);
+			FeatureIterator<SimpleFeature> iterator = features.features();
+
+			envelope = getViewer().getFeatureExtent(layer, filter);
+
+			while (iterator.hasNext()) {
+				ids.add(iterator.next().getID());
+			}
+			layer.setSelection(ids);
+
+			// Indien geen knooppunten gevonden toon provincie
+			if (layer.getSelection().isEmpty()) {
+				envelope = getEnvelopeProvincie();
+			}
+		}
+	}
+
+	/**
+	 * Operaties op de Netwerklagen.
+	 * 
+	 * @param layer
+	 * @param viewer
+	 */
+	private void searchNetwerkLayer(FeatureMapLayer layer) {
+
+		layer.setHidden(false);
+		layer.set("selectable", false);
+		layer.setSelection(Collections.EMPTY_LIST);
+		Filter filter = null;
+
+		if (regio != null && trajectNaam == null && knooppuntNummer == null) {
+
+			filter = FilterUtils.equal("regio", regio);
+			envelope = getViewer().getFeatureExtent(layer, filter);
+
+			List<String> ids = new ArrayList<String>();
+			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+					.getFeature(layer, getViewer().getContext().getSrsName(),
+							getViewer().getContext().getBoundingBox(), null,
+							filter, null, null);
+			FeatureIterator<SimpleFeature> iterator = features.features();
+
+			while (iterator.hasNext()) {
+				ids.add(iterator.next().getID());
+			}
+
+			layer.setSelection(ids);
+
+			// Indien geen selectie gevonden toon provincie
+			if (layer.getSelection().isEmpty()) {
+				envelope = getEnvelopeProvincie();
+			}
+		}
+
+		else if (trajectNaam != null) {
+
+			filter = FilterUtils.equal("naam", trajectNaam);
+			layer.set("selectable", true);
+
+			if (knooppuntNummer == null) {
+				List<String> ids = new ArrayList<String>();
+				FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+						.getFeature(layer,
+								getViewer().getContext().getSrsName(),
+								getViewer().getContext().getBoundingBox(),
+								null, filter, null, null);
+				FeatureIterator<SimpleFeature> iterator = features.features();
+				while (iterator.hasNext()) {
+					ids.add(iterator.next().getID());
+				}
+				layer.setSelection(ids);
+				envelope = getViewer().getFeatureExtent(layer, filter);
+			}
+		}
+		// Heel de provincie tonen indien geen filters ingesteld
+		if (filter == null) {
+			envelope = getEnvelopeProvincie();
+		}
+	}
+
+	/**
+	 * Bewaart een manueel aangemaakte WerkOpdracht in de databank.
+	 * 
+	 */
+	public void saveWerkOpdracht() {
+
+		try {
+			setHasErrors(true);
+
+			// Save en check WerkOpdracht
+			if (checkWerkOpdracht(object)) {
+				setHasErrors(false);
+				modelRepository.saveObject(object);
+				messages.info("Werkopdracht succesvol aangemaakt.");
+				trajectType = null;
+				trajectNaam = null;
+				probleemType = null;
+				object = null;
+				search();
+			}
+
+		} catch (IOException e) {
+			messages.error("Fout bij het aanmaken van werkopdracht.");
+			LOG.error("Can not save model object.", e);
+		}
+	}
+
+	/**
+	 * Checkt of een manueel aangemaakte WerkOpdracht mag bewaard worden in de
+	 * databank.
+	 * 
+	 * @param werkOpdracht
+	 * @return
+	 */
+	public boolean checkWerkOpdracht(WerkOpdracht werkOpdracht) {
+
+		if (probleemType == null || probleemType.isEmpty()) {
+			messages.warn("Gelieve eerst een probleem aan de werkopdracht te koppelen.");
+			return false;
+		}
+		if (object.getProbleem() instanceof AnderProbleem) {
+			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
+				messages.warn("Werkopdracht niet aangemaakt: gelieve eerst een punt aan te duiden op de kaart.");
+				return false;
+			}
+			// Indien RouteAnderProbleem koppel trajectId aan de melding via de
+			// routeNaam
+			if (object.getProbleem() instanceof RouteAnderProbleem) {
+				MapViewer viewer = getViewer();
+				MapContext context = viewer.getConfiguration().getContext();
+
+				for (FeatureMapLayer layer : context.getFeatureLayers()) {
+					if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+						searchTrajectId(layer);
+					}
+				}
+			}
+			// Indien NetwerkAnderProbleem check of segment geselecteerd is
+			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+				if (object.getTraject() == null) {
+					messages.warn("Werkopdracht niet aangemaakt: gelieve eerst een segment te selecteren.");
+					return false;
+				}
+			}
+
+		}
+		// Indien BordProbleem check of bord geselecteerd is
+		if (object.getProbleem() instanceof BordProbleem) {
+			BordProbleem b = (BordProbleem) object.getProbleem();
+			if (b.getBord() == null) {
+				messages.warn("Werkopdracht niet aangemaakt: gelieve eerst een bord op de kaart te selecteren.");
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Event bij het selecteren van features op de kaart
+	 * 
+	 * @param event
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	public void onSelectFeatures(ControllerEvent event) throws IOException {
+
+		// Selecteren segment
+		if (object.getProbleem() != null
+				&& object.getProbleem() instanceof NetwerkAnderProbleem) {
+
+			String layerId = (String) event.getParams().get("layerId");
+			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
+					.getLayer(layerId);
+
+			if (layer.getSelection().size() == 1) {
+				object.setTraject(new ResourceKey("Traject", layer
+						.getSelection().get(0)));
+			} else {
+				messages.error("Gelieve precies 1 segment te selecteren.");
+				layer.setSelection(new ArrayList<String>(1));
+			}
+		}
+
+		// Selecteren bord
+		else if (object.getProbleem() != null
+				&& object.getProbleem() instanceof BordProbleem) {
+
+			String layerId = (String) event.getParams().get("layerId");
+			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
+					.getLayer(layerId);
+
+			if (layer.getSelection().size() == 1) {
+				((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
+						"Bord", layer.getSelection().get(0)));
+
+				Bord selectedBord = (Bord) modelRepository
+						.loadObject(new ResourceKey("Bord", layer
+								.getSelection().get(0)));
+
+				// Zoek traject dat bij routebord hoort
+				if (selectedBord instanceof RouteBord) {
+					object.setTraject(((RouteBord) selectedBord).getRoute());
+				}
+
+				// Zoek segment dat bij NetwerkBord hoort
+				else if (selectedBord instanceof NetwerkBord) {
+					object.setTraject(((NetwerkBord) selectedBord)
+							.getSegmenten().get(0));
+				}
+			}
+
+			else {
+				messages.error("Er zijn meerdere borden geselecteerd. Mogelijk bevinden deze borden zich op dezelfde locatie. Gelieve in dit geval de 'Tonen informatie' knop te gebruiken om uw selectie te verfijnen.");
+				layer.setSelection(new ArrayList<String>(1));
+			}
+		}
+	}
+
+	/**
+	 * Event bij het deselecteren van features op de kaart
+	 * 
+	 * @param event
+	 */
+	@SuppressWarnings("unchecked")
+	public void onUnselectFeatures(ControllerEvent event) {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		for (FeatureMapLayer layer : context.getFeatureLayers()) {
+			layer.setSelection(new ArrayList<String>(1));
+		}
+
+		List<String> ids = (List<String>) event.getParams().get("featureIds");
+		if (ids.size() > 0) {
+			if (object.getProbleem() instanceof BordProbleem) {
+				((BordProbleem) object.getProbleem()).setBord(null);
+			}
+
+			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+				object.setTraject(null);
+			}
+		}
+	}
+
+	/**
+	 * Event bij het updaten van features op de kaart
+	 * 
+	 * @param event
+	 */
+	public void onUpdateFeatures(ControllerEvent event) {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		GeometryListFeatureMapLayer layer = (GeometryListFeatureMapLayer) context
+				.getLayer(GEOMETRY_LAYER_NAME);
+
+		// Slechts 1 punt mag ingegeven worden
+		if (layer.getGeometries().size() > 1) {
+			layer.getGeometries().remove(0);
+		}
+
+		// Precies 1 punt koppelen aan een Anderprobleem
+		if (layer.getGeometries().size() == 1) {
+			if (object.getProbleem() instanceof AnderProbleem) {
+				((AnderProbleem) object.getProbleem()).setGeom(layer
+						.getGeometries().iterator().next());
+			}
+		}
+	}
+
+	/**
+	 * Event bij het deleten van features op de kaart
+	 * 
+	 * @param event
+	 */
+	@SuppressWarnings("unchecked")
+	public void onDeleteFeatures(ControllerEvent event) {
+
+		List<String> ids = (List<String>) event.getParams().get("featureIds");
+		if (ids.size() > 0) {
+			((AnderProbleem) object.getProbleem()).setGeom(null);
+		}
+	}
+
+	/**
+	 * Filteren van de laag op basis van de trajectNaam en setten van TrajectID
+	 * via trajectNaam. Dit is enkel toepasbaar op routes.
+	 * 
+	 * @param layer
+	 */
+	public void searchTrajectId(FeatureMapLayer layer) {
+
+		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
+					.getFeature(layer, getViewer().getContext().getSrsName(),
+							getViewer().getContext().getBoundingBox(), null,
+							FilterUtils.equal("naam", trajectNaam), null, 1);
+			FeatureIterator<SimpleFeature> iterator = features.features();
+
+			try {
+				if (features.size() == 1) {
+					while (iterator.hasNext()) {
+						SimpleFeature feature = iterator.next();
+						getWerkOpdracht().setTraject(
+								new ResourceKey("Traject", feature
+										.getAttribute("id").toString()));
+					}
+				}
+			} finally {
+				iterator.close();
+			}
+		}
+	}
+
+	/**
+	 * Maakt een door de gebruiker gekozen type probleem aan en configureert de
+	 * kaart om problemen te kunnen aanduiden. De status van het probleem
+	 * gekoppeld aan een nieuwe manueel aangemaakte WerkOpdracht heeft steeds de
+	 * waarde WERKOPDRACHT.
+	 * 
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 */
+	public void createProbleem() throws InstantiationException,
+			IllegalAccessException {
+
+		MapViewer viewer = getViewer();
+		MapContext context = viewer.getConfiguration().getContext();
+
+		if (object.getProbleem() != null) {
+			modelRepository.evictObject(object.getProbleem());
+			object.setProbleem(null);
+		}
+
+		Probleem probleem = null;
+
+		if ("bord".equals(probleemType)) {
+
+			if (trajectType.endsWith("Route")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"RouteBordProbleem", null);
+
+			} else if (trajectType.contains("Netwerk")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"NetwerkBordProbleem", null);
+			}
+
+			// Itereren over de lagen en de correcte lagen selecteerbaar zetten
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				layer.set("selectable", false);
+
+				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
+					layer.set("selectable", true);
+					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
+					layer.setSelection(new ArrayList<String>(1));
+
+				} else if (layer.getLayerId().equalsIgnoreCase(
+						trajectType.replace("Segment", "") + "Bord")) {
+					layer.set("selectable", true);
+					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
+					layer.setSelection(new ArrayList<String>(1));
+
+				} else if (layer.getLayerId().contains("Knooppunt")) {
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+
+				else if (layer.getLayerId().equalsIgnoreCase(
+						GEOMETRY_LAYER_NAME)) {
+					layer.setHidden(true);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(Collections.EMPTY_LIST);
+				} else {
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+		} else if ("ander".equals(probleemType)) {
+
+			if (trajectType.endsWith("Route")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"RouteAnderProbleem", null);
+
+			} else if (trajectType.contains("Netwerk")) {
+				probleem = (Probleem) modelRepository.createObject(
+						"NetwerkAnderProbleem", null);
+			}
+
+			for (FeatureMapLayer layer : context.getFeatureLayers()) {
+
+				// Geometrie laag
+				if (layer.getLayerId().equalsIgnoreCase(GEOMETRY_LAYER_NAME)) {
+					layer.setHidden(false);
+					layer.set("selectable", true);
+					layer.set("editable", true);
+					((GeometryListFeatureMapLayer) layer)
+							.setGeometries(new ArrayList<Geometry>(1));
+				}
+
+				// Indien NetwerkSegment laag laag op selecteerbaar zetten
+				else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+					layer.set("selectable", true);
+					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
+					layer.setSelection(new ArrayList<String>(1));
+
+				} else {
+					layer.set("selectable", false);
+					layer.setSelection(Collections.EMPTY_LIST);
+				}
+			}
+		}
+
+		probleem.setStatus(ProbleemStatus.WERKOPDRACHT);
+		object.setProbleem(probleem);
+		viewer.updateContext(null);
 	}
 }

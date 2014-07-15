@@ -14,10 +14,9 @@
 		icon="#{resources['core/images/actions/16x16/view.png']}"
 		modal="true"
 		resizable="false"
-		width="1100"
-		height="700"
 		onShow="#{r:component('viewInclude')}.show();"
-		onHide="#{r:component('viewInclude')}.hide();">
+		onHide="#{r:component('viewInclude')}.hide();"
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="viewInclude"
 			src="/resources/osyris/includes/_werkOpdrachtViewPanel.xhtml">
@@ -31,10 +30,9 @@
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
 		resizable="false"
-		width="1100"
-		height="700"
 		onShow="#{r:component('controleerInclude')}.show();"
-		onHide="#{r:component('controleerInclude')}.hide();">
+		onHide="#{r:component('controleerInclude')}.hide();"
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="controleerInclude"
 			src="/resources/osyris/includes/_werkOpdrachtControleerPanel.xhtml">
@@ -48,10 +46,9 @@
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
 		resizable="false"
-		width="1100"
-		height="700"
 		onShow="#{r:component('rapporteerInclude')}.show();"
-		onHide="#{r:component('rapporteerInclude')}.hide();">
+		onHide="#{r:component('rapporteerInclude')}.hide();"
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="rapporteerInclude"
 			src="/resources/osyris/includes/_werkOpdrachtRapporteerPanel.xhtml">
@@ -65,10 +62,9 @@
 		icon="#{resources['core/images/actions/16x16/edit.png']}"
 		modal="true"
 		resizable="false"
-		width="1100"
-		height="700"
 		onShow="#{r:component('valideerInclude')}.show();"
-		onHide="#{r:component('valideerInclude')}.hide();">
+		onHide="#{r:component('valideerInclude')}.hide();"
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="valideerInclude"
 			src="/resources/osyris/includes/_werkOpdrachtValideerPanel.xhtml">
@@ -82,10 +78,9 @@
 		icon="#{resources['core/images/actions/16x16/delete.png']}"
 		modal="true"
 		resizable="false"
-		width="600"
-		height="600"
 		onShow="#{r:component('deleteInclude')}.show();"
-		onHide="#{r:component('deleteInclude')}.hide();">
+		onHide="#{r:component('deleteInclude')}.hide();"
+		style="max-height:90% !important; right:30% !important; left:30% !important; top:10% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="deleteInclude"
 			src="/resources/osyris/includes/_deleteWerkOpdrachtPanel.xhtml">
@@ -93,5 +88,20 @@
 			<f:param name="render" value="#{render}" />
 		</j:lazyInclude>
 	</p:dialog>
-		
+	
+	<p:dialog id="createPopup"
+		header="#{messages['page.create.title']} #{form.modelClass.label}"
+		icon="#{resources['core/images/actions/16x16/create.png']}"
+		modal="true"
+		resizable="false"
+		onShow="#{r:component('createInclude')}.show();"
+		onHide="#{r:component('createInclude')}.hide();"
+		style="max-height:100% !important; right:10% !important; left:10% !important; top:0% !important; overflow:auto !important;">
+		<j:relocate />
+		<j:lazyInclude id="createInclude"
+			src="/resources/osyris/includes/_werkOpdrachtCreatePanel.xhtml">
+			<f:param name="form" value="#{form}" />
+			<f:param name="render" value="#{render}" />
+		</j:lazyInclude>
+	</p:dialog>	
 </u:composition>

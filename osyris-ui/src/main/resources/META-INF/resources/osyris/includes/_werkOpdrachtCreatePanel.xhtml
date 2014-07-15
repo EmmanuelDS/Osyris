@@ -1,0 +1,258 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
+	
+	<h:outputStylesheet id="fileuploadCss"
+		name="fileupload/fileupload.css"
+		library="primefaces" />
+		
+	<table width="100%">
+	<tr>
+	<td width="40%" valign="top">
+	<r:panel id="searchTrajectPanel" header="Zoek route of netwerk">
+		<d:fields>
+			<d:field for="trajectType" label="Route of netwerk type" required="true">
+				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" >
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+					<a:ajax
+						event="change"
+						render="detailSearchPanel"
+						execute="@this"
+						listener="#{form.resetChildSearchParameters()}" />
+				</h:selectOneMenu>
+			</d:field>
+			<d:field for="regio" label="Regio">
+				<h:selectOneMenu id="regio" value="#{form.regio}">
+					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+					<a:ajax
+						event="change"
+						render="trajectNaam"
+						execute="@this" />
+				</h:selectOneMenu>
+			</d:field>
+			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectType != null}">
+				<d:field for="trajectNaam" label="Traject naam" rendered="#{form.trajectType.contains('Route') or form.trajectType.contains('WandelNetwerk') }" required="#{form.trajectType.contains('Route')}">
+					<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+					</h:selectOneMenu>
+				</d:field>
+				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
+					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
+					</h:selectOneMenu>
+				</d:field>
+			</j:renderPanel>
+		</d:fields>
+		<d:buttons>
+			<j:commandButton value="Zoeken"
+				image="#{resource['core/images/actions/12x12/search.png']}"
+				type="button"
+				action="#{form.searchTraject()}"
+				render="problemPanel"
+				execute="searchTrajectPanel">
+			</j:commandButton>
+		</d:buttons>
+	</r:panel>
+		
+	<r:panel header="Selecteer en beschrijf het probleem">
+	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
+<!-- 		<h:outputText value="Kies het type probleem" /> -->
+		
+		<a:outputPanel id="radioProblemType">
+			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+		<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
+           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+			<a:ajax event="change" 
+					listener="#{form.createProbleem()}" 
+					render="radioProblemType" 
+					execute="@this"/> 
+       </h:selectOneRadio>
+    
+        
+<!-- 		<h:selectOneMenu id="probleemType" value="#{form.probleemType}"> -->
+<!-- 			<f:selectItem itemValue="" itemLabel="" /> -->
+<!-- 			<f:selectItem itemValue="bord" itemLabel="Bord Probleem" /> -->
+<!-- 			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" /> -->
+<!-- 			<a:ajax -->
+<!-- 				event="change" -->
+<!-- 				render="probleemPanel" -->
+<!-- 				listener="#{form.createProbleem()}" -->
+<!-- 				execute="@this" /> -->
+<!-- 		</h:selectOneMenu> -->
+		
+		<j:renderPanel id="probleemPanel" rendered="#{form.object.probleem != null}">
+			<div>
+			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
+			<br/>
+			<d:fields>
+			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
+			<j:commandButton
+				id="selectFeatures"
+				rendered="#{form.probleemType == 'bord'}"
+				image="#{resource['core/images/actions/24x24/select.png']}"
+				styleClass="component-toolbar-button"
+				value="Selecteer bord"
+				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+				submit="false">
+				<j:activateControl
+					for="viewer"
+					event="click"
+					control="selectBox" />
+			</j:commandButton>
+			</a:outputPanel>
+			<br/>
+			
+			<a:outputPanel rendered="#{form.probleemType == 'ander'}">
+			<br/>
+			<d:fields>
+			<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
+			<j:commandButton
+				id="drawPoint"
+				rendered="#{form.probleemType == 'ander'}"
+				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+				styleClass="component-toolbar-button"
+				value="Teken punt">
+				<j:activateControl
+					for="viewer"
+					event="click"
+					control="drawPoint" />
+			</j:commandButton>
+			</a:outputPanel>
+			<br/>
+			<a:outputPanel rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}">
+			<br/>
+			<d:fields>
+			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
+			<h:graphicImage alt="(verplicht)"
+						value="#{resource['core/images/actions/12x12/required.png']}" />
+			</d:fields>
+			<j:commandButton
+				id="selectSegment"
+				rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}"
+				image="#{resource['core/images/actions/24x24/select.png']}"
+				styleClass="component-toolbar-button"
+				value="Selecteer segment"
+				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+				submit="false">
+				<j:activateControl
+					for="viewer"
+					event="click"
+					control="selectBox" >
+					<f:param
+						name="layerId"
+						value="#{trajectType}" />
+				</j:activateControl>
+			</j:commandButton>
+			</a:outputPanel>
+			</div>
+			<br/>
+			<d:propertyField id="foto" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+						value="#{form.object.probleem.foto}"
+						mode="EDIT" />		
+			<j:renderPanel id="typePanel" rendered="#{form.isBordProbleem(form.object.probleem)}">			
+			<d:propertyField id="type" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+						value="#{form.object.probleem.type}"
+						mode="EDIT" />		
+			</j:renderPanel>
+			<j:renderPanel id="categoriePanel" rendered="#{!form.isBordProbleem(form.object.probleem)}">
+			<d:propertyField id="categorie" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+						value="#{form.object.probleem.categorie}"
+						mode="EDIT" />	
+			</j:renderPanel>
+			<d:propertyField id="status" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+						value="#{form.object.probleem.status}"
+						mode="VIEW" />				
+			<d:propertyField id="commentaar" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{form.object.probleem.commentaar}"
+						mode="EDIT" />
+						
+		</j:renderPanel>
+		 </h:panelGrid>
+       </a:outputPanel>
+	</j:renderPanel>
+	  		
+	</r:panel>
+		<r:panel id="werkOpdrachtInfo" header="Werkopdracht Info">
+		<d:fields>
+			<d:propertyField id="medewerker" 
+					 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+							value="#{form.object.medewerker}"
+							mode="EDIT" />
+			<d:propertyField id="uitvoerder" 
+					 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+							value="#{form.object.uitvoerder}"
+							mode="EDIT" />
+			<d:propertyField id="commentaarMedewerker" 
+					 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+							value="#{form.object.commentaarMedewerker}"
+							mode="EDIT" />
+		</d:fields>
+	</r:panel>
+		</td>
+			<!-- MINI MAP -->
+			<td width="60%" valign="top">
+			<r:panel id="map">
+				<div style="height: 500px">
+					<m:mapViewer id="viewer"
+						configuration="#{form.createWerkOpdrachtConfiguration}">
+						<j:controllerListener name="selectedFeatures"
+							listener="#{form.onSelectFeatures}" />
+						<j:controllerListener name="unselectedFeatures"
+							listener="#{form.onUnselectFeatures}" />
+						<j:controllerListener name="addedFeature"
+							listener="#{form.onUpdateFeatures}" />
+						<j:controllerListener name="updatedFeature"
+							listener="#{form.onUpdateFeatures}" />
+						<j:controllerListener name="deletedFeature"
+							listener="#{form.onDeleteFeatures}" />
+					</m:mapViewer>
+				</div>
+			</r:panel>
+			<u:decorate
+			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+			<u:param name="form" value="#{form}" />
+			</u:decorate>
+			</td>
+		</tr>
+	</table>
+	
+	<d:buttons>
+		<j:commandButton value="#{messages['page.create.create.button']}"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button"
+			action="#{form.saveWerkOpdracht()}"
+			render="#{render}"
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('createPopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.cancel.button']}"
+			type="button"
+			image="#{resource['core/images/actions/12x12/cancel.png']}"
+			action="#{form.cancel()}"
+			execute="@this"
+			oncomplete="conscientia.widget(#{r:element('createPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

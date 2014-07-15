@@ -16,7 +16,7 @@
 	<table width="100%">
 	<tr valign="top">
 	<td>
-	<r:panel id="werkOpdrachtInfo">
+	<r:panel id="werkOpdrachtInfo" header="Werkopdracht Info">
 	<d:fields>
 		<d:field for="status" label="Status">
 			<d:propertyValue id="status"
@@ -63,6 +63,12 @@
 	<br/>
 	<r:panel id="handelingenPanel">
 	<d:fields>
+		<d:field for="probleemFoto" label="Foto probleem" rendered="#{form.object.probleem.foto != null}">
+			<d:propertyValue id="probleemFoto"
+			 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+					value="#{form.object.probleem.foto}"
+					mode="VIEW" />
+		</d:field>
 		<d:field for="handelingen" label="Handelingen">
 			<d:propertyValue id="handelingen"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"

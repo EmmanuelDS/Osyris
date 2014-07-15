@@ -104,6 +104,13 @@
 						type="button"
 						actionListener="#{werkOpdrachtOverzichtFormBase.search()}"
 						render="objects" />
+					<j:commandButton
+						rendered="#{werkOpdrachtOverzichtFormBase.canCreate}"
+						value="Aanmaken"
+						image="#{resource['core/images/actions/12x12/create.png']}"
+						type="button"
+						action="#{werkOpdrachtOverzichtFormBase.createWerkOpdracht()}"
+						onclick="conscientia.widget(#{r:element('createPopup')}).show();" />
 					<d:fileDownload fileName="#{werkOpdrachtOverzichtFormBase.fileName}"
 						type="button"
 						image="#{resource['core/images/actions/12x12/download.png']}"

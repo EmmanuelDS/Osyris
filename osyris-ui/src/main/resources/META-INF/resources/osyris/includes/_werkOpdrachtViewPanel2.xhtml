@@ -20,16 +20,7 @@
 				<u:param name="render" value="#{render}" />
 			</u:decorate>
 	<br/>
-	<r:panel id="commentaarValidatiePanel" rendered="#{form.object.commentaarValidatie != null}">
-	<d:fields>
-		<d:field for="commentaarValidatie" label="Commentaar validatie">
-			<d:propertyValue id="commentaarValidatie"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarValidatie')}"
-					value="#{form.object.commentaarValidatie}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
-	</r:panel>
+	
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>

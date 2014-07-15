@@ -41,10 +41,12 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),
 		@Permission(profile = "group:Routedokter", action = "edit", allow = true),
 		@Permission(profile = "group:Routedokter", action = "delete", allow = true),
+		@Permission(profile = "group:Routedokter", action = "create", allow = true),
 
 		@Permission(profile = "group:Medewerker", action = "search", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
 		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
+		@Permission(profile = "group:Medewerker", action = "create", allow = true),
 
 		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
 		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
@@ -70,6 +72,7 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
+	@Edit(type = "menu")
 	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
 	@Target("_blank")
 	private ResourceIdentifier medewerker;
