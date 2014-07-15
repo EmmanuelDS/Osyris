@@ -449,6 +449,10 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		setHasErrors(true);
 
 		try {
+			if (object.getAfstand() <= 0) {
+				messages.error("Uitvoeringsronde niet gerapporteerd: De het totaal aantal km moet groter zijn dan 0.");
+				return;
+			}
 			if (checkWerkOpdrachtenGerapporteerd()) {
 				object.setStatus(UitvoeringsrondeStatus.UITGEVOERD);
 				modelRepository.saveObject(object);

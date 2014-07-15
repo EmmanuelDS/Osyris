@@ -226,7 +226,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 						traject.getNaam()));
 			}
 
-			// TonenNetwerkKnooppunten indien Segment
+			// Tonen netwerkKnooppunten indien Segment
 			if (traject instanceof NetwerkSegment) {
 
 				NetwerkSegment segment = (NetwerkSegment) traject;
@@ -273,7 +273,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 								.singletonList(bord.getId().toString()));
 
 						envelope = GeometryUtils.getEnvelope(bord.getGeom());
-						GeometryUtils.expandEnvelope(envelope, 0.05,
+						GeometryUtils.expandEnvelope(envelope, 0.04,
 								context.getMaxBoundingBox());
 
 					} else {
@@ -319,7 +319,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 
 				Envelope envelope = GeometryUtils.getEnvelope(anderProbleem
 						.getGeom());
-				GeometryUtils.expandEnvelope(envelope, 0.05,
+				GeometryUtils.expandEnvelope(envelope, 0.04,
 						context.getMaxBoundingBox());
 				context.setBoundingBox(envelope);
 			}
