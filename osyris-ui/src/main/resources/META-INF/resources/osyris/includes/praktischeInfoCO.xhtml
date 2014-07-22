@@ -22,19 +22,14 @@
 			<td>
 			<d:fields>
 				<d:propertyField 
-			 		id="traject" 
-				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('traject')}"
-					value="#{form.object.traject}"
+			 		id="medewerker" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}"
+					value="#{form.object.medewerker}"
 					mode="VIEW" />
 				<d:propertyField 
-			 		id="trajectType" 
-				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('trajectType')}"
-					value="#{form.object.trajectType}"
-					mode="VIEW" />
-				<d:propertyField 
-			 		id="regio" 
-				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('regio')}"
-					value="#{form.object.regio}"
+			 		id="peterMeter" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
+					value="#{form.object.peterMeter}"
 					mode="VIEW" />
 			 	<d:propertyField 
 			 		id="periode" 
@@ -42,17 +37,48 @@
 					value="#{form.object.periode}"
 					mode="VIEW" />
 				<d:propertyField 
-			 		id="jaar" 
-				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('jaar')}"
-					value="#{form.object.jaar}"
-					mode="VIEW" />
-				<d:propertyField 
 			 		id="status" 
 				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('status')}"
 					value="#{form.object.status}"
 					mode="VIEW" />
-				
-				<d:field for="commentaar" label="Commentaar">
+				<d:propertyField 
+			 		id="datumTerreinBezoek" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTerreinBezoek')}"
+					value="#{form.object.datumTerreinBezoek}"
+					mode="VIEW" />
+				<d:propertyField 
+			 		id="datumLaatsteWijziging" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumLaatsteWijziging')}"
+					value="#{form.object.datumLaatsteWijziging}"
+					mode="VIEW" />
+		</d:fields>
+		</td>
+		<td width="40%">
+			<d:propertyField 
+			 		id="datumTeControleren" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTeControleren')}"
+					value="#{form.object.datumTeControleren}"
+					mode="VIEW" />
+			<d:propertyField 
+			 		id="datumUitTeVoeren" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumUitTeVoeren')}"
+					value="#{form.object.datumUitTeVoeren}"
+					mode="VIEW" />		
+			<d:propertyField 
+			 		id="datumGerapporteerd" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}"
+					value="#{form.object.datumGerapporteerd}"
+					mode="VIEW" />
+			<d:propertyField 
+			 		id="datumGevalideerd" 
+				 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGevalideerd')}"
+					value="#{form.object.datumGevalideerd}"
+					mode="VIEW" />
+		</td>
+		</tr>
+		</table>
+		<d:fields>
+			<d:field for="commentaar" label="Commentaar">
 				<div style="white-space:pre-line;">
 					<d:propertyValue id="commentaar"
 					 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('commentaar')}"
@@ -61,50 +87,5 @@
 				</div>
 				</d:field>
 		</d:fields>
-		</td>
-		<td width="40%">
-			<d:propertyField 
-				 		id="medewerker" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('medewerker')}"
-						value="#{form.object.medewerker}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="peterMeter" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
-						value="#{form.object.peterMeter}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="datumLaatsteWijziging" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumLaatsteWijziging')}"
-						value="#{form.object.datumLaatsteWijziging}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="datumTeControleren" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTeControleren')}"
-						value="#{form.object.datumTeControleren}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="datumUitTeVoeren" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumUitTeVoeren')}"
-						value="#{form.object.datumUitTeVoeren}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="datumTerreinBezoek" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumTerreinBezoek')}"
-						value="#{form.object.datumTerreinBezoek}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="datumGerapporteerd" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}"
-						value="#{form.object.datumGerapporteerd}"
-						mode="VIEW" />
-			<d:propertyField 
-				 		id="datumGevalideerd" 
-					 	modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGevalideerd')}"
-						value="#{form.object.datumGevalideerd}"
-						mode="VIEW" />
-		</td>
-		</tr>
-		</table>
 	</r:panel>
 </u:composition>

@@ -1508,13 +1508,16 @@ public class WerkOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Reset zoekvelden trajectNaam en knooppuntNummer bij het wijzigen van het
-	 * trajectType zoekveld.
+	 * Reset zoekvelden trajectNaam en knooppuntNummer en koppel de medewerker
+	 * aan de WerkOpdracht bij het wijzigen van het trajectType zoekveld.
 	 */
 	public void resetChildSearchParameters() {
 
 		setKnooppuntNummer(null);
 		setTrajectNaam(null);
+
+		object.setMedewerker(Beans.getReference(OsyrisModelFunctions.class)
+				.zoekVerantwoordelijke(trajectType));
 	}
 
 	/**

@@ -17,6 +17,7 @@
 			type="button"
 			action="#{form.rapporterenControleOpdracht()}"
 			render="#{render}"
+			immediate="true"
 			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide(); conscientia.widget(#{r:element('confirmVerzendenPopup')}).hide();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"

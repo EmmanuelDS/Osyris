@@ -28,6 +28,7 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
+import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
@@ -67,6 +68,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 	protected Date vanDatum;
 	protected Date totDatum;
 	protected ResourceIdentifier trajectId;
+	protected String baseLayerName;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -111,6 +113,14 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 
 	public void setTrajectId(ResourceIdentifier trajectId) {
 		this.trajectId = trajectId;
+	}
+
+	public String getBaseLayerName() {
+		return baseLayerName;
+	}
+
+	public void setBaseLayerName(String baseLayerName) {
+		this.baseLayerName = baseLayerName;
 	}
 
 	// METHODS
@@ -207,6 +217,17 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 				// Provincie altijd zichtbaar
 				if (layer.getLayerId().equalsIgnoreCase("provincie")) {
 					layer.setHidden(false);
+				}
+			}
+
+			// Ortho TMS als default achtergrondlaag
+			for (RasterMapLayer baseLayer : context.getBaseRasterLayers()) {
+
+				baseLayer.setHidden(true);
+
+				if (baseLayer.getLayerId().equalsIgnoreCase("tms")) {
+					baseLayer.setHidden(false);
+					baseLayerName = baseLayer.getLayerId();
 				}
 			}
 
@@ -377,5 +398,14 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 		else {
 			return false;
 		}
+	}
+
+	/**
+	 * Switchen tussen basislagen voor PetersMeters.
+	 * 
+	 */
+	public void switchBaseLayers() {
+
+		getViewer().setBaseLayerId(baseLayerName);
 	}
 }

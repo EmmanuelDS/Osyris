@@ -13,6 +13,7 @@
 		name="fileupload/fileupload.css"
 		library="primefaces" />
 
+	<h1>Meld een probleem op een route via onderstaand formulier</h1>
 	<div>
 		<ol>
 			<li>Zoek de route of het netwerk waarover je een probleem wil melden. </li>
@@ -79,31 +80,29 @@
 			</j:commandButton>
 		</d:buttons>
 	</r:panel>
-	
-
-	
+		
 	<r:panel header="Selecteer en beschrijf het probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
-		<h:outputText value="Kies het type probleem" />
-		<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
-			<f:selectItem itemValue="" itemLabel="" />
-			<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+	
+		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+		<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
+           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
 			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
-			<a:ajax
-				event="change"
-				render="probleemPanel"
-				listener="#{form.createProbleem()}"
-				execute="@this" />
-		</h:selectOneMenu>
-		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">
-		
+			<a:ajax event="change" 
+					listener="#{form.createProbleem()}" 
+					render="problemPanel" 
+					execute="@this"/> 
+       </h:selectOneRadio>
+       </h:panelGrid>
+       
+		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">	
 			<div>
 			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
 			<br/>
 			<d:fields>
 			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 			</d:fields>
 			<j:commandButton
 				id="selectFeatures"
@@ -126,7 +125,7 @@
 			<d:fields>
 			<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 			</d:fields>
 			<j:commandButton
 				id="drawPoint"
@@ -146,7 +145,7 @@
 			<d:fields>
 			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 			</d:fields>
 			<j:commandButton
 				id="selectSegment"

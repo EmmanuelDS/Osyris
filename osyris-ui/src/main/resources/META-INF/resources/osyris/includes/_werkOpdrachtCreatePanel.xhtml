@@ -25,7 +25,7 @@
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
 					<a:ajax
 						event="change"
-						render="detailSearchPanel"
+						render="detailSearchPanel, praktischeInfoPanel"
 						execute="@this"
 						listener="#{form.resetChildSearchParameters()}" />
 				</h:selectOneMenu>
@@ -69,31 +69,18 @@
 		
 	<r:panel header="Selecteer en beschrijf het probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
-<!-- 		<h:outputText value="Kies het type probleem" /> -->
-		
-		<a:outputPanel id="radioProblemType">
-			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+	
+		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
 		<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
            	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
 			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
 			<a:ajax event="change" 
 					listener="#{form.createProbleem()}" 
-					render="radioProblemType" 
+					render="problemPanel" 
 					execute="@this"/> 
        </h:selectOneRadio>
-    
-        
-<!-- 		<h:selectOneMenu id="probleemType" value="#{form.probleemType}"> -->
-<!-- 			<f:selectItem itemValue="" itemLabel="" /> -->
-<!-- 			<f:selectItem itemValue="bord" itemLabel="Bord Probleem" /> -->
-<!-- 			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" /> -->
-<!-- 			<a:ajax -->
-<!-- 				event="change" -->
-<!-- 				render="probleemPanel" -->
-<!-- 				listener="#{form.createProbleem()}" -->
-<!-- 				execute="@this" /> -->
-<!-- 		</h:selectOneMenu> -->
-		
+       </h:panelGrid>
+    	
 		<j:renderPanel id="probleemPanel" rendered="#{form.object.probleem != null}">
 			<div>
 			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
@@ -101,7 +88,7 @@
 			<d:fields>
 			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 			</d:fields>
 			<j:commandButton
 				id="selectFeatures"
@@ -124,14 +111,15 @@
 			<d:fields>
 			<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 			</d:fields>
 			<j:commandButton
 				id="drawPoint"
 				rendered="#{form.probleemType == 'ander'}"
 				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
 				styleClass="component-toolbar-button"
-				value="Teken punt">
+				value="Teken punt"
+				submit="false">
 				<j:activateControl
 					for="viewer"
 					event="click"
@@ -144,7 +132,7 @@
 			<d:fields>
 			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 			</d:fields>
 			<j:commandButton
 				id="selectSegment"
@@ -192,27 +180,36 @@
 						mode="EDIT" />
 						
 		</j:renderPanel>
-		 </h:panelGrid>
-       </a:outputPanel>
 	</j:renderPanel>
 	  		
 	</r:panel>
+		
+		<j:renderPanel id="praktischeInfoPanel">
 		<r:panel id="werkOpdrachtInfo" header="Werkopdracht Info">
 		<d:fields>
-			<d:propertyField id="medewerker" 
+		
+			<d:field label="Medewerker (*)" for="medewerker">	 
+				<d:propertyValue id="medewerker" 
 					 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
 							value="#{form.object.medewerker}"
 							mode="EDIT" />
-			<d:propertyField id="uitvoerder" 
+			</d:field>
+
+			<d:field label="Uitvoerder (*)" for="uitvoerder">	 
+				<d:propertyValue id="uitvoerder" 
 					 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
 							value="#{form.object.uitvoerder}"
 							mode="EDIT" />
+			</d:field>
+		
 			<d:propertyField id="commentaarMedewerker" 
 					 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
 							value="#{form.object.commentaarMedewerker}"
 							mode="EDIT" />
 		</d:fields>
+		<h:outputText value="(*) Deze velden worden automatisch ingevuld indien leeg bij het aanmaken van de werkopdracht." style="font-size:xx-small; font-style:italic;"/>
 	</r:panel>
+	</j:renderPanel>
 		</td>
 			<!-- MINI MAP -->
 			<td width="60%" valign="top">

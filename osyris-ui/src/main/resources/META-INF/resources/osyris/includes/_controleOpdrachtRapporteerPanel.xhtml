@@ -19,32 +19,49 @@
 	<td width="50%" valign="top">
 	<r:panel id="ProblemenPanel" header="Problemen">	
 	<j:renderPanel id="problemPanel">
-	Kies type probleem:<h:selectOneMenu id="probleemType" value="#{form.probleemType}">
-		<f:selectItem itemValue="" itemLabel="" />
-		<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
-		<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
-		<a:ajax
-			event="change"
-			render="probleemPanel"
-			listener="#{form.createProbleem()}"
-			execute="@this" />
-	</h:selectOneMenu>
-	<br/>
+		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+			<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
+	           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+				<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+				<a:ajax event="change" 
+						listener="#{form.createProbleem()}" 
+						render="problemPanel" 
+						execute="@this"/> 
+	       </h:selectOneRadio>
+	    </h:panelGrid>
 	<br/>
 	<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
-		<d:object mode="EDIT"
-				value="#{form.probleem}" />	
+<!-- 		<d:object mode="EDIT" -->
+<!-- 				value="#{form.probleem}" />	 -->
+
+				<a:outputPanel rendered="#{form.isBordProbleem(form.probleem)}">
+   					<d:field label="Beschrijving" for="type">	 
+						<d:propertyValue id="type"
+							modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
+							value="#{form.probleem.type}"
+							mode="EDIT" />
+					</d:field>
+				</a:outputPanel>
+				
+				<a:outputPanel rendered="#{!form.isBordProbleem(form.probleem)}">
+					<d:field label="Beschrijving" for="categorie">	 
+						<d:propertyValue id="categorie"
+							modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
+							value="#{form.probleem.categorie}"
+							mode="EDIT" />
+					</d:field>
+				</a:outputPanel>
 				<d:propertyField id="commentaar"
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.probleem.commentaar}"
 						mode="EDIT" />
 						
 		<a:outputPanel rendered="#{form.probleemType == 'bord'}">
-			<d:fields>
+		<d:fields>
 			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
-			</d:fields>
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
+		</d:fields>
 		<j:commandButton
 			id="selectFeatures"
 			rendered="#{form.probleemType == 'bord'}"
@@ -65,7 +82,7 @@
 		<d:fields>
 		<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
 		<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required.png']}" />
+						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 		</d:fields>
 		<j:commandButton
 			id="drawPoint"
@@ -134,7 +151,7 @@
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>
-			<div style="height: 50%">
+			<div style="height: 500px">
 				<m:mapViewer id="viewer"
 					configuration="#{form.configuration}">
 					<j:controllerListener name="selectedFeatures"
@@ -162,6 +179,7 @@
 			value="Verzenden"
 			image="#{resource['core/images/actions/12x12/next.png']}"
 			type="button"
+			immediate="true"
 			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).show();" />
 	</d:buttons>
 </u:composition>

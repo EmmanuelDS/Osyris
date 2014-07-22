@@ -454,11 +454,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			context = configuration.getContext();
 
 			// Reset layers
-			for (FeatureMapLayer layer : context.getFeatureLayers()) {
-				layer.setFilter(null);
-				layer.setHidden(true);
-				layer.setSelection(Collections.EMPTY_LIST);
-			}
+			resetLayers(context);
 
 			// Startconfiguratie zoomt naar Provincie OVL
 			FeatureMapLayer provincieLayer = (FeatureMapLayer) context

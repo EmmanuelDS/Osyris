@@ -962,6 +962,59 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Zoekt verantwoordelijke medewerker voor een bepaald trajectType aan de
+	 * hand van het MedewerkerProfiel.
+	 * 
+	 * @param traject
+	 * @return
+	 */
+	@RunPrivileged
+	@SuppressWarnings("unchecked")
+	public ResourceName zoekVerantwoordelijke(String trajectType) {
+
+		try {
+
+			// Group medewerkers opzoeken
+			DefaultQuery query = new DefaultQuery("Group");
+			query.addFilter(FilterUtils.equal("groupname", "Medewerker"));
+			List<Group> groups = new ArrayList<Group>();
+			groups = (List<Group>) modelRepository.searchObjects(query, false,
+					false);
+			Group group = (Group) ModelRepository.getUniqueResult(groups);
+
+			// Users uit medewerker group halen
+			for (ResourceIdentifier id : group.getMembers()) {
+				User medewerker = (User) modelRepository.loadObject(id);
+
+				if (medewerker != null) {
+					// Check welke Medewerker verantwoordelijk is voor het
+					// gekozen trajectType
+					MedewerkerProfiel profiel = (MedewerkerProfiel) medewerker
+							.getAspect("MedewerkerProfiel", modelRepository,
+									true);
+					if (profiel != null) {
+						for (String type : profiel.getTrajectType()) {
+
+							if (type.equals(trajectType)) {
+								return modelRepository
+										.getResourceName(medewerker);
+							}
+						}
+					}
+				}
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		} catch (InstantiationException e) {
+			LOG.error("Can not instantiate object.", e);
+		} catch (IllegalAccessException e) {
+			LOG.error("Can not access object.", e);
+		}
+		return null;
+	}
+
+	/**
 	 * Validaties voor WerkOpdrachten.
 	 * 
 	 * @return

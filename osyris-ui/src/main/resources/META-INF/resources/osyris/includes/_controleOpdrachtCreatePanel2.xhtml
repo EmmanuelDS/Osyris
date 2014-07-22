@@ -211,7 +211,12 @@
 							listener="#{form.onDeleteFeatures}" />
 					</m:mapViewer>
 				</div>
-			</r:panel></td>
+			</r:panel>
+			<u:decorate
+				template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+				<u:param name="form" value="#{form}" />
+			</u:decorate>
+		</td>
 		</tr>
 	</table>
 	<d:buttons>
