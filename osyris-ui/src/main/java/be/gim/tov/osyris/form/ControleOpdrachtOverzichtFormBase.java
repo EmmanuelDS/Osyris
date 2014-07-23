@@ -526,7 +526,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			// Routes filteren op trajectNaam
 			if (trajectType.contains("Route")) {
-				QueryBuilder builder = new QueryBuilder("Bord");
+				QueryBuilder builder = new QueryBuilder("RouteBord");
 				// builder.addFilter(FilterUtils.equal("naam", trajectNaam));
 				builder.addFilter(FilterUtils.and(
 						FilterUtils.equal("naam", trajectNaam),
@@ -581,7 +581,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			if (t instanceof Route) {
 
 				// Routes filteren op trajectNaam
-				QueryBuilder builder = new QueryBuilder("Bord");
+				QueryBuilder builder = new QueryBuilder("RouteBord");
 				// builder.addFilter(FilterUtils.equal("naam", t.getNaam()));
 				builder.addFilter(FilterUtils.and(
 						FilterUtils.equal("naam", t.getNaam()),
