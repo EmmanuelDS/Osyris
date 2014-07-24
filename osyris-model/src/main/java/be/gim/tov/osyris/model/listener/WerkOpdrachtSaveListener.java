@@ -64,27 +64,27 @@ public class WerkOpdrachtSaveListener {
 			werkOpdracht.setDatumLaatsteWijziging(new Date());
 			werkOpdracht.setGemeente(osyrisModelFunctions
 					.getWerkOpdrachtGemeente(werkOpdracht.getProbleem()));
+		}
 
-			// Voor BordProbleem uitvoerder zoeken via RegioID van het
-			// Bord
-			if (werkOpdracht.getUitvoerder() == null) {
-				if (werkOpdracht.getProbleem() instanceof BordProbleem) {
-					Bord b = (Bord) modelRepository
-							.loadObject(((BordProbleem) werkOpdracht
-									.getProbleem()).getBord());
-					werkOpdracht.setUitvoerder(osyrisModelFunctions
-							.zoekUitvoerder(b.getRegio()));
-				}
+		// Voor BordProbleem uitvoerder zoeken via RegioID van het
+		// Bord
+		if (werkOpdracht.getUitvoerder() == null) {
+			if (werkOpdracht.getProbleem() instanceof BordProbleem) {
+				Bord b = (Bord) modelRepository
+						.loadObject(((BordProbleem) werkOpdracht.getProbleem())
+								.getBord());
+				werkOpdracht.setUitvoerder(osyrisModelFunctions
+						.zoekUitvoerder(b.getRegio()));
+			}
 
-				// Voor AnderProbleem uitvoerder zoeken via intersect geometrie
-				// met regio
-				if (werkOpdracht.getProbleem() instanceof AnderProbleem) {
-					werkOpdracht
-							.setUitvoerder(osyrisModelFunctions.zoekUitvoerder(osyrisModelFunctions
-									.searchRegioForProbleem(((AnderProbleem) werkOpdracht
-											.getProbleem()).getGeom())));
+			// Voor AnderProbleem uitvoerder zoeken via intersect geometrie
+			// met regio
+			if (werkOpdracht.getProbleem() instanceof AnderProbleem) {
+				werkOpdracht
+						.setUitvoerder(osyrisModelFunctions.zoekUitvoerder(osyrisModelFunctions
+								.searchRegioForProbleem(((AnderProbleem) werkOpdracht
+										.getProbleem()).getGeom())));
 
-				}
 			}
 		}
 	}
