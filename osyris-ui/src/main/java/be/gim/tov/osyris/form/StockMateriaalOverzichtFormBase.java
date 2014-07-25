@@ -164,6 +164,6 @@ public class StockMateriaalOverzichtFormBase extends
 	@Override
 	public void clear() {
 		object = null;
-		setHoeveelheid(null);
+		setHoeveelheid(0);
 	}
 }

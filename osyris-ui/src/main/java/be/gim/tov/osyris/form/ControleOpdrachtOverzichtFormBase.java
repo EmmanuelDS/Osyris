@@ -144,6 +144,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected ResourceIdentifier regio;
 	protected String trajectType;
 	protected String trajectNaam;
+	protected String trajectTypeCreate;
+	protected String trajectNaamCreate;
 	protected Date vanDatum;
 	protected Date totDatum;
 	protected List<Bord> bewegwijzering;
@@ -188,6 +190,22 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	public void setTrajectNaam(String trajectNaam) {
 		this.trajectNaam = trajectNaam;
+	}
+
+	public String getTrajectTypeCreate() {
+		return trajectTypeCreate;
+	}
+
+	public void setTrajectTypeCreate(String trajectTypeCreate) {
+		this.trajectTypeCreate = trajectTypeCreate;
+	}
+
+	public String getTrajectNaamCreate() {
+		return trajectNaamCreate;
+	}
+
+	public void setTrajectNaamCreate(String trajectNaamCreate) {
+		this.trajectNaamCreate = trajectNaamCreate;
 	}
 
 	public Date getVanDatum() {
@@ -361,8 +379,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void create() {
 
 		try {
-			trajectType = null;
-			trajectNaam = null;
+			trajectTypeCreate = null;
+			trajectNaamCreate = null;
 			object = null;
 			bewegwijzering = null;
 
@@ -392,18 +410,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			// Indien route achterhalen van de TrajectId via de routeNaam
 			if (object.getTraject() == null) {
-				if (trajectType.contains("Route")) {
-					MapViewer viewer = getViewer();
-					MapContext context = viewer.getConfiguration().getContext();
+				// if (trajectTypeCreate.contains("Route")) {
+				MapViewer viewer = getViewer();
+				MapContext context = viewer.getConfiguration().getContext();
 
-					for (FeatureMapLayer layer : context.getFeatureLayers()) {
-						if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-							layer.setFilter(FilterUtils.equal("naam",
-									trajectNaam));
-							searchTrajectId(layer);
-						}
+				for (FeatureMapLayer layer : context.getFeatureLayers()) {
+					if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+						layer.setFilter(FilterUtils.equal("naam",
+								trajectNaamCreate));
+						searchTrajectId(layer);
 					}
 				}
+				// }
 			}
 
 			if (object.getTraject() != null) {
@@ -526,11 +544,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		try {
 			// Routes filteren op trajectNaam
-			if (trajectType.contains("Route")) {
+			if (trajectTypeCreate.contains("Route")) {
 				QueryBuilder builder = new QueryBuilder("RouteBord");
 				// builder.addFilter(FilterUtils.equal("naam", trajectNaam));
 				builder.addFilter(FilterUtils.and(
-						FilterUtils.equal("naam", trajectNaam),
+						FilterUtils.equal("naam", trajectNaamCreate),
 						FilterUtils.equal("actief", "1")));
 
 				bewegwijzering = (List<Bord>) modelRepository.searchObjects(
@@ -539,14 +557,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 				Collections.sort(bewegwijzering, new AlphanumericSorting());
 			}
 
-			else if (trajectType.contains("Lus")) {
+			else if (trajectTypeCreate.contains("Lus")) {
 
 				MapViewer viewer = getViewer();
 				MapContext context = viewer.getConfiguration().getContext();
 
 				for (FeatureMapLayer layer : context.getFeatureLayers()) {
-					if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+					if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+						layer.setFilter(FilterUtils.equal("naam",
+								trajectNaamCreate));
 						searchTrajectId(layer);
 					}
 				}
@@ -633,23 +652,24 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 
 			// Traject
-			else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+			else if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
 				// Route of Lussen
 				searchRouteLayer(layer);
 				envelope = viewer.getContentExtent(layer);
 			}
 			// RouteBord
-			else if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
+			else if (layer.getLayerId().equalsIgnoreCase(
+					trajectTypeCreate + "Bord")) {
 				searchRouteLayer(layer);
 			}
 			// NetwerkBord
 			else if (layer.getLayerId().equalsIgnoreCase(
-					trajectType.replace("Lus", "") + "Bord")) {
+					trajectTypeCreate.replace("Lus", "") + "Bord")) {
 				searchNetwerkBordLayer(layer);
 			}
 			// Knooppunten
 			else if (layer.getLayerId().equalsIgnoreCase(
-					trajectType.replace("Lus", "") + "Knooppunt")) {
+					trajectTypeCreate.replace("Lus", "") + "Knooppunt")) {
 				searchKnooppuntLayer(layer);
 			}
 		}
@@ -676,8 +696,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 			MapContext context = viewer.getConfiguration().getContext();
 
 			for (FeatureMapLayer mapLayer : context.getFeatureLayers()) {
-				if (mapLayer.getLayerId().equalsIgnoreCase(trajectType)) {
-					mapLayer.setFilter(FilterUtils.equal("naam", trajectNaam));
+				if (mapLayer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+					mapLayer.setFilter(FilterUtils.equal("naam",
+							trajectNaamCreate));
 					searchTrajectId(mapLayer);
 				}
 			}
@@ -708,8 +729,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private void searchRouteLayer(FeatureMapLayer layer) {
 
 		layer.setHidden(false);
-		if (trajectNaam != null) {
-			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		if (trajectNaamCreate != null) {
+			layer.setFilter(FilterUtils.like("naam", trajectNaamCreate));
 		}
 	}
 
@@ -761,11 +782,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public void searchTrajectId(FeatureMapLayer layer) {
 
-		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+		if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
 					.getFeature(layer, getViewer().getContext().getSrsName(),
 							getViewer().getContext().getBoundingBox(), null,
-							FilterUtils.equal("naam", trajectNaam), null, 1);
+							FilterUtils.equal("naam", trajectNaamCreate), null,
+							1);
 
 			FeatureIterator<SimpleFeature> iterator = features.features();
 

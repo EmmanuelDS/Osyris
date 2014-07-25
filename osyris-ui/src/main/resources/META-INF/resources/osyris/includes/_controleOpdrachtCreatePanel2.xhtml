@@ -13,10 +13,10 @@
 		<td width="50%" valign="top">
 		<r:panel id="searchTrajectPanel" header="Zoek traject">
 				<d:fields>
-					<d:field for="trajectType"
+					<d:field for="trajectTypeCreate"
 						label="Traject type">
-						<h:selectOneMenu id="trajectType"
-							value="#{form.trajectType}">
+						<h:selectOneMenu id="trajectTypeCreate"
+							value="#{form.trajectTypeCreate}">
 							<f:selectItem itemValue=""
 								itemLabel="" />
 							<f:selectItems
@@ -27,15 +27,15 @@
 						</h:selectOneMenu>
 					</d:field>
 					<j:renderPanel id="detailSearchPanel"
-							rendered="#{form.trajectType != null}">
-						<d:field for="trajectNaam" label="Traject naam"
+							rendered="#{form.trajectTypeCreate != null}">
+						<d:field for="trajectNaamCreate" label="Traject naam"
 								rendered="true"
 								required="true">
-							<h:selectOneMenu id="trajectNaam"
-									value="#{form.trajectNaam}">
+							<h:selectOneMenu id="trajectNaamCreate"
+									value="#{form.trajectNaamCreate}">
 									<f:selectItem itemValue="" itemLabel="" />
 									<f:selectItems
-										value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+										value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectTypeCreate))}" />
 							</h:selectOneMenu>
 						</d:field>
 						<br />

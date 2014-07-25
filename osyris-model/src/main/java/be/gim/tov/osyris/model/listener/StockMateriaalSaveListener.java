@@ -52,6 +52,12 @@ public class StockMateriaalSaveListener {
 		// Check of StockMateriaal onder minimum aantal zit
 		if (stockMateriaal.getInStock() <= stockMateriaal.getMin()) {
 
+			// Te bestelling hoeveelheid
+			if (stockMateriaal.getMax() > 0) {
+				stockMateriaal.setTeBestellen(stockMateriaal.getMax()
+						- stockMateriaal.getInStock());
+			}
+
 			// Stuur email naar Routedokters
 			String mailServiceStatus = DefaultConfiguration.instance()
 					.getString("service.mail.stockMateriaal");
@@ -59,6 +65,10 @@ public class StockMateriaalSaveListener {
 			if (mailServiceStatus.equalsIgnoreCase("on")) {
 				sendMail(stockMateriaal);
 			}
+		}
+		// Er moet niets besteld worden
+		else {
+			stockMateriaal.setTeBestellen(0);
 		}
 	}
 
