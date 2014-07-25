@@ -93,6 +93,8 @@ import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.exceptions.AlreadyInRondeException;
+import be.gim.tov.osyris.model.werk.exceptions.InStatusTeControlerenException;
 import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
@@ -585,7 +587,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 				// Opdrachten mogen nog niet aan een ronde toegewezen zijn
 				if (werkOpdracht.getInRonde().equals("1")) {
-					throw new IOException();
+					throw new AlreadyInRondeException();
+				}
+
+				// Opdracht mag niet in status Te Controleren staan
+				if (werkOpdracht.getStatus().equals(
+						WerkopdrachtStatus.TE_CONTROLEREN)) {
+					throw new InStatusTeControlerenException();
 				}
 
 				// Set opdrachten flagged inRonde true
@@ -607,8 +615,17 @@ public class WerkOpdrachtOverzichtFormBase extends
 					+ e.getMessage());
 			LOG.error("Illegal access at creation model object.", e);
 
-		} catch (IOException e) {
+		} catch (AlreadyInRondeException e) {
 			messages.error("Gelieve minstens 1 werkopdracht aan te vinken die nog niet aan een ronde is toegevoegd.");
+			LOG.error("Can not save Uitvoeringsronde.", e);
+
+		} catch (InStatusTeControlerenException e) {
+			messages.error("Er zijn geselecteerde opdrachten die zich in status 'Te Controleren' bevinden. Gelieve deze opdracht(en) eerst te controleren.");
+			LOG.error("Can not save Uitvoeringsronde.", e);
+
+		} catch (IOException e) {
+			messages.error("Fout bij het aanmaken van uitvoeringsronde: "
+					+ e.getMessage());
 			LOG.error("Can not save Uitvoeringsronde.", e);
 
 		}

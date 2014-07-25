@@ -361,9 +361,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void create() {
 
 		try {
+			trajectType = null;
+			trajectNaam = null;
 			object = null;
 			bewegwijzering = null;
-			trajectNaam = null;
 
 			if (controleOpdrachtType.equals("route")) {
 				object = (ControleOpdracht) modelRepository.createObject(
@@ -686,6 +687,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			layer.setFilter(FilterUtils.in("segmenten", lus.getSegmenten()));
 
+			List<String> bordIds = new ArrayList<String>();
+
+			for (Bord b : createBewegwijzering(object.getTraject())) {
+				bordIds.add(b.getId().toString());
+			}
+			layer.setFilter(FilterUtils.in("id", bordIds));
+
 		} catch (IOException e) {
 			LOG.error("Can not load NetwerkLus.", e);
 		}
@@ -884,9 +892,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 					sendConfirmationMail();
 				}
 
-				clear();
-				search();
+				// clear();
+				object = null;
+				controleOpdrachtType = null;
+				bewegwijzering = null;
+				trajectId = null;
 
+				search();
 				messages.info("Controleopdracht succesvol verzonden.");
 
 			} catch (IOException e) {
@@ -1759,7 +1771,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			modelRepository.deleteObject(object);
 			messages.info("Controleopdracht succesvol verwijderd.");
-			clear();
+			// clear();
 			search();
 
 		} catch (IOException e) {

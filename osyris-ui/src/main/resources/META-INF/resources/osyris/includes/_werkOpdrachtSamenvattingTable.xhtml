@@ -36,7 +36,7 @@
 					</j:commandButton>
 					
 					<j:commandButton
-						rendered="#{form.isCanView(werkOpdracht) and form.object.status == 'AANGEMAAKT'}"
+						rendered="#{form.isCanView(werkOpdracht) and form.object.status == 'AANGEMAAKT' and werkOpdracht.status != 'TE_CONTROLEREN'}"
 						image="#{resource['core/images/actions/16x16/edit.png']}"
 						type="image"
 						title="Rapporteren werkopdracht"

@@ -122,7 +122,6 @@ public class StockMateriaalOverzichtFormBase extends
 			// GebruiktMateriaal toevoegen en saven indien niet 0
 			if (aantalGebruikt != 0) {
 				opdracht.getMaterialen().add(gebruiktMateriaal);
-				modelRepository.saveObject(opdracht);
 			}
 
 			// reset aantal gebruikt
@@ -136,10 +135,6 @@ public class StockMateriaalOverzichtFormBase extends
 			messages.error("Fout bij het toevoegen van stockmateriaal: "
 					+ e.getMessage());
 			LOG.error("Illegal access at object.", e);
-		} catch (IOException e) {
-			messages.error("Fout bij het toevoegen van stockmateriaal: "
-					+ e.getMessage());
-			LOG.error("Can not save object.", e);
 		}
 	}
 

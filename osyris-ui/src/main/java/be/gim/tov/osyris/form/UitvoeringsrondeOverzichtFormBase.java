@@ -439,6 +439,18 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		}
 	}
 
+	public void saveWO(WerkOpdracht werkOpdracht) {
+
+		try {
+			modelRepository.saveObject(getSelectedWerkOpdracht());
+
+		} catch (IOException e) {
+			messages.error("fout bij het bewaren van Werkopdracht: "
+					+ e.getMessage());
+			LOG.error("Can not save Uitvoeringsronde.", e);
+		}
+	}
+
 	/**
 	 * Rapporteren van een Uitvoeringsronde waarin alle WerkOpdrachten
 	 * gerapporteerd zijn.

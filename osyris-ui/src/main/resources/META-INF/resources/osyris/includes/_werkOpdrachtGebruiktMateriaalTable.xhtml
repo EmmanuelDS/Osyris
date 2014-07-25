@@ -96,7 +96,8 @@
 					title="Materiaal toevoegen"
 					image="#{resource['core/images/actions/16x16/add.png']}"
 					type="image"
-					onclick="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).show();" />
+					action="#{form.saveWO(form.selectedWerkOpdracht)}"
+					oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).show();" />
 				</a:outputPanel>
 			</f:facet>
 	   	</p:dataTable>
