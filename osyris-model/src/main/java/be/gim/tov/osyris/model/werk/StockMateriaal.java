@@ -4,6 +4,7 @@ import java.util.Date;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Default;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Minimum;
 import org.conscientia.api.model.annotation.Model;
@@ -15,6 +16,7 @@ import org.conscientia.api.model.annotation.NotViewable;
 import org.conscientia.api.model.annotation.Parents;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Search;
 import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
@@ -71,19 +73,28 @@ public class StockMateriaal extends AbstractModelObject implements
 
 	private String nummer;
 
+	@Required
 	@NotEditable
 	@NotSearchable
+	@Default("0")
+	@Minimum(value = 0)
 	private int inStock;
 
+	@Required
 	@NotSearchable
+	@Default("5")
 	@Minimum(value = 0)
 	private int min;
 
+	@Required
 	@NotSearchable
+	@Default("10")
 	@Minimum(value = 0)
 	private int max;
 
 	@NotSearchable
+	@Default("0")
+	@Minimum(value = 0)
 	private int teBestellen;
 
 	@NotEditable

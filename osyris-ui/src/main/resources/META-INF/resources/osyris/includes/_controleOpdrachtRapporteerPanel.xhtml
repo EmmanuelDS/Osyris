@@ -51,6 +51,14 @@
 							mode="EDIT" />
 					</d:field>
 				</a:outputPanel>
+				
+				<d:field label="Foto" for="foto">	 
+						<d:propertyValue id="foto"
+							modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+							value="#{form.probleem.foto}"
+							mode="EDIT" />
+					</d:field>
+					
 				<d:propertyField id="commentaar"
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.probleem.commentaar}"

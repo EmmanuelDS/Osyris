@@ -19,8 +19,8 @@
 	<td width="40%" valign="top">
 	<r:panel id="searchTrajectPanel" header="Zoek route of netwerk">
 		<d:fields>
-			<d:field for="trajectType" label="Route of netwerk type" required="true">
-				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" >
+			<d:field for="trajectTypeCreate" label="Route of netwerk type" required="true">
+				<h:selectOneMenu id="trajectTypeCreate" value="#{form.trajectTypeCreate}" >
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
 					<a:ajax
@@ -30,26 +30,26 @@
 						listener="#{form.resetChildSearchParameters()}" />
 				</h:selectOneMenu>
 			</d:field>
-			<d:field for="regio" label="Regio">
-				<h:selectOneMenu id="regio" value="#{form.regio}">
+			<d:field for="regioCreate" label="Regio">
+				<h:selectOneMenu id="regioCreate" value="#{form.regioCreate}">
 					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
 					<a:ajax
 						event="change"
-						render="trajectNaam"
+						render="trajectNaamCreate"
 						execute="@this" />
 				</h:selectOneMenu>
 			</d:field>
-			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectType != null}">
-				<d:field for="trajectNaam" label="Traject naam" rendered="#{form.trajectType.contains('Route') or form.trajectType.contains('WandelNetwerk') }" required="#{form.trajectType.contains('Route')}">
-					<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true">
+			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectTypeCreate != null}">
+				<d:field for="trajectNaamCreate" label="Traject naam" rendered="#{form.trajectTypeCreate.contains('Route') or form.trajectTypeCreate.contains('WandelNetwerk') }" required="#{form.trajectTypeCreate.contains('Route')}">
+					<h:selectOneMenu id="trajectNaamCreate" value="#{form.trajectNaamCreate}" rendered="true">
 						<f:selectItem itemValue="" itemLabel="" />
-						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regioCreate, form.trajectTypeCreate))}" />
 					</h:selectOneMenu>
 				</d:field>
-				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
-					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
+				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectTypeCreate.contains('Segment')}" >
+					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectTypeCreate.contains('Segment')}">
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
 					</h:selectOneMenu>
@@ -68,7 +68,7 @@
 	</r:panel>
 		
 	<r:panel header="Selecteer en beschrijf het probleem">
-	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
+	<j:renderPanel id="problemPanel" rendered="#{form.trajectTypeCreate != null}">
 	
 		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
 		<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
@@ -127,7 +127,7 @@
 			</j:commandButton>
 			</a:outputPanel>
 			<br/>
-			<a:outputPanel rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}">
+			<a:outputPanel rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}">
 			<br/>
 			<d:fields>
 			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
@@ -136,7 +136,7 @@
 			</d:fields>
 			<j:commandButton
 				id="selectSegment"
-				rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}"
+				rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}"
 				image="#{resource['core/images/actions/24x24/select.png']}"
 				styleClass="component-toolbar-button"
 				value="Selecteer segment"
@@ -248,7 +248,7 @@
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"
 			image="#{resource['core/images/actions/12x12/cancel.png']}"
-			action="#{form.cancel()}"
+			action="#{form.cancelCreateWO()}"
 			execute="@this"
 			oncomplete="conscientia.widget(#{r:element('createPopup')}).hide();" />
 	</d:buttons>

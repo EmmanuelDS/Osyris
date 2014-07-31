@@ -142,6 +142,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	protected String controleOpdrachtType;
 	protected ResourceIdentifier regio;
+	protected String regioCreate;
 	protected String trajectType;
 	protected String trajectNaam;
 	protected String trajectTypeCreate;
@@ -190,6 +191,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	public void setTrajectNaam(String trajectNaam) {
 		this.trajectNaam = trajectNaam;
+	}
+
+	public String getRegioCreate() {
+		return regioCreate;
+	}
+
+	public void setRegioCreate(String regioCreate) {
+		this.regioCreate = regioCreate;
 	}
 
 	public String getTrajectTypeCreate() {
@@ -379,8 +388,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void create() {
 
 		try {
+			regioCreate = null;
 			trajectTypeCreate = null;
 			trajectNaamCreate = null;
+
 			object = null;
 			bewegwijzering = null;
 
@@ -2121,16 +2132,23 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void validerenControleOpdracht() {
 		// Indien alle problemen in een ControleOpdracht een status hebben is de
 		// ControleOpdracht gevalideerd
-		if (object != null) {
-			if (checkOpenstaandeProblemen(object) == 0) {
+		try {
+			if (object != null) {
+				if (checkOpenstaandeProblemen(object) == 0) {
 
-				object.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
-				object.setDatumGevalideerd(new Date());
-				object.setDatumLaatsteWijziging(new Date());
+					object.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
+					object.setDatumGevalideerd(new Date());
+					object.setDatumLaatsteWijziging(new Date());
 
-				// WerkOpdrachten aanmaken
-				createWerkOpdrachten(object);
+					modelRepository.saveObject(object);
+					messages.info("Controleopdracht succesvol gevalideerd.");
+
+					// WerkOpdrachten aanmaken
+					createWerkOpdrachten(object);
+				}
 			}
+		} catch (IOException e) {
+			LOG.error("Can not validate ControleOpdracht.", e);
 		}
 	}
 

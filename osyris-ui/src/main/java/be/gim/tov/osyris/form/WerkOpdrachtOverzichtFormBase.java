@@ -142,6 +142,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected ResourceIdentifier regio;
 	protected String trajectType;
 	protected String trajectNaam;
+	protected ResourceIdentifier regioCreate;
+	protected String trajectTypeCreate;
+	protected String trajectNaamCreate;
 	protected Date vanDatum;
 	protected Date totDatum;
 	protected String gemeente;
@@ -213,6 +216,30 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	public void setTrajectNaam(String trajectNaam) {
 		this.trajectNaam = trajectNaam;
+	}
+
+	public ResourceIdentifier getRegioCreate() {
+		return regioCreate;
+	}
+
+	public void setRegioCreate(ResourceIdentifier regioCreate) {
+		this.regioCreate = regioCreate;
+	}
+
+	public String getTrajectTypeCreate() {
+		return trajectTypeCreate;
+	}
+
+	public void setTrajectTypeCreate(String trajectTypeCreate) {
+		this.trajectTypeCreate = trajectTypeCreate;
+	}
+
+	public String getTrajectNaamCreate() {
+		return trajectNaamCreate;
+	}
+
+	public void setTrajectNaamCreate(String trajectNaamCreate) {
+		this.trajectNaamCreate = trajectNaamCreate;
 	}
 
 	public Date getVanDatum() {
@@ -1386,11 +1413,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 	@SuppressWarnings("unchecked")
 	public void searchTraject() throws IOException {
 
-		if (trajectType == null) {
+		if (trajectTypeCreate == null) {
 			messages.warn("Gelieve eerst een route- of netwerktype te selecteren alvorens te zoeken.");
 		}
 
-		else if (trajectType.contains("Route") && trajectNaam == null) {
+		else if (trajectTypeCreate.contains("Route")
+				&& trajectNaamCreate == null) {
 			messages.warn("Gelieve bij het zoeken naar routes een trajectnaam te selecteren.");
 		}
 
@@ -1412,9 +1440,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 					layer.setHidden(false);
 				}
 
-				else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+				else if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
 					// Netwerk
-					if (trajectType.contains("Segment")) {
+					if (trajectTypeCreate.contains("Segment")) {
 						searchNetwerkLayer(layer);
 					}
 					// Route
@@ -1425,19 +1453,19 @@ public class WerkOpdrachtOverzichtFormBase extends
 				}
 				// RouteBord
 				else if (layer.getLayerId().equalsIgnoreCase(
-						trajectType + "Bord")) {
+						trajectTypeCreate + "Bord")) {
 					searchRouteBordLayer(layer);
 				}
 				// NetwerkBord
 				// Filtering op de borden
 				else if (layer.getLayerId().equalsIgnoreCase(
-						trajectType.replace("Segment", "") + "Bord")) {
+						trajectTypeCreate.replace("Segment", "") + "Bord")) {
 					layer.setHidden(false);
 					searchNetwerkBordLayer(layer);
 				}
 				// WandelKnooppunt
 				else if (layer.getLayerId().contains("Knooppunt")
-						&& trajectType.contains("WandelNetwerk")) {
+						&& trajectTypeCreate.contains("WandelNetwerk")) {
 					FeatureMapLayer mapLayer = (FeatureMapLayer) context
 							.getLayer("wandelNetwerkKnooppunt");
 					searchKnooppuntLayer2(mapLayer);
@@ -1445,7 +1473,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 				// FietsKnooppunt
 				else if (layer.getLayerId().contains("Knooppunt")
-						&& trajectType.contains("FietsNetwerk")) {
+						&& trajectTypeCreate.contains("FietsNetwerk")) {
 					FeatureMapLayer mapLayer = (FeatureMapLayer) context
 							.getLayer("fietsNetwerkKnooppunt");
 					searchKnooppuntLayer2(mapLayer);
@@ -1497,11 +1525,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 			// Reset layers
 			resetLayers(context);
-			// for (FeatureMapLayer layer : context.getFeatureLayers()) {
-			// layer.setFilter(null);
-			// layer.setHidden(true);
-			// layer.setSelection(Collections.EMPTY_LIST);
-			// }
 
 			// Add edit layer to context
 			mapFactory.createGeometryLayer(context, GEOMETRY_LAYER_NAME, null,
@@ -1531,10 +1554,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 	public void resetChildSearchParameters() {
 
 		setKnooppuntNummer(null);
-		setTrajectNaam(null);
+		trajectNaamCreate = null;
 
 		object.setMedewerker(Beans.getReference(OsyrisModelFunctions.class)
-				.zoekVerantwoordelijke(trajectType));
+				.zoekVerantwoordelijke(trajectTypeCreate));
 	}
 
 	/**
@@ -1572,10 +1595,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		layer.setHidden(false);
 
-		if (regio != null && trajectNaam == null) {
-			layer.setFilter(FilterUtils.equal("regio", regio));
-		} else if (trajectNaam != null) {
-			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		if (regioCreate != null && trajectNaamCreate == null) {
+			layer.setFilter(FilterUtils.equal("regio", regioCreate));
+		} else if (trajectNaamCreate != null) {
+			layer.setFilter(FilterUtils.like("naam", trajectNaamCreate));
 		}
 	}
 
@@ -1590,12 +1613,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 		layer.setHidden(false);
 		layer.setSelection(Collections.EMPTY_LIST);
 
-		if (regio != null && trajectNaam == null) {
-			layer.setFilter(FilterUtils.equal("regio", regio));
+		if (regioCreate != null && trajectNaam == null) {
+			layer.setFilter(FilterUtils.equal("regio", regioCreate));
 		}
 
-		else if (trajectNaam != null) {
-			layer.setFilter(FilterUtils.like("naam", trajectNaam));
+		else if (trajectNaamCreate != null) {
+			layer.setFilter(FilterUtils.like("naam", trajectNaamCreate));
 		}
 
 		layer.set("selectionMode", FeatureSelectionMode.SINGLE);
@@ -1620,22 +1643,24 @@ public class WerkOpdrachtOverzichtFormBase extends
 				FilterUtils.equal("kpnr3", knooppuntNummer));
 
 		Filter filter = null;
-		if (regio != null) {
+		if (regioCreate != null) {
 			if (knooppuntNummer == null) {
-				filter = FilterUtils.and(FilterUtils.equal("regio", regio));
+				filter = FilterUtils.and(FilterUtils
+						.equal("regio", regioCreate));
 			} else {
-				filter = FilterUtils.and(FilterUtils.equal("regio", regio),
+				filter = FilterUtils.and(
+						FilterUtils.equal("regio", regioCreate),
 						knooppuntFilter);
 			}
 		}
-		if (trajectNaam != null) {
+		if (trajectNaamCreate != null) {
 			if (knooppuntNummer == null) {
-				filter = FilterUtils
-						.and(FilterUtils.equal("naam", trajectNaam),
-								knooppuntFilter);
+				filter = FilterUtils.and(
+						FilterUtils.equal("naam", trajectNaamCreate),
+						knooppuntFilter);
 			} else {
-				filter = FilterUtils
-						.and(FilterUtils.equal("naam", trajectNaam));
+				filter = FilterUtils.and(FilterUtils.equal("naam",
+						trajectNaamCreate));
 			}
 		}
 		layer.setFilter(filter);
@@ -1655,32 +1680,33 @@ public class WerkOpdrachtOverzichtFormBase extends
 		Filter filter = null;
 
 		if (knooppuntNummer == null) {
-			if (regio != null) {
-				filter = FilterUtils.equal("regio", regio);
+			if (regioCreate != null) {
+				filter = FilterUtils.equal("regio", regioCreate);
 				layer.setFilter(filter);
 			}
 
-			if (trajectNaam != null) {
-				filter = FilterUtils.equal("naam", trajectNaam);
+			if (trajectNaamCreate != null) {
+				filter = FilterUtils.equal("naam", trajectNaamCreate);
 				layer.setFilter(filter);
 			}
 		}
 
 		else if (knooppuntNummer != null) {
-			if (regio != null) {
-				filter = FilterUtils.and(FilterUtils.equal("regio", regio),
-						(FilterUtils.equal("nummer", knooppuntNummer)));
-				layer.setFilter(filter);
-			}
-
-			if (trajectNaam != null) {
+			if (regioCreate != null) {
 				filter = FilterUtils.and(
-						FilterUtils.equal("naam", trajectNaam),
+						FilterUtils.equal("regio", regioCreate),
 						(FilterUtils.equal("nummer", knooppuntNummer)));
 				layer.setFilter(filter);
 			}
 
-			if (trajectNaam == null && regio == null) {
+			if (trajectNaamCreate != null) {
+				filter = FilterUtils.and(
+						FilterUtils.equal("naam", trajectNaamCreate),
+						(FilterUtils.equal("nummer", knooppuntNummer)));
+				layer.setFilter(filter);
+			}
+
+			if (trajectNaamCreate == null && regioCreate == null) {
 				filter = FilterUtils.equal("nummer", knooppuntNummer);
 				layer.setFilter(filter);
 			}
@@ -1720,9 +1746,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 		layer.setSelection(Collections.EMPTY_LIST);
 		Filter filter = null;
 
-		if (regio != null && trajectNaam == null && knooppuntNummer == null) {
+		if (regioCreate != null && trajectNaamCreate == null
+				&& knooppuntNummer == null) {
 
-			filter = FilterUtils.equal("regio", regio);
+			filter = FilterUtils.equal("regio", regioCreate);
 			envelope = getViewer().getFeatureExtent(layer, filter);
 
 			List<String> ids = new ArrayList<String>();
@@ -1744,9 +1771,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 		}
 
-		else if (trajectNaam != null) {
+		else if (trajectNaamCreate != null) {
 
-			filter = FilterUtils.equal("naam", trajectNaam);
+			filter = FilterUtils.equal("naam", trajectNaamCreate);
 			layer.set("selectable", true);
 
 			if (knooppuntNummer == null) {
@@ -1784,8 +1811,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 				setHasErrors(false);
 				modelRepository.saveObject(object);
 				messages.info("Werkopdracht succesvol aangemaakt.");
-				trajectType = null;
-				trajectNaam = null;
+				regioCreate = null;
+				trajectTypeCreate = null;
+				trajectNaamCreate = null;
 				probleemType = null;
 				object = null;
 				search();
@@ -1822,8 +1850,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 				MapContext context = viewer.getConfiguration().getContext();
 
 				for (FeatureMapLayer layer : context.getFeatureLayers()) {
-					if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
-						layer.setFilter(FilterUtils.equal("naam", trajectNaam));
+					if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+						layer.setFilter(FilterUtils.equal("naam",
+								trajectNaamCreate));
 						searchTrajectId(layer);
 					}
 				}
@@ -1985,11 +2014,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 */
 	public void searchTrajectId(FeatureMapLayer layer) {
 
-		if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+		if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
 			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
 					.getFeature(layer, getViewer().getContext().getSrsName(),
 							getViewer().getContext().getBoundingBox(), null,
-							FilterUtils.equal("naam", trajectNaam), null, 1);
+							FilterUtils.equal("naam", trajectNaamCreate), null,
+							1);
 			FeatureIterator<SimpleFeature> iterator = features.features();
 
 			try {
@@ -2031,11 +2061,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		if ("bord".equals(probleemType)) {
 
-			if (trajectType.endsWith("Route")) {
+			if (trajectTypeCreate.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
 
-			} else if (trajectType.contains("Netwerk")) {
+			} else if (trajectTypeCreate.contains("Netwerk")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkBordProbleem", null);
 			}
@@ -2044,13 +2074,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 			for (FeatureMapLayer layer : context.getFeatureLayers()) {
 				layer.set("selectable", false);
 
-				if (layer.getLayerId().equalsIgnoreCase(trajectType + "Bord")) {
+				if (layer.getLayerId().equalsIgnoreCase(
+						trajectTypeCreate + "Bord")) {
 					layer.set("selectable", true);
 					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 					layer.setSelection(new ArrayList<String>(1));
 
 				} else if (layer.getLayerId().equalsIgnoreCase(
-						trajectType.replace("Segment", "") + "Bord")) {
+						trajectTypeCreate.replace("Segment", "") + "Bord")) {
 					layer.set("selectable", true);
 					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 					layer.setSelection(new ArrayList<String>(1));
@@ -2072,11 +2103,11 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 		} else if ("ander".equals(probleemType)) {
 
-			if (trajectType.endsWith("Route")) {
+			if (trajectTypeCreate.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteAnderProbleem", null);
 
-			} else if (trajectType.contains("Netwerk")) {
+			} else if (trajectTypeCreate.contains("Netwerk")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"NetwerkAnderProbleem", null);
 			}
@@ -2093,7 +2124,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 				}
 
 				// Indien NetwerkSegment laag laag op selecteerbaar zetten
-				else if (layer.getLayerId().equalsIgnoreCase(trajectType)) {
+				else if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
 					layer.set("selectable", true);
 					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 					layer.setSelection(new ArrayList<String>(1));
@@ -2108,5 +2139,21 @@ public class WerkOpdrachtOverzichtFormBase extends
 		probleem.setStatus(ProbleemStatus.WERKOPDRACHT);
 		object.setProbleem(probleem);
 		viewer.updateContext(null);
+	}
+
+	/**
+	 * Annuleren van een manueel aangemaakte WerkOpdracht
+	 * 
+	 */
+	public void cancelCreateWO() {
+		if (object != null) {
+			modelRepository.evictObject(object);
+		}
+		trajectTypeCreate = null;
+		regioCreate = null;
+		trajectNaamCreate = null;
+		probleemType = null;
+		object = null;
+		search();
 	}
 }

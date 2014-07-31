@@ -114,7 +114,7 @@
 		       		<fo:inline font-weight="bold"><xsl:text>Werkhandelingen: </xsl:text></fo:inline>
 		      	</fo:block>    
 		       	<xsl:for-each select="/opdracht/handeling">
-			        <fo:block margin-left="20px" margin-bottom="20px">
+			        <fo:block margin-left="20px" margin-bottom="8px">
 			        	<xsl:value-of
 			        		select="./nummer">
 			        	</xsl:value-of>

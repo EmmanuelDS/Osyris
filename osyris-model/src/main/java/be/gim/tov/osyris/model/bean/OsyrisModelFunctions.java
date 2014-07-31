@@ -1814,8 +1814,9 @@ public class OsyrisModelFunctions {
 
 		if (geom != null) {
 			Traject t = (Traject) modelRepository.loadObject(traject);
-
 			DefaultQuery query = new DefaultQuery();
+			List<ResourceIdentifier> segmentIds = new ArrayList<ResourceIdentifier>();
+			segmentIds.add(traject);
 
 			if (t instanceof Route) {
 				query.setModelClassName(t.getModelClass().getName()
@@ -1826,13 +1827,14 @@ public class OsyrisModelFunctions {
 			if (t instanceof NetwerkSegment) {
 				query.setModelClassName(t.getModelClass().getName()
 						.replace("Segment", "Bord"));
-				// query.addFilter(FilterUtils.in("segmenten", segmentIds));
+				query.addFilter(FilterUtils.in("segmenten", segmentIds));
 			}
 
 			if (t instanceof NetwerkLus) {
 				query.setModelClassName(t.getModelClass().getName()
 						.replace("Lus", "Bord"));
-				// query.addFilter(FilterUtils.in("segmenten", segmentIds));
+				query.addFilter(FilterUtils.in("segmenten",
+						((NetwerkLus) t).getSegmenten()));
 			}
 
 			// Query op buffer 3000m rond het AnderProbleem punt

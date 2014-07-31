@@ -37,6 +37,7 @@ import be.gim.commons.encoder.impl.raster.RasterEncoderFactory;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
+import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
@@ -1052,21 +1053,24 @@ public class XmlBuilder {
 			rootElement.appendChild(naarKp);
 		}
 
-		Element handeling = doc.createElement("handeling");
 		if (object.getHandelingen() != null
 				&& !object.getHandelingen().isEmpty()) {
 			for (WerkHandeling h : object.getHandelingen()) {
 
-				rootElement.appendChild(handeling);
+				if (h != null && h.getType() != null) {
+					Element handeling = doc.createElement("handeling");
+					rootElement.appendChild(handeling);
 
-				Element nummer = doc.createElement("nummer");
-				nummer.appendChild(doc.createTextNode(String.valueOf(counter)));
-				handeling.appendChild(nummer);
-				counter++;
+					Element nummer = doc.createElement("nummer");
+					nummer.appendChild(doc.createTextNode(String
+							.valueOf(counter)));
+					handeling.appendChild(nummer);
+					counter++;
 
-				Element type = doc.createElement("type");
-				type.appendChild(doc.createTextNode(h.getType()));
-				handeling.appendChild(type);
+					Element type = doc.createElement("type");
+					type.appendChild(doc.createTextNode(h.getType()));
+					handeling.appendChild(type);
+				}
 			}
 		}
 
@@ -1152,19 +1156,26 @@ public class XmlBuilder {
 						false)));
 		rootElement.appendChild(mapTopoAnderProbleem);
 
-		viewer.setBaseLayerId("tms");
 		if (nearestBord != null) {
-
 			// Laat opnieuw de overige borden zien
-			if (nearestBord instanceof NetwerkBord) {
-				layer.setFilter(FilterUtils.equal("segmenten",
-						object.getTraject()));
-			} else {
+			if (traject instanceof NetwerkSegment) {
+
+				ArrayList<ResourceIdentifier> segmentIds = new ArrayList<ResourceIdentifier>();
+				segmentIds.add(object.getTraject());
+				layer.setFilter(FilterUtils.in("segmenten", segmentIds));
+
+			} else if (traject instanceof NetwerkLus) {
+				layer.setFilter(FilterUtils.in("segmenten",
+						((NetwerkLus) traject).getSegmenten()));
+			}
+
+			else if (traject instanceof Route) {
 				layer.setFilter(FilterUtils.equal("naam", traject.getNaam()));
 			}
-			viewer.setLayerVisibility(layer, true);
+			layer.setHidden(false);
 		}
 		nearestBord = null;
+		viewer.setBaseLayerId("tms");
 
 		return doc;
 	}
