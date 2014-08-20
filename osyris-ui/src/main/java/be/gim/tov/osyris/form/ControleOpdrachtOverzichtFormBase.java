@@ -681,7 +681,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// Knooppunten
 			else if (layer.getLayerId().equalsIgnoreCase(
 					trajectTypeCreate.replace("Lus", "") + "Knooppunt")) {
-				searchKnooppuntLayer(layer);
+				searchKnooppuntLayer2(layer);
 			}
 		}
 
@@ -745,10 +745,6 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 	}
 
-	/**
-	 * 
-	 * @param layer
-	 */
 	private void searchKnooppuntLayer(FeatureMapLayer layer) {
 
 		layer.setHidden(false);
@@ -758,6 +754,49 @@ public class ControleOpdrachtOverzichtFormBase extends
 		try {
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
+
+			Set<Long> knooppuntFilterIds = new HashSet<Long>();
+
+			for (ResourceIdentifier segment : lus.getSegmenten()) {
+				NetwerkSegment seg = (NetwerkSegment) modelRepository
+						.loadObject(segment);
+
+				NetwerkKnooppunt vanKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getVanKnooppunt());
+
+				NetwerkKnooppunt naarKp = (NetwerkKnooppunt) modelRepository
+						.loadObject(seg.getNaarKnooppunt());
+
+				if (vanKp != null) {
+					knooppuntFilterIds.add(vanKp.getId());
+				}
+
+				if (naarKp != null) {
+					knooppuntFilterIds.add(naarKp.getId());
+				}
+			}
+			layer.setFilter(FilterUtils.in("id", knooppuntFilterIds));
+
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		}
+	}
+
+	private void searchKnooppuntLayer2(FeatureMapLayer layer) {
+
+		layer.setHidden(false);
+		layer.setFilter(null);
+		layer.setSelection(Collections.EMPTY_LIST);
+
+		try {
+
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName(trajectTypeCreate);
+			query.setFilter(FilterUtils.equal("naam", trajectNaamCreate));
+			List<NetwerkLus> lussen = (List<NetwerkLus>) modelRepository
+					.searchObjects(query, false, false);
+			NetwerkLus lus = lussen.get(0);
+
 			Set<Long> knooppuntFilterIds = new HashSet<Long>();
 
 			for (ResourceIdentifier segment : lus.getSegmenten()) {
@@ -1216,8 +1255,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
 
-			if (layer.getSelection().size() == 1) {
-				String id = ids.iterator().next();
+			// Vermijden dat niet zichtbare borden geselecteerd worden
+			List<String> idsFiltered = new ArrayList<String>();
+			for (Bord b : createBewegwijzering(object.getTraject())) {
+				if (ids.contains(b.getId().toString())) {
+					idsFiltered.add(b.getId().toString());
+				}
+			}
+
+			// Limiteren selectie Borden tot 1
+			if (idsFiltered.size() == 1) {
+				String id = idsFiltered.iterator().next();
+				layer.setSelection(idsFiltered);
 				((BordProbleem) getProbleem()).setBord(new ResourceKey("Bord",
 						id));
 			} else {

@@ -1,6 +1,5 @@
 package be.gim.tov.osyris.model.controle.status;
 
-
 /**
  * 
  * @author kristof
@@ -8,5 +7,5 @@ package be.gim.tov.osyris.model.controle.status;
  */
 public enum MeldingStatus {
 
-	GEMELD, GEVALIDEERD
+	GEMELD, IN_BEHANDELING, REEDS_GEMELD, GEEN_WERKOPDRACHT, GEVALIDEERD
 }

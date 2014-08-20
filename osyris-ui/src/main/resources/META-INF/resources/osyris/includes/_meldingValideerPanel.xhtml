@@ -91,7 +91,7 @@
 	</table>
 	<d:buttons>
 		<j:commandButton
-			rendered="#{form.isCanEdit(form.object) and form.object.status == 'GEMELD'}"
+			rendered="#{form.isCanEdit(form.object) and (form.object.status == 'GEMELD' or form.object.status == 'IN_BEHANDELING') }"
 			value="Opslaan"
 			image="#{resource['core/images/actions/12x12/apply.png']}"
 			type="button"

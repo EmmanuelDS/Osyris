@@ -67,15 +67,44 @@ public class MeldingSaveListener {
 		if (melding.getProbleem() != null) {
 			if (melding.getProbleem().getStatus() != null) {
 
-				melding.setStatus(MeldingStatus.GEVALIDEERD);
-				melding.setDatumGevalideerd(new Date());
-				melding.setDatumLaatsteWijziging(new Date());
-				melding.setTrajectType(osyrisModelFunctions
-						.getTrajectType(melding.getTraject()));
+				// Indien Probleem reeds gemeld
+				if (melding.getProbleem().getStatus()
+						.equals(ProbleemStatus.REEDS_GEMELD)) {
+					melding.setStatus(MeldingStatus.REEDS_GEMELD);
+					melding.setDatumGevalideerd(new Date());
+					melding.setDatumLaatsteWijziging(new Date());
+					melding.setTrajectType(osyrisModelFunctions
+							.getTrajectType(melding.getTraject()));
+				}
+
+				// Indien Probleem in behandeling
+				if (melding.getProbleem().getStatus()
+						.equals(ProbleemStatus.IN_BEHANDELING)) {
+					melding.setStatus(MeldingStatus.IN_BEHANDELING);
+					melding.setDatumGevalideerd(new Date());
+					melding.setDatumLaatsteWijziging(new Date());
+					melding.setTrajectType(osyrisModelFunctions
+							.getTrajectType(melding.getTraject()));
+				}
+
+				// Indien Probleem geen WerkOpdracht moet worden
+				if (melding.getProbleem().getStatus()
+						.equals(ProbleemStatus.GEEN_WERKOPDRACHT)) {
+					melding.setStatus(MeldingStatus.GEEN_WERKOPDRACHT);
+					melding.setDatumGevalideerd(new Date());
+					melding.setDatumLaatsteWijziging(new Date());
+					melding.setTrajectType(osyrisModelFunctions
+							.getTrajectType(melding.getTraject()));
+				}
 
 				// Aanmaken werkopdracht indien status probleem werkopdracht
 				if (melding.getProbleem().getStatus()
 						.equals(ProbleemStatus.WERKOPDRACHT)) {
+					melding.setStatus(MeldingStatus.GEVALIDEERD);
+					melding.setDatumGevalideerd(new Date());
+					melding.setDatumLaatsteWijziging(new Date());
+					melding.setTrajectType(osyrisModelFunctions
+							.getTrajectType(melding.getTraject()));
 					createWerkOpdracht(melding);
 				}
 			}
