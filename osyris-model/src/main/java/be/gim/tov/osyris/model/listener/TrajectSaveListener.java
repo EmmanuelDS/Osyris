@@ -41,7 +41,10 @@ public class TrajectSaveListener {
 			traject.setId(newId);
 		}
 
-		// Indien geen PeterMeter opgegeven veld op nulll zetten
+		// Set LabelId for SLD
+		traject.setLabelId(traject.getId().toString());
+
+		// Indien geen PeterMeter opgegeven veld op null zetten
 		if (traject.getPeterMeter1() != null
 				&& traject.getPeterMeter1().equals(GEEN_PETER_METER)) {
 			traject.setPeterMeter1(null);

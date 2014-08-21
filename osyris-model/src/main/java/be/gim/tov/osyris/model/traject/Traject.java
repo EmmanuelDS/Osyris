@@ -98,6 +98,11 @@ public abstract class Traject extends AbstractModelObject implements
 	@Target("_blank")
 	private ResourceIdentifier peterMeter3;
 
+	@NotViewable
+	@NotSearchable
+	@NotEditable
+	private String labelId;
+
 	// GETTERS AND SETTERS
 	public String getNaam() {
 		return naam;
@@ -153,6 +158,14 @@ public abstract class Traject extends AbstractModelObject implements
 
 	public void setPeterMeter3(ResourceIdentifier peterMeter3) {
 		this.peterMeter3 = peterMeter3;
+	}
+
+	public String getLabelId() {
+		return labelId;
+	}
+
+	public void setLabelId(String labelId) {
+		this.labelId = labelId;
 	}
 
 	@Transient

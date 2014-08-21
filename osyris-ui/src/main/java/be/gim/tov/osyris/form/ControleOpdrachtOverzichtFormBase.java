@@ -1255,7 +1255,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
 
-			// Vermijden dat niet zichtbare borden geselecteerd worden
+			// Workaround om te vermijden dat niet zichtbare borden geselecteerd
+			// worden
+			// Enkel de Borden behorende tot de bewegwijzering van het Traject
+			// mogen geselecteerd
+			// worden.
 			List<String> idsFiltered = new ArrayList<String>();
 			for (Bord b : createBewegwijzering(object.getTraject())) {
 				if (ids.contains(b.getId().toString())) {
