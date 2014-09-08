@@ -235,7 +235,7 @@
 		
 		<j:sectionPanel
 			label="Selecteren"
-			rendered="#{viewer.context.title == 'Routes' and viewer.context.showFeatureInfoControl and (!identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))}"
+			rendered="#{viewer.context.title == 'Routes' and viewer.context.showFeatureInfoControl}"
 			transient="true">
 			<j:commandButton
 				image="#{resource['osyris/images/selectBord.png']}"

@@ -19,7 +19,7 @@
 	<td width="40%" valign="top">
 	<r:panel id="searchTrajectPanel" header="Zoek route of netwerk">
 		<d:fields>
-			<d:field for="trajectTypeCreate" label="Route of netwerk type" required="true">
+			<d:field for="trajectTypeCreate" label="Type" required="true">
 				<h:selectOneMenu id="trajectTypeCreate" value="#{form.trajectTypeCreate}" >
 					<f:selectItem itemValue="" itemLabel="" />
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
@@ -70,94 +70,93 @@
 	<r:panel header="Selecteer en beschrijf het probleem">
 	<j:renderPanel id="problemPanel" rendered="#{form.trajectTypeCreate != null}">
 	
-		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
-		<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
-           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
-			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
-			<a:ajax event="change" 
-					listener="#{form.createProbleem()}" 
-					render="problemPanel" 
-					execute="@this"/> 
-       </h:selectOneRadio>
-       </h:panelGrid>
+		<d:field for="probleemType" 
+				label="Type probleem"
+				required="true">
+				<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
+		           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
+					<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+					<a:ajax event="change" 
+							listener="#{form.createProbleem()}" 
+							render="problemPanel,viewer" 
+							execute="@this"/> 
+		       </h:selectOneRadio>
+	     </d:field>
     	
 		<j:renderPanel id="probleemPanel" rendered="#{form.object.probleem != null}">
 			<div>
 			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
-			<br/>
-			<d:fields>
-			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
-			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
-			</d:fields>
-			<j:commandButton
-				id="selectFeatures"
-				rendered="#{form.probleemType == 'bord'}"
-				image="#{resource['core/images/actions/24x24/select.png']}"
-				styleClass="component-toolbar-button"
-				value="Selecteer bord"
-				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-				submit="false">
-				<j:activateControl
-					for="viewer"
-					event="click"
-					control="selectBox" />
-			</j:commandButton>
+<!-- 			<br/> -->
+<!-- 			<j:commandButton -->
+<!-- 				id="selectFeatures" -->
+<!-- 				rendered="#{form.probleemType == 'bord'}" -->
+<!-- 				image="#{resource['core/images/actions/24x24/select.png']}" -->
+<!-- 				styleClass="component-toolbar-button" -->
+<!-- 				value="Selecteer bord" -->
+<!-- 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
+<!-- 				submit="false" -->
+<!-- 				render="viewer"> -->
+<!-- 				<j:activateControl -->
+<!-- 					for="viewer" -->
+<!-- 					event="click" -->
+<!-- 					control="selectBox" /> -->
+<!-- 			</j:commandButton> -->
 			</a:outputPanel>
 			<br/>
 			
 			<a:outputPanel rendered="#{form.probleemType == 'ander'}">
-			<br/>
-			<d:fields>
-			<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
-			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
-			</d:fields>
-			<j:commandButton
-				id="drawPoint"
-				rendered="#{form.probleemType == 'ander'}"
-				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
-				styleClass="component-toolbar-button"
-				value="Teken punt"
-				submit="false">
-				<j:activateControl
-					for="viewer"
-					event="click"
-					control="drawPoint" />
-			</j:commandButton>
+<!-- 			<br/> -->
+<!-- 			<d:fields> -->
+<!-- 			<b><h:outputText value="Duid probleem(punt) aan op kaart hiernaast. "></h:outputText></b> -->
+<!-- 			<h:graphicImage alt="(verplicht)" -->
+<!-- 						value="#{resource['core/images/actions/12x12/required_alt.png']}" /> -->
+<!-- 			</d:fields> -->
+<!-- 			<j:commandButton -->
+<!-- 				id="drawPoint" -->
+<!-- 				rendered="#{form.probleemType == 'ander'}" -->
+<!-- 				image="#{resource['core/images/actions/24x24/drawPoint.png']}" -->
+<!-- 				styleClass="component-toolbar-button" -->
+<!-- 				value="Teken punt" -->
+<!-- 				submit="false" -->
+<!-- 				render="viewer"> -->
+<!-- 				<j:activateControl -->
+<!-- 					for="viewer" -->
+<!-- 					event="click" -->
+<!-- 					control="drawPoint" /> -->
+<!-- 			</j:commandButton> -->
 			</a:outputPanel>
-			<br/>
+<!-- 			<br/> -->
 			<a:outputPanel rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}">
 			<br/>
-			<d:fields>
-			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
-			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
-			</d:fields>
-			<j:commandButton
-				id="selectSegment"
-				rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}"
-				image="#{resource['core/images/actions/24x24/select.png']}"
-				styleClass="component-toolbar-button"
-				value="Selecteer segment"
-				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-				submit="false">
-				<j:activateControl
-					for="viewer"
-					event="click"
-					control="selectBox" >
-					<f:param
-						name="layerId"
-						value="#{trajectType}" />
-				</j:activateControl>
-			</j:commandButton>
+<!-- 			<d:fields> -->
+<!-- 			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b> -->
+<!-- 			<h:graphicImage alt="(verplicht)" -->
+<!-- 						value="#{resource['core/images/actions/12x12/required_alt.png']}" /> -->
+<!-- 			</d:fields> -->
+<!-- 			<j:commandButton -->
+<!-- 				id="selectSegment" -->
+<!-- 				rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}" -->
+<!-- 				image="#{resource['core/images/actions/24x24/select.png']}" -->
+<!-- 				styleClass="component-toolbar-button" -->
+<!-- 				value="Selecteer segment" -->
+<!-- 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
+<!-- 				submit="false"> -->
+<!-- 				<j:activateControl -->
+<!-- 					for="viewer" -->
+<!-- 					event="click" -->
+<!-- 					control="selectBox" > -->
+<!-- 					<f:param -->
+<!-- 						name="layerId" -->
+<!-- 						value="#{trajectType}" /> -->
+<!-- 				</j:activateControl> -->
+<!-- 			</j:commandButton> -->
 			</a:outputPanel>
 			</div>
-			<br/>
-			<d:propertyField id="foto" 
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
-						value="#{form.object.probleem.foto}"
-						mode="EDIT" />		
+<!-- 			<br/>		 -->
+			<d:propertyField id="status" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+						value="#{form.object.probleem.status}"
+						mode="VIEW" />			
 			<j:renderPanel id="typePanel" rendered="#{form.isBordProbleem(form.object.probleem)}">			
 			<d:propertyField id="type" 
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
@@ -170,22 +169,25 @@
 						value="#{form.object.probleem.categorie}"
 						mode="EDIT" />	
 			</j:renderPanel>
-			<d:propertyField id="status" 
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
-						value="#{form.object.probleem.status}"
-						mode="VIEW" />				
+			<d:propertyField id="foto" 
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+						value="#{form.object.probleem.foto}"
+						mode="EDIT" />						
 			<d:propertyField id="commentaar" 
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
 						value="#{form.object.probleem.commentaar}"
 						mode="EDIT" />
-						
+			<d:fields>
+				<b><h:outputText value="Duid een bord aan op de kaart hiernaast. "></h:outputText></b>
+				<h:graphicImage alt="(verplicht)"
+							value="#{resource['core/images/actions/12x12/required_alt.png']}" />
+			</d:fields>						
 		</j:renderPanel>
-	</j:renderPanel>
-	  		
+	</j:renderPanel>	  		
 	</r:panel>
 		
-		<j:renderPanel id="praktischeInfoPanel">
-		<r:panel id="werkOpdrachtInfo" header="Werkopdracht Info">
+	<j:renderPanel id="praktischeInfoPanel">
+	<r:panel id="werkOpdrachtInfo" header="Werkopdracht Info">
 		<d:fields>
 		
 			<d:field label="Medewerker (*)" for="medewerker">	 

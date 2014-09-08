@@ -121,7 +121,7 @@
 			type="button"
 			action="#{form.verzendenWerkOpdracht()}"
 			render="#{render}" 
-			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();"/>
+			oncomplete="if(#{!form.hasErrors})conscientia.widget(#{r:element('viewPopup')}).hide();"/>
 		<j:commandButton
 			rendered="#{form.object.status == 'GERAPPORTEERD' }"
 			value="Valideren"

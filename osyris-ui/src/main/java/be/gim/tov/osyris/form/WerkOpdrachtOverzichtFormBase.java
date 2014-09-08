@@ -460,10 +460,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 			if (object.getHandelingen().isEmpty()
 					|| object.getHandelingen() == null) {
 
-				messages.error("Gelieve minstens 1 handeling toe te voegen alvorens de werkopdracht te verzenden.");
+				messages.warn("Gelieve minstens 1 werkhandeling toe te voegen alvorens deze werkopdracht te verzenden.");
+				setHasErrors(true);
 
 			} else {
 
+				setHasErrors(false);
 				object.setStatus(WerkopdrachtStatus.UIT_TE_VOEREN);
 				object.setDatumUitTeVoeren(new Date());
 				object.setDatumLaatsteWijziging(new Date());
@@ -1612,15 +1614,22 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		layer.setHidden(false);
 		layer.setSelection(Collections.EMPTY_LIST);
+		Filter filter = null;
 
-		if (regioCreate != null && trajectNaam == null) {
-			layer.setFilter(FilterUtils.equal("regio", regioCreate));
+		if (regioCreate != null && trajectNaamCreate != null) {
+			filter = FilterUtils.and(FilterUtils.equal("regio", regioCreate),
+					FilterUtils.like("naam", trajectNaamCreate));
 		}
 
 		else if (trajectNaamCreate != null) {
-			layer.setFilter(FilterUtils.like("naam", trajectNaamCreate));
+			filter = FilterUtils.like("naam", trajectNaamCreate);
 		}
 
+		else if (regioCreate != null) {
+			filter = FilterUtils.equal("regio", regioCreate);
+
+		}
+		layer.setFilter(filter);
 		layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 	}
 
@@ -1969,8 +1978,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * Event bij het updaten van features op de kaart
 	 * 
 	 * @param event
+	 * @throws IOException
 	 */
-	public void onUpdateFeatures(ControllerEvent event) {
+	public void onUpdateFeatures(ControllerEvent event) throws IOException {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
@@ -1985,7 +1995,26 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		// Precies 1 punt koppelen aan een Anderprobleem
 		if (layer.getGeometries().size() == 1) {
-			if (object.getProbleem() instanceof AnderProbleem) {
+
+			if (object.getProbleem() instanceof NetwerkAnderProbleem) {
+
+				// Zoek het dichtstbijzijnde NetwerkSegment
+				ResourceIdentifier segmentId = Beans.getReference(
+						OsyrisModelFunctions.class).getNearestSegment(
+						layer.getGeometries().iterator().next(),
+						trajectTypeCreate.replace("netwerk", "Netwerk"));
+
+				// Koppel het dichtstbijzijnde NetwerkSegment bij het
+				// Probleempunt
+				if (segmentId != null) {
+					object.setTraject(segmentId);
+					((AnderProbleem) object.getProbleem()).setGeom(layer
+							.getGeometries().iterator().next());
+				} else {
+					layer.getGeometries().clear();
+				}
+
+			} else if (object.getProbleem() instanceof AnderProbleem) {
 				((AnderProbleem) object.getProbleem()).setGeom(layer
 						.getGeometries().iterator().next());
 			}
@@ -2061,6 +2090,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		if ("bord".equals(probleemType)) {
 
+			context.setShowFeatureInfoControl(true);
+			context.setShowDrawPointControl(false);
+
 			if (trajectTypeCreate.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
@@ -2102,6 +2134,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 				}
 			}
 		} else if ("ander".equals(probleemType)) {
+
+			context.setShowFeatureInfoControl(false);
+			context.setShowDrawPointControl(true);
 
 			if (trajectTypeCreate.endsWith("Route")) {
 				probleem = (Probleem) modelRepository.createObject(
