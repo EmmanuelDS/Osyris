@@ -11,7 +11,12 @@
 	<h:outputStylesheet id="fileuploadCss"
 		name="fileupload/fileupload.css"
 		library="primefaces" />
-		
+	<script>
+		function test() {
+			var controller = #{j:controller()};
+			controller.activateControl("drawLineString");
+		}
+	</script>
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
 	<table width="100%">
@@ -19,23 +24,23 @@
 	<td width="50%" valign="top">
 	<r:panel id="ProblemenPanel" header="Problemen">	
 	<j:renderPanel id="problemPanel">
-		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
+		<d:field for="probleemType" label="Kies het type probleem">
 			<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
-	           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
-				<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
+	           	<f:selectItem itemValue="bord" itemLabel="Bordprobleem" />
+				<f:selectItem itemValue="ander" itemLabel="Ander probleem" />
 				<a:ajax event="change" 
 						listener="#{form.createProbleem()}" 
-						render="problemPanel" 
+						render="problemPanel, viewer" 
 						execute="@this"/> 
 	       </h:selectOneRadio>
-	    </h:panelGrid>
+		</d:field>
 	<br/>
 	<j:renderPanel id="probleemPanel" rendered="#{form.probleem != null}">
 <!-- 		<d:object mode="EDIT" -->
 <!-- 				value="#{form.probleem}" />	 -->
 
 				<a:outputPanel rendered="#{form.isBordProbleem(form.probleem)}">
-   					<d:field label="Beschrijving" for="type">	 
+   					<d:field label="Beschrijving" for="type" required="true">	 
 						<d:propertyValue id="type"
 							modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
 							value="#{form.probleem.type}"
@@ -44,7 +49,7 @@
 				</a:outputPanel>
 				
 				<a:outputPanel rendered="#{!form.isBordProbleem(form.probleem)}">
-					<d:field label="Beschrijving" for="categorie">	 
+					<d:field label="Beschrijving" for="categorie"  required="true">	 
 						<d:propertyValue id="categorie"
 							modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
 							value="#{form.probleem.categorie}"
@@ -52,84 +57,57 @@
 					</d:field>
 				</a:outputPanel>
 				
+				<d:propertyField id="commentaar"
+				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{form.probleem.commentaar}"
+						mode="EDIT" />
+				
 				<d:field label="Foto" for="foto">	 
 						<d:propertyValue id="foto"
 							modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
 							value="#{form.probleem.foto}"
 							mode="EDIT" />
 					</d:field>
-					
-				<d:propertyField id="commentaar"
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-						value="#{form.probleem.commentaar}"
-						mode="EDIT" />
 						
 		<a:outputPanel rendered="#{form.probleemType == 'bord'}">
 		<d:fields>
-			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
+			<b><h:outputText value="Duid het bord aan op de kaart hiernaast. "></h:outputText></b>
 			<h:graphicImage alt="(verplicht)"
 						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
 		</d:fields>
-		<j:commandButton
-			id="selectFeatures"
-			rendered="#{form.probleemType == 'bord'}"
-			image="#{resource['core/images/actions/24x24/select.png']}"
-			styleClass="component-toolbar-button"
-			value="Selecteer bord op kaart"
-			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-			submit="false">
-			<j:activateControl
-				for="viewer"
-				event="click"
-				control="selectBox" />
-		</j:commandButton>
 		</a:outputPanel>
 		
+<!-- 		<a:outputPanel rendered="#{form.probleemType == 'ander'}"> -->
+<!-- 		<br/> -->
+<!-- 		<d:fields> -->
+<!-- 		<b><h:outputText value="Duid het probleem(punt) aan op kaart hiernaast. "></h:outputText></b> -->
+<!-- 		<h:graphicImage alt="(verplicht)" -->
+<!-- 						value="#{resource['core/images/actions/12x12/required_alt.png']}" /> -->
+<!-- 		</d:fields> -->
+
+<!-- 		<br/> -->
+<!-- 		<br/> -->
+<!-- 		<d:fields> -->
+<!-- 		<b><h:outputText value="Teken een omleiding op de kaart hiernaast (optioneel)."></h:outputText></b> -->
+<!-- 		</d:fields> -->
+
 		<a:outputPanel rendered="#{form.probleemType == 'ander'}">
-		<br/>
-		<d:fields>
-		<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
-		<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
+		<d:fields> 
+			<b><h:outputText value="Kies de gewenste actie en voer daarna uit op de kaart: "></h:outputText></b>
 		</d:fields>
-		<j:commandButton
-			id="drawPoint"
-			rendered="#{form.probleemType == 'ander'}"
-			image="#{resource['core/images/actions/24x24/drawPoint.png']}"
-			styleClass="component-toolbar-button"
-			value="Teken punt"
-			action="#{form.switchToPointGeomLayer()}"
-			immediate="true">
-			<j:activateControl
-				for="viewer"
-				event="click"
-				control="drawPoint" />
-		</j:commandButton>
-		</a:outputPanel>
-		
-		<a:outputPanel rendered="#{form.probleemType == 'ander' }">
-		<br/>
-		<br/>
-		<d:fields>
-		<b><h:outputText value="Duid omleiding aan op kaart (optioneel)"></h:outputText></b>
-		</d:fields>
-		<j:commandButton
-			id="drawLineString"
-			rendered="#{form.probleemType == 'ander' }"
-			image="#{resource['core/images/actions/24x24/drawLineString.png']}"
-			styleClass="component-toolbar-button"
-			value="Teken lijn"
-			action="#{form.switchToLineGeomLayer()}"
-			immediate="true">
-			<j:activateControl
-				for="viewer"
-				event="click"
-				control="drawLineString" />
-		</j:commandButton>
+
+		<h:selectOneRadio id="editType" value="#{form.editType}" layout="pageDirection">
+	           	<f:selectItem itemValue="drawPoint" itemLabel="Duid een probleem(punt) aan (verplicht)"/>
+				<f:selectItem itemValue="drawLineString" itemLabel="Teken een omleiding (optioneel)" />
+				<a:ajax event="change" 
+						listener="#{form.setupEditLayers()}" 
+						render="viewer" 
+						execute="@this"/> 
+	       </h:selectOneRadio>
 		</a:outputPanel>
 	<d:buttons>
 		<j:commandButton value="Probleem toevoegen" rendered="true"
-			image="#{resource['core/images/actions/12x12/apply.png']}"
+			image="#{resource['core/images/actions/12x12/add.png']}"
 			type="button"
 			action="#{form.addProbleem()}" render="problemPanel" execute="problemPanel">
 		</j:commandButton>
@@ -173,21 +151,25 @@
 			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
 			<u:param name="form" value="#{form}" />
 		</u:decorate>
-	</td>
-	</tr>
-	</table>
-	<d:buttons>
-		<j:commandButton value="#{messages['form.general.save.button']}"
-			image="#{resource['core/images/actions/12x12/save.png']}"
+		<br/>
+		<d:buttons>
+		<j:commandButton 
+			style="font-size:1.5em;"
+			value="#{messages['form.general.save.button']}" 
+			image="#{resource['core/images/actions/16x16/save.png']}"
 			type="button"
 			action="#{form.save()}"
 			render="#{r:clientId('problemenOverzichtPanel')}"
 			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
 		<j:commandButton 
+			style="font-size:1.5em;"
 			value="Verzenden"
-			image="#{resource['core/images/actions/12x12/next.png']}"
+			image="#{resource['core/images/actions/16x16/next.png']}"
 			type="button"
 			immediate="true"
 			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).show();" />
 	</d:buttons>
+	</td>
+	</tr>
+	</table>
 </u:composition>

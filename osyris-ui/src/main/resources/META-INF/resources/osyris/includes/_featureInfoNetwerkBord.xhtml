@@ -1,0 +1,116 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:r="http://richfaces.org/rich">
+	
+	<table id="netwerkBordInfoTable">
+		<c:forEach items="#{info.results}" var="o" varStatus="loop">
+			<tr>
+				<td style="vertical-align: top; width: 10%;"><p:radioButton
+						for="bordInfoRadio" itemIndex="#{loop.index}" rendered="#{info.layer.isSelectable()}" />
+				</td>
+				<td style="width: 20%;">
+					<h:outputLabel styleClass="model-field-label" style="width:100%;" value="Bord id" />
+				</td>
+				<td style="width: 70%;">
+					<d:propertyValue id="netwerkBordId#{loop.index}"
+						modelProperty="#{d:modelClass('Bord').getProperty('id')}"
+						value="#{o.labelId}" mode="VIEW" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<h:outputLabel styleClass="model-field-label" style="width:100%;" value="Straat" />					
+				</td>
+				<td>	
+					<d:propertyValue id="netwerkBordStraat#{loop.index}"
+							modelProperty="#{d:modelClass('Bord').getProperty('straatnaam')}"
+							value="#{o.straatnaam}" mode="VIEW" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<h:outputLabel styleClass="model-field-label" style="width:100%;" value="Type" />
+						
+				</td>
+				<td>
+					<d:propertyValue id="netwerkBordType#{loop.index}"
+							modelProperty="#{d:modelClass('Bord').getProperty('bordType')}"
+							value="#{o.bordType}" mode="VIEW" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td>
+					<a:outputPanel rendered="#{o.kpnr0 != null}">
+						<h:outputLabel styleClass="model-field-label" style="width:100%;" value="KP" />
+					</a:outputPanel>
+				</td>
+				<td>
+					<d:propertyValue id="netwerkBordKP0#{loop.index}"
+							modelProperty="#{d:modelClass('Bord').getProperty('kpnr0')}"
+							value="#{o.kpnr0}" mode="VIEW" />
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td>
+					<a:outputPanel rendered="#{o.kpnr1 != null}" style="width:100%;">
+						<h:graphicImage rendered="#{o.kp1ImageCode == '2'}" alt="R"
+							value="#{resource['osyris/images/pijl_rechts.png']}" />
+						<d:propertyValue id="netwerkBordKP1#{loop.index}"
+							modelProperty="#{d:modelClass('Bord').getProperty('kpnr1')}"
+							value="#{o.kpnr1}" mode="VIEW" />
+						<h:graphicImage rendered="#{o.kp1ImageCode == '1'}" alt="L"
+							value="#{resource['osyris/images/pijl_links.png']}" />						
+						<h:graphicImage rendered="#{o.kp1ImageCode == '3'}" alt="RD"
+							value="#{resource['osyris/images/pijl_rechtdoor.png']}" />
+					</a:outputPanel>
+				</td>
+			</tr>
+			<tr>
+				<td></td>
+				<td></td>
+				<td>
+					<a:outputPanel rendered="#{o.kpnr2 != null}" style="width:100%;">
+						<h:graphicImage rendered="#{o.kp2ImageCode == '2'}" alt="R"
+							value="#{resource['osyris/images/pijl_rechts.png']}" />
+						<d:propertyValue id="netwerkBordKP2#{loop.index}"
+							modelProperty="#{d:modelClass('Bord').getProperty('kpnr2')}"
+							value="#{o.kpnr2}" mode="VIEW" />
+						<h:graphicImage rendered="#{o.kp2ImageCode == '1'}" alt="L"
+							value="#{resource['osyris/images/pijl_links.png']}" />						
+						<h:graphicImage rendered="#{o.kp2ImageCode == '3'}" alt="RD"
+							value="#{resource['osyris/images/pijl_rechtdoor.png']}" />
+					</a:outputPanel>
+				</td>
+			</tr>
+			<tr>
+				<td style="padding-bottom:30px;"></td>
+				<td style="padding-bottom:30px;"></td>
+				<td style="padding-bottom:30px;">
+					<a:outputPanel rendered="#{o.kpnr3 != null}" style="width:100%;">
+						<h:graphicImage rendered="#{o.kp3ImageCode == '2'}" alt="R"
+							value="#{resource['osyris/images/pijl_rechts.png']}" />
+						<d:propertyValue id="netwerkBordKP3#{loop.index}"
+							modelProperty="#{d:modelClass('Bord').getProperty('kpnr3')}"
+							value="#{o.kpnr3}" mode="VIEW" />
+						<h:graphicImage rendered="#{o.kp3ImageCode == '1'}" alt="L"
+							value="#{resource['osyris/images/pijl_links.png']}" />			
+						<h:graphicImage rendered="#{o.kp3ImageCode == '3'}" alt="RD"
+							value="#{resource['osyris/images/pijl_rechtdoor.png']}" />	
+					</a:outputPanel>
+				</td>	
+			</tr>
+		</c:forEach>
+	</table>
+</u:composition>

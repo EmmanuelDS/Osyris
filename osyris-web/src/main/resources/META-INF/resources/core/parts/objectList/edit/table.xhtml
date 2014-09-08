@@ -1,0 +1,119 @@
+<div
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="org.conscientia.ui.ModelValueList" />
+	<cc:implementation>
+		<p:dataTable
+			id="table"
+			value="#{cc.attrs.value}"
+			styleClass="model-table"
+			emptyMessage="">
+			<j:bindAttribute
+				var="index"
+				name="rowIndex" />
+			<j:cache
+				var="properties"
+				value="#{cc.attrs.modelProperty.objectClass.filterProperties(modelUtils.includeVisibleProperties(cc.attrs.mode, cc.attrs.level, true))}" />
+			<c:forEach
+				items="#{properties}"
+				var="property"
+				varStatus="status"
+				transient="true">
+				<p:column>
+					<f:facet name="header">
+						<d:displayLabel property="#{property}" />
+						<span> <h:graphicImage
+								value="#{resource['core/images/actions/12x12/required_alt.png']}"
+								styleClass="model-field-indicator"
+								title="#{messages['component.field.required.label']}"
+								rendered="#{property.required}" /> <h:graphicImage
+								value="#{resource['core/images/actions/12x12/final.png']}"
+								styleClass="model-field-indicator"
+								title="#{messages['component.field.final.label']}"
+								rendered="#{property.final}" /> <h:graphicImage
+								value="#{resource['core/images/actions/12x12/localized.png']}"
+								styleClass="model-field-indicator"
+								title="#{messages['component.field.international.label']}"
+								rendered="#{property.international}" />
+						</span>
+					</f:facet>
+					<c:set
+						var="itemId"
+						value="item_#{status.index}" />
+					<d:propertyValue
+						id="#{itemId}"
+						modelObject="#{cc.attrs.value[index]}"
+						modelProperty="#{property}"
+						mode="#{cc.attrs.mode}"
+						level="#{cc.attrs.level}" />
+					<p:message for="#{d:valueId(itemId)}" />
+				</p:column>
+			</c:forEach>
+			<p:column style="width: 60px; text-align: right;">
+				<f:facet name="header" />
+				<a:commandButton
+					value="Move up"
+					action="#{cc.moveItemUp(index)}"
+					render="table"
+					execute="table"
+					rendered="#{cc.canMoveItemUp(index)}"
+					image="#{resource['core/images/actions/16x16/up.png']}" />
+				<a:commandButton
+					value="Move down"
+					action="#{cc.moveItemDown(index)}"
+					render="table"
+					execute="table"
+					rendered="#{cc.canMoveItemDown(index)}"
+					image="#{resource['core/images/actions/16x16/down.png']}" />
+				<a:commandButton
+					value="#{messages['form.general.remove.button']}"
+					action="#{cc.removeItem(index)}"
+					render="table"
+					execute="table"
+					image="#{resource['core/images/actions/16x16/remove.png']}"
+					immediate="true" />
+			</p:column>
+			<f:facet name="footer">
+				<a:outputPanel
+					layout="block"
+					style="text-align: center">
+					<c:set
+						var="objectClass"
+						value="#{cc.attrs.modelProperty.objectClass}" />
+					<a:commandButton
+						value="#{messages['form.general.add.button']}"
+						image="#{resource['core/images/actions/16x16/add.png']}"
+						rendered="#{!objectClass.getHandler('create').hasComponent(objectClass, true)}"
+						action="#{cc.addItem(modelRepository.createObject(objectClass, null))}"
+						render="table"
+						execute="table" />
+					<a:commandButton
+						value="#{messages['form.general.add.button']}"
+						image="#{resource['core/images/actions/16x16/add.png']}"
+						rendered="#{objectClass.getHandler('create').hasComponent(objectClass, true)}">
+						<j:renderControl
+							event="click"
+							target="createObject"
+							rendered="true"
+							execute="table" />
+					</a:commandButton>
+					<d:createObject
+						id="createObject"
+						parentObject="#{cc.attrs.modelObject}"
+						modelClass="#{objectClass}"
+						assignMethod="#{cc.addItem}"
+						render="table"
+						rendered="false" />
+				</a:outputPanel>
+			</f:facet>
+		</p:dataTable>
+	</cc:implementation>
+</div>

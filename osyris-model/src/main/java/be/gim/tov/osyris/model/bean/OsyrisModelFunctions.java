@@ -791,7 +791,7 @@ public class OsyrisModelFunctions {
 			}
 
 		} catch (IOException e) {
-			LOG.error("Can not load Traject.", e);
+			LOG.error("Can not load Regio.", e);
 		}
 		return null;
 	}
@@ -1451,7 +1451,14 @@ public class OsyrisModelFunctions {
 			variables.put("lastname", melding.getNaam());
 			variables.put("phone", melding.getTelefoon());
 			variables.put("status", melding.getStatus());
-			variables.put("problem", melding.getProbleem());
+			if (melding.getProbleem() instanceof BordProbleem) {
+				variables.put("categorie",
+						((BordProbleem) melding.getProbleem()).getType());
+			} else if (melding.getProbleem() instanceof AnderProbleem) {
+				variables.put("categorie",
+						((AnderProbleem) melding.getProbleem()).getCategorie());
+			}
+			variables.put("commentaar", melding.getProbleem().getCommentaar());
 
 			// Mail naar melder
 			String mailServiceStatusMelder = DefaultConfiguration.instance()
@@ -1995,5 +2002,57 @@ public class OsyrisModelFunctions {
 			jaren.add(code1);
 		}
 		return jaren;
+	}
+
+	/**
+	 * Zoeken van het dichtsbijzijnde NetwerkSegment bij een
+	 * AnderNetwerkProbleem
+	 * 
+	 * @param geom
+	 * @param traject
+	 * @return
+	 * @throws Exception
+	 */
+	public ResourceIdentifier getNearestSegment(Geometry geom, String type)
+			throws IOException {
+
+		if (geom != null) {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName(type);
+
+			// Query op buffer 3000m rond het AnderProbleem punt
+			query.addFilter(FilterUtils.intersects(geom
+					.buffer(BUFFER_BORD_METER)));
+
+			List<Traject> segmenten = (List<Traject>) modelRepository
+					.searchObjects(query, false, false);
+
+			Map<ResourceIdentifier, Double> distances = new HashMap<ResourceIdentifier, Double>();
+
+			for (Traject segment : segmenten) {
+				double distance = DistanceOp.distance(geom, segment.getGeom());
+				distances.put(modelRepository.getResourceIdentifier(segment),
+						distance);
+			}
+
+			if (segmenten != null && !segmenten.isEmpty()) {
+
+				double minValueInMap = (Collections.min(distances.values()));
+
+				for (Entry<ResourceIdentifier, Double> entry : distances
+						.entrySet()) {
+					if (entry.getValue() == minValueInMap) {
+
+						ResourceIdentifier minSegmentId = entry.getKey();
+						return minSegmentId;
+					}
+				}
+			}
+
+			else {
+				messages.error("Het door U opgegeven punt bevindt zich niet in de buurt van het netwerk.");
+			}
+		}
+		return null;
 	}
 }

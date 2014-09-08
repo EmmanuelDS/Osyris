@@ -52,10 +52,6 @@ import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
-import org.geotools.feature.FeatureCollection;
-import org.geotools.feature.FeatureIterator;
-import org.opengis.feature.simple.SimpleFeature;
-import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.w3c.dom.Document;
@@ -160,6 +156,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected String baseLayerName;
 	protected String periode;
 	protected String jaar;
+	protected String editType;
+	protected boolean hasOmleiding;
+	protected boolean hasErrors;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -309,6 +308,25 @@ public class ControleOpdrachtOverzichtFormBase extends
 		this.jaar = jaar;
 	}
 
+	public String getEditType() {
+		if (editType == null) {
+			editType = "drawPoint";
+		}
+		return editType;
+	}
+
+	public void setEditType(String editType) {
+		this.editType = editType;
+	}
+
+	public boolean isHasErrors() {
+		return hasErrors;
+	}
+
+	public void setHasErrors(boolean hasErrors) {
+		this.hasErrors = hasErrors;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -418,24 +436,15 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@Override
 	public void save() {
 
+		setHasErrors(true);
 		try {
 			// Indien route achterhalen van de TrajectId via de routeNaam
 			if (object.getTraject() == null) {
-				// if (trajectTypeCreate.contains("Route")) {
-				MapViewer viewer = getViewer();
-				MapContext context = viewer.getConfiguration().getContext();
-
-				for (FeatureMapLayer layer : context.getFeatureLayers()) {
-					if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
-						layer.setFilter(FilterUtils.equal("naam",
-								trajectNaamCreate));
-						searchTrajectId(layer);
-					}
-				}
-				// }
+				messages.warn("Gelieve een traject voor deze controleopdracht te selecteren.");
 			}
 
 			if (object.getTraject() != null) {
+				setHasErrors(false);
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol bewaard.");
 				// clear();
@@ -570,16 +579,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			else if (trajectTypeCreate.contains("Lus")) {
 
-				MapViewer viewer = getViewer();
-				MapContext context = viewer.getConfiguration().getContext();
-
-				for (FeatureMapLayer layer : context.getFeatureLayers()) {
-					if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
-						layer.setFilter(FilterUtils.equal("naam",
-								trajectNaamCreate));
-						searchTrajectId(layer);
-					}
-				}
+				// MapViewer viewer = getViewer();
+				// MapContext context = viewer.getConfiguration().getContext();
+				//
+				// for (FeatureMapLayer layer : context.getFeatureLayers()) {
+				// if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+				// layer.setFilter(FilterUtils.equal("naam",
+				// trajectNaamCreate));
+				// searchTrajectId(layer);
+				// }
+				// }
 				NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 						.getTraject());
 
@@ -652,6 +661,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 		envelope = viewer.getContentExtent();
 		bewegwijzering = Collections.emptyList();
 
+		koppelTraject();
+
 		for (FeatureMapLayer layer : context.getFeatureLayers()) {
 			layer.setFilter(null);
 			layer.setHidden(true);
@@ -703,16 +714,16 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			// Indien nieuwe ControleOpdracht koppelen van TrajectID aan
 			// ControleOpdracht
-			MapViewer viewer = getViewer();
-			MapContext context = viewer.getConfiguration().getContext();
-
-			for (FeatureMapLayer mapLayer : context.getFeatureLayers()) {
-				if (mapLayer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
-					mapLayer.setFilter(FilterUtils.equal("naam",
-							trajectNaamCreate));
-					searchTrajectId(mapLayer);
-				}
-			}
+			// MapViewer viewer = getViewer();
+			// MapContext context = viewer.getConfiguration().getContext();
+			//
+			// for (FeatureMapLayer mapLayer : context.getFeatureLayers()) {
+			// if (mapLayer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+			// mapLayer.setFilter(FilterUtils.equal("naam",
+			// trajectNaamCreate));
+			// searchTrajectId(mapLayer);
+			// }
+			// }
 
 			NetwerkLus lus = (NetwerkLus) modelRepository.loadObject(object
 					.getTraject());
@@ -830,30 +841,31 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * 
 	 * @param layer
 	 */
-	public void searchTrajectId(FeatureMapLayer layer) {
-
-		if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
-			FeatureCollection<SimpleFeatureType, SimpleFeature> features = getViewer()
-					.getFeature(layer, getViewer().getContext().getSrsName(),
-							getViewer().getContext().getBoundingBox(), null,
-							FilterUtils.equal("naam", trajectNaamCreate), null,
-							1);
-
-			FeatureIterator<SimpleFeature> iterator = features.features();
-
-			try {
-				if (features.size() == 1) {
-					while (iterator.hasNext()) {
-						SimpleFeature feature = iterator.next();
-						object.setTraject(new ResourceKey("Traject", feature
-								.getAttribute("id").toString()));
-					}
-				}
-			} finally {
-				iterator.close();
-			}
-		}
-	}
+	// public void searchTrajectId(FeatureMapLayer layer) {
+	//
+	// if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
+	// FeatureCollection<SimpleFeatureType, SimpleFeature> features =
+	// getViewer()
+	// .getFeature(layer, getViewer().getContext().getSrsName(),
+	// getViewer().getContext().getBoundingBox(), null,
+	// FilterUtils.equal("naam", trajectNaamCreate), null,
+	// 1);
+	//
+	// FeatureIterator<SimpleFeature> iterator = features.features();
+	//
+	// try {
+	// if (features.size() == 1) {
+	// while (iterator.hasNext()) {
+	// SimpleFeature feature = iterator.next();
+	// object.setTraject(new ResourceKey("Traject", feature
+	// .getAttribute("id").toString()));
+	// }
+	// }
+	// } finally {
+	// iterator.close();
+	// }
+	// }
+	// }
 
 	/**
 	 * Toont het traject met bijbehorende borden voor controleopdrachten in
@@ -943,46 +955,52 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Verzenden van controleOpdracht naar de betrokken peterMeter
+	 * Verzenden van controleOpdracht naar de betrokken peterMeter.
 	 * 
 	 */
 	public void verzendenControleOpdracht() {
 
+		setHasErrors(true);
+
 		if (object != null) {
 
-			object.setStatus(ControleOpdrachtStatus.UIT_TE_VOEREN);
-			object.setDatumUitTeVoeren(new Date());
+			if (checkControleOpdracht(object)) {
 
-			try {
-				modelRepository.saveObject(object);
+				setHasErrors(false);
+				object.setStatus(ControleOpdrachtStatus.UIT_TE_VOEREN);
+				object.setDatumUitTeVoeren(new Date());
 
-				// Send confirmatie mail naar peterMeter
-				String mailServiceStatus = DefaultConfiguration.instance()
-						.getString("service.mail.controleOpdracht");
+				try {
+					modelRepository.saveObject(object);
 
-				if (mailServiceStatus.equalsIgnoreCase("on")) {
-					sendConfirmationMail();
+					// Send confirmatie mail naar peterMeter
+					String mailServiceStatus = DefaultConfiguration.instance()
+							.getString("service.mail.controleOpdracht");
+
+					if (mailServiceStatus.equalsIgnoreCase("on")) {
+						sendConfirmationMail();
+					}
+
+					// clear();
+					object = null;
+					controleOpdrachtType = null;
+					bewegwijzering = null;
+					trajectId = null;
+
+					search();
+					messages.info("Controleopdracht succesvol verzonden.");
+
+				} catch (IOException e) {
+
+					messages.error("Fout bij het verzenden van controleopdracht: "
+							+ e.getMessage());
+					LOG.error("Can not save object.", e);
+				} catch (Exception e) {
+
+					messages.error("Fout bij het versturen van bevestigingsmail naar de betrokken Peter/Meter: "
+							+ e.getMessage());
+					LOG.error("Can not send email", e);
 				}
-
-				// clear();
-				object = null;
-				controleOpdrachtType = null;
-				bewegwijzering = null;
-				trajectId = null;
-
-				search();
-				messages.info("Controleopdracht succesvol verzonden.");
-
-			} catch (IOException e) {
-
-				messages.error("Fout bij het verzenden van controleopdracht: "
-						+ e.getMessage());
-				LOG.error("Can not save object.", e);
-			} catch (Exception e) {
-
-				messages.error("Fout bij het versturen van bevestigingsmail naar de betrokken Peter/Meter: "
-						+ e.getMessage());
-				LOG.error("Can not send email", e);
 			}
 		}
 	}
@@ -1133,6 +1151,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		// Bordprobleem
 		if ("bord".equals(probleemType)) {
+
+			viewer.getContext().setShowFeatureInfoControl(true);
+			viewer.getContext().setShowDrawPointControl(false);
+			viewer.getContext().setShowDrawLineStringControl(false);
+
 			if (object.getTrajectType().contains("route")) {
 				probleem = (Probleem) modelRepository.createObject(
 						"RouteBordProbleem", null);
@@ -1166,6 +1189,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 		}
 		// Ander probleem
 		else if ("ander".equals(probleemType)) {
+
+			viewer.getContext().setShowFeatureInfoControl(false);
+			viewer.getContext().setShowDrawPointControl(true);
+			viewer.getContext().setShowDrawLineStringControl(false);
+
+			setEditType(null);
 
 			if (object.getTrajectType().contains("route")) {
 				probleem = (Probleem) modelRepository.createObject(
@@ -1301,7 +1330,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 		FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 				.getLayer(layerId);
 
-		if (pointLayer.isEditable()) {
+		if (viewer.getEditLayerId().equals(GEOMETRY_LAYER_NAME)) {
 			// Slechts 1 punt mag ingegeven worden
 			if (pointLayer.getGeometries().size() > 1) {
 				pointLayer.getGeometries().remove(0);
@@ -1315,13 +1344,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 			}
 		}
 
-		if (lineLayer.isEditable()) {
+		if (viewer.getEditLayerId().equals(GEOMETRY_LAYER_LINE_NAME)) {
 			// Slechts 1 lijn mag ingegeven worden
 			if (lineLayer.getGeometries().size() > 1) {
 				lineLayer.getGeometries().remove(0);
 			}
 
-			if (lineLayer.getGeometries().size() == 1 && lineLayer.isEditable()) {
+			if (lineLayer.getGeometries().size() == 1) {
 				if (probleem instanceof AnderProbleem) {
 					((AnderProbleem) probleem).setGeomOmleiding(lineLayer
 							.getGeometries().iterator().next());
@@ -1945,15 +1974,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// Lijn laag
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
-		lineLayer.setEditable(false);
+		// lineLayer.setEditable(false);
 		lineLayer.setSelectable(false);
+		viewer.getContext().setShowDrawLineStringControl(false);
 
 		// Punten laag
 		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);
-		pointLayer.setEditable(true);
-		pointLayer.setGeometries(new ArrayList<Geometry>(1));
+		// pointLayer.setEditable(true);
+		// pointLayer.setGeometries(new ArrayList<Geometry>(1));
+		pointLayer.setSelectable(false);
 		viewer.setEditLayerId(GEOMETRY_LAYER_NAME);
+		viewer.getContext().setShowDrawPointControl(true);
 
 		viewer.updateContext(null);
 	}
@@ -1961,12 +1993,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	/**
 	 * Test switch naar lineGeomLayer bij intekenen omleiding
 	 * 
-	 * @throws IOException
-	 * @throws IllegalAccessException
-	 * @throws InstantiationException
 	 */
-	public void switchToLineGeomLayer() throws IOException,
-			InstantiationException, IllegalAccessException {
+	public void switchToLineGeomLayer() {
 
 		MapViewer viewer = getViewer();
 		MapContext context = viewer.getConfiguration().getContext();
@@ -1974,15 +2002,18 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// Punten laag
 		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_NAME);
-		pointLayer.setEditable(false);
+		// pointLayer.setEditable(false);
 		pointLayer.setSelectable(false);
+		viewer.getContext().setShowDrawPointControl(false);
 
 		// Lijn laag
 		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) context
 				.getLayer(GEOMETRY_LAYER_LINE_NAME);
-		lineLayer.setGeometries(new ArrayList<Geometry>(1));
-		lineLayer.setEditable(true);
+		// lineLayer.setGeometries(new ArrayList<Geometry>(1));
+		// lineLayer.setEditable(true);
+		lineLayer.setSelectable(false);
 		viewer.setEditLayerId(GEOMETRY_LAYER_LINE_NAME);
+		viewer.getContext().setShowDrawLineStringControl(true);
 
 		viewer.updateContext(null);
 	}
@@ -2317,6 +2348,64 @@ public class ControleOpdrachtOverzichtFormBase extends
 						LOG.error("Can not access WerkOpdracht.", e);
 					}
 				}
+			}
+		}
+	}
+
+	public void setupEditLayers() {
+		if (editType.equals("drawPoint")) {
+			switchToPointGeomLayer();
+
+		} else if (editType.equals("drawLineString")) {
+			switchToLineGeomLayer();
+		}
+	}
+
+	/**
+	 * Checken of een ControleOpdracht beschikt over een periode en een
+	 * peter/meter.
+	 * 
+	 * @param controleOpdracht
+	 * @return
+	 */
+	public boolean checkControleOpdracht(ControleOpdracht controleOpdracht) {
+		if (controleOpdracht.getPeriode() == null
+				|| controleOpdracht.getPeriode().isEmpty()) {
+			messages.warn("Gelieve een periode voor deze controleopdracht te selecteren.");
+			return false;
+		} else if (controleOpdracht.getPeterMeter() == null) {
+			messages.warn("Gelieve een peter/meter voor deze controleopdracht te selecteren.");
+			return false;
+		}
+		return true;
+	}
+
+	/**
+	 * Koppelen van de Route of Lus aan de nieuwe ControleOpdracht.
+	 * 
+	 */
+	public void koppelTraject() {
+		// Koppelen traject aan ControleOpdracht
+		if (trajectNaamCreate != null) {
+			try {
+				DefaultQuery query = new DefaultQuery("Traject");
+				query.addFilter(FilterUtils.equal("naam", trajectNaamCreate));
+				List<Traject> trajecten = (List<Traject>) modelRepository
+						.searchObjects(query, false, false);
+
+				if (trajecten.size() == 1) {
+					Traject selectedTraject = trajecten.get(0);
+
+					// Indien precies 1 traject gevonden, koppelen aan de
+					// ControleOpdracht
+					if (selectedTraject != null) {
+
+						object.setTraject(modelRepository
+								.getResourceIdentifier(selectedTraject));
+					}
+				}
+			} catch (IOException e) {
+				LOG.error("Can not search Trajecten.");
 			}
 		}
 	}

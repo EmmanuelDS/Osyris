@@ -1,0 +1,61 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:r="http://richfaces.org/rich">
+
+	<a:outputPanel id="mapFeatureInfoContent"
+		styleClass="component-map-featureInfo component-map-featureInfo-content">
+		<a:outputPanel
+			styleClass="model-block-value"
+			layout="block"
+			rendered="#{info.multiLayer}">
+			<h:selectOneMenu id="layer"
+				value="#{info.layerId}">
+				<f:selectItems value="#{info.layerOptions}" />
+				<a:ajax event="change"
+					render="infoPanel layer"
+					execute="@this"/>
+			</h:selectOneMenu>
+		</a:outputPanel>
+		<div>
+			<j:renderPanel id="infoPanel"
+				rendered="#{info.layer != null}">
+				
+			<c:choose>
+			<c:when test="#{(!identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM')) and info.layerId.contains('Bord') and info.viewer.context.title == 'Routes'}">
+				<u:decorate
+					template="/resources/osyris/includes/_featureInfoBord.xhtml">
+					<u:param name="info" value="#{info}" />
+				</u:decorate>				    						        	
+			</c:when>
+			
+			<c:otherwise>
+				<a:outputPanel styleClass="component-map-featureInfo-result"
+					rendered="#{not empty info.results}">
+					<d:objects id="objects"
+						value="#{info.results}"
+						mode="RESULT"
+						type="list"
+						level="LONG">
+						<f:param name="viewer"
+							value="#{info.viewer}" />
+						<f:param name="layer"
+							value="#{info.layer}" />
+						<f:facet name="left">
+							<u:include src="/resources/map/includes/infoActions.xhtml" />
+						</f:facet>
+					</d:objects>
+				</a:outputPanel>
+			</c:otherwise>
+			</c:choose>
+			</j:renderPanel>
+		</div>
+	</a:outputPanel>
+</u:composition>

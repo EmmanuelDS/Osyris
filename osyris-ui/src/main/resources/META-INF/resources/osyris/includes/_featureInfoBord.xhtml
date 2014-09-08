@@ -1,0 +1,41 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:p="http://primefaces.org/ui" xmlns:r="http://richfaces.org/rich">
+
+	<a:outputPanel styleClass="component-map-featureInfo-result"
+		rendered="#{not empty info.results}">
+
+		<a:outputPanel rendered="#{info.results.size > 1 and info.layer.isSelectable()}">
+			<div style="font-weight: bold; padding-bottom:5px;">Op deze locatie bevinden zich
+				meerdere borden.</div>		
+		</a:outputPanel>
+		<div style="font-weight: bold">Vink het gewenste bord aan:</div>
+		
+		<p:selectOneRadio id="bordInfoRadio"
+			value="#{meldingFormBase.selectedFeatureId}" layout="custom">
+			<f:selectItems
+				value="#{meldingFormBase.getBordIds(info.results)}" />
+			<f:ajax listener="#{meldingFormBase.selectBord(info.layer)}"
+				execute="@this" render=":#{r:clientId('viewer')}" />
+		</p:selectOneRadio>
+			<a:outputPanel rendered="#{info.layer.layerId.contains('RouteBord')}">
+				<u:decorate
+					template="/resources/osyris/includes/_featureInfoRouteBord.xhtml">
+					<u:param name="info" value="#{info}" />
+				</u:decorate>
+			</a:outputPanel>
+			<a:outputPanel rendered="#{info.layer.layerId.contains('NetwerkBord')}">
+				<u:decorate
+					template="/resources/osyris/includes/_featureInfoNetwerkBord.xhtml">
+					<u:param name="info" value="#{info}" />
+				</u:decorate>
+			</a:outputPanel>		
+	</a:outputPanel>
+</u:composition>

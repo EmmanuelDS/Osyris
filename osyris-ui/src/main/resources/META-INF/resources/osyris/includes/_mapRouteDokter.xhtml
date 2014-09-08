@@ -1,0 +1,49 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+
+		<r:panel>
+				<div style="height: 500px">
+					<m:mapViewer id="viewer" configuration="#{form.configurationWizard}">
+						<j:controllerListener name="selectedFeatures"
+							listener="#{form.onSelectFeatures}" />
+						<j:controllerListener name="unselectedFeatures"
+							listener="#{form.onUnselectFeatures}" />
+						<j:controllerListener name="addedFeature"
+							listener="#{form.onUpdateFeatures}" />
+						<j:controllerListener name="updatedFeature"
+							listener="#{form.onUpdateFeatures}" />
+						<j:controllerListener name="deletedFeature"
+							listener="#{form.onDeleteFeatures}" />
+					</m:mapViewer>
+				</div> 
+			</r:panel>
+			<r:panel id="backgroundLayerPanel" header="ACHTERGRONDLAAG">
+					<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">
+						<h:selectOneRadio id="options" value="#{form.baseLayerName}">
+							<f:selectItem itemLabel="Orthofoto" itemValue="tms" />
+							<f:selectItem itemLabel="Topografische kaart" itemValue="topo" />
+							<f:selectItem itemLabel="Stratenkaart" itemValue="navstreet" />
+							<a:ajax event="change" listener="#{form.switchBaseLayers()}"
+								render="backgroundLayerPanel" execute="@this" />
+						</h:selectOneRadio>
+					</h:panelGrid>
+				</r:panel>
+			<a:outputPanel>
+				 <d:buttons>
+<!-- 					<j:commandButton type="button" value="Terug" -->
+<!-- 						image="#{resource['core/images/actions/12x12/previous.png']}" -->
+<!-- 						oncomplete="conscientia.widget(#{r:element('mapPopup')}).hide();" execute="@this" /> -->
+					<j:commandButton type="button" value="Klaar"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						oncomplete="if(#{form.checkMeldingWizard(form.melding)})conscientia.widget(#{r:element('mapPopup')}).hide();" execute="@this" />
+				</d:buttons>
+			</a:outputPanel>
+</u:composition>

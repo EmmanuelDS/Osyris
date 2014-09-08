@@ -9,7 +9,8 @@
 			<dt>Naam: <b> ${lastname} </b></dt>
 			<dt>Telefoon: <b> ${phone}</b></dt>
 			<dt>Status melding: <b> ${status} </b></dt>
-			<dt>Probleem: <b> ${problem} </b></dt>
+			<dt>Probleem: <b> ${categorie} </b></dt>
+			<dt>Commentaar: <b> ${commentaar} </b></dt>
 		</dl>
 	</body>
 </html>

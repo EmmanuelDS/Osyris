@@ -14,7 +14,8 @@
 		<r:panel id="searchTrajectPanel" header="Zoek traject">
 				<d:fields>
 					<d:field for="trajectTypeCreate"
-						label="Traject type">
+						label="Traject type"
+						required="true">
 						<h:selectOneMenu id="trajectTypeCreate"
 							value="#{form.trajectTypeCreate}">
 							<f:selectItem itemValue=""
@@ -54,7 +55,7 @@
 				<r:panel id="controleOpdrachtPanel">
 					<d:buttons>
 						<j:commandButton value="Maak bewegwijzeringsverslag"
-							image="#{resource['core/images/actions/12x12/search.png']}"
+							image="#{resource['core/images/actions/12x12/apply.png']}"
 							type="button" action="#{form.createBewegwijzeringVerslag()}"
 							render="bewegwijzering">
 						</j:commandButton>
@@ -225,7 +226,7 @@
 			type="button"
 			action="#{form.save()}"
 			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('createPopup2')}).hide();" />
+			oncomplete="if(#{!form.hasErrors})conscientia.widget(#{r:element('createPopup2')}).hide();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"
 			image="#{resource['core/images/actions/12x12/cancel.png']}"

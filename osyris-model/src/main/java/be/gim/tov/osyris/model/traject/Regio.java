@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.traject;
 
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
 import org.conscientia.api.model.annotation.LabelProperty;
 import org.conscientia.api.model.annotation.Model;
@@ -43,6 +44,7 @@ public class Regio extends AbstractModelObject implements StorableObject {
 
 	@ModelClassName("UitvoerderBedrijf")
 	@Target("_blank")
+	@Edit(type = "menu")
 	private ResourceIdentifier uitvoerder;
 
 	// GETTERS AND SETTERS

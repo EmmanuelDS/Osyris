@@ -74,7 +74,7 @@
 			type="button"
 			action="#{form.verzendenControleOpdracht()}"
 			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+			oncomplete="if(#{!form.hasErrors})conscientia.widget(#{r:element('viewPopup')}).hide();" />
 		<j:commandButton 
 			value="Printen"
 			image="#{resource['core/images/actions/12x12/print.png']}"

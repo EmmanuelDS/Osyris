@@ -1,0 +1,25 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+	
+	<p:dialog id="mapPopup"
+		header="3. DUID AAN OP DE KAART"
+		modal="true"
+		resizable="false"
+		onShow="#{r:component('mapInclude')}.show();"
+		onHide="#{r:component('mapInclude')}.hide();"
+		style="max-height:100% !important; bottom: 10% !important; right:20% !important; left:20% !important; top:0% !important; overflow:auto !important;">
+		<j:relocate />
+		<j:lazyInclude id="mapInclude"
+			src="/resources/osyris/includes/_mapRouteDokter.xhtml">
+			<f:param name="form" value="#{form}" />
+		</j:lazyInclude>
+	</p:dialog>
+	
+</u:composition>

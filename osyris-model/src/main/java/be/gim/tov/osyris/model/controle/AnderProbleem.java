@@ -6,6 +6,7 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
+import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
@@ -22,6 +23,7 @@ import com.vividsolutions.jts.geom.Geometry;
 public abstract class AnderProbleem extends Probleem {
 
 	// VARIABLES
+	@Required
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.getCodeList('AnderProbleemCategorieCode')}")
 	private String categorie;

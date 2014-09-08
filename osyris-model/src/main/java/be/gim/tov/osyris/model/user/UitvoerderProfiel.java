@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.user;
 
 import org.conscientia.api.model.ModelAspect;
 import org.conscientia.api.model.StorableObject;
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.For;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
@@ -45,6 +46,7 @@ public class UitvoerderProfiel extends AbstractModelObject implements
 
 	@ModelClassName("UitvoerderBedrijf")
 	@Target("_blank")
+	@Edit(type = "menu")
 	private ResourceIdentifier bedrijf;
 
 	// GETTERS AND SETTERS

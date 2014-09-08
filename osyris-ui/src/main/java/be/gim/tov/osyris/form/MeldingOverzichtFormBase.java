@@ -268,6 +268,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 							.id(ids)));
 
 					ids = null;
+					knooppuntLayer.set("queryable", false);
 				}
 			}
 
@@ -353,7 +354,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 	public void save() {
 		try {
 			modelRepository.saveObject(object);
-			messages.info("Melding succesvol gevalideerd.");
+			messages.info("Melding succesvol aangepast.");
 			clear();
 			search();
 		} catch (IOException e) {

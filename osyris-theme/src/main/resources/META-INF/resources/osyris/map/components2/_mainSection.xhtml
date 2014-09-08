@@ -1,0 +1,323 @@
+<u:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<j:useParam name="viewer" />
+	<j:sectionPanel>	
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.zoomAndPan.label']}">
+			<j:commandButton
+				image="#{resource['core/images/actions/24x24/zoomIn.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['model.entry.mapContext.tools.zoomIn.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.zoomIn.label']}"
+				rendered="#{viewer.context.hasTool('zoomIn')}"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="zoomIn" />
+			</j:commandButton>
+			<j:commandButton
+				image="#{resource['core/images/actions/24x24/zoomOut.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['model.entry.mapContext.tools.zoomOut.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.zoomOut.label']}"
+				rendered="#{viewer.context.hasTool('zoomOut')}"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="zoomOut" />
+			</j:commandButton>
+			<j:commandButton
+				image="#{resource['core/images/actions/24x24/pan.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['model.entry.mapContext.tools.pan.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.pan.label']}"
+				rendered="#{viewer.context.hasTool('pan')}"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="pan" />
+			</j:commandButton>
+			<m:zoomPoint rendered="#{viewer.context.hasTool('zoomPoint')}" />
+			<j:sectionPanel rows="2">
+				<j:commandButton
+					onclick="#{j:controller()}.zoomToPreviousExtent();"
+					image="#{resource['core/images/actions/12x12/undo.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.zoomToPrevious.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.zoomToPrevious.label']}"
+					rendered="#{viewer.context.hasTool('zoomToPrevious')}"
+					submit="false" />
+				<j:commandButton
+					onclick="#{j:controller()}.zoomToNextExtent();"
+					image="#{resource['core/images/actions/12x12/redo.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.zoomToNext.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.zoomToNext.label']}"
+					rendered="#{viewer.context.hasTool('zoomToNext')}"
+					submit="false" />
+			</j:sectionPanel>
+		</j:sectionPanel>
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.extent.label']}"
+			rendered="#{viewer.context.hasAnyTool('zoomToMax', 'zoomToContent', 'zoomToSelection')}"
+			transient="true">
+			<j:sectionPanel rows="2">
+				<j:commandButton
+					image="#{resource['core/images/actions/12x12/zoomToMax.png']}"
+					value="#{messages['model.entry.mapContext.tools.zoomToMax.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.zoomToMax.label']}"
+					rendered="#{viewer.context.hasTool('zoomToMax')}"
+					onclick="#{j:controller()}.zoomToMaxExtent();"
+					styleClass="component-toolbar-button" />
+				<j:commandButton
+					image="#{resource['core/images/actions/12x12/zoomToContent.png']}"
+					value="#{messages['model.entry.mapContext.tools.zoomToContent.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.zoomToContent.label']}"
+					rendered="#{viewer.context.hasTool('zoomToContent')}"
+					onclick="#{j:controller()}.zoomToContentExtent();"
+					styleClass="component-toolbar-button" />
+				<j:commandButton
+					image="#{resource['core/images/actions/12x12/zoomToSelection.png']}"
+					value="#{messages['model.entry.mapContext.tools.zoomToSelection.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.zoomToSelection.label']}"
+					rendered="#{viewer.context.hasTool('zoomToSelection')}"
+					onclick="#{j:controller()}.zoomToSelectionExtent();"
+					styleClass="component-toolbar-button" />
+			</j:sectionPanel>
+		</j:sectionPanel>
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.search.label']}"
+			rendered="#{not empty viewer.context.locationExtentExpression}">
+			<j:sectionPanel rows="2">
+				<h:outputText
+					value="#{messages['model.entry.mapContext.tools.searchLocation.label']}" />
+				<p:inputText id="geoLocatorText"
+					styleClass="component-map-geolocator"
+					rendered="#{empty viewer.context.locationSuggestionsExpression}"
+					onkeydown="if(event.keyCode == 13) { #{j:controller()}.zoomToLocationExtent(#{r:element('geoLocatorText')}.value); return false; }" />
+				<p:autoComplete id="geoLocatorComplete"
+					styleClass="component-map-geolocator"
+					rendered="#{not empty viewer.context.locationSuggestionsExpression}"
+					onkeydown="if(event.keyCode == 13) { #{j:controller()}.zoomToLocationExtent(conscientia.widget(#{r:element('geoLocatorComplete')}).input.val()); return false; }"
+                    completeMethod="#{viewer.getLocationSuggestions}"
+                    minQueryLength="3" />  
+			</j:sectionPanel>
+		</j:sectionPanel>
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.animation.label']}"
+			rendered="#{viewer.context.hasTool('animation')}"
+			transient="true">
+			<j:commandButton
+				id="animation"
+				onclick="#{j:controller()}.getTimeSeries(function (timeSeries){ #{j:controller()}.animation.timeSeries = timeSeries; #{j:controller()}.animation.waitTime = #{viewer.context.timeRefreshPeriod}; #{j:controller()}.animation.timeIndex = 0; #{j:controller()}.animation.start(); });"
+				submit="false"
+				image="#{resource['core/images/actions/24x24/play.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['component.map.statusBar.animation.start.btn.label']}"
+				title="#{messages['component.map.statusBar.animation.start.label']}" />
+			<j:commandButton
+				onclick="#{j:controller()}.animation.stop();"
+				submit="false"
+				image="#{resource['core/images/actions/24x24/stop.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['component.map.statusBar.animation.stop.btn.label']}"
+				title="#{messages['component.map.statusBar.animation.stop.label']}" />
+		</j:sectionPanel>
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.selection.label']}"
+			rendered="#{viewer.context.hasAnyTool('selectFeatures','clearSelection','selectOverlapping','selectionBuffer') and viewer.context.title != 'Routes' and (identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))}"
+			transient="true">
+			<j:commandButton
+				id="selectFeatures"
+				image="#{resource['core/images/actions/24x24/select.png']}"
+				styleClass="component-toolbar-button"
+				value="#{messages['model.entry.mapContext.tools.selectFeatures.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+				rendered="#{viewer.context.hasTool('selectFeatures') or (viewer.context.title == 'Routes' and viewer.context.showSelectControl)}"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="selectBox">
+					<f:param
+						name="layerId"
+						value="#{null}" />
+					<f:param
+						name="afterHandle"
+						value="#{null}" />
+				</j:activateControl>
+			</j:commandButton>
+			<j:commandButton
+				id="clearSelection"
+				onclick="#{j:controller()}.clearSelection()"
+				image="#{resource['core/images/actions/24x24/clearSelection.png']}"
+				styleClass="component-toolbar-button"
+				value="Deselecteren"
+				title="#{messages['model.entry.mapContext.tools.clearSelection.label']}"
+				rendered="#{viewer.context.hasTool('clearSelection') and viewer.context.title != 'Routes' and (identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))}"
+				submit="false" />
+			<j:sectionPanel rows="2">
+				<m:selectOverlapping
+					rendered="#{viewer.context.hasTool('selectOverlapping')}" />
+				<m:selectBuffer
+					rendered="#{viewer.context.hasTool('selectionBuffer')}" />
+			</j:sectionPanel>
+		</j:sectionPanel>
+		
+		<j:sectionPanel
+				label="Aanduiden"
+				rendered="#{viewer.context.title == 'Routes' and viewer.context.showDrawPointControl and identity.inGroup('PeterMeter','CUSTOM')}"
+				transient="true">
+			<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+					styleClass="component-toolbar-button"
+					value="Probleem"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="drawPoint" />
+			</j:commandButton>
+		</j:sectionPanel>
+		<j:sectionPanel
+				label="Aanduiden"
+				rendered="#{viewer.context.title == 'Routes' and viewer.context.showDrawPointControl and !identity.inGroup('PeterMeter','CUSTOM')}"
+				transient="true">
+			<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+					styleClass="component-toolbar-button"
+					value="Probleem"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="drawPoint" />
+			</j:commandButton>
+		</j:sectionPanel>
+		
+		<j:sectionPanel
+				label="Tekenen"
+				rendered="#{viewer.context.title == 'Routes' and viewer.context.showDrawLineStringControl and identity.inGroup('PeterMeter','CUSTOM')}"
+				transient="true">
+			<j:commandButton
+					id="test"
+					image="#{resource['core/images/actions/24x24/drawLineString.png']}"
+					styleClass="component-toolbar-button"
+					value="Omleiding"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="drawLineString" />
+				</j:commandButton>
+		</j:sectionPanel>	
+		<j:sectionPanel
+				label="Tekenen"
+				rendered="#{viewer.context.title == 'Routes' and viewer.context.showDrawLineStringControl and !identity.inGroup('PeterMeter','CUSTOM')}"
+				transient="true">
+			<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawLineString.png']}"
+					styleClass="component-toolbar-button"
+					value="Omleiding"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="drawLineString" />
+				</j:commandButton>
+		</j:sectionPanel>	
+		
+		<j:sectionPanel
+			label="Selecteren"
+			rendered="#{viewer.context.title == 'Routes' and viewer.context.showFeatureInfoControl and (!identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))}"
+			transient="true">
+			<j:commandButton
+				image="#{resource['osyris/images/selectBord.png']}"
+				styleClass="component-toolbar-button"
+				value="Bord aanduiden"
+				title="Aanduiden van een bord op de kaart"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="featureInfoBox">
+					<f:param
+						name="layerId"
+						value="#{null}" />
+				</j:activateControl>
+			</j:commandButton>
+		</j:sectionPanel>
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.info.label']}"
+			rendered="#{viewer.context.hasTool('featureInfo') and identity.isLoggedIn() and !identity.inGroup('PeterMeter','CUSTOM')}"
+			transient="true">
+			<j:commandButton
+				image="#{resource['core/images/actions/24x24/featureInfo.png']}"
+				styleClass="component-toolbar-button"
+				rendered="#{viewer.context.hasTool('featureInfo')}"
+				value="#{messages['model.entry.mapContext.tools.featureInfo.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.featureInfo.label']}"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="featureInfoBox">
+					<f:param
+						name="layerId"
+						value="#{null}" />
+				</j:activateControl>
+			</j:commandButton>
+		</j:sectionPanel>
+		
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.measure.label']}"
+			rendered="#{viewer.context.hasAnyTool('measureLine','measureArea')}"
+			transient="true">
+			<j:sectionPanel rows="2">
+				<j:commandButton
+					image="#{resource['core/images/actions/12x12/measureLine.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.measureLine.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.measureLine.label']}"
+					rendered="#{viewer.context.hasTool('measureLine')}"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="measureLine" />
+				</j:commandButton>
+				<j:commandButton
+					image="#{resource['core/images/actions/12x12/measureArea.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.measureArea.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.measureArea.label']}"
+					rendered="#{viewer.context.hasTool('measureArea')}"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="measureArea" />
+				</j:commandButton>
+			</j:sectionPanel>
+		</j:sectionPanel>
+		<j:sectionPanel
+			label="Streetview"
+			rendered="#{viewer.context.hasTool('streetView')}"
+			transient="true">
+			<j:commandButton
+					image="#{resource['core/images/actions/24x24/google.png']}"
+					styleClass="component-toolbar-button"
+					value="Street View"
+					title="Go to Google Street View"
+					rendered="#{viewer.context.hasTool('streetView')}"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="streetView" />
+				</j:commandButton>
+		</j:sectionPanel>
+		<j:insertFacet name="extra" />
+	</j:sectionPanel>
+</u:composition>

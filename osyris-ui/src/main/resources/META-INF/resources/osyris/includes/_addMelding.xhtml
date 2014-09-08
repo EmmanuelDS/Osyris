@@ -6,253 +6,312 @@
 	xmlns:c="http://java.sun.com/jsp/jstl/core"
 	xmlns:r="http://richfaces.org/rich"
 	xmlns:d="http://specto.gim.be/display"
-	xmlns:j="http://conscientia.org/jsf"
+	xmlns:j="http://conscientia.org/jsf" xmlns:p="http://primefaces.org/ui"
 	xmlns:m="http://specto.gim.be/map">
-	
-	<h:outputStylesheet id="fileuploadCss"
-		name="fileupload/fileupload.css"
+
+	<style>
+		.ui-wizard {
+			margin: 0;
+			padding-left: 15%;
+			padding-right: 15%;
+		}
+		.ui-wizard-step-title {
+			/*font-size: 1em;
+			margin: 0 3px 0 0;
+			padding: 0.4em;
+			float: left;*/
+			display: none;
+		}
+		.rf-p-hdr {
+			font-size:1.2em;
+		}
+		
+		*.model-field-label {
+			display: block;
+			float: left;
+			width: 15%;
+		}
+		*.model-field-value {
+			margin-left: 20%;
+			margin-right: 20%;
+		}
+	</style>
+	<h:outputStylesheet id="fileuploadCss" name="fileupload/fileupload.css"
 		library="primefaces" />
 
-	<h1>Meld een probleem op een route via onderstaand formulier</h1>
-	<div>
-		<ol>
-			<li>Zoek de route of het netwerk waarover je een probleem wil melden. </li>
-			<li>Zoom op de kaart in op de plaats waarover je een probleem wil melden </li>
-			<li>Kies het type probleem en selecteer vervolgens met het pijltje de exacte locatie </li>
-			<li>Beschrijf het probleem via het veld 'type' </li>
-			<li>Vul je gegevens in </li>
-			<li>Klik op verzenden </li>
-		</ol>
-		<br />
-	<div>Een uitgebreidere handleiding vind je rechts bovenaan, onder ?</div>
-	</div>
-	<br/>
-	<table width="100%">
-	<tr>
-	<td width="40%" valign="top">
-	
-	<r:panel id="searchTrajectPanel" header="Zoek route of netwerk">
-		<d:fields>
-			<d:field for="trajectType" label="Route of netwerk type" required="true">
-				<h:selectOneMenu id="trajectType" value="#{form.trajectType}" >
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
-					<a:ajax
-						event="change"
-						render="detailSearchPanel"
-						execute="@this"
-						listener="#{form.resetChildSearchParameters()}" />
-				</h:selectOneMenu>
-			</d:field>
-			<d:field for="regio" label="Regio">
-				<h:selectOneMenu id="regio" value="#{form.regio}">
-					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
-					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
-					<a:ajax
-						event="change"
-						render="trajectNaam"
-						execute="@this" />
-				</h:selectOneMenu>
-			</d:field>
-			<j:renderPanel id="detailSearchPanel" rendered="#{form.trajectType != null}">
-				<d:field for="trajectNaam" label="Traject naam" rendered="#{form.trajectType.contains('Route') or form.trajectType.contains('WandelNetwerk') }" required="#{form.trajectType.contains('Route')}">
-					<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}" rendered="true">
-						<f:selectItem itemValue="" itemLabel="" />
-						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
-					</h:selectOneMenu>
-				</d:field>
-				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectType.contains('Segment')}" >
-					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectType.contains('Segment')}">
-						<f:selectItem itemValue="" itemLabel="" />
-						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
-					</h:selectOneMenu>
-				</d:field>
-			</j:renderPanel>
-		</d:fields>
-		<d:buttons>
-			<j:commandButton value="Zoeken"
-				image="#{resource['core/images/actions/12x12/search.png']}"
-				type="button"
-				action="#{form.searchTraject()}"
-				render="problemPanel"
-				execute="searchTrajectPanel">
-			</j:commandButton>
-		</d:buttons>
-	</r:panel>
-		
-	<r:panel header="Selecteer en beschrijf het probleem">
-	<j:renderPanel id="problemPanel" rendered="#{form.trajectType != null}">
-	
-		<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
-		<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
-           	<f:selectItem itemValue="bord" itemLabel="Bord Probleem" />
-			<f:selectItem itemValue="ander" itemLabel="Ander Probleem" />
-			<a:ajax event="change" 
-					listener="#{form.createProbleem()}" 
-					render="problemPanel" 
-					execute="@this"/> 
-       </h:selectOneRadio>
-       </h:panelGrid>
-       
-		<j:renderPanel id="probleemPanel" rendered="#{form.melding.probleem != null}">	
-			<div>
-			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
-			<br/>
-			<d:fields>
-			<b><h:outputText value="Selecteer maximaal 1 bord op kaart "></h:outputText></b>
-			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
-			</d:fields>
-			<j:commandButton
-				id="selectFeatures"
-				rendered="#{form.probleemType == 'bord'}"
-				image="#{resource['core/images/actions/24x24/select.png']}"
-				styleClass="component-toolbar-button"
-				value="Selecteer bord"
-				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-				submit="false">
-				<j:activateControl
-					for="viewer"
-					event="click"
-					control="selectBox" />
-			</j:commandButton>
-			</a:outputPanel>
-			<br/>
-			
-			<a:outputPanel rendered="#{form.probleemType == 'ander'}">
-			<br/>
-			<d:fields>
-			<b><h:outputText value="Duid probleem(punt) aan op kaart "></h:outputText></b>
-			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
-			</d:fields>
-			<j:commandButton
-				id="drawPoint"
-				rendered="#{form.probleemType == 'ander'}"
-				image="#{resource['core/images/actions/24x24/drawPoint.png']}"
-				styleClass="component-toolbar-button"
-				value="Teken punt">
-				<j:activateControl
-					for="viewer"
-					event="click"
-					control="drawPoint" />
-			</j:commandButton>
-			</a:outputPanel>
-			<br/>
-			<a:outputPanel rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}">
-			<br/>
-			<d:fields>
-			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b>
-			<h:graphicImage alt="(verplicht)"
-						value="#{resource['core/images/actions/12x12/required_alt.png']}" />
-			</d:fields>
-			<j:commandButton
-				id="selectSegment"
-				rendered="#{form.trajectType.contains('Segment') and form.probleemType == 'ander'}"
-				image="#{resource['core/images/actions/24x24/select.png']}"
-				styleClass="component-toolbar-button"
-				value="Selecteer segment"
-				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
-				submit="false">
-				<j:activateControl
-					for="viewer"
-					event="click"
-					control="selectBox" >
-					<f:param
-						name="layerId"
-						value="#{trajectType}" />
-				</j:activateControl>
-			</j:commandButton>
-			</a:outputPanel>
-			</div>
-			<br/>
-			
-			<d:object mode="EDIT"
-					value="#{form.melding.probleem}" />	
+	<br />
+	<p:wizard widgetVar="wiz"
+					flowListener="#{form.onFlowProcess}" showNavBar="false">
 					
-			<d:propertyField id="commentaar" 
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-						value="#{form.melding.probleem.commentaar}"
-						mode="EDIT" />
+					<p:tab id="tab_lokaliseerProbleem" title="1. Lokaliseer probleem">
+						<r:panel header="1. LOKALISEER PROBLEEM">
+						<div style="padding:3%;">
+						<h:outputText value="Waar doet het probleem zich voor?"></h:outputText>
+						<br/>
+						<br/>
+						<h:outputText value="Selecteer het type, de regio en de naam in het geval van een route."></h:outputText>
+						<br/>
+						<br/>
+						<h:outputText value="Selecteer het type, de regio en een knooppunt in de buurt in het geval van een netwerk."></h:outputText>
+						<br/>
+						<br/>
+						<h:outputText value="Alle verplicht in te vullen velden zijn aangeduid met een "></h:outputText>
+						<h:graphicImage alt="(verplicht)"
+									value="#{resource['core/images/actions/12x12/required_alt.png']}" />
+						<br/>
+						<br/>
+						<br/>
+						<a:outputPanel id="searchTrajectPanel">
+							<d:fields>
+								<d:field for="trajectType" label="Type"
+									required="true">
+									<h:selectOneMenu id="trajectType" value="#{form.trajectType}"
+										required="true" requiredMessage="De waarde voor Type is verplicht.">
+										<f:selectItem itemValue="" itemLabel="" />
+										<f:selectItems
+											value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+										<a:ajax render="detailSearchPanel" execute="@this"
+											listener="#{form.resetChildSearchParameters()}" />
+									</h:selectOneMenu>
+								</d:field>
+								
+						 <j:renderPanel id="detailSearchPanel"
+								rendered="#{form.trajectType != null}">
+								
+							<j:renderPanel id="regioSearchPanel"
+									rendered="#{form.trajectType != null}">
+									
+								<d:field for="regio" label="Regio" required="true">
+									<h:selectOneMenu id="regio" value="#{form.regio}" required="true" requiredMessage="De waarde voor Regio is verplicht.">
+										<f:converter
+											converterId="be.gim.commons.ResourceIdentifierConverter" />
+										<f:selectItem itemValue="" itemLabel="" />
+										<f:selectItems
+											value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+										<a:ajax render="detail2SearchPanel" execute="@this" />
+									</h:selectOneMenu>
+								</d:field>
+								</j:renderPanel>
+								<j:renderPanel id="detail2SearchPanel"
+									rendered="#{form.regio != null}">
+									<d:field for="trajectNaam" label="Naam"
+										rendered="#{form.trajectType.contains('Route') or form.trajectType.contains('WandelNetwerk') }"
+										required="#{form.trajectType.contains('Route')}">
+										<h:selectOneMenu id="trajectNaam" value="#{form.trajectNaam}"
+											rendered="true"
+											required="#{form.trajectType.contains('Route')}"
+											requiredMessage="De waarde voor Naam is verplicht.">
+											<f:selectItem itemValue="" itemLabel="" />
+											<f:selectItems
+												value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regio, form.trajectType))}" />
+										</h:selectOneMenu>
+									</d:field>
+									<d:field for="knooppuntNr" label="KnooppuntNummer"
+										rendered="#{form.trajectType.contains('Segment')}">
+										<h:selectOneMenu id="knooppuntNummer"
+											value="#{form.knooppuntNummer}"
+											rendered="#{form.trajectType.contains('Segment')}">
+											<f:selectItem itemValue="" itemLabel="" />
+											<f:selectItems
+												value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
+										</h:selectOneMenu>
+									</d:field>
+								</j:renderPanel>
+								</j:renderPanel>
+							</d:fields>
+							<d:buttons>
+								<j:commandButton value="Volgende"
+									image="#{resource['core/images/actions/12x12/next.png']}"
+									type="button" oncomplete="wiz.next();"
+									render="problemPanel, viewer"
+									execute="searchTrajectPanel">
+								</j:commandButton>
+							</d:buttons>
+						</a:outputPanel>
+					</div>
+					</r:panel>
+					</p:tab>
+
+					<p:tab id="tab_beschrijfProbleem" title="2. Beschrijf probleem">
+					<r:panel header="2. BESCHRIJF PROBLEEM">
+					<div style="padding:3%;">
+						<h:outputText value="Welk probleem hebt u opgemerkt?"></h:outputText>
+						<br/>
+						<br/>
+						<h:outputText value="Selecteer het type probleem en de beschrijving die het beste past. U kunt het probleem verder verduidelijken in het commentaarveld."></h:outputText>
+						<br/>
+						<br/>
+						<br/>
+						<j:renderPanel id="problemPanel"
+							rendered="#{form.trajectType != null}">
+
+							<d:field for="probleemType" label="Type probleem"
+									required="true">
+							<h:selectOneRadio id="probleemType" value="#{form.probleemType}"
+								layout="grid">
+								<f:selectItem itemValue="bord" itemLabel="Bordprobleem" />
+								<f:selectItem itemValue="ander" itemLabel="Ander probleem" />
+								<a:ajax listener="#{form.createProbleemWizard()}"
+									render="problemPanel" execute="@this" />
+							</h:selectOneRadio>
+							</d:field>
+
+						<j:renderPanel id="probleemPanel"
+								rendered="#{form.melding.probleem != null and form.probleemType != null}">
+						<br />
+								<a:outputPanel rendered="#{form.isBordProbleem(form.melding.probleem)}">
+				   					<d:field label="Beschrijving" for="type" required="true">	 
+										<d:propertyValue id="type"
+											modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
+											value="#{form.melding.probleem.type}"
+											mode="EDIT" />
+									</d:field>
+								</a:outputPanel>
+								
+								<a:outputPanel rendered="#{!form.isBordProbleem(form.melding.probleem)}">
+									<d:field label="Beschrijving" for="categorie">	 
+										<d:propertyValue id="categorie"
+											modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
+											value="#{form.melding.probleem.categorie}"
+											mode="EDIT" />
+									</d:field>
+								</a:outputPanel>
+																					
+								<d:propertyField id="commentaar"
+							 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+									value="#{form.melding.probleem.commentaar}"
+									mode="EDIT" />
+								
+								<d:field label="Foto" for="foto">	 
+									<d:propertyValue id="foto"
+										modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+										value="#{form.melding.probleem.foto}"
+										mode="EDIT" />
+								</d:field>
+										
+								<d:propertyField id="datumVaststelling"
+									modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}"
+									value="#{form.melding.datumVaststelling}" mode="EDIT" />
+
+								<d:buttons>
+									<j:commandButton type="button" value="Terug"
+										image="#{resource['core/images/actions/12x12/previous.png']}"
+										oncomplete="wiz.back();" execute="@this" />
+									<j:commandButton type="button" value="Volgende"
+										image="#{resource['core/images/actions/12x12/next.png']}"
+										oncomplete="if(#{form.checkProbleem()})wiz.next();" execute="problemPanel" render="bordProbleemPanel, anderProbleemPanel, anderNetwerkprobleemPanel" />
+								</d:buttons>
+							</j:renderPanel>
+						</j:renderPanel>
+					</div>
+					</r:panel>
+					</p:tab>
+					
+					<p:tab id="tab_DuidAanOpKaart" title="3. Duid aan op kaart">
+					<r:panel header="3. DUID AAN OP DE KAART">
+						<div style="padding:3%;">
+																	
+						<j:renderPanel id="bordProbleemPanel" rendered="#{form.probleemType == 'bord'}">	
+						 <h:outputText value="Waar bevindt het bord zich?"></h:outputText>
+							<br/>
+							<br/>												
+							<h:outputText value="Zoom in op de kaart en selecteer het juiste bord. Om een bord aan te duiden, gebruik je de knop "></h:outputText>
+									<h:graphicImage value="#{resource['osyris/images/selectBord_small.png']}" />
+									<h:outputText value=" in de werkbalk bovenaan in het kaartvenster."></h:outputText>
+									<br/>
+							<br/>
+							<br/>
+							</j:renderPanel>
+							
+							<j:renderPanel id="anderProbleemPanel" rendered="#{form.probleemType == 'ander'}">
+								<h:outputText value="Waar bevindt het probleem zich?"></h:outputText>
+								<br/>
+								<br/>
+								<h:outputText value="Zoom in op de kaart en duid een punt aan. Om een probleem aan te duiden gebruik je de knop "></h:outputText>
+								<h:graphicImage value="#{resource['core/images/actions/24x24/drawPoint.png']}" />
+								<h:outputText value=" in de werkbalk bovenaan in het kaartvenster."></h:outputText>
+							<br/>
+							<br/>
+							</j:renderPanel>
+						<h:outputText value="Klik op onderstaande knop om het kaartvenster te openen."></h:outputText>
+						<br/>
+						<br/>
+						<j:commandButton type="button" value="Tonen kaart"
+							oncomplete="conscientia.widget(#{r:element('mapPopup')}).show();" execute="@this" />
+						</div>
+						<br/>
+						<a:outputPanel>
+							 <d:buttons>
+								<j:commandButton type="button" value="Terug"
+									image="#{resource['core/images/actions/12x12/previous.png']}"
+									oncomplete="wiz.back();" execute="@this" />
+								<j:commandButton type="button" value="Volgende"
+									image="#{resource['core/images/actions/12x12/next.png']}"
+									oncomplete="if(#{form.checkMeldingWizard(form.melding)})wiz.next();" execute="@this" />
+							</d:buttons>
+						</a:outputPanel>
+					</r:panel>
+					</p:tab>
+					
+					<p:tab id="tab_gegevens" title="4. Uw gegevens">
+					<r:panel header="4. UW GEGEVENS">
+					<div style="padding:3%;">
+						<j:renderPanel id="gegevensPanel">
+							<h:outputText value="Uw gegevens zullen enkel gebruikt worden indien we meer gegevens nodig hebben over dit probleem."></h:outputText>
+							<br/>
+							<br/>
+							<d:fields>
+								<d:propertyField id="voornaam"
+									modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}"
+									value="#{form.melding.voornaam}" mode="EDIT" />
+								<d:propertyField id="naam"
+									modelProperty="#{d:modelClass('Melding').getProperty('naam')}"
+									value="#{form.melding.naam}" mode="EDIT" />
+								<d:propertyField id="telefoon"
+									modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}"
+									value="#{form.melding.telefoon}" mode="EDIT" />
+								<d:propertyField id="email"
+									modelProperty="#{d:modelClass('Melding').getProperty('email')}"
+									value="#{form.melding.email}" mode="EDIT" />
+							</d:fields>
 						
-<!-- 			<d:buttons> -->
-<!-- 			<j:commandButton value="Verzenden" -->
-<!-- 				image="#{resource['core/images/actions/12x12/apply.png']}" -->
-<!-- 				type="button" -->
-<!-- 				action="#{form.saveMelding()}" -->
-<!-- 				render="searchTrajectPanel, gegevensPanel, problemPanel"> -->
-<!-- 			</j:commandButton> -->
-<!-- 		</d:buttons> -->
-		</j:renderPanel>
-	</j:renderPanel>		
-	</r:panel>
-	
-		<r:panel id="gegevensPanel" header="Uw gegevens">
-		<d:fields>
-			<d:propertyField id="voornaam" 
-					modelProperty="#{d:modelClass('Melding').getProperty('voornaam')}" 
-					value="#{form.melding.voornaam}" 
-					mode="EDIT" />
-			<d:propertyField id="naam" 
-					modelProperty="#{d:modelClass('Melding').getProperty('naam')}" 
-					value="#{form.melding.naam}" 
-					mode="EDIT" />
-			<d:propertyField id="telefoon" 
-					modelProperty="#{d:modelClass('Melding').getProperty('telefoon')}" 
-					value="#{form.melding.telefoon}" 
-					mode="EDIT" />
-			<d:propertyField id="email"
-			 		modelProperty="#{d:modelClass('Melding').getProperty('email')}"
-					value="#{form.melding.email}"
-					mode="EDIT" />
-			<d:propertyField id="datumVaststelling" 
-					modelProperty="#{d:modelClass('Melding').getProperty('datumVaststelling')}" 
-					value="#{form.melding.datumVaststelling}" 
-					mode="EDIT" />
-		</d:fields>
-		
-		<d:buttons>
-			<j:commandButton value="Verzenden"
-				image="#{resource['core/images/actions/12x12/apply.png']}"
-				type="button"
-				action="#{form.saveMelding()}"
-				render="searchTrajectPanel, gegevensPanel, problemPanel">
-			</j:commandButton>
-		</d:buttons>
-		
-	</r:panel>
-	
-	</td>
-	<td width="60%" valign="top">
-	<r:panel>
-		<div style="height: 500px">
-			<m:mapViewer id="viewer"
-				configuration="#{form.configuration}">
-				<j:controllerListener name="selectedFeatures"
-					listener="#{form.onSelectFeatures}" />
-				<j:controllerListener name="unselectedFeatures"
-					listener="#{form.onUnselectFeatures}" />
-				<j:controllerListener name="addedFeature"
-					listener="#{form.onUpdateFeatures}" />
-				<j:controllerListener name="updatedFeature"
-					listener="#{form.onUpdateFeatures}" />
-				<j:controllerListener name="deletedFeature"
-					listener="#{form.onDeleteFeatures}" />
-			</m:mapViewer>
-		</div>
-	</r:panel>
-	<r:panel id="backgroundLayerPanel" header="Achtergrondlaag">
-			<h:panelGrid columns="2" style="margin-bottom:10px" cellpadding="5">  
-        	<h:selectOneRadio id="options" value="#{form.baseLayerName}">  
-	            <f:selectItem itemLabel="Orthofoto" itemValue="tms" />  
-	            <f:selectItem itemLabel="Topografische kaart" itemValue="topo" /> 
-	            <f:selectItem itemLabel="Stratenkaart" itemValue="navstreet" /> 
-	            <a:ajax event="change" listener="#{form.switchBaseLayers()}" render="backgroundLayerPanel" execute="@this"/> 
-        	</h:selectOneRadio>  
-	    </h:panelGrid>  	
-	</r:panel>
-	</td>
-	</tr>
-	</table>
+						<d:buttons>
+						<j:commandButton type="button" value="Terug"
+								image="#{resource['core/images/actions/12x12/previous.png']}"
+								oncomplete="wiz.back();" render="problemPanel" execute="@this"/>
+							<j:commandButton type="button" value="Verzenden"
+								image="#{resource['core/images/actions/12x12/apply.png']}"
+								oncomplete="if(#{!form.hasErrors})wiz.next();" execute="gegevensPanel"
+								action="#{form.saveMeldingWizard()}" />	
+						</d:buttons>
+						</j:renderPanel>	
+						</div>												
+					</r:panel>
+					</p:tab>
+					<p:tab id="tab_bedankt" title="5. Bedankt">
+					<r:panel header="5. BEDANKT">
+					<div style="padding:3%;">
+					<h:outputText value="Bedankt voor uw Melding!"></h:outputText>
+					<br/>
+					<br/>
+	        		<h:outputText value="Onze Medewerkers behandelen dit zo snel mogelijk en nemen indien nodig contact me u op."></h:outputText>
+					<br/>
+					<br/>
+					<h:panelGrid columns="2" cellpadding="50">
+						<j:commandButton type="button" value="Meld nog een Probleem"
+							action="#{form.resetWizard()}" execute="@this" />													
+						<h:outputLabel>Naar de website van <a href="http://www.tov.be">Toerisme Oost-Vlaanderen</a></h:outputLabel>					     
+					</h:panelGrid>
+					<br />
+					</div>
+					</r:panel>
+					</p:tab>
+			</p:wizard>
+			<br/>
+			<div style="display: none">
+				<u:decorate
+					template="/resources/osyris/includes/routeDokterPanels.xhtml">
+					<u:param name="form" value="#{form}" />					
+				</u:decorate>
+			</div>
 </u:composition>
