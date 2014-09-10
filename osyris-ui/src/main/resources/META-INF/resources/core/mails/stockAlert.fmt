@@ -1,5 +1,5 @@
 <#assign subject>
-[${preferences.title?string}] Stockmateriaal ${naam} onder minimum limiet
+[${preferences.title?string}] Stockmateriaal uit magazijn ${magazijn} onder minimum limiet
 </#assign>
 <html xmlns="http://www.w3.org/1999/xhtml">
 	<body>

@@ -42,6 +42,7 @@ import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 		@Permission(profile = "group:Medewerker", action = "create", allow = true),
 		@Permission(profile = "group:Medewerker", action = "edit", allow = true),
 		@Permission(profile = "group:Medewerker", action = "view", allow = true),
+		@Permission(profile = "group:Medewerker", action = "delete", allow = true),
 
 		@Permission(profile = "group:Routedokter", action = "search", allow = true),
 		@Permission(profile = "group:Routedokter", action = "view", allow = true),

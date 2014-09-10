@@ -106,7 +106,8 @@ public class ControleOpdrachtPermissionHandler extends DefaultPermissionHandler 
 							return true;
 						}
 					} else {
-						if (!action.equals(Permission.VIEW_ACTION)) {
+						if (!(action.equals(Permission.VIEW_ACTION) || action
+								.equals(Permission.DELETE_ACTION))) {
 							return false;
 						}
 					}

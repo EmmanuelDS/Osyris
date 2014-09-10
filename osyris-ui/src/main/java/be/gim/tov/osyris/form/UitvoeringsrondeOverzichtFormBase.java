@@ -255,6 +255,11 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				// Filter Uitvoeringsronde ahv resultaten Werkopdracht query
 				query.addFilter(FilterUtils.id(getSubQueryIds(list)));
 
+				// if (werkOpdracht == null) {
+				// query.addFilter(FilterUtils.in("opdrachten",
+				// getFilteredWerkOpdrachten()));
+				// }
+
 				results = (List<Uitvoeringsronde>) modelRepository
 						.searchObjects(query, false, false, true);
 			}
@@ -465,7 +470,30 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				messages.error("Uitvoeringsronde niet gerapporteerd: De het totaal aantal km moet groter zijn dan 0.");
 				return;
 			}
+
+			// Checken of alle WO in status GERAPPORTEERD
 			if (checkWerkOpdrachtenGerapporteerd()) {
+
+				// Afboeken stock voor elk gebruikt materiaal in elke WO
+				for (ResourceIdentifier id : object.getOpdrachten()) {
+					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+							.loadObject(id);
+					if (!opdracht.getMaterialen().isEmpty()
+							|| opdracht.getMaterialen() != null) {
+
+						for (GebruiktMateriaal materiaal : opdracht
+								.getMaterialen()) {
+							int inStockUpdated = materiaal.getStockMateriaal()
+									.getInStock() - materiaal.getAantal();
+							materiaal.getStockMateriaal().setInStock(
+									inStockUpdated);
+							// Save
+							modelRepository.saveObject(materiaal
+									.getStockMateriaal());
+						}
+					}
+				}
+
 				object.setStatus(UitvoeringsrondeStatus.UITGEVOERD);
 				modelRepository.saveObject(object);
 				messages.info("Uitvoeringsronde succesvol gerapporteerd.");
@@ -964,6 +992,56 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		}
 
 		return rondeIds;
+	}
+
+	/**
+	 * Zoeken naar de rondeIds die de gevonden werkopdrachten bevatten aan de
+	 * hand van de opgegeven zoekparameters.
+	 * 
+	 * @param list
+	 * @return
+	 * @throws IOException
+	 */
+	private List<ResourceIdentifier> getFilteredWerkOpdrachten()
+			throws IOException {
+
+		// Indien minstens 1 van de velden ingevuld WerkOpdracht query
+		// uitvoeren en resultaten filteren op de uitvoeringsronde query
+		QueryBuilder builder = new QueryBuilder("WerkOpdracht");
+
+		if (uitvoerder != null) {
+			builder.addFilter(FilterUtils.equal("uitvoerder", uitvoerder));
+		}
+		if (medewerker != null) {
+			builder.addFilter(FilterUtils.equal("medewerker", medewerker));
+		}
+
+		if (trajectType != null) {
+			builder.addFilter(FilterUtils.equal("trajectType", trajectType));
+		}
+
+		if (regio != null) {
+			builder.addFilter(FilterUtils.equal("regioId", regio));
+		}
+
+		if (trajectId != null) {
+			builder.addFilter(FilterUtils.equal("traject", trajectId));
+		}
+
+		// Enkel WerkOpdracht ids nodig
+		builder.results(FilterUtils.properties("id"));
+		List<Long> ids = (List<Long>) modelRepository.searchObjects(
+				builder.build(), false, false, true);
+
+		// Omzetten ids naar ResourceIdentifiers
+		List<ResourceIdentifier> filteredWerkOpdrachten = new ArrayList<ResourceIdentifier>();
+
+		for (Long id : ids) {
+			filteredWerkOpdrachten.add(new ResourceKey("WerkOpdracht", id
+					.toString()));
+		}
+
+		return filteredWerkOpdrachten;
 	}
 
 	/**

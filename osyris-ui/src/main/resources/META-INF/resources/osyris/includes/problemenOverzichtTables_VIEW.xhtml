@@ -1,0 +1,162 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:j="http://conscientia.org/jsf" 
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:p="http://primefaces.org/ui">
+
+	<a:outputPanel id="problemenOverzichtPanel">
+		<p:dataTable id="bordProblemen"
+			value="#{form.bordProblemen}"
+			mode="RESULT"
+			var="bordProbleem"
+			styleClass="model-table #{cc.attrs.contentClass}"
+			paginator="true"
+			rows="5"
+			resizableColumns="true"
+			paginatorPosition="bottom"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+<!-- 			<j:bindAttribute var="bordProbleem" -->
+<!-- 						name="rowData" /> -->
+			<f:facet name="header">
+				<h:outputText value="Bordproblemen" />
+			</f:facet>
+			
+			<p:column style="width:55px;">
+				<j:commandButton
+					rendered="#{bordProbleem.bord != null}"
+					src="#{resource['core/images/actions/16x16/zoom.png']}"
+					type="image"
+					title="#{messages['component.map.zoomToFeature.label']}"
+					action="#{form.zoomToBordProbleem(bordProbleem)}" />
+				<j:commandButton rendered="#{bordProbleem.bord != null and form.object.status == 'UIT_TE_VOEREN'}"
+					src="#{resource['core/images/actions/16x16/delete.png']}"
+					type="image"
+					title="Probleem verwijderen"
+					oncomplete="conscientia.widget(#{r:element('removeProbleemPopup')}).show();">
+							<f:setPropertyActionListener
+								target="#{form.selectedProbleem}"
+								value="#{bordProbleem}" />
+							</j:commandButton>
+	   		</p:column>	   		   		
+	   		<p:column style="width:30px;" rendered="#{form.object.trajectType.contains('route')}">
+				<f:facet name="header">
+				<h:outputText value="VolgNr" />
+				</f:facet>
+					<h:outputText
+						rendered="#{bordProbleem.bord != null and form.isRouteBord(bordProbleem.bord)}"
+						value="#{osyrisModelFunctions.getBordVolg(bordProbleem.bord) }" mode="VIEW" />
+			</p:column>
+			<p:column style="width:35px;">
+				<f:facet name="header">
+				<h:outputText value="Bord ID" />
+				</f:facet>
+					<h:outputText 
+						rendered="#{bordProbleem.bord != null}"
+						value= "#{d:modelObject(bordProbleem.bord).getId()}" mode="VIEW" />
+			</p:column>
+			
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Type" />
+				</f:facet>
+				<div style="white-space:pre-line;">
+				<d:propertyValue id="typeColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+					value="#{bordProbleem.type}"
+					mode="VIEW" />
+					</div>
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Commentaar" />
+				</f:facet>
+				<div style="white-space:pre-line;">
+				<d:propertyValue id="commentaarColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+					value="#{bordProbleem.commentaar}"
+					mode="VIEW" />
+					</div>
+			</p:column>
+			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
+				<f:facet name="header">
+				<h:outputText value="Status" />
+				</f:facet>
+				<d:propertyValue id="statusColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+					value="#{bordProbleem.status}"
+					mode="VIEW" />
+			</p:column>
+	   	</p:dataTable>
+	   	
+	   	<br/>
+  		
+	   	<p:dataTable id="AndereProblemen"
+			value="#{form.getAndereProblemen()}"
+			mode="RESULT"
+			var="anderProbleem"
+			styleClass="model-table #{cc.attrs.contentClass}"
+			paginator="true"
+			rows="5"
+			resizableColumns="true"
+			paginatorPosition="bottom"
+			paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+			emptyMessage="#{messages['ui.dataTable.empty']}">
+			<j:bindAttribute var="anderProbleem"
+						name="rowData" />
+			<f:facet name="header">
+				<h:outputText value="Andere problemen" />
+			</f:facet>
+			<p:column style="width:55px;">
+				<j:commandButton
+					src="#{resource['core/images/actions/16x16/zoom.png']}"
+					type="image"
+					title="#{messages['component.map.zoomToFeature.label']}"
+					action="#{form.zoomToAnderProbleem(anderProbleem)}" />
+				<j:commandButton rendered="#{form.object.status == 'UIT_TE_VOEREN'}"
+					src="#{resource['core/images/actions/16x16/delete.png']}"
+					type="image"
+					title="Probleem verwijderen"
+					oncomplete="conscientia.widget(#{r:element('removeProbleemPopup')}).show();">
+							<f:setPropertyActionListener
+								target="#{form.selectedProbleem}"
+								value="#{anderProbleem}" />
+							</j:commandButton>
+	   		</p:column>
+	   		<p:column>
+				<f:facet name="header">
+				<h:outputText value="Categorie" />
+				</f:facet>
+				<d:propertyValue id="categorieColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+					value="#{anderProbleem.categorie}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Commentaar" />
+				</f:facet>
+				<div style="white-space:pre-line;">
+				<d:propertyValue id="commentaarColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+					value="#{anderProbleem.commentaar}"
+					mode="VIEW" />
+				</div>
+			</p:column>
+			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
+				<f:facet name="header">
+				<h:outputText value="Status" />
+				</f:facet>
+				<d:propertyValue id="statusColumn"
+					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+					value="#{anderProbleem.status}" mode="VIEW" />
+			</p:column>
+   		</p:dataTable>
+	</a:outputPanel>
+</u:composition>

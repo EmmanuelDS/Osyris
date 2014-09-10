@@ -23,7 +23,7 @@
 	<!-- Probleem tabellen -->
 	<a:outputPanel rendered="#{form.object.status == 'GEVALIDEERD' or form.object.status == 'GERAPPORTEERD'}">
 	<u:decorate
-		template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
+		template="/resources/osyris/includes/problemenOverzichtTables_VIEW.xhtml">
 		<u:param name="form" value="#{form}" />
 	</u:decorate>
 	</a:outputPanel>

@@ -90,7 +90,6 @@ import be.gim.tov.osyris.model.traject.Provincie;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
-import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.exceptions.AlreadyInRondeException;
@@ -460,7 +459,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 			if (object.getHandelingen().isEmpty()
 					|| object.getHandelingen() == null) {
 
-				messages.warn("Gelieve minstens 1 werkhandeling toe te voegen alvorens deze werkopdracht te verzenden.");
+				messages.warn("Gelieve minstens 1 werkhandeling toe te voegen alvorens deze werkopdracht naar de uitvoerder te verzenden.");
 				setHasErrors(true);
 
 			} else {
@@ -782,17 +781,17 @@ public class WerkOpdrachtOverzichtFormBase extends
 			object.setDatumLaatsteWijziging(new Date());
 
 			// Afboeken stock voor elk gebruikt materiaal
-			if (!object.getMaterialen().isEmpty()
-					|| object.getMaterialen() != null) {
+			// if (!object.getMaterialen().isEmpty()
+			// || object.getMaterialen() != null) {
 
-				for (GebruiktMateriaal materiaal : object.getMaterialen()) {
-					int inStockUpdated = materiaal.getStockMateriaal()
-							.getInStock() - materiaal.getAantal();
-					materiaal.getStockMateriaal().setInStock(inStockUpdated);
-					// Save
-					modelRepository.saveObject(materiaal.getStockMateriaal());
-				}
-			}
+			// for (GebruiktMateriaal materiaal : object.getMaterialen()) {
+			// int inStockUpdated = materiaal.getStockMateriaal()
+			// .getInStock() - materiaal.getAantal();
+			// materiaal.getStockMateriaal().setInStock(inStockUpdated);
+			// // Save
+			// modelRepository.saveObject(materiaal.getStockMateriaal());
+			// }
+			// }
 
 			modelRepository.saveObject(object);
 			messages.info("Werkopdracht succesvol gevalideerd.");

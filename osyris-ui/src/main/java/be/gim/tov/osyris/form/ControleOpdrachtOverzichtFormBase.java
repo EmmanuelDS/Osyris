@@ -2214,21 +2214,31 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	public void validerenControleOpdracht() {
-		// Indien alle problemen in een ControleOpdracht een status hebben is de
-		// ControleOpdracht gevalideerd
+
 		try {
 			if (object != null) {
-				if (checkOpenstaandeProblemen(object) == 0) {
+
+				// Indien alle problemen in een ControleOpdracht een status
+				// hebben is die niet IN BEHANDELING is, mag de ControleOpdracht
+				// gevalideerd worden en mogen de WO
+				// aangemaakt worden in batch
+				int aantalOpenProblemen = checkOpenstaandeProblemen(object);
+
+				if (aantalOpenProblemen != 0) {
+					messages.warn("Opgelet: Sommige problemen zijn nog in behandeling of hebben nog geen status. Om deze controleopdracht te kunnen valideren, moeten alle problemen een status hebben en niet meer in behandeling zijn.");
+				}
+				if (aantalOpenProblemen == 0) {
 
 					object.setStatus(ControleOpdrachtStatus.GEVALIDEERD);
 					object.setDatumGevalideerd(new Date());
 					object.setDatumLaatsteWijziging(new Date());
 
+					// WerkOpdrachten aanmaken
+					createWerkOpdrachten(object);
+
 					modelRepository.saveObject(object);
 					messages.info("Controleopdracht succesvol gevalideerd.");
 
-					// WerkOpdrachten aanmaken
-					createWerkOpdrachten(object);
 				}
 			}
 		} catch (IOException e) {
@@ -2237,23 +2247,25 @@ public class ControleOpdrachtOverzichtFormBase extends
 	}
 
 	/**
-	 * Check of problemen bij een controleOpdracht een status hebben
+	 * Check of problemen bij een controleOpdracht een status hebben en niet in
+	 * status IN_BEHANDELING zijn.
 	 * 
 	 * @param controleOpdracht
 	 * @return
 	 */
 	private int checkOpenstaandeProblemen(ControleOpdracht controleOpdracht) {
 
-		int probleemNotChecked = 0;
+		int openstaandeProblemen = 0;
 
 		if (controleOpdracht.getProblemen() != null) {
 			for (Probleem p : controleOpdracht.getProblemen()) {
-				if (p.getStatus() == null || p.getStatus().toString().isEmpty()) {
-					probleemNotChecked = +1;
+				if (p.getStatus() == null || p.getStatus().toString().isEmpty()
+						|| p.getStatus().equals(ProbleemStatus.IN_BEHANDELING)) {
+					openstaandeProblemen = +1;
 				}
 			}
 		}
-		return probleemNotChecked;
+		return openstaandeProblemen;
 	}
 
 	/**
@@ -2265,6 +2277,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private void createWerkOpdrachten(ControleOpdracht controleOpdracht) {
 
 		if (controleOpdracht.getProblemen() != null) {
+
+			int counter = 0;
 			for (Probleem probleem : controleOpdracht.getProblemen()) {
 
 				if (probleem.getStatus().equals(ProbleemStatus.WERKOPDRACHT)) {
@@ -2334,7 +2348,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 						}
 						modelRepository.saveObject(werkOpdracht);
-						messages.info("Nieuwe werkopdracht(en) succesvol aangemaakt.");
+						counter += 1;
 
 					} catch (IOException e) {
 						messages.error("Fout bij het bewaren van een nieuwe werkopdracht.");
@@ -2349,6 +2363,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					}
 				}
 			}
+			messages.info(counter + " werkopdracht(en) succesvol aangemaakt.");
 		}
 	}
 
