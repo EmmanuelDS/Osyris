@@ -65,6 +65,7 @@ import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.utils.DropdownListSorting;
+import be.gim.tov.osyris.model.werk.StockMateriaal;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -585,8 +586,46 @@ public class OsyrisModelFunctions {
 	@RunPrivileged
 	public List<Integer> getKnooppuntNummers() throws IOException {
 
-		QueryBuilder builder = new QueryBuilder("NetwerkKnooppunt");
+		QueryBuilder builder = new QueryBuilder();
 		builder.filter(FilterUtils.notEqual("nummer", 0, true));
+
+		builder.results(FilterUtils.properties("nummer"));
+		builder.groupBy(FilterUtils.properties("nummer"));
+		builder.orderBy(new DefaultQueryOrderBy(FilterUtils.property("nummer")));
+
+		return (List<Integer>) modelRepository.searchObjects(builder.build(),
+				true, true);
+	}
+
+	/**
+	 * Zoekt knooppuntnummers op basis van trajectType, regio en trajectnaam.
+	 * 
+	 * @return
+	 * @throws IOException
+	 */
+	@SuppressWarnings("unchecked")
+	@RunPrivileged
+	public List<Integer> getKnooppuntNummers(String trajectType,
+			ResourceIdentifier regio, String naam) throws IOException {
+
+		QueryBuilder builder = new QueryBuilder();
+		builder.filter(FilterUtils.notEqual("nummer", 0, true));
+
+		if (trajectType.contains("WandelNetwerk")) {
+			builder.modelClassName("WandelNetwerkKnooppunt");
+		}
+
+		else if (trajectType.contains("FietsNetwerk")) {
+			builder.modelClassName("FietsNetwerkKnooppunt");
+		}
+
+		if (regio != null) {
+			builder.addFilter(FilterUtils.equal("regio", regio));
+		}
+
+		if (naam != null && !naam.isEmpty()) {
+			builder.addFilter(FilterUtils.equal("naam", naam));
+		}
 		builder.results(FilterUtils.properties("nummer"));
 		builder.groupBy(FilterUtils.properties("nummer"));
 		builder.orderBy(new DefaultQueryOrderBy(FilterUtils.property("nummer")));
@@ -1163,14 +1202,15 @@ public class OsyrisModelFunctions {
 					QueryBuilder builder = new QueryBuilder("Regio");
 					builder.addFilter(FilterUtils.equal("uitvoerder",
 							profiel.getBedrijf()));
-					builder.results(FilterUtils.properties("naam"));
-					builder.groupBy(FilterUtils.properties("naam"));
-					List<String> regios = (List<String>) modelRepository
+					// builder.results(FilterUtils.properties("naam"));
+					// builder.groupBy(FilterUtils.properties("naam"));
+					List<Regio> regios = (List<Regio>) modelRepository
 							.searchObjects(builder.build(), false, false);
 
-					for (String regio : regios) {
-						Object[] object = { new ResourceKey("Regio", regio),
-								regio };
+					for (Regio regio : regios) {
+						Object[] object = {
+								new ResourceKey("Regio", regio.getId()
+										.toString()), regio.getNaam() };
 						uitvoerderRegios.add(object);
 					}
 				}
@@ -1516,6 +1556,50 @@ public class OsyrisModelFunctions {
 
 			LOG.error("Can not send email.", e);
 			messages.error("Fout bij het versturen van bevestigingsmail");
+		}
+	}
+
+	/**
+	 * Stuurt een email naar de Routedokter wanneer een stock item onder de
+	 * minimum limiet zit.
+	 * 
+	 * @param stockMateriaal
+	 */
+	@RunPrivileged
+	public void sendMailStockMateriaalLimiet(StockMateriaal stockMateriaal) {
+
+		try {
+			Map<String, Object> variables = new HashMap<String, Object>();
+			variables.put("preferences", preferences);
+			variables.put("magazijn", stockMateriaal.getMagazijn());
+			variables.put("categorie", stockMateriaal.getCategorie());
+			variables.put("subCategorie", stockMateriaal.getSubCategorie());
+			variables.put("type", stockMateriaal.getType());
+			variables.put("naam", stockMateriaal.getNaam());
+			variables.put("nummer", stockMateriaal.getNummer());
+			variables.put("inStock", stockMateriaal.getInStock());
+			variables.put("min", stockMateriaal.getMin());
+			variables.put("max", stockMateriaal.getMax());
+
+			// Ophalen emailadres Routedokters
+			List<ResourceIdentifier> users = getUsersInGroup("RouteDokter");
+
+			for (ResourceIdentifier user : users) {
+
+				User routeDokter = (User) modelRepository.loadObject(user);
+				UserProfile profiel = (UserProfile) routeDokter.getAspect(
+						"UserProfile", modelRepository, true);
+
+				mailSender.sendMail(preferences.getNoreplyEmail(),
+						Collections.singleton(profiel.getEmail()),
+						"/META-INF/resources/core/mails/stockAlert.fmt",
+						variables);
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not load object.", e);
+		} catch (Exception e) {
+			LOG.error("Can not send email.", e);
 		}
 	}
 

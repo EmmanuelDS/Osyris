@@ -136,7 +136,7 @@
 		</j:sectionPanel>
 		<j:sectionPanel
 			label="#{messages['model.entry.mapContext.tools.selection.label']}"
-			rendered="#{viewer.context.hasAnyTool('selectFeatures','clearSelection','selectOverlapping','selectionBuffer') and viewer.context.title != 'Routes' and (identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))}"
+			rendered="#{(viewer.context.hasAnyTool('selectFeatures','clearSelection','selectOverlapping','selectionBuffer') and viewer.context.title != 'Routes' and (identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))) or (viewer.context.title == 'Routes' and viewer.context.showSelectControl and !identity.inGroup('PeterMeter','CUSTOM'))}"
 			transient="true">
 			<j:commandButton
 				id="selectFeatures"
@@ -164,7 +164,7 @@
 				styleClass="component-toolbar-button"
 				value="Deselecteren"
 				title="#{messages['model.entry.mapContext.tools.clearSelection.label']}"
-				rendered="#{viewer.context.hasTool('clearSelection') and viewer.context.title != 'Routes' and (identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM'))}"
+				rendered="#{viewer.context.hasTool('clearSelection') and viewer.context.title != 'Routes' and (identity.isLoggedIn() or identity.inGroup('PeterMeter','CUSTOM')) or (viewer.context.title == 'Routes' and viewer.context.showSelectControl)}"
 				submit="false" />
 			<j:sectionPanel rows="2">
 				<m:selectOverlapping
@@ -254,7 +254,7 @@
 		</j:sectionPanel>
 		<j:sectionPanel
 			label="#{messages['model.entry.mapContext.tools.info.label']}"
-			rendered="#{viewer.context.hasTool('featureInfo') and identity.isLoggedIn() and !identity.inGroup('PeterMeter','CUSTOM')}"
+			rendered="#{viewer.context.hasTool('featureInfo') and identity.isLoggedIn() and !identity.inGroup('PeterMeter','CUSTOM') and !viewer.context.showFeatureInfoControl}"
 			transient="true">
 			<j:commandButton
 				image="#{resource['core/images/actions/24x24/featureInfo.png']}"

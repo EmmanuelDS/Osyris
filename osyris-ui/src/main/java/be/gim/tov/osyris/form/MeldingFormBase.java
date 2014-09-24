@@ -44,6 +44,7 @@ import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.FeatureSelectionMode;
 import be.gim.specto.api.context.MapContext;
+import be.gim.specto.api.context.MapLayer;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
@@ -106,6 +107,7 @@ public class MeldingFormBase implements Serializable {
 	protected Long selectedFeatureId;
 	protected boolean hasErrors;
 	protected List<Bord> selectableBorden;
+	protected Probleem probleem;
 
 	// GETTERS AND SETTERS
 	public Melding getMelding() {
@@ -206,6 +208,14 @@ public class MeldingFormBase implements Serializable {
 
 	public void setSelectableBorden(List<Bord> selectableBorden) {
 		this.selectableBorden = selectableBorden;
+	}
+
+	public Probleem getProbleem() {
+		return probleem;
+	}
+
+	public void setProbleem(Probleem probleem) {
+		this.probleem = probleem;
 	}
 
 	// METHODS
@@ -414,7 +424,7 @@ public class MeldingFormBase implements Serializable {
 		if (getMelding().getProbleem() != null) {
 			modelRepository.evictObject(getMelding().getProbleem());
 		}
-		Probleem probleem = null;
+		probleem = null;
 		if ("bord".equals(probleemType)) {
 
 			if (trajectType.endsWith("Route")) {
@@ -611,7 +621,7 @@ public class MeldingFormBase implements Serializable {
 
 		if (object.getProbleem() instanceof AnderProbleem) {
 			if (((AnderProbleem) object.getProbleem()).getGeom() == null) {
-				messages.warn("Gelieve eerst een punt aan te duiden op de kaart. Gebruik de 'Tonen kaart' knop om de kaart te openen.");
+				messages.warn("Gelieve eerst een punt aan te duiden op de kaart. Gebruik de 'Kaart tonen' knop om de kaart te openen.");
 				return false;
 			}
 
@@ -1223,6 +1233,13 @@ public class MeldingFormBase implements Serializable {
 		setRegio(null);
 		setKnooppuntNummer(null);
 		setTrajectNaam(null);
+		setProbleemType(null);
+
+		// Probleem ook mee resetten
+		if (probleem != null) {
+			probleem = null;
+			object.setProbleem(null);
+		}
 	}
 
 	/**
@@ -1302,7 +1319,7 @@ public class MeldingFormBase implements Serializable {
 		if (getMelding().getProbleem() != null) {
 			modelRepository.evictObject(getMelding().getProbleem());
 		}
-		Probleem probleem = null;
+		probleem = null;
 		if ("bord".equals(probleemType)) {
 
 			if (trajectType.endsWith("Route")) {
@@ -1608,6 +1625,7 @@ public class MeldingFormBase implements Serializable {
 				else if (layer.getLayerId().equalsIgnoreCase(
 						GEOMETRY_LAYER_NAME)) {
 					layer.setHidden(true);
+					String style = layer.getStyle();
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(Collections.EMPTY_LIST);
 				} else {
@@ -1618,7 +1636,17 @@ public class MeldingFormBase implements Serializable {
 				}
 			}
 			context.setBoundingBox(envelope);
-			setBaseLayerName("tms");
+
+			// Stratenkaart als defauls achtergrond
+			setBaseLayerName("navstreet");
+			List<MapLayer> baseLayers = context.getBaseLayers();
+
+			for (MapLayer baseLayer : baseLayers) {
+				baseLayer.setHidden(true);
+				if (baseLayer.getLayerId().equals(baseLayerName)) {
+					baseLayer.setHidden(false);
+				}
+			}
 		}
 	}
 
@@ -1770,11 +1798,11 @@ public class MeldingFormBase implements Serializable {
 		if (trajectNaam != null) {
 			if (knooppuntNummer == null) {
 				filter = FilterUtils
-						.and(FilterUtils.equal("naam", trajectNaam),
-								knooppuntFilter);
+						.and(FilterUtils.equal("naam", trajectNaam));
 			} else {
 				filter = FilterUtils
-						.and(FilterUtils.equal("naam", trajectNaam));
+						.and(FilterUtils.equal("naam", trajectNaam),
+								knooppuntFilter);
 			}
 		}
 		layer.setFilter(filter);
@@ -1782,8 +1810,9 @@ public class MeldingFormBase implements Serializable {
 		DefaultQuery query = new DefaultQuery("NetwerkBord");
 		if (filter != null) {
 			query.addFilter(filter);
+		} else {
+			query.addFilter(knooppuntFilter);
 		}
-		query.addFilter(knooppuntFilter);
 		selectableBorden = (List<Bord>) modelRepository.searchObjects(query,
 				false, false);
 
@@ -1858,7 +1887,14 @@ public class MeldingFormBase implements Serializable {
 							.add(GeometryUtils.getEnvelope(knooppunt.getGeom()));
 					ids.add(knooppunt.getId().toString());
 				}
+
 				envelope = GeometryUtils.getEnvelope(envelopes);
+
+				// Niet te ver inzoomen indien maar 1 KP gevonden
+				if (netwerkKnooppunten.size() == 1) {
+					GeometryUtils.expandEnvelope(envelope, 0.04,
+							context.getMaxBoundingBox());
+				}
 			}
 
 			if (trajectNaam != null) {
@@ -1883,6 +1919,12 @@ public class MeldingFormBase implements Serializable {
 
 				}
 				envelope = GeometryUtils.getEnvelope(envelopes);
+
+				// Niet te ver inzoomen indien maar 1 KP gevonden
+				if (netwerkKnooppunten.size() == 1) {
+					GeometryUtils.expandEnvelope(envelope, 0.04,
+							context.getMaxBoundingBox());
+				}
 			}
 
 			if (trajectNaam == null && regio == null) {
@@ -1903,6 +1945,12 @@ public class MeldingFormBase implements Serializable {
 					ids.add(knooppunt.getId().toString());
 				}
 				envelope = GeometryUtils.getEnvelope(envelopes);
+
+				// Niet te ver inzoomen indien maar 1 KP gevonden
+				if (netwerkKnooppunten.size() == 1) {
+					GeometryUtils.expandEnvelope(envelope, 0.04,
+							context.getMaxBoundingBox());
+				}
 			}
 
 			// Set Selectie enkel als specifiek knooppuntNr is opgegeven
@@ -1944,6 +1992,7 @@ public class MeldingFormBase implements Serializable {
 	}
 
 	/**
+	 * Check of er bij een Probleem commentaar aanwezig is.
 	 * 
 	 * @return
 	 */

@@ -10,7 +10,9 @@
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	
-	<a:outputPanel id="bordProbleemPanel" rendered="#{form.isBordProbleem(form.object.probleem)}">
+	<c:choose>
+	<c:when test="#{form.isBordProbleem(form.object.probleem)}">
+	<a:outputPanel id="bordProbleemPanel" >
 		<p:dataTable id="bordProbleemTable"
 			value="#{form.object.probleem}"
 			mode="RESULT"
@@ -75,7 +77,10 @@
 			</p:column>
 	   	</p:dataTable>
 	</a:outputPanel>
-	<a:outputPanel id="AnderProbleemPanel" rendered="#{!form.isBordProbleem(form.object.probleem)}" >
+	</c:when>
+	
+	<c:otherwise>
+	<a:outputPanel id="AnderProbleemPanel" >
 	<p:dataTable id="AnderProbleem"
 			value="#{form.object.probleem}"
 			mode="RESULT"
@@ -125,4 +130,6 @@
 			</p:column>
    		</p:dataTable>
    		</a:outputPanel>
+   		</c:otherwise>
+   		</c:choose>
 	</u:composition>

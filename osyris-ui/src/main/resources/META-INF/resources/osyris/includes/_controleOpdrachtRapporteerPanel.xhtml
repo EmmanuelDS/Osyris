@@ -11,20 +11,52 @@
 	<h:outputStylesheet id="fileuploadCss"
 		name="fileupload/fileupload.css"
 		library="primefaces" />
-	<script>
-		function test() {
-			var controller = #{j:controller()};
-			controller.activateControl("drawLineString");
-		}
-	</script>
+	
+	<table>
+	<tr>
+	<td style="width:90%">
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
-	<br/>
+	</td>
+	<td style="align-content:center;">
+	<d:buttons>
+		<j:commandButton 
+			style="font-size:1.5em;"
+			value="#{messages['form.general.save.button']}" 
+			image="#{resource['core/images/actions/16x16/save.png']}"
+			type="button"
+			action="#{form.save()}"
+			render="#{r:clientId('problemenOverzichtPanel')}"
+			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
+		<j:commandButton 
+			style="font-size:1.5em;"
+			value="Verzenden"
+			image="#{resource['core/images/actions/16x16/next.png']}"
+			type="button"
+			immediate="true"
+			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).show();" />
+	</d:buttons>
+	</td>
+	</tr>
+	</table>
+
+	
+<!-- 	<br/> -->
 	<table width="100%">
 	<tr>
-	<td width="50%" valign="top">
-	<r:panel id="ProblemenPanel" header="Problemen">	
+	<td width="45%" valign="top">
+	
+	<p:tabView>
+    <p:tab title="Probleem toevoegen">
+        <h:outputText value="Welk probleem hebt u opgemerkt?"></h:outputText>
+		<br/>
+		<br/>
+		<h:outputText value="Selecteer het type probleem en de beschrijving die het beste past."></h:outputText>
+		<br/>
+		<br/>
+		<br/>
+<!-- 	<r:panel id="ProblemenPanel" header="Problemen">	 -->
 	<j:renderPanel id="problemPanel">
-		<d:field for="probleemType" label="Kies het type probleem">
+		<d:field for="probleemType" label="Type">
 			<h:selectOneRadio id="probleemType" value="#{form.probleemType}" layout="grid">
 	           	<f:selectItem itemValue="bord" itemLabel="Bordprobleem" />
 				<f:selectItem itemValue="ander" itemLabel="Ander probleem" />
@@ -57,10 +89,15 @@
 					</d:field>
 				</a:outputPanel>
 				
-				<d:propertyField id="commentaar"
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-						value="#{form.probleem.commentaar}"
-						mode="EDIT" />
+<!-- 				<d:propertyField id="commentaar" -->
+<!-- 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}" -->
+<!-- 						value="#{form.probleem.commentaar}" -->
+<!-- 						mode="EDIT" /> -->
+
+				<d:field label="Commentaar" for="commentaar" required="true">
+				 	<h:inputTextarea id="commentaar" value="#{form.probleem.commentaar}" required="true" requiredMessage="De waarde voor Commentaar is verplicht." />
+					<p:watermark for="commentaar" value="Geef hier wat extra uitleg bij het probleem." />
+				</d:field>
 				
 				<d:field label="Foto" for="foto">	 
 						<d:propertyValue id="foto"
@@ -106,25 +143,32 @@
 	       </h:selectOneRadio>
 		</a:outputPanel>
 	<d:buttons>
-		<j:commandButton value="Probleem toevoegen" rendered="true"
-			image="#{resource['core/images/actions/12x12/add.png']}"
+		<j:commandButton value="Bewaren" rendered="true"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
 			type="button"
-			action="#{form.addProbleem()}" render="problemPanel" execute="problemPanel">
+			action="#{form.addProbleem()}" render="problemPanel, #{r:clientId('problemenOverzichtPanel')}, viewer" execute="problemPanel">
 		</j:commandButton>
 	</d:buttons>
 	</j:renderPanel>
 	<br/>
 	
+	</j:renderPanel>
+<!-- 		</r:panel> -->
+		</p:tab>
+		
+	<p:tab title="Probleem overzicht">
 	<!-- Probleem tabellen -->
 	<u:decorate
 		template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
 		<u:param name="form" value="#{form}" />
 	</u:decorate>
-	
-   	</j:renderPanel>
-   	</r:panel>
+   	
+   
    	<br/>
-   	<r:panel header="Terreinbezoek">
+   	</p:tab>
+   	
+   	<p:tab title="Terreinbezoek">
+<!--    	<r:panel header="Terreinbezoek"> -->
   		<d:fields>
    		<d:field label="Datum terreinbezoek" for="datumTerreinBezoek">	 
 		<d:propertyValue id="datumTerreinBezoek" 
@@ -133,9 +177,11 @@
 				mode="EDIT" />
 			</d:field>
 	</d:fields>
-	</r:panel>
+<!-- 	</r:panel> -->
+	</p:tab>
+	</p:tabView>
 	</td>
-	<td width="50%" valign="top">
+	<td width="55%" valign="top">
 		<r:panel>
 			<div style="height: 500px">
 				<m:mapViewer id="viewer"
@@ -152,23 +198,23 @@
 			<u:param name="form" value="#{form}" />
 		</u:decorate>
 		<br/>
-		<d:buttons>
-		<j:commandButton 
-			style="font-size:1.5em;"
-			value="#{messages['form.general.save.button']}" 
-			image="#{resource['core/images/actions/16x16/save.png']}"
-			type="button"
-			action="#{form.save()}"
-			render="#{r:clientId('problemenOverzichtPanel')}"
-			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" />
-		<j:commandButton 
-			style="font-size:1.5em;"
-			value="Verzenden"
-			image="#{resource['core/images/actions/16x16/next.png']}"
-			type="button"
-			immediate="true"
-			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).show();" />
-	</d:buttons>
+<!-- 		<d:buttons> -->
+<!-- 		<j:commandButton  -->
+<!-- 			style="font-size:1.5em;" -->
+<!-- 			value="#{messages['form.general.save.button']}"  -->
+<!-- 			image="#{resource['core/images/actions/16x16/save.png']}" -->
+<!-- 			type="button" -->
+<!-- 			action="#{form.save()}" -->
+<!-- 			render="#{r:clientId('problemenOverzichtPanel')}" -->
+<!-- 			oncomplete="conscientia.widget(#{r:element('rapporteerPopup')}).hide();" /> -->
+<!-- 		<j:commandButton  -->
+<!-- 			style="font-size:1.5em;" -->
+<!-- 			value="Verzenden" -->
+<!-- 			image="#{resource['core/images/actions/16x16/next.png']}" -->
+<!-- 			type="button" -->
+<!-- 			immediate="true" -->
+<!-- 			oncomplete="conscientia.widget(#{r:element('confirmVerzendenPopup')}).show();" /> -->
+<!-- 	</d:buttons> -->
 	</td>
 	</tr>
 	</table>

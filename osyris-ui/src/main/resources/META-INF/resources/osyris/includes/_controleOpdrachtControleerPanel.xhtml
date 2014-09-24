@@ -13,13 +13,10 @@
 	<table width="100%">
 	<tr valign="top">
 	<td>
-	<a:outputPanel>	
-		<u:decorate template="/resources/osyris/includes/bewegwijzering.xhtml">
-			<u:param name="form" value="#{form}" />
-		</u:decorate>
-	</a:outputPanel>
-	<br/>
-	<r:panel>
+	
+	<p:tabView>
+    <p:tab title="Bewerken Info">
+<!-- 	<r:panel> -->
 	<d:fields>
 		<d:field label="Periode" for="periode">	 
 			<d:propertyValue id="periode" 
@@ -58,7 +55,19 @@
 					mode="EDIT" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+<!-- 	</r:panel> -->
+	</p:tab>
+	
+    <p:tab title="Bewegwijzering">
+	<a:outputPanel>	
+		<u:decorate template="/resources/osyris/includes/bewegwijzering.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+	</a:outputPanel>
+	<br/>
+	</p:tab>
+	</p:tabView>
+	
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>

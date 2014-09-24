@@ -11,15 +11,20 @@
 	<h2>#{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
 	<br/>
 	<table width="100%">
-			<tr valign="top">
-			<td style="width:550px;">	
+	<tr valign="top">
+	<td style="width:50%;">	
+	
+	<p:tabView>
+       			<p:tab title="Bewegwijzering">
 				<a:outputPanel>	
 					<u:decorate template="/resources/osyris/includes/bewegwijzering.xhtml">
 						<u:param name="form" value="#{form}" />
 					</u:decorate>
 				</a:outputPanel>
 	<br/>
+	</p:tab>
 	
+    <p:tab title="Overzicht problemen" rendered="#{form.object.status == 'GEVALIDEERD' or form.object.status == 'GERAPPORTEERD'}">
 	<!-- Probleem tabellen -->
 	<a:outputPanel rendered="#{form.object.status == 'GEVALIDEERD' or form.object.status == 'GERAPPORTEERD'}">
 	<u:decorate
@@ -28,10 +33,16 @@
 	</u:decorate>
 	</a:outputPanel>
 	<br/>
+	</p:tab>
+	
+    <p:tab title="Praktische info">
 	<u:decorate
 		template="/resources/osyris/includes/praktischeInfoCO.xhtml">
 		<u:param name="form" value="#{form}" />
 	</u:decorate>
+	</p:tab>
+	</p:tabView>
+	
 	</td>
 	<td width="50%">
 		<r:panel>

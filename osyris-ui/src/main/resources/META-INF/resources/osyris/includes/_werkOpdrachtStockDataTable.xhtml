@@ -1,0 +1,175 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:q="http://specto.gim.be/search"
+	xmlns:p="http://primefaces.org/ui">
+
+	<p:dataTable id="objects"
+		value="#{stockMateriaalOverzichtFormBase.dataModel}" lazy="true"
+		var="stockMateriaal" style="width: 100%; vertical-align:top;" styleClass="blue"
+		paginator="true" paginatorPosition="bottom" rows="20"
+		paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}" scrollable="true"
+		resizableColumns="true" tableStyle="min-width: 850px;"
+		emptyMessage="#{messages['ui.dataTable.empty']}">
+		<j:layoutContent />
+		<p:column label="Acties" style="width:20px;">
+			<a:outputPanel rendered="true" styleClass="model-table-actions">
+				<j:commandButton
+					rendered="#{stockMateriaalOverzichtFormBase.isCanView(stockMateriaal)}"
+					image="#{resource['core/images/actions/16x16/add.png']}"
+					type="image"
+					title="Materiaal toevoegen"
+					oncomplete="conscientia.widget(#{r:element('gekozenMateriaalPopup')}).show(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).hide(); ">
+					<f:setPropertyActionListener
+						target="#{stockMateriaalOverzichtFormBase.object}"
+						value="#{stockMateriaal}" />
+				</j:commandButton>
+			</a:outputPanel>
+		</p:column>
+		<p:column label="Magazijn" sortBy="#{stockMateriaal.magazijn }"
+			style="width:80px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('magazijn')}" />
+			</f:facet>
+			<d:propertyValue id="magazijnColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('magazijn')}"
+				value="#{stockMateriaal.magazijn }" mode="VIEW" />
+		</p:column>
+		<p:column label="Categorie" sortBy="#{stockMateriaal.categorie }"
+			style="width:80px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('categorie')}" />
+			</f:facet>
+			<d:propertyValue id="categorieColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
+				value="#{stockMateriaal.categorie }" mode="VIEW" />
+		</p:column>
+		<p:column label="Subcategorie"
+			sortBy="#{stockMateriaal.subCategorie }" style="width:80px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}" />
+			</f:facet>
+			<d:propertyValue id="subCategorieColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
+				value="#{stockMateriaal.subCategorie }" mode="VIEW" />
+		</p:column>
+		<p:column label="Type" sortBy="#{stockMateriaal.type }"
+			style="width:140px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('type')}" />
+			</f:facet>
+			<d:propertyValue id="typeColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
+				value="#{stockMateriaal.type }" mode="VIEW" />
+		</p:column>
+		<p:column label="Naam" sortBy="#{stockMateriaal.naam }"
+			style="width:400px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('naam')}" />
+			</f:facet>
+			<d:propertyValue id="naamColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
+				value="#{stockMateriaal.naam }" mode="VIEW" />
+		</p:column>
+		<p:column label="Nummer" sortBy="#{stockMateriaal.nummer }"
+			style="width:50px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('nummer')}" />
+			</f:facet>
+			<d:propertyValue id="nummerColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
+				value="#{stockMateriaal.nummer }" mode="VIEW" />
+		</p:column>
+		<p:column label="In stock" sortBy="#{stockMateriaal.inStock }"
+			style="width:50px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('inStock')}" />
+			</f:facet>
+			<d:propertyValue id="inStockColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('inStock')}"
+				value="#{stockMateriaal.inStock }" mode="VIEW" />
+		</p:column>
+		<p:column label="Minimum" sortBy="#{stockMateriaal.min}"
+			style="width:60px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('min')}" />
+			</f:facet>
+			<d:propertyValue id="minimumColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('min')}"
+				value="#{stockMateriaal.min }" mode="VIEW" />
+		</p:column>
+		<p:column label="Maximum" sortBy="#{stockMateriaal.max }"
+			style="width:60px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('max')}" />
+			</f:facet>
+			<d:propertyValue id="MaximumColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('max')}"
+				value="#{stockMateriaal.max }" mode="VIEW" />
+		</p:column>
+		<p:column label="te bestellen" sortBy="#{stockMateriaal.teBestellen }"
+			style="width:65px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('teBestellen')}" />
+			</f:facet>
+			<d:propertyValue id="teBestellenColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('teBestellen')}"
+				value="#{stockMateriaal.teBestellen }" mode="VIEW" />
+		</p:column>
+		<p:column label="Besteld" sortBy="#{stockMateriaal.besteld }"
+			style="width:65px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('besteld')}" />
+			</f:facet>
+			<d:propertyValue id="besteldColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('besteld')}"
+				value="#{stockMateriaal.besteld }" mode="VIEW" />
+		</p:column>
+		<p:column label="Regio" sortBy="#{stockMateriaal.regio }"
+			style="width:105px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('regio')}" />
+			</f:facet>
+			<d:propertyValue id="regioColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('regio')}"
+				value="#{stockMateriaal.regio }" mode="VIEW" />
+		</p:column>
+		<p:column label="Datum besteld"
+			sortBy="#{stockMateriaal.datumBesteld }" style="width:80px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('datumBesteld')}" />
+			</f:facet>
+			<d:propertyValue id="datumBesteldColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('datumBesteld')}"
+				value="#{stockMateriaal.datumBesteld }" mode="VIEW" />
+		</p:column>
+		<p:column label="Datum geleverd"
+			sortBy="#{stockMateriaal.datumGeleverd }" style="width:85px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('datumGeleverd')}" />
+			</f:facet>
+			<d:propertyValue id="datumGeleverdColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('datumGeleverd')}"
+				value="#{stockMateriaal.datumGeleverd }" mode="VIEW" />
+		</p:column>
+	</p:dataTable>
+</u:composition>

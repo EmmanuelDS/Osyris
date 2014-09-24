@@ -7,6 +7,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -30,6 +31,7 @@ import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.time.DateUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.fop.apps.Fop;
@@ -151,6 +153,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected ValidatieStatus validatieStatus;
 	protected ResourceIdentifier trajectId;
 	protected String baseLayerName;
+	protected List<Bord> selectableBorden;
 
 	// GETTERS AND SETTERS
 	public WerkOpdracht getWerkOpdracht() {
@@ -295,6 +298,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	public void setBaseLayerName(String baseLayerName) {
 		this.baseLayerName = baseLayerName;
+	}
+
+	public List<Bord> getSelectableBorden() {
+		return selectableBorden;
+	}
+
+	public void setSelectableBorden(List<Bord> selectableBorden) {
+		this.selectableBorden = selectableBorden;
 	}
 
 	// METHODS
@@ -773,75 +784,85 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * 
 	 */
 	public void valideerWerkOpdracht() {
+
+		setHasErrors(true);
 		try {
-			// Set status en datum GEVALIDEERD
-			object.setStatus(WerkopdrachtStatus.GEVALIDEERD);
-			object.setDatumGevalideerd(new Date());
-			object.setValidatie(validatieStatus);
-			object.setDatumLaatsteWijziging(new Date());
+			if (checkWerkOpdrachtValidatie()) {
+				setHasErrors(false);
 
-			// Afboeken stock voor elk gebruikt materiaal
-			// if (!object.getMaterialen().isEmpty()
-			// || object.getMaterialen() != null) {
+				// Set status en datum GEVALIDEERD
+				object.setStatus(WerkopdrachtStatus.GEVALIDEERD);
+				object.setDatumGevalideerd(new Date());
+				object.setValidatie(validatieStatus);
+				object.setDatumLaatsteWijziging(new Date());
 
-			// for (GebruiktMateriaal materiaal : object.getMaterialen()) {
-			// int inStockUpdated = materiaal.getStockMateriaal()
-			// .getInStock() - materiaal.getAantal();
-			// materiaal.getStockMateriaal().setInStock(inStockUpdated);
-			// // Save
-			// modelRepository.saveObject(materiaal.getStockMateriaal());
-			// }
-			// }
+				// Afboeken stock voor elk gebruikt materiaal
+				// if (!object.getMaterialen().isEmpty()
+				// || object.getMaterialen() != null) {
 
-			modelRepository.saveObject(object);
-			messages.info("Werkopdracht succesvol gevalideerd.");
+				// for (GebruiktMateriaal materiaal : object.getMaterialen()) {
+				// int inStockUpdated = materiaal.getStockMateriaal()
+				// .getInStock() - materiaal.getAantal();
+				// materiaal.getStockMateriaal().setInStock(inStockUpdated);
+				// // Save
+				// modelRepository.saveObject(materiaal.getStockMateriaal());
+				// }
+				// }
 
-			// OPNIEUW UIT TE VOEREN = nieuwe WerkOpdracht
-			if (validatieStatus.equals(ValidatieStatus.OPNIEUW_UITVOEREN)) {
+				modelRepository.saveObject(object);
+				messages.info("Werkopdracht succesvol gevalideerd.");
 
-				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
-						.createObject(getModelClass().getName(), null);
+				// OPNIEUW UIT TE VOEREN = nieuwe WerkOpdracht
+				if (validatieStatus.equals(ValidatieStatus.OPNIEUW_UITVOEREN)) {
 
-				opdracht.setMedewerker(object.getMedewerker());
-				opdracht.setProbleem(object.getProbleem());
-				opdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
-				opdracht.setTraject(object.getTraject());
-				opdracht.setUitvoerder(object.getUitvoerder());
-				opdracht.setInRonde("0");
-				opdracht.setDatumTeControleren(new Date());
-				opdracht.setValidatie(validatieStatus);
-				opdracht.setTrajectType(object.getTrajectType());
-				opdracht.setRegioId(object.getRegioId());
-				opdracht.setDatumLaatsteWijziging(new Date());
+					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+							.createObject(getModelClass().getName(), null);
 
-				modelRepository.saveObject(opdracht);
-				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Te controleren'");
+					opdracht.setMedewerker(object.getMedewerker());
+					opdracht.setProbleem(object.getProbleem());
+					opdracht.setStatus(WerkopdrachtStatus.TE_CONTROLEREN);
+					opdracht.setTraject(object.getTraject());
+					opdracht.setUitvoerder(object.getUitvoerder());
+					opdracht.setInRonde("0");
+					opdracht.setDatumTeControleren(new Date());
+					opdracht.setValidatie(validatieStatus);
+					opdracht.setTrajectType(object.getTrajectType());
+					opdracht.setRegioId(object.getRegioId());
+					opdracht.setDatumLaatsteWijziging(new Date());
+					opdracht.setGemeente(object.getGemeente());
 
+					modelRepository.saveObject(opdracht);
+					messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Te controleren'");
+
+				}
+				// LATER OPNIEUW UITVOEREN VANAF = status UITGESTELD en nieuwe
+				// werkOpdracht met status UITGESTELD en set datum
+				// laterUitTeVoeren
+				else if (validatieStatus
+						.equals(ValidatieStatus.LATER_OPNIEUW_UITVOEREN_VANAF)) {
+
+					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+							.createObject(getModelClass().getName(), null);
+
+					opdracht.setMedewerker(object.getMedewerker());
+					opdracht.setProbleem(object.getProbleem());
+					opdracht.setStatus(WerkopdrachtStatus.UITGESTELD);
+					opdracht.setTraject(object.getTraject());
+					opdracht.setUitvoerder(object.getUitvoerder());
+					opdracht.setInRonde("0");
+					opdracht.setDatumLaterUitTeVoeren(object
+							.getDatumLaterUitTeVoeren());
+					opdracht.setValidatie(validatieStatus);
+					opdracht.setTrajectType(object.getTrajectType());
+					opdracht.setRegioId(object.getRegioId());
+					opdracht.setDatumLaatsteWijziging(new Date());
+					opdracht.setGemeente(object.getGemeente());
+
+					modelRepository.saveObject(opdracht);
+					messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Uitgesteld.' De werkopdracht zal status 'Te controleren' verkrijgen op de gespecifieerde datum.");
+				}
+				search();
 			}
-			// LATER OPNIEUW UITVOEREN VANAF = status UITGESTELD en nieuwe
-			// werkOpdracht met status UITGESTELD en set datum laterUitTeVoeren
-			else if (validatieStatus
-					.equals(ValidatieStatus.LATER_OPNIEUW_UITVOEREN_VANAF)) {
-
-				WerkOpdracht opdracht = (WerkOpdracht) modelRepository
-						.createObject(getModelClass().getName(), null);
-
-				opdracht.setMedewerker(object.getMedewerker());
-				opdracht.setProbleem(object.getProbleem());
-				opdracht.setStatus(WerkopdrachtStatus.UITGESTELD);
-				opdracht.setTraject(object.getTraject());
-				opdracht.setUitvoerder(object.getUitvoerder());
-				opdracht.setInRonde("0");
-				opdracht.setDatumLaterUitTeVoeren(new Date());
-				opdracht.setValidatie(validatieStatus);
-				opdracht.setTrajectType(object.getTrajectType());
-				opdracht.setRegioId(object.getRegioId());
-				opdracht.setDatumLaatsteWijziging(new Date());
-
-				modelRepository.saveObject(opdracht);
-				messages.info("Er is een nieuwe Werkopdracht aangemaakt met status 'Uitgesteld.' De werkopdracht zal status 'Te controleren' verkrijgen op de gespecifieerde datum.");
-			}
-			search();
 
 		} catch (IOException e) {
 			messages.error("Fout bij het valideren van werkopdracht: "
@@ -1242,9 +1263,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 				.getTrajectRegio(object.getTraject()));
 		variables.put("medewerker",
 				profiel.getLastName() + " " + profiel.getFirstName());
+		variables.put("commentaar", object.getCommentaarMedewerker());
 
 		User uitvoerder = (User) modelRepository.loadObject(object
-				.getMedewerker());
+				.getUitvoerder());
 
 		UserProfile uitvoerderProfiel = (UserProfile) uitvoerder.getAspect(
 				"UserProfile", modelRepository, true);
@@ -1281,8 +1303,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 		variables.put("editor",
 				profiel.getLastName() + " " + profiel.getFirstName());
 
+		variables.put("commentaar", object.getCommentaarMedewerker());
+
 		User uitvoerder = (User) modelRepository.loadObject(object
-				.getMedewerker());
+				.getUitvoerder());
 
 		UserProfile uitvoerderProfiel = (UserProfile) uitvoerder.getAspect(
 				"UserProfile", modelRepository, true);
@@ -1608,8 +1632,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * 
 	 * @param layer
 	 * @param viewer
+	 * @throws IOException
 	 */
-	private void searchRouteBordLayer(FeatureMapLayer layer) {
+	private void searchRouteBordLayer(FeatureMapLayer layer) throws IOException {
 
 		layer.setHidden(false);
 		layer.setSelection(Collections.EMPTY_LIST);
@@ -1628,6 +1653,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 			filter = FilterUtils.equal("regio", regioCreate);
 
 		}
+
+		DefaultQuery query = new DefaultQuery("RouteBord");
+		query.addFilter(filter);
+		selectableBorden = (List<Bord>) modelRepository.searchObjects(query,
+				false, false);
+
 		layer.setFilter(filter);
 		layer.set("selectionMode", FeatureSelectionMode.SINGLE);
 	}
@@ -1636,8 +1667,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 	 * Operaties op de NetwerkBord lagen.
 	 * 
 	 * @param layer
+	 * @throws IOException
 	 */
-	private void searchNetwerkBordLayer(FeatureMapLayer layer) {
+	private void searchNetwerkBordLayer(FeatureMapLayer layer)
+			throws IOException {
 
 		layer.setFilter(null);
 		layer.setHidden(false);
@@ -1663,14 +1696,24 @@ public class WerkOpdrachtOverzichtFormBase extends
 		}
 		if (trajectNaamCreate != null) {
 			if (knooppuntNummer == null) {
+				filter = FilterUtils.and(FilterUtils.equal("naam",
+						trajectNaamCreate));
+			} else {
 				filter = FilterUtils.and(
 						FilterUtils.equal("naam", trajectNaamCreate),
 						knooppuntFilter);
-			} else {
-				filter = FilterUtils.and(FilterUtils.equal("naam",
-						trajectNaamCreate));
 			}
 		}
+
+		DefaultQuery query = new DefaultQuery("NetwerkBord");
+		if (filter != null) {
+			query.addFilter(filter);
+		} else {
+			query.addFilter(knooppuntFilter);
+		}
+		selectableBorden = (List<Bord>) modelRepository.searchObjects(query,
+				false, false);
+
 		layer.setFilter(filter);
 	}
 
@@ -1886,6 +1929,50 @@ public class WerkOpdrachtOverzichtFormBase extends
 	}
 
 	/**
+	 * Checkt of een manueel aangemaakte WerkOpdracht mag bewaard worden in de
+	 * databank.
+	 * 
+	 * @param werkOpdracht
+	 * @return
+	 */
+	public boolean checkWerkOpdrachtValidatie() {
+
+		if (validatieStatus != null) {
+
+			// Checken of datum LATER OPNIEUW UIT TE VOEREN is opgegeven en de
+			// datum
+			// in de toekomst ligt
+			if (validatieStatus
+					.equals(ValidatieStatus.LATER_OPNIEUW_UITVOEREN_VANAF)) {
+
+				if (object.getDatumLaterUitTeVoeren() == null) {
+					messages.warn("Gelieve een datum op te geven om de werkopdracht later opnieuw te kunnen uitvoeren. Deze datum moet in de toekomst liggen.");
+					return false;
+				}
+
+				Calendar datumLaterUitTeVoeren = Calendar.getInstance();
+				datumLaterUitTeVoeren
+						.setTime(object.getDatumLaterUitTeVoeren());
+				Calendar datumVandaag = Calendar.getInstance();
+				datumVandaag.setTime(new Date());
+
+				if (datumLaterUitTeVoeren.getTimeInMillis() < datumVandaag
+						.getTimeInMillis()
+						|| DateUtils.isSameDay(datumLaterUitTeVoeren,
+								datumVandaag)) {
+					messages.warn("De datum om de werkopdracht later opnieuw te kunnen uitvoeren moet in de toekomst liggen.");
+					return false;
+				}
+
+			}
+		} else {
+			messages.warn("Gelieve eerst een validatiestatus te selecteren voor deze werkopdracht.");
+			return false;
+		}
+		return true;
+	}
+
+	/**
 	 * Event bij het selecteren van features op de kaart
 	 * 
 	 * @param event
@@ -1894,32 +1981,36 @@ public class WerkOpdrachtOverzichtFormBase extends
 	@SuppressWarnings("unchecked")
 	public void onSelectFeatures(ControllerEvent event) throws IOException {
 
-		// Selecteren segment
-		if (object.getProbleem() != null
-				&& object.getProbleem() instanceof NetwerkAnderProbleem) {
-
-			String layerId = (String) event.getParams().get("layerId");
-			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
-					.getLayer(layerId);
-
-			if (layer.getSelection().size() == 1) {
-				object.setTraject(new ResourceKey("Traject", layer
-						.getSelection().get(0)));
-			} else {
-				messages.error("Gelieve precies 1 segment te selecteren.");
-				layer.setSelection(new ArrayList<String>(1));
-			}
-		}
-
 		// Selecteren bord
-		else if (object.getProbleem() != null
+		if (object.getProbleem() != null
 				&& object.getProbleem() instanceof BordProbleem) {
 
+			List<String> ids = (List<String>) event.getParams().get(
+					"featureIds");
+
 			String layerId = (String) event.getParams().get("layerId");
 			FeatureMapLayer layer = (FeatureMapLayer) getViewer().getContext()
 					.getLayer(layerId);
 
-			if (layer.getSelection().size() == 1) {
+			// Workaround om te vermijden dat niet zichtbare borden geselecteerd
+			// worden
+			// Enkel de Borden behorende tot de bewegwijzering van het Traject
+			// mogen geselecteerd
+			// worden.
+			List<String> idsFiltered = new ArrayList<String>();
+			for (Bord b : selectableBorden) {
+				if (ids.contains(b.getId().toString())) {
+					idsFiltered.add(b.getId().toString());
+				}
+			}
+
+			if (idsFiltered.isEmpty()) {
+				layer.setSelection(new ArrayList<String>(1));
+			}
+
+			else if (idsFiltered.size() == 1) {
+				layer.setSelection(idsFiltered);
+
 				((BordProbleem) object.getProbleem()).setBord(new ResourceKey(
 						"Bord", layer.getSelection().get(0)));
 
@@ -2089,7 +2180,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		if ("bord".equals(probleemType)) {
 
-			context.setShowFeatureInfoControl(true);
+			// context.setShowFeatureInfoControl(true);
+			context.setShowSelectControl(true);
 			context.setShowDrawPointControl(false);
 
 			if (trajectTypeCreate.endsWith("Route")) {
@@ -2134,7 +2226,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 			}
 		} else if ("ander".equals(probleemType)) {
 
-			context.setShowFeatureInfoControl(false);
+			// context.setShowFeatureInfoControl(false);
+			context.setShowSelectControl(false);
 			context.setShowDrawPointControl(true);
 
 			if (trajectTypeCreate.endsWith("Route")) {
@@ -2155,14 +2248,6 @@ public class WerkOpdrachtOverzichtFormBase extends
 					layer.set("editable", true);
 					((GeometryListFeatureMapLayer) layer)
 							.setGeometries(new ArrayList<Geometry>(1));
-				}
-
-				// Indien NetwerkSegment laag laag op selecteerbaar zetten
-				else if (layer.getLayerId().equalsIgnoreCase(trajectTypeCreate)) {
-					layer.set("selectable", true);
-					layer.set("selectionMode", FeatureSelectionMode.SINGLE);
-					layer.setSelection(new ArrayList<String>(1));
-
 				} else {
 					layer.set("selectable", false);
 					layer.setSelection(Collections.EMPTY_LIST);

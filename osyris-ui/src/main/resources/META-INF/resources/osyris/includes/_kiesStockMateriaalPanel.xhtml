@@ -39,7 +39,9 @@
     </style>
     
 	<h2>Kies het gebruikte materiaal</h2>
-	<h:panelGrid columns="2" style="width:100%">
+	<table style="width:100%; vertical-align:top;">
+	<tr>
+	<td style="vertical-align:top;">
 	<r:panel>
 <!-- 	<j:layout style="height: 400px"> -->
 <!-- 		<j:layoutPane region="west" size="350" minSize="200" resizable="false" -->
@@ -74,29 +76,13 @@
 <!-- 			</div> -->
 <!-- 		</j:layoutPane> -->
 		</r:panel>
-		<r:panel>
-				<d:objects id="objects"
-					value="#{stockMateriaalOverzichtFormBase.results}"
-					modelClass="#{stockMateriaalOverzichtFormBase.modelClass}"
-					mode="RESULT" level="SHORT">
-					<f:facet name="left">
-						<a:outputPanel rendered="true"
-							styleClass="model-table-actions">
-							<j:commandButton
-								rendered="#{stockMateriaalOverzichtFormBase.isCanView(object)}"
-								image="#{resource['core/images/actions/16x16/add.png']}"
-								type="image"
-								title="Materiaal toevoegen"
-								oncomplete="conscientia.widget(#{r:element('gekozenMateriaalPopup')}).show(); conscientia.widget(#{r:element('kiesStockMateriaalPopup')}).hide(); ">
-								<f:setPropertyActionListener
-									target="#{stockMateriaalOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-						</a:outputPanel>
-					</f:facet>
-				</d:objects>
-				<j:layoutContent
-					selector="*[id='#{j:clientId('objects', 'table')}']" />	
-		</r:panel>
-		</h:panelGrid>
+		</td>
+		<td style="vertical-align:top;">
+			<u:decorate template="/resources/osyris/includes/_werkOpdrachtStockDataTable.xhtml">
+				<u:param name="form" value="#{stockMateriaalOverzichtFormBase}" />
+				<u:param name="render" value="#{r:clientId('result')}" />
+			</u:decorate>
+		</td>
+		</tr>
+		</table>
 </u:composition>

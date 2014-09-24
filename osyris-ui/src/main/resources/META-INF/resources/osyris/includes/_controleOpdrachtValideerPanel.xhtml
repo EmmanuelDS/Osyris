@@ -14,24 +14,38 @@
 	<table width="100%">
 		<tr>
 		<td width="50%" valign="top">
+		
+		<p:tabView>
+			<p:tab title="Probleemoverzicht">
 		<!-- Probleem tabellen -->
 		<u:decorate
 			template="/resources/osyris/includes/problemenOverzichtTables.xhtml">
 			<u:param name="form" value="#{form}" />
 		</u:decorate>
 		<br/>
-		<r:panel id="infoPanel" header="Info">
-		<d:fields>
-			<d:propertyField id="peterMeterField"
-		 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}"
-				value="#{form.object.peterMeter}"
-				mode="VIEW" />
-			<d:propertyField id="datumGerapporteerdField"
-		 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}"
-				value="#{form.object.datumGerapporteerd}"
-				mode="VIEW" />		
-		</d:fields>
-		</r:panel>
+		</p:tab>
+		
+		<p:tab title="Praktische info">
+		<u:decorate
+			template="/resources/osyris/includes/praktischeInfoCO.xhtml">
+			<u:param name="form" value="#{form}" />
+		</u:decorate>
+		</p:tab>
+		</p:tabView>
+		
+	
+<!-- 		<r:panel id="infoPanel" header="Info"> -->
+<!-- 		<d:fields> -->
+<!-- 			<d:propertyField id="peterMeterField" -->
+<!-- 		 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('peterMeter')}" -->
+<!-- 				value="#{form.object.peterMeter}" -->
+<!-- 				mode="VIEW" /> -->
+<!-- 			<d:propertyField id="datumGerapporteerdField" -->
+<!-- 		 		modelProperty="#{d:modelClass('ControleOpdracht').getProperty('datumGerapporteerd')}" -->
+<!-- 				value="#{form.object.datumGerapporteerd}" -->
+<!-- 				mode="VIEW" />		 -->
+<!-- 		</d:fields> -->
+<!-- 		</r:panel> -->
 
 		</td>
 		<td width="50%" valign="top">
@@ -42,6 +56,10 @@
 					</m:mapViewer>
 				</div>
 			</r:panel>
+			<u:decorate
+				template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+				<u:param name="form" value="#{form}" />
+			</u:decorate>
 		</td>
 		</tr>
 	</table>

@@ -9,16 +9,30 @@
 	xmlns:j="http://conscientia.org/jsf">
 	
 	<p:dialog id="mapPopup"
-		header="3. DUID AAN OP DE KAART"
+		header="STAP 3/4   -   DUID AAN OP DE KAART"
 		modal="true"
 		resizable="false"
 		onShow="#{r:component('mapInclude')}.show();"
 		onHide="#{r:component('mapInclude')}.hide();"
-		style="max-height:100% !important; bottom: 10% !important; right:20% !important; left:20% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; bottom: 8% !important; right:20% !important; left:20% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="mapInclude"
 			src="/resources/osyris/includes/_mapRouteDokter.xhtml">
 			<f:param name="form" value="#{form}" />
+		</j:lazyInclude>
+	</p:dialog>
+	
+	<p:dialog id="instructionsPopup"
+		modal="true"
+		header="Instructies"
+		resizable="false"
+		onShow="#{r:component('instructionsInclude')}.show();"
+		onHide="#{r:component('instructionsInclude')}.hide();"
+		style="max-height:100% !important; bottom: 40% !important; right:37% !important; left:37% !important; top:20% !important; overflow:auto !important;">
+		<j:relocate />
+		<j:lazyInclude id="instructionsInclude"
+			src="/resources/osyris/includes/_instructiesRouteDokter.xhtml">
+			<u:param name="form" value="#{form}" />
 		</j:lazyInclude>
 	</p:dialog>
 	

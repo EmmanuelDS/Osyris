@@ -445,6 +445,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			if (object.getTraject() != null) {
 				setHasErrors(false);
+				probleem = null;
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol bewaard.");
 				// clear();
@@ -1256,6 +1257,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 				}
 
 				setupLayers(configuration, context);
+				context.setShowFeatureInfoControl(false);
+				context.setShowDrawPointControl(false);
+				context.setShowDrawLineStringControl(false);
 				viewer.updateContext(null);
 			}
 		} catch (IOException e) {

@@ -18,7 +18,6 @@ import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.api.user.User;
 import org.conscientia.api.user.UserProfile;
-import org.conscientia.core.configuration.DefaultConfiguration;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
@@ -59,12 +58,12 @@ public class StockMateriaalSaveListener {
 			}
 
 			// Stuur email naar Routedokters
-			String mailServiceStatus = DefaultConfiguration.instance()
-					.getString("service.mail.stockMateriaal");
+			// String mailServiceStatus = DefaultConfiguration.instance()
+			// .getString("service.mail.stockMateriaal");
 
-			if (mailServiceStatus.equalsIgnoreCase("on")) {
-				sendMail(stockMateriaal);
-			}
+			// if (mailServiceStatus.equalsIgnoreCase("on")) {
+			// sendMail(stockMateriaal);
+			// }
 		}
 		// Er moet niets besteld worden
 		else {

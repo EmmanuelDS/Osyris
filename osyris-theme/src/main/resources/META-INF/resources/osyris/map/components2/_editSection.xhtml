@@ -1,0 +1,295 @@
+<u:composition
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<j:useParam name="viewer" />
+	<c:set
+		var="editLayer"
+		value="#{viewer.editLayer}" />
+	<j:subscribe
+		name="updatedEditLayer"
+		render="editTabContent" />
+	<a:outputPanel id="editTabContent">
+		<j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.layer.label']}"
+				rendered="#{viewer.editLayerCount gt 1}">
+				<j:sectionPanel rows="2">
+					<h:outputText
+						value="#{messages['model.entry.mapContext.tools.selectEditLayer.label']}" />
+					<h:selectOneMenu
+						value="#{viewer.editLayerId}"
+						style="width: 160px">
+						<f:selectItems value="#{viewer.editLayerOptions}" />
+						<a:ajax
+							event="change"
+							execute="@this" />
+					</h:selectOneMenu>
+				</j:sectionPanel>
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.session.label']}"
+				rendered="#{editLayer.inEditSession}">
+				<j:commandButton
+					action="#{viewer.commitEditSession(editLayer)}"
+					image="#{resource['core/images/actions/24x24/save.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.saveEditedFeatures.label']}" />
+				<j:commandButton
+					action="#{viewer.cancelEditSession(editLayer)}"
+					image="#{resource['core/images/actions/24x24/cancel.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.cancelEditedFeatures.label']}" />
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.selection.label']}"
+				rendered="#{editLayer.editMode != 'single'}"
+				transient="true">
+				<j:commandButton
+					id="selectEditFeatures"
+					image="#{resource['core/images/actions/24x24/select.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapContext.tools.selectFeatures.btn.label']}"
+					title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}"
+					submit="false">
+					<j:activateControl
+						event="click"
+						control="selectBox">
+						<f:param
+							name="layerId"
+							value="#{viewer.editLayerId}" />
+						<f:param
+							name="afterHandle"
+							value="#{null}" />
+					</j:activateControl>
+				</j:commandButton>
+				<j:commandButton
+					id="clearEditSelection"
+					onclick="#{j:controller()}.clearSelection(function() { #{j:controller()}.reactivateControl(); })"
+					image="#{resource['core/images/actions/24x24/clearSelection.png']}"
+					styleClass="component-toolbar-button"
+					value="Deselecteren"
+					title="#{messages['model.entry.mapContext.tools.clearSelection.label']}"
+					submit="false" />
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.draw.label']}"
+				rendered="#{editLayer.hasAnyTool('drawPoint','drawLinestring','drawPolygon','drawRectangle','drawCircle')}"
+				transient="true">
+				<j:sectionPanel rows="2">
+					<h:selectOneMenu
+						style="width: 120px"
+						onchange="#{j:controller()}.setEditCombinationMode(this.value)">
+						<f:selectItems
+							value="#{d:selectItems(editLayer.combinationModeOptions)}" />
+					</h:selectOneMenu>
+					<h:selectOneMenu
+						style="width: 120px; margin-top: -4px;"
+						onchange="#{j:controller()}.setSnapping(this.value != 'none')"
+						rendered="#{editLayer.hasTool('toggleSnapping')}">
+						<f:selectItem
+							itemValue="none"
+							itemLabel="#{messages['model.entry.mapLayer.tools.noSnapping.label']}" />
+						<f:selectItem
+							itemValue="point"
+							itemLabel="#{messages['model.entry.mapLayer.tools.snapPoint.label']}" />
+					</h:selectOneMenu>
+				</j:sectionPanel>
+				<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawPoint.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapLayer.tools.drawPoint.btn.label']}"
+					rendered="#{editLayer.hasTool('drawPoint') and viewer.supportsGeometryType(editLayer, 'MULTIPOINT')}">
+					<j:activateControl
+						event="click"
+						control="drawPoint" />
+				</j:commandButton>
+				<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawLineString.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapLayer.tools.drawLinestring.btn.label']}"
+					rendered="#{editLayer.hasTool('drawLinestring') and viewer.supportsGeometryType(editLayer, 'MULTILINESTRING')}">
+					<j:activateControl
+						event="click"
+						control="drawLineString" />
+				</j:commandButton>
+				<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawPolygon.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapLayer.tools.drawPolygon.btn.label']}"
+					rendered="#{editLayer.hasTool('drawPolygon') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}"
+					onclick="#{j:controller()}.activateControl('drawPolygon')">
+					<j:activateControl
+						event="click"
+						control="drawPolygon" />
+				</j:commandButton>
+				<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawRectangle.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapLayer.tools.drawRectangle.btn.label']}"
+					rendered="#{editLayer.hasTool('drawRectangle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}">
+					<j:activateControl
+						event="click"
+						control="drawRectangle" />
+				</j:commandButton>
+				<j:commandButton
+					image="#{resource['core/images/actions/24x24/drawCircle.png']}"
+					styleClass="component-toolbar-button"
+					value="#{messages['model.entry.mapLayer.tools.drawCircle.btn.label']}"
+					rendered="#{editLayer.hasTool('drawCircle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}">
+					<j:activateControl
+						event="click"
+						control="drawCircle" />
+				</j:commandButton>
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.insert.label']}"
+				rendered="#{editLayer.hasAnyTool('insertPoint','insertLinestring','insertPolygon','insertRectangle','insertCircle')}">
+				<j:sectionPanel rows="2">
+					<m:insertPoint
+						rendered="#{editLayer.hasTool('insertPoint') and viewer.supportsGeometryType(editLayer, 'MULTIPOINT')}" />
+					<m:insertLineString
+						rendered="#{editLayer.hasTool('insertLinestring') and viewer.supportsGeometryType(editLayer, 'MULTILINESTRING')}" />
+					<m:insertPolygon
+						rendered="#{editLayer.hasTool('insertPolygon') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+					<m:insertRectangle
+						rendered="#{editLayer.hasTool('insertRectangle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+					<m:insertCircle
+						rendered="#{editLayer.hasTool('insertCircle') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+				</j:sectionPanel>
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.modify.label']}"
+				rendered="#{editLayer.hasAnyTool('modifyReshape','modifyRotate','modifyResize','modifyDrag')}"
+				transient="true">
+				<j:sectionPanel rows="2">
+					<j:commandButton
+						image="#{resource['core/images/actions/12x12/modifyReshape.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.modifyReshape.label']}"
+						rendered="#{editLayer.hasTool('modifyReshape')}">
+						<j:activateControl
+							event="click"
+							control="modifyReshape" />
+					</j:commandButton>
+					<j:commandButton
+						image="#{resource['core/images/actions/12x12/modifyRotate.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.modifyRotate.label']}"
+						rendered="#{editLayer.hasTool('modifyRotate')}">
+						<j:activateControl
+							event="click"
+							control="modifyRotate" />
+					</j:commandButton>
+					<j:commandButton
+						image="#{resource['core/images/actions/12x12/modifyResize.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.modifyResize.label']}"
+						rendered="#{editLayer.hasTool('modifyResize')}">
+						<j:activateControl
+							event="click"
+							control="modifyResize" />
+					</j:commandButton>
+					<j:commandButton
+						image="#{resource['core/images/actions/12x12/modifyDrag.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.modifyDrag.label']}"
+						rendered="#{editLayer.hasTool('modifyDrag')}">
+						<j:activateControl
+							event="click"
+							control="modifyDrag" />
+					</j:commandButton>
+				</j:sectionPanel>
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.other.label']}"
+				rendered="#{editLayer.hasAnyTool('cloneGeometry','mergeGeometry','splitGeometry','explodeGeometry','createBuffer','editWKT')}">
+				<j:sectionPanel rows="2">
+					<j:commandButton
+						image="#{resource['core/images/actions/12x12/cloneGeometry.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.cloneGeometry.label']}"
+						rendered="#{editLayer.hasTool('cloneGeometry')}"
+						submit="false">
+						<j:check event="click"
+							test="#{viewer.getSelectedFeatureCount(null) gt 0}"
+							onsuccess="#{j:controller()}.cloneSelectedFeatures()"
+							onfail="#{j:controller()}.activateControl('selectBox', { layerId: null });"
+							message="#{messages['component.map.ribbon.pleaseSelectAtLeastOne.warning']}" />
+					</j:commandButton>
+					<j:commandButton image="#{resource['core/images/actions/12x12/mergeGeometry.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.mergeGeometry.label']}"
+						rendered="#{editLayer.hasTool('mergeGeometry')}"
+						submit="false">
+						<j:check event="click"
+							test="#{viewer.getSelectedFeatureCount(editLayer) gt 1}"
+							onsuccess="#{j:controller()}.mergeSelectedFeatures()"
+							onfail="#{j:controller()}.activateControl('selectBox', { layerId: '#{viewer.editLayerId}' });"
+							message="Please select at least 2 features first" />
+					</j:commandButton>
+					<j:commandButton id="splitGeometry"
+						image="#{resource['core/images/actions/12x12/splitGeometry.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.splitGeometry.label']}"
+						rendered="#{editLayer.hasTool('splitGeometry')}"
+						submit="false">
+						<j:check event="click"
+							test="#{viewer.getSelectedFeatureCount(editLayer) gt 0}"
+							onsuccess="#{j:controller()}.activateControl('split');"
+							onfail="#{j:controller()}.activateControl('selectBox', { layerId: '#{viewer.editLayerId}' });"
+							message="#{messages['component.map.ribbon.pleaseSelectAtLeastOne.warning']}" />
+						<script>
+					    	// <![CDATA[
+						    jQuery(document).ready(function() {
+							    	var element = RichFaces.getDomElement("#{r:clientId('splitGeometry')}");
+							    	var controller = #{j:controller()};
+							    	
+							    	controller.subscribe("activatedControl", null, function(event, params) {
+										var control = params.control || null;
+										conscientia.setControlActiveState(element, control == "split");
+							    	});
+							    	
+							    	if (controller.activeControl == "split") {
+							    		controller.activateControl("split");
+							    	}
+						    	});
+					    	// ]]>
+						</script>
+					</j:commandButton>
+					<j:commandButton image="#{resource['core/images/actions/12x12/explodeGeometry.png']}"
+						styleClass="component-toolbar-button"
+						value="#{messages['model.entry.mapLayer.tools.explodeGeometry.label']}"
+						rendered="#{editLayer.hasTool('explodeGeometry')}"
+						submit="false">
+						<j:check event="click"
+							test="#{viewer.getSelectedFeatureCount(editLayer) gt 0}"
+							onsuccess="#{j:controller()}.explodeSelectedFeatures()"
+							onfail="#{j:controller()}.activateControl('selectBox', { layerId: '#{viewer.editLayerId}' });"
+							message="#{messages['component.map.ribbon.pleaseSelectAtLeastOne.warning']}" />
+					</j:commandButton>
+					<m:createBuffer rendered="#{editLayer.hasTool('createBuffer') and viewer.supportsGeometryType(editLayer, 'MULTIPOLYGON')}" />
+					<m:editWKT rendered="#{editLayer.hasTool('editWKT')}" />
+				</j:sectionPanel>
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.attributes.label']}"
+				rendered="#{editLayer.hasTool('editAttributes')}">
+				<m:editAttributes />
+			</j:sectionPanel>
+			<j:sectionPanel
+				label="#{messages['model.entry.mapContext.tools.delete.label']}"
+				rendered="#{editLayer.editMode != 'single' and editLayer.hasTool('deleteFeature')}">
+				<m:deleteFeature />
+			</j:sectionPanel>
+		</j:sectionPanel>
+	</a:outputPanel>
+</u:composition>

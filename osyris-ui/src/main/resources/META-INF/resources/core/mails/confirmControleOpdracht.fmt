@@ -13,6 +13,6 @@
 			<dt>Regio: <b> ${regio} </b></dt>
 			<dt>Medewerker Toerisme Oost-Vlaanderen: <b> ${medewerker} </b></dt>
 		</dl>
-		<div>Gelieve via OSYRIS het overzicht van Uw controleopdrachten te raadplegen.</div>
+		<div>Gelieve via OSYRIS het overzicht van uw controleopdrachten te raadplegen.</div>
 	</body>
 </html>

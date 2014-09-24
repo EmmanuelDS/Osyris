@@ -38,7 +38,7 @@
 	</tr>
 	</table>
 	<br/>
-	<r:panel id="fotoPanel" rendered="form.object.foto != null or form.object.foto2 != null or form.object.foto3 != null">
+	<r:panel id="fotoPanel" rendered="#{form.object.foto != null or form.object.foto2 != null or form.object.foto3 != null}">
 	<d:fields>
 		<d:propertyField id="foto"
 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
@@ -53,7 +53,7 @@
 				value="#{form.object.foto3}"
 				mode="VIEW" />
 	</d:fields>
-	</r:panel>
+	</r:panel>	
 	<d:buttons>
 		<j:commandButton
 			rendered="#{form.object.status == 'GERAPPORTEERD' }"

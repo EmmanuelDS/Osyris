@@ -52,59 +52,13 @@
 		</j:layoutPane>
 		<j:layoutPane>
 			<a:outputPanel id="result">
-				<d:objects id="objects"
-					value="#{stockMateriaalOverzichtFormBase.results}"
-					modelClass="#{stockMateriaalOverzichtFormBase.modelClass}"
-					mode="RESULT"
-					level="SHORT">
-					<f:facet name="left">
-						<a:outputPanel rendered="true"
-							styleClass="model-table-actions">
-							<j:commandButton
-								rendered="#{stockMateriaalOverzichtFormBase.isCanView(object)}"
-								image="#{resource['core/images/actions/16x16/view.png']}"
-								type="image"
-								title="#{messages['page.actions.view.label']}"
-								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{stockMateriaalOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-							<j:commandButton
-								rendered="#{stockMateriaalOverzichtFormBase.isCanEdit(object)}"
-								image="#{resource['core/images/actions/16x16/edit.png']}"
-								type="image"
-								title="Aanpassen stockmateriaal"
-								oncomplete="conscientia.widget(#{r:element('editPopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{stockMateriaalOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-							<j:commandButton
-								rendered="#{stockMateriaalOverzichtFormBase.isCanEdit(object)}"
-								image="#{resource['core/images/actions/16x16/reload.png']}"
-								type="image"
-								title="Aanpassen voorraad"
-								oncomplete="conscientia.widget(#{r:element('editVoorraadPopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{stockMateriaalOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-							<j:commandButton
-								rendered="#{stockMateriaalOverzichtFormBase.isCanDelete(object)}"
-								image="#{resource['core/images/actions/16x16/delete.png']}"
-								type="image"
-								title="#{messages['page.actions.delete.label']}"
-								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
-								<f:setPropertyActionListener
-									target="#{stockMateriaalOverzichtFormBase.object}"
-									value="#{object}" />
-							</j:commandButton>
-						</a:outputPanel>
-					</f:facet>
-				</d:objects>
-				<j:layoutContent
-					selector="*[id='#{j:clientId('objects', 'table')}']" />
+	
+				
+			<u:decorate template="/resources/osyris/includes/_stockDataTable.xhtml">
+				<u:param name="form" value="#{stockMateriaalOverzichtFormBase}" />
+				<u:param name="render" value="#{r:clientId('result')}" />
+			</u:decorate>
+				
 			</a:outputPanel>
 
 			<u:decorate template="/resources/core/includes/managePanels.xhtml">

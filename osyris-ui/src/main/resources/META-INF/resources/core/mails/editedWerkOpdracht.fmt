@@ -7,6 +7,7 @@
 		<dl>
 			<dt>Werkopdracht identificatie: <b> ${id} </b></dt>
 			<dt>Gewijzigd door: <b> ${editor} </b></dt>
+			<dt>Commentaar: <b> ${commentaar} </b></dt>
 		</dl>
 		<div>Gelieve via OSYRIS het overzicht van Uw werkopdrachten te raadplegen.</div>
 	</body>

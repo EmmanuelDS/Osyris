@@ -75,7 +75,7 @@
 			type="button"
 			action="#{form.valideerWerkOpdracht()}"
 			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('valideerPopup')}).hide();" />
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('valideerPopup')}).hide();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"
 			image="#{resource['core/images/actions/12x12/cancel.png']}"

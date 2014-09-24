@@ -23,11 +23,13 @@ import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
+import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 
+import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
@@ -40,6 +42,7 @@ import be.gim.specto.api.context.RasterMapLayer;
 import be.gim.specto.core.context.MapFactory;
 import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
+import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
@@ -100,6 +103,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected ResourceIdentifier trajectId;
 	protected boolean hasErrors;
 	protected String baseLayerName;
+	protected List<WerkOpdracht> opdrachtenInRonde;
+	protected WerkOpdracht opdrachtInRonde;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -188,6 +193,22 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public void setBaseLayerName(String baseLayerName) {
 		this.baseLayerName = baseLayerName;
+	}
+
+	public List<WerkOpdracht> getOpdrachtenInRonde() {
+		return opdrachtenInRonde;
+	}
+
+	public void setOpdrachtenInRonde(List<WerkOpdracht> opdrachtenInRonde) {
+		this.opdrachtenInRonde = opdrachtenInRonde;
+	}
+
+	public WerkOpdracht getOpdrachtInRonde() {
+		return opdrachtInRonde;
+	}
+
+	public void setOpdrachtInRonde(WerkOpdracht opdrachtInRonde) {
+		this.opdrachtInRonde = opdrachtInRonde;
 	}
 
 	// METHODS
@@ -286,18 +307,18 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 						try {
 							if (ronde != null) {
-								List<WerkOpdracht> opdrachten = new ArrayList<WerkOpdracht>();
+								opdrachtenInRonde = new ArrayList<WerkOpdracht>();
 
 								for (ResourceIdentifier id : ((Uitvoeringsronde) ronde)
 										.getOpdrachten()) {
-									WerkOpdracht opdracht = (WerkOpdracht) modelRepository
+									opdrachtInRonde = (WerkOpdracht) modelRepository
 											.loadObject(id);
 
-									if (opdracht != null) {
-										opdrachten.add(opdracht);
+									if (opdrachtInRonde != null) {
+										opdrachtenInRonde.add(opdrachtInRonde);
 									}
 								}
-								return opdrachten;
+								return opdrachtenInRonde;
 
 							}
 						} catch (IOException e) {
@@ -490,6 +511,25 @@ public class UitvoeringsrondeOverzichtFormBase extends
 							// Save
 							modelRepository.saveObject(materiaal
 									.getStockMateriaal());
+
+							// Checken of materiaal aan limiet zit en mail
+							// sturen
+							if (materiaal.getStockMateriaal().getInStock() <= materiaal
+									.getStockMateriaal().getMin()) {
+
+								// Stuur email naar Routedokters
+								String mailServiceStatus = DefaultConfiguration
+										.instance().getString(
+												"service.mail.stockMateriaal");
+
+								if (mailServiceStatus.equalsIgnoreCase("on")) {
+									Beans.getReference(
+											OsyrisModelFunctions.class)
+											.sendMailStockMateriaalLimiet(
+													materiaal
+															.getStockMateriaal());
+								}
+							}
 						}
 					}
 				}

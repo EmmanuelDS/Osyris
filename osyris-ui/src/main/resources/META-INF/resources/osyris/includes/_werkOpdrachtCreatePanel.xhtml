@@ -37,7 +37,7 @@
 					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
 					<a:ajax
 						event="change"
-						render="trajectNaamCreate"
+						render="detailSearchPanel"
 						execute="@this" />
 				</h:selectOneMenu>
 			</d:field>
@@ -46,12 +46,16 @@
 					<h:selectOneMenu id="trajectNaamCreate" value="#{form.trajectNaamCreate}" rendered="true">
 						<f:selectItem itemValue="" itemLabel="" />
 						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.regioCreate, form.trajectTypeCreate))}" />
+						<a:ajax
+							event="change"
+							render="detailSearchPanel"
+							execute="@this" />
 					</h:selectOneMenu>
 				</d:field>
 				<d:field for="knooppuntNr" label="Knooppuntnummer" rendered="#{form.trajectTypeCreate.contains('Segment')}" >
 					<h:selectOneMenu id="knooppuntNummer" value="#{form.knooppuntNummer}" rendered="#{form.trajectTypeCreate.contains('Segment')}">
 						<f:selectItem itemValue="" itemLabel="" />
-						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers())}" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getKnooppuntNummers(form.trajectTypeCreate, form.regioCreate, form.trajectNaamCreate))}" />
 					</h:selectOneMenu>
 				</d:field>
 			</j:renderPanel>
@@ -172,11 +176,16 @@
 			<d:propertyField id="foto" 
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
 						value="#{form.object.probleem.foto}"
-						mode="EDIT" />						
-			<d:propertyField id="commentaar" 
-				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-						value="#{form.object.probleem.commentaar}"
-						mode="EDIT" />
+						mode="EDIT" />												
+<!-- 			<d:propertyField id="commentaar"  -->
+<!-- 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}" -->
+<!-- 						value="#{form.object.probleem.commentaar}" -->
+<!-- 						mode="EDIT" /> -->
+						
+			<d:field label="Commentaar" for="commentaar" required="true">
+			 	<h:inputTextarea id="commentaar" value="#{form.object.probleem.commentaar}" required="true" requiredMessage="De waarde voor Commentaar is verplicht." />
+				<p:watermark for="commentaar" value="Geef hier wat extra uitleg bij het probleem." />
+			</d:field>
 			<d:fields>
 				<b><h:outputText value="Duid een bord aan op de kaart hiernaast. "></h:outputText></b>
 				<h:graphicImage alt="(verplicht)"

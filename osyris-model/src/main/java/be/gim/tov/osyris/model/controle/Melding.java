@@ -12,7 +12,6 @@ import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.NotViewable;
-import org.conscientia.api.model.annotation.Pattern;
 import org.conscientia.api.model.annotation.Permission;
 import org.conscientia.api.model.annotation.Permissions;
 import org.conscientia.api.model.annotation.Required;
@@ -67,13 +66,13 @@ public class Melding extends AbstractModelObject implements StorableObject {
 	@EditableInStatus("")
 	@NotSearchable
 	@Length(min = 3, max = 128)
-	@Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
+	// @Pattern("[\\w%\\.\\+\\-]+@[\\w%\\.\\+\\-]+\\.[a-zA-Z0-9]{2,4}")
 	private String email;
 
 	@EditableInStatus("")
 	@NotSearchable
 	@Length(min = 3, max = 30)
-	@Pattern("(\\+?[\\d\\s]+)?")
+	// @Pattern("(\\+?[\\d\\s]+)?")
 	private String telefoon;
 
 	@ModelClassName("User")
