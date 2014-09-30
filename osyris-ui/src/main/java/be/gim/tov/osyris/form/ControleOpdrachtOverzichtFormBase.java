@@ -159,6 +159,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 	protected String editType;
 	protected boolean hasOmleiding;
 	protected boolean hasErrors;
+	protected List<BordProbleem> bordProblemen;
+	protected List<AnderProbleem> andereProblemen;
+	protected List<Geometry> anderProbleemLineGeoms;
+	protected List<String> bordSelection;
+	protected List<Geometry> anderProbleemPointGeoms;
 
 	public String getControleOpdrachtType() {
 		return controleOpdrachtType;
@@ -325,6 +330,39 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 	public void setHasErrors(boolean hasErrors) {
 		this.hasErrors = hasErrors;
+	}
+
+	public void setBordProblemen(List<BordProbleem> bordProblemen) {
+		this.bordProblemen = bordProblemen;
+	}
+
+	public void setAndereProblemen(List<AnderProbleem> andereProblemen) {
+		this.andereProblemen = andereProblemen;
+	}
+
+	public List<Geometry> getAnderProbleemLineGeoms() {
+		return anderProbleemLineGeoms;
+	}
+
+	public void setAnderProbleemLineGeoms(List<Geometry> anderProbleemLineGeoms) {
+		this.anderProbleemLineGeoms = anderProbleemLineGeoms;
+	}
+
+	public List<String> getBordSelection() {
+		return bordSelection;
+	}
+
+	public void setBordSelection(List<String> bordSelection) {
+		this.bordSelection = bordSelection;
+	}
+
+	public List<Geometry> getAnderProbleemPointGeoms() {
+		return anderProbleemPointGeoms;
+	}
+
+	public void setAnderProbleemPointGeoms(
+			List<Geometry> anderProbleemPointGeoms) {
+		this.anderProbleemPointGeoms = anderProbleemPointGeoms;
 	}
 
 	// METHODS
@@ -1106,7 +1144,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public List<BordProbleem> getBordProblemen() {
 
-		List<BordProbleem> bordProblemen = new ArrayList<BordProbleem>();
+		bordProblemen = new ArrayList<BordProbleem>();
 
 		if (object != null) {
 			for (Probleem probleem : object.getProblemen()) {
@@ -1125,7 +1163,8 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 */
 	public List<AnderProbleem> getAndereProblemen() {
 
-		List<AnderProbleem> andereProblemen = new ArrayList<AnderProbleem>();
+		// andereProblemen = new ArrayList<AnderProbleem>();
+		andereProblemen = new ArrayList<AnderProbleem>();
 
 		if (object != null) {
 			for (Probleem probleem : object.getProblemen()) {
@@ -1850,8 +1889,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// Updaten bordselectie
 			if (probleem instanceof BordProbleem) {
 
-				ArrayList<String> bordSelection = (ArrayList<String>) bordLayer
-						.getSelection();
+				// ArrayList<String> bordSelection = (ArrayList<String>)
+				// bordLayer
+				// .getSelection();
+				bordSelection = bordLayer.getSelection();
 				Bord bord = (Bord) modelRepository
 						.loadObject(((BordProbleem) probleem).getBord());
 
@@ -2055,9 +2096,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 	private void setupLayers(MapConfiguration configuration, MapContext context)
 			throws InstantiationException, IllegalAccessException, IOException {
 
-		List<String> bordSelection = new ArrayList<String>();
-		List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
-		List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+		// List<String> bordSelection = new ArrayList<String>();
+		// List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
+		// List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+
+		bordSelection = new ArrayList<String>();
+		anderProbleemPointGeoms = new ArrayList<Geometry>();
+		anderProbleemLineGeoms = new ArrayList<Geometry>();
 
 		GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) mapFactory
 				.createGeometryLayer(configuration.getContext(),

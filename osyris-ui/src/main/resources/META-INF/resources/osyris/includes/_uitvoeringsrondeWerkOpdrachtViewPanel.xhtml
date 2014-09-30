@@ -7,7 +7,8 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
-	xmlns:m="http://specto.gim.be/map">
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h2>Werkopdracht #{d:modelObject(form.selectedWerkOpdracht).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.selectedWerkOpdracht.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.selectedWerkOpdracht.traject)}) - #{osyrisModelFunctions.getTrajectType(form.selectedWerkOpdracht.traject)}</h2>
 	<br/>
 	<table width="100%">
@@ -43,7 +44,9 @@
 	</r:panel>
 	<br/>
 	<!-- Probleem tabel --> 
-	<r:panel id="bordProbleemPanel" rendered="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
+	<c:choose>
+	<c:when test="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
+	<r:panel id="bordProbleemPanel">
 		<p:dataTable id="bordProbleem"
 			value="#{form.selectedWerkOpdracht.probleem}"
 			mode="RESULT"
@@ -63,7 +66,7 @@
 					title="#{messages['component.map.zoomToFeature.label']}"
 					action="#{form.zoomToProbleem(form.selectedWerkOpdracht.probleem)}" />
 	   		</p:column>
-	   		<p:column>
+	   		<p:column rendered="#{form.isRouteBordProbleem(bordProbleem)}">
 				<f:facet name="header">
 				<h:outputText value="Volgnummer" />
 				</f:facet>
@@ -106,7 +109,9 @@
 			</p:column>
 	   	</p:dataTable>
 	</r:panel>
-	<r:panel id="AnderProbleemPanel" rendered="#{!form.isBordProbleem(form.selectedWerkOpdracht.probleem)}" >
+	</c:when>
+	<c:otherwise>
+	<r:panel id="AnderProbleemPanel" >
 	<p:dataTable id="AnderProbleem"
 			value="#{form.selectedWerkOpdracht.probleem}"
 			mode="RESULT"
@@ -156,6 +161,8 @@
 			</p:column>
    		</p:dataTable>
    	</r:panel>
+   	</c:otherwise>
+	</c:choose>
    	<br/>
 	<r:panel id="handelingenPanel">
 	<d:fields>

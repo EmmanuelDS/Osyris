@@ -46,6 +46,7 @@ import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Probleem;
+import be.gim.tov.osyris.model.controle.RouteBordProbleem;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
@@ -105,6 +106,9 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected String baseLayerName;
 	protected List<WerkOpdracht> opdrachtenInRonde;
 	protected WerkOpdracht opdrachtInRonde;
+	protected List<String> bordSelection;
+	protected List<Geometry> anderProbleemGeoms;
+	protected List<Geometry> anderProbleemLineGeoms;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -209,6 +213,30 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public void setOpdrachtInRonde(WerkOpdracht opdrachtInRonde) {
 		this.opdrachtInRonde = opdrachtInRonde;
+	}
+
+	public List<String> getBordSelection() {
+		return bordSelection;
+	}
+
+	public void setBordSelection(List<String> bordSelection) {
+		this.bordSelection = bordSelection;
+	}
+
+	public List<Geometry> getAnderProbleemGeoms() {
+		return anderProbleemGeoms;
+	}
+
+	public void setAnderProbleemGeoms(List<Geometry> anderProbleemGeoms) {
+		this.anderProbleemGeoms = anderProbleemGeoms;
+	}
+
+	public List<Geometry> getAnderProbleemLineGeoms() {
+		return anderProbleemLineGeoms;
+	}
+
+	public void setAnderProbleemLineGeoms(List<Geometry> anderProbleemLineGeoms) {
+		this.anderProbleemLineGeoms = anderProbleemLineGeoms;
 	}
 
 	// METHODS
@@ -611,6 +639,20 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	}
 
 	/**
+	 * Bepalen of het probleem bij de WerkOpdracht een RouteBordProbleem is.
+	 * 
+	 * @param probleem
+	 * @return
+	 */
+	public boolean isRouteBordProbleem(Probleem probleem) {
+		if (probleem instanceof RouteBordProbleem) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	/**
 	 * Zoomen naar een probleem op de kaart
 	 * 
 	 * @param bordProbleem
@@ -754,9 +796,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			MapConfiguration configuration, MapContext context)
 			throws IOException, InstantiationException, IllegalAccessException {
 
-		List<String> bordSelection = new ArrayList<String>();
-		List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
-		List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+		// List<String> bordSelection = new ArrayList<String>();
+		// List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+		// List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+
+		bordSelection = new ArrayList<String>();
+		anderProbleemGeoms = new ArrayList<Geometry>();
+		anderProbleemLineGeoms = new ArrayList<Geometry>();
 		FeatureMapLayer bordLayer = null;
 
 		// Geometry laag voor punt probleem
@@ -882,9 +928,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			MapConfiguration configuration, MapContext context)
 			throws InstantiationException, IllegalAccessException, IOException {
 
-		List<String> bordSelection = new ArrayList<String>();
-		List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
-		List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+		// List<String> bordSelection = new ArrayList<String>();
+		// List<Geometry> anderProbleemGeoms = new ArrayList<Geometry>();
+		// List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+
+		bordSelection = new ArrayList<String>();
+		anderProbleemGeoms = new ArrayList<Geometry>();
+		anderProbleemLineGeoms = new ArrayList<Geometry>();
 		FeatureMapLayer bordLayer = null;
 
 		// Geometry laag voor punt probleem
