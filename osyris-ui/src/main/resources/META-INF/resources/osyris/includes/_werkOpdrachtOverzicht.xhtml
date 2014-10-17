@@ -129,9 +129,9 @@
 					style="width: 100%;"
 					styleClass="blue"
 					paginator="true"
-					rows="50"
+					rows="25"
 					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-					rowsPerPageTemplate="10,20,30,40,50"
+					rowsPerPageTemplate="10,15,20,25"
 					scrollable="true"
 					resizableColumns="true"
 					tableStyle="min-width: 850px"
@@ -173,15 +173,15 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					 <p:column label="id" style="width:40px;">
-					 	<!-- sortBy="#{werkOpdracht.id }" -->
+					 <p:column label="id" style="width:40px;"
+					 	sortBy="#{werkOpdracht.id }" >
 						<f:facet name="header">
 						<h:outputText value="Id" />
 						</f:facet>
 						<div>#{d:modelObject(werkOpdracht).getId()}</div>
 					</p:column>
-					<p:column label="InRonde" style="width:50px;" >
-						<!-- sortBy="#{werkOpdracht.inRonde }" -->
+					<p:column label="InRonde" style="width:50px;"
+						sortBy="#{werkOpdracht.inRonde }" >
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}" />
@@ -190,8 +190,8 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}"
 							value="#{werkOpdracht.inRonde }" mode="VIEW" />
 					</p:column>
-					<p:column label="TrajectType" style="width:120px;" >
-						<!--  sortBy="#{werkOpdracht.trajectType }" -->
+					<p:column label="TrajectType" style="width:120px;"
+						 sortBy="#{werkOpdracht.trajectType }" >
 						<f:facet name="header">
 						<d:displayLabel
 							property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
@@ -201,8 +201,8 @@
 							value="#{werkOpdracht.trajectType }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Traject" style="width:100px;">
-						<!-- sortBy="#{werkOpdracht.traject }" -->
+					<p:column label="Traject" style="width:100px;"
+						sortBy="#{werkOpdracht.traject }" >
 						<f:facet name="header">
 							<h:outputText value="Routenaam" />
 						</f:facet>
@@ -211,8 +211,8 @@
 							value="#{werkOpdracht.traject }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Regio" style="width:100px;">
-						<!-- sortBy="#{werkOpdracht.regioId}" -->					
+					<p:column label="Regio" style="width:100px;"
+						sortBy="#{werkOpdracht.regioId}" >				
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('regioId')}" />
@@ -221,8 +221,8 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regioId')}"
 							value="#{werkOpdracht.regioId }" mode="VIEW" />
 					</p:column>
-					<p:column label="Gemeente" style="width:100px;">
-						<!-- sortBy="#{werkOpdracht.gemeente }" -->
+					<p:column label="Gemeente" style="width:100px;"
+						sortBy="#{werkOpdracht.gemeente }" >
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}" />
@@ -231,8 +231,8 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}"
 							value="#{werkOpdracht.gemeente }" mode="VIEW" />
 					</p:column>
-					<p:column label="Uitvoerder" style="width:100px;">
-						<!-- sortBy="#{werkOpdracht.uitvoerder }"-->
+					<p:column label="Uitvoerder" style="width:100px;"
+						sortBy="#{werkOpdracht.uitvoerder }" >
 						<f:facet name="header">
 						<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
@@ -241,8 +241,8 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
 							value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
 					</p:column>
-					<p:column label="Medewerker" style="width:100px;" >
-						<!-- sortBy="#{werkOpdracht.medewerker }" -->
+					<p:column label="Medewerker" style="width:100px;"
+						sortBy="#{werkOpdracht.medewerker }" >
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
@@ -252,8 +252,8 @@
 							value="#{werkOpdracht.medewerker }"
 							mode="VIEW" />
 					</p:column>				
-					<p:column label="Status" style="width:100px;">
-						<!--  sortBy="#{werkOpdracht.status }" -->
+					<p:column label="Status" style="width:100px;"
+						 sortBy="#{werkOpdracht.status }" >
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('status')}" />
@@ -263,8 +263,8 @@
 							value="#{werkOpdracht.status }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Validatie" style="width:150px;">
-						<!-- sortBy="#{werkOpdracht.validatie }" -->
+					<p:column label="Validatie" style="width:150px;"
+						sortBy="#{werkOpdracht.validatie }" >
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('WerkOpdracht').getProperty('validatie')}" />
@@ -274,8 +274,8 @@
 							value="#{werkOpdracht.validatie }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" style="width:100px;">
-						<!-- sortBy="#{werkOpdracht.datumLaatsteWijziging }"  -->
+					<p:column label="Datum" style="width:100px;"
+						sortBy="#{werkOpdracht.datumLaatsteWijziging }" >
 						<f:facet name="header">
 							<h:outputText value="Datum" />
 						</f:facet>

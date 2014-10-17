@@ -1538,16 +1538,16 @@ public class OsyrisModelFunctions {
 			}
 
 			// Testmail
-			if (mailServiceStatusMedewerker.equalsIgnoreCase("off")) {
+			// if (mailServiceStatusMedewerker.equalsIgnoreCase("off")) {
 
-				String testEmail = DefaultConfiguration.instance().getString(
-						"service.mail.testEmail");
+			// String testEmail = DefaultConfiguration.instance().getString(
+			// "service.mail.testEmail");
 
-				mailSender.sendMail(preferences.getNoreplyEmail(),
-						Collections.singleton(testEmail),
-						"/META-INF/resources/core/mails/confirmMelding.fmt",
-						variables);
-			}
+			// mailSender.sendMail(preferences.getNoreplyEmail(),
+			// Collections.singleton(testEmail),
+			// "/META-INF/resources/core/mails/confirmMelding.fmt",
+			// variables);
+			// }
 
 		} catch (IOException e) {
 

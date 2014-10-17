@@ -1054,6 +1054,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 			object.setStatus(ControleOpdrachtStatus.GERAPPORTEERD);
 			object.setDatumGerapporteerd(new Date());
+			object.setDatumLaatsteWijziging(new Date());
 
 			try {
 				modelRepository.saveObject(object);

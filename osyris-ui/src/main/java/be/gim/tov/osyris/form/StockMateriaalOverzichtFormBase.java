@@ -43,6 +43,7 @@ public class StockMateriaalOverzichtFormBase extends
 	protected int aantalGebruikt;
 	protected Integer hoeveelheid;
 	protected String keuzeAanpassing;
+	protected GebruiktMateriaal gebruiktMateriaal;
 
 	// GETTERS AND SETTERS
 	public int getAantalGebruikt() {
@@ -67,6 +68,14 @@ public class StockMateriaalOverzichtFormBase extends
 
 	public void setKeuzeAanpassing(String keuzeAanpassing) {
 		this.keuzeAanpassing = keuzeAanpassing;
+	}
+
+	public GebruiktMateriaal getGebruiktMateriaal() {
+		return gebruiktMateriaal;
+	}
+
+	public void setGebruiktMateriaal(GebruiktMateriaal gebruiktMateriaal) {
+		this.gebruiktMateriaal = gebruiktMateriaal;
 	}
 
 	// METHODS
@@ -114,7 +123,7 @@ public class StockMateriaalOverzichtFormBase extends
 		try {
 
 			// Aanmaken gebruikt materiaal en toevoegen aan Werkopdracht
-			GebruiktMateriaal gebruiktMateriaal = (GebruiktMateriaal) modelRepository
+			gebruiktMateriaal = (GebruiktMateriaal) modelRepository
 					.createObject("GebruiktMateriaal", null);
 			gebruiktMateriaal.setStockMateriaal(object);
 			gebruiktMateriaal.setAantal(aantalGebruikt);

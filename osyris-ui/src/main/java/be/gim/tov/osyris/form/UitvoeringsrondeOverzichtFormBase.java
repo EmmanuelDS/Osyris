@@ -593,7 +593,9 @@ public class UitvoeringsrondeOverzichtFormBase extends
 						.loadObject(id);
 
 				if (!opdracht.getStatus().equals(
-						WerkopdrachtStatus.GERAPPORTEERD)) {
+						WerkopdrachtStatus.GERAPPORTEERD)
+						&& !opdracht.getStatus().equals(
+								WerkopdrachtStatus.GEVALIDEERD)) {
 					isGerapporteerd = false;
 				}
 			}

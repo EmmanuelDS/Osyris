@@ -231,10 +231,8 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 				}
 			}
 
-			Melding melding = getObject();
-
 			// Get traject
-			Traject traject = (Traject) modelRepository.loadObject(melding
+			Traject traject = (Traject) modelRepository.loadObject(object
 					.getTraject());
 
 			// Load layer depending on traject type
