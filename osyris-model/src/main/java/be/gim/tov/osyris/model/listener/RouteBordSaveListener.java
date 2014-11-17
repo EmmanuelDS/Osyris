@@ -45,32 +45,33 @@ public class RouteBordSaveListener {
 			// Ophalen regio van de gekoppelde route
 			Traject traject = Beans.getReference(OsyrisModelFunctions.class)
 					.getRouteForRouteBord(routeBord);
-			if (traject != null)
+			if (traject != null) {
 				routeBord.setRegio(traject.getRegio());
+			}
+		}
+
+		if (routeBord.getNaam() != null && !routeBord.getNaam().isEmpty()) {
+
+			QueryBuilder builder = new QueryBuilder("Traject");
+			builder.addFilter(FilterUtils.equal("naam", routeBord.getNaam()));
+			builder.maxResults(1);
+			Traject traject = (Traject) CollectionUtils.first(modelRepository
+					.searchObjects(builder.build(), false, false));
+			if (traject != null) {
+				routeBord.setRoute(modelRepository
+						.getResourceIdentifier(traject));
+			}
 		}
 
 		// Set route voor RouteBord indien niet aanwezig
-		if (routeBord.getRoute() == null) {
-			if (routeBord.getNaam() != null) {
+		if (routeBord.getNaam() == null || routeBord.getNaam().isEmpty()
+				|| routeBord.getRoute() == null) {
 
-				QueryBuilder builder = new QueryBuilder("Traject");
-				builder.addFilter(FilterUtils.equal("naam", routeBord.getNaam()));
-				builder.maxResults(1);
-				Traject traject = (Traject) CollectionUtils
-						.first(modelRepository.searchObjects(builder.build(),
-								false, false));
-				if (traject != null)
-					routeBord.setRoute(modelRepository
-							.getResourceIdentifier(traject));
-			}
-
-			if (routeBord.getNaam() == null) {
-
-				Traject traject = Beans
-						.getReference(OsyrisModelFunctions.class)
-						.getRouteForRouteBord(routeBord);
-				if (traject != null)
-					routeBord.setRoute(modelRepository.getResourceKey(traject));
+			Traject traject = Beans.getReference(OsyrisModelFunctions.class)
+					.getRouteForRouteBord(routeBord);
+			if (traject != null) {
+				routeBord.setRoute(modelRepository.getResourceKey(traject));
+				routeBord.setNaam(traject.getNaam());
 			}
 		}
 	}
