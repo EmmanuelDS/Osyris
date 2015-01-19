@@ -16,6 +16,8 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.api.model.annotation.Width;
 import org.conscientia.core.model.AbstractModelObject;
+import org.hibernate.bytecode.internal.javassist.FieldHandled;
+import org.hibernate.bytecode.internal.javassist.FieldHandler;
 
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 
@@ -29,7 +31,7 @@ import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
 @SubClassPersistence(UNION)
 @Edit(type = "probleem")
 public abstract class Probleem extends AbstractModelObject implements
-		StorableObject {
+		StorableObject, FieldHandled {
 
 	// VARIABLES
 	private ProbleemStatus status;
@@ -45,6 +47,8 @@ public abstract class Probleem extends AbstractModelObject implements
 	@FileSize(2 * 1024 * 1024)
 	@Width(250)
 	private byte[] foto;
+
+	private transient FieldHandler FIELD_HANDLER;
 
 	// GETTERS AND SETTERS
 	public ProbleemStatus getStatus() {
@@ -64,10 +68,28 @@ public abstract class Probleem extends AbstractModelObject implements
 	}
 
 	public byte[] getFoto() {
-		return foto;
+		if (FIELD_HANDLER != null)
+			return (byte[]) FIELD_HANDLER.readObject(this, "foto", foto);
+		else
+			return foto;
 	}
 
 	public void setFoto(byte[] foto) {
-		this.foto = foto;
+
+		if (FIELD_HANDLER != null)
+			this.foto = (byte[]) FIELD_HANDLER.writeObject(this, "foto",
+					this.foto, foto);
+		else
+			this.foto = foto;
+	}
+
+	@Override
+	public void setFieldHandler(FieldHandler handler) {
+		this.FIELD_HANDLER = handler;
+	}
+
+	@Override
+	public FieldHandler getFieldHandler() {
+		return FIELD_HANDLER;
 	}
 }
