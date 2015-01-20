@@ -22,6 +22,7 @@ import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
 import org.conscientia.api.model.annotation.View;
 import org.conscientia.api.model.annotation.Width;
+import org.conscientia.api.model.select.Level;
 import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.resource.ResourceIdentifier;
@@ -55,6 +56,10 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 public class WerkOpdracht extends AbstractModelObject implements StorableObject {
 
 	// VARIABLES
+	// @NotSearchable
+	@NotEditable
+	private Long id;
+
 	@NotEditable
 	@Type(value = ModelPropertyType.ENUM)
 	@ValuesExpression("#{osyrisModelFunctions.canonicalBoolean}")
@@ -95,21 +100,21 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(value = ModelPropertyType.TEXT)
 	private String commentaarValidatie;
 
-	@View(type = "image")
+	@View(level = Level.LONG, type = "image")
 	@NotSearchable
 	@ContentType("image/*")
 	@FileSize(2 * 1024 * 1024)
 	@Width(350)
 	private byte[] foto;
 
-	@View(type = "image")
+	@View(level = Level.LONG, type = "image")
 	@NotSearchable
 	@ContentType("image/*")
 	@FileSize(2 * 1024 * 1024)
 	@Width(350)
 	private byte[] foto2;
 
-	@View(type = "image")
+	@View(level = Level.LONG, type = "image")
 	@NotSearchable
 	@ContentType("image/*")
 	@FileSize(2 * 1024 * 1024)
@@ -186,8 +191,8 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	// GETTERS AND SETTERS
 	@Override
-	@NotSearchable
-	@NotEditable
+	// @NotSearchable
+	// @NotEditable
 	public Long getId() {
 		return (Long) super.getId();
 	}

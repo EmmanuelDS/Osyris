@@ -19,6 +19,19 @@
 	<j:layoutPane region="west" size="350" minSize="200" resizable="true"
 			slidable="true">
 			<div class="ui-layout-content">
+					<q:query value="#{werkOpdrachtOverzichtFormBase.query}"
+					modelClassName="#{werkOpdrachtOverzichtFormBase.modelClass.name}">
+					<c:if test="#{werkOpdrachtOverzichtFormBase.index}">
+						<d:field for="term"
+							label="#{messages['page.search.query.term.title']}">
+							<q:phrase id="termFilter" value="#{searchForm.term}">
+								<h:inputText value="#{searchForm.term}" />
+							</q:phrase>
+						</d:field>
+					</c:if>
+					<d:object mode="SEARCH"
+						modelClass="#{werkOpdrachtOverzichtFormBase.modelClass}" />
+				</q:query>
 				<d:fields>
 					<d:field for="trajectType" label="Traject type">
 						<h:selectOneMenu id="trajectType"
@@ -64,19 +77,7 @@
 						</h:selectOneMenu>
 					</d:field>
 				</d:fields>
-				<q:query value="#{werkOpdrachtOverzichtFormBase.query}"
-					modelClassName="#{werkOpdrachtOverzichtFormBase.modelClass.name}">
-					<c:if test="#{werkOpdrachtOverzichtFormBase.index}">
-						<d:field for="term"
-							label="#{messages['page.search.query.term.title']}">
-							<q:phrase id="termFilter" value="#{searchForm.term}">
-								<h:inputText value="#{searchForm.term}" />
-							</q:phrase>
-						</d:field>
-					</c:if>
-					<d:object mode="SEARCH"
-						modelClass="#{werkOpdrachtOverzichtFormBase.modelClass}" />
-				</q:query>
+		
 				<d:fields>
 					<b><h:outputText value="Datum laatste statuswijziging">
 					</h:outputText></b>
@@ -116,6 +117,13 @@
 						image="#{resource['core/images/actions/12x12/download.png']}"
 						content="#{werkOpdrachtOverzichtFormBase.report()}"
 						value="#{messages['page.actions.report.label']}" />
+				<!-- 
+					<j:commandButton rendered="true"
+						value="Save images to disk"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{werkOpdrachtOverzichtFormBase.saveImagesToDisk()}" />
+				-->
 				</d:buttons>
 			</div>
 		</j:layoutPane>
@@ -138,6 +146,8 @@
 					emptyMessage="#{messages['ui.dataTable.empty']}"
 					rowKey="#{werkOpdracht.id}" 
 					selection="#{werkOpdrachtOverzichtFormBase.selectedOpdrachten}">
+					<j:bindAttribute var="werkOpdracht"
+						name="rowData" />
 					<j:layoutContent />
 					<p:column style="width:20px;">
 						<p:rowToggler />

@@ -110,6 +110,10 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected List<Geometry> anderProbleemGeoms;
 	protected List<Geometry> anderProbleemLineGeoms;
 
+	protected List<String> rondeIds;
+	protected List<Long> werkOpdrachtIds;
+	protected List<ResourceIdentifier> filteredWerkOpdrachten;
+
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
 		return regio;
@@ -239,6 +243,27 @@ public class UitvoeringsrondeOverzichtFormBase extends
 		this.anderProbleemLineGeoms = anderProbleemLineGeoms;
 	}
 
+	public List<String> getRondeIds() {
+		return rondeIds;
+	}
+
+	public void setRondeIds(List<String> rondeIds) {
+		this.rondeIds = rondeIds;
+	}
+
+	public List<Long> getWerkOpdrachtIds() {
+		return werkOpdrachtIds;
+	}
+
+	public void setWerkOpdrachtIds(List<Long> werkOpdrachtIds) {
+		this.werkOpdrachtIds = werkOpdrachtIds;
+	}
+
+	public void setFilteredWerkOpdrachten(
+			List<ResourceIdentifier> filteredWerkOpdrachten) {
+		this.filteredWerkOpdrachten = filteredWerkOpdrachten;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -291,7 +316,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			Query query = transformQuery(getQuery());
 
 			List<Uitvoeringsronde> list = (List<Uitvoeringsronde>) modelRepository
-					.searchObjects(query, false, false, true);
+					.searchObjects(query, true, isIndex(), true);
 
 			if (uitvoerder == null && medewerker == null && trajectType == null
 					&& regio == null && trajectNaam == null) {
@@ -310,7 +335,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				// }
 
 				results = (List<Uitvoeringsronde>) modelRepository
-						.searchObjects(query, false, false, true);
+						.searchObjects(query, true, isIndex(), true);
 			}
 		} catch (IOException e) {
 			LOG.error("Can not search Uitvoeringsronde.", e);
@@ -1034,7 +1059,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	private List<String> getSubQueryIds(List<Uitvoeringsronde> list)
 			throws IOException {
 
-		List<String> rondeIds = new ArrayList<String>();
+		rondeIds = new ArrayList<String>();
 
 		// Indien minstens 1 van de velden ingevuld WerkOpdracht query
 		// uitvoeren en resultaten filteren op de uitvoeringsronde query
@@ -1061,13 +1086,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 		// Enkel WerkOpdracht ids nodig
 		builder.results(FilterUtils.properties("id"));
-		List<Long> ids = (List<Long>) modelRepository.searchObjects(
-				builder.build(), false, false, true);
+		werkOpdrachtIds = (List<Long>) modelRepository.searchObjects(
+				builder.build(), false, false, false);
 
 		// Omzetten ids naar ResourceIdentifiers
-		List<ResourceIdentifier> filteredWerkOpdrachten = new ArrayList<ResourceIdentifier>();
+		filteredWerkOpdrachten = new ArrayList<ResourceIdentifier>();
 
-		for (Long id : ids) {
+		for (Long id : werkOpdrachtIds) {
 			filteredWerkOpdrachten.add(new ResourceKey("WerkOpdracht", id
 					.toString()));
 		}

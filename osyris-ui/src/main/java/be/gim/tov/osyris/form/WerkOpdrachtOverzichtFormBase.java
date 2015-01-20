@@ -39,6 +39,7 @@ import org.apache.fop.apps.FopFactory;
 import org.apache.fop.apps.MimeConstants;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
+import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.search.QueryOrderBy;
@@ -47,6 +48,7 @@ import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.model.DefaultModelObjectList;
 import org.conscientia.core.resource.FileResource;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
@@ -61,11 +63,13 @@ import org.quartz.xml.ValidationException;
 import org.w3c.dom.Document;
 
 import be.gim.commons.bean.Beans;
+import be.gim.commons.encoder.api.Encoder;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.peritia.codec.EncodableContent;
 import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
@@ -83,6 +87,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteAnderProbleem;
 import be.gim.tov.osyris.model.controle.RouteBordProbleem;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
+import be.gim.tov.osyris.model.encoder.WerkOpdrachtCSVModelEncoder;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
@@ -2310,5 +2315,85 @@ public class WerkOpdrachtOverzichtFormBase extends
 		probleemType = null;
 		object = null;
 		search();
+	}
+
+	/**
+	 * Custom WerkOpdracht CSV export
+	 * 
+	 */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Content<?> report() {
+
+		File file = null;
+
+		DefaultModelObjectList objectList = new DefaultModelObjectList<WerkOpdracht>(
+				getModelClass(), getResults());
+
+		// START Write to disk test
+		Content content = new EncodableContent<ModelObjectList>(
+				(Encoder) new WerkOpdrachtCSVModelEncoder(), objectList);
+
+		Random randomGenerator = new Random();
+		Integer randomInt = randomGenerator.nextInt(1000000000);
+		String fileName = "WerkOpdrachtOverzicht_" + randomInt.toString()
+				+ ".csv";
+
+		String location = DefaultConfiguration.instance().getString(
+				"osyris.location.temp.csv");
+
+		file = new File(location + fileName);
+
+		try {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			content.encode(file);
+		} catch (IOException e) {
+			LOG.error("Can not encode CSV file.");
+		} catch (Exception e) {
+			LOG.error("Can not create new CSV file.");
+		}
+		return new FileResource(file);
+		// END of test
+
+		// return new EncodableContent<ModelObjectList>(
+		// (Encoder) new WerkOpdrachtCSVModelEncoder(), objectList);
+	}
+
+	public void saveImagesToDisk() {
+
+		File file = null;
+
+		try {
+			for (WerkOpdracht wo : getResults()) {
+
+				if (wo.getFoto() != null) {
+
+					// WerkOpdracht wo = (WerkOpdracht) modelRepository
+					// .loadObject(new ResourceKey("WerkOpdracht", "4"));
+
+					String fileName = wo.getId().toString() + "_foto1" + ".jpg";
+
+					String location = DefaultConfiguration.instance()
+							.getString("osyris.location.temp.csv");
+
+					file = new File(location + wo.getId().toString() + "/"
+							+ fileName);
+
+					file.getParentFile().mkdirs();
+
+					if (!file.exists()) {
+						file.createNewFile();
+					}
+					FileOutputStream fos = new FileOutputStream(file.getPath());
+
+					fos.write(wo.getFoto());
+					fos.close();
+				}
+			}
+		} catch (Exception e) {
+
+		}
 	}
 }

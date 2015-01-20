@@ -301,6 +301,10 @@ public class PeterMeterCSVModelEncoder extends CSVModelEncoder {
 		}
 	}
 
+	/**
+	 * Use a ; as delimiter in CSV output file. Belgian Regional settings define
+	 * a ; as the default delimiter. This value is used by MS Excel.
+	 */
 	@Override
 	protected CsvListWriter getCsvWriter(Writer writer) {
 		return new CsvListWriter(writer, new CsvPreference('\"', ';', "\n"));

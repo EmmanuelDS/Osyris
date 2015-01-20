@@ -38,6 +38,7 @@ import org.apache.fop.apps.MimeConstants;
 import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
+import org.conscientia.api.model.ModelObjectList;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
 import org.conscientia.api.search.QueryOrderBy;
@@ -46,6 +47,7 @@ import org.conscientia.api.user.UserProfile;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.model.DefaultModelObjectList;
 import org.conscientia.core.resource.FileResource;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
@@ -57,12 +59,14 @@ import org.opengis.referencing.NoSuchAuthorityCodeException;
 import org.w3c.dom.Document;
 
 import be.gim.commons.bean.Beans;
+import be.gim.commons.encoder.api.Encoder;
 import be.gim.commons.filter.FilterUtils;
 import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
 import be.gim.commons.resource.ResourceName;
+import be.gim.peritia.codec.EncodableContent;
 import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
@@ -82,6 +86,7 @@ import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.controle.RouteControleOpdracht;
 import be.gim.tov.osyris.model.controle.status.ControleOpdrachtStatus;
 import be.gim.tov.osyris.model.controle.status.ProbleemStatus;
+import be.gim.tov.osyris.model.encoder.ControleOpdrachtCSVModelEncoder;
 import be.gim.tov.osyris.model.traject.Bord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
@@ -2473,5 +2478,19 @@ public class ControleOpdrachtOverzichtFormBase extends
 				LOG.error("Can not search Trajecten.");
 			}
 		}
+	}
+
+	/**
+	 * Custom ControleOpdracht CSV export
+	 * 
+	 */
+	@Override
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	public Content<?> report() {
+
+		DefaultModelObjectList objectList = new DefaultModelObjectList<ControleOpdracht>(
+				getModelClass(), getResults());
+		return new EncodableContent<ModelObjectList>(
+				(Encoder) new ControleOpdrachtCSVModelEncoder(), objectList);
 	}
 }
