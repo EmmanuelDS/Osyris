@@ -24,6 +24,8 @@ import org.conscientia.api.model.annotation.View;
 import org.conscientia.api.model.annotation.Width;
 import org.conscientia.api.model.select.Level;
 import org.conscientia.core.model.AbstractModelObject;
+import org.hibernate.bytecode.internal.javassist.FieldHandled;
+import org.hibernate.bytecode.internal.javassist.FieldHandler;
 
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.controle.Probleem;
@@ -53,7 +55,8 @@ import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
 		@Permission(profile = "group:Uitvoerder", action = "search", allow = true),
 		@Permission(profile = "group:Uitvoerder", action = "view", allow = true),
 		@Permission(profile = "group:Uitvoerder", action = "edit", allow = true) })
-public class WerkOpdracht extends AbstractModelObject implements StorableObject {
+public class WerkOpdracht extends AbstractModelObject implements
+		StorableObject, FieldHandled {
 
 	// VARIABLES
 	// @NotSearchable
@@ -189,6 +192,8 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	@Type(ModelPropertyType.DATE)
 	private Date datumLaatsteWijziging;
 
+	private transient FieldHandler FIELD_HANDLER;
+
 	// GETTERS AND SETTERS
 	@Override
 	// @NotSearchable
@@ -246,27 +251,48 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 	}
 
 	public byte[] getFoto() {
-		return foto;
+		if (FIELD_HANDLER != null)
+			return (byte[]) FIELD_HANDLER.readObject(this, "foto", foto);
+		else
+			return foto;
 	}
 
 	public void setFoto(byte[] foto) {
-		this.foto = foto;
+		if (FIELD_HANDLER != null)
+			this.foto = (byte[]) FIELD_HANDLER.writeObject(this, "foto",
+					this.foto, foto);
+		else
+			this.foto = foto;
 	}
 
 	public byte[] getFoto2() {
-		return foto2;
+		if (FIELD_HANDLER != null)
+			return (byte[]) FIELD_HANDLER.readObject(this, "foto2", foto2);
+		else
+			return foto2;
 	}
 
 	public void setFoto2(byte[] foto2) {
-		this.foto2 = foto2;
+		if (FIELD_HANDLER != null)
+			this.foto2 = (byte[]) FIELD_HANDLER.writeObject(this, "foto2",
+					this.foto2, foto2);
+		else
+			this.foto2 = foto2;
 	}
 
 	public byte[] getFoto3() {
-		return foto3;
+		if (FIELD_HANDLER != null)
+			return (byte[]) FIELD_HANDLER.readObject(this, "foto3", foto3);
+		else
+			return foto3;
 	}
 
 	public void setFoto3(byte[] foto3) {
-		this.foto3 = foto3;
+		if (FIELD_HANDLER != null)
+			this.foto3 = (byte[]) FIELD_HANDLER.writeObject(this, "foto3",
+					this.foto3, foto3);
+		else
+			this.foto3 = foto3;
 	}
 
 	public Date getDatumGeannuleerd() {
@@ -395,5 +421,15 @@ public class WerkOpdracht extends AbstractModelObject implements StorableObject 
 
 	public void setDatumLaatsteWijziging(Date datumLaatsteWijziging) {
 		this.datumLaatsteWijziging = datumLaatsteWijziging;
+	}
+
+	@Override
+	public void setFieldHandler(FieldHandler handler) {
+		this.FIELD_HANDLER = handler;
+	}
+
+	@Override
+	public FieldHandler getFieldHandler() {
+		return FIELD_HANDLER;
 	}
 }
