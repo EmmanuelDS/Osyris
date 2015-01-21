@@ -2330,7 +2330,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 		DefaultModelObjectList objectList = new DefaultModelObjectList<WerkOpdracht>(
 				getModelClass(), getResults());
 
-		// START Write to disk test
+		// Write CSV to disk
 		Content content = new EncodableContent<ModelObjectList>(
 				(Encoder) new WerkOpdrachtCSVModelEncoder(), objectList);
 
@@ -2355,45 +2355,34 @@ public class WerkOpdrachtOverzichtFormBase extends
 			LOG.error("Can not create new CSV file.");
 		}
 		return new FileResource(file);
-		// END of test
-
-		// return new EncodableContent<ModelObjectList>(
-		// (Encoder) new WerkOpdrachtCSVModelEncoder(), objectList);
 	}
 
-	public void saveImagesToDisk() {
-
-		File file = null;
-
-		try {
-			for (WerkOpdracht wo : getResults()) {
-
-				if (wo.getFoto() != null) {
-
-					// WerkOpdracht wo = (WerkOpdracht) modelRepository
-					// .loadObject(new ResourceKey("WerkOpdracht", "4"));
-
-					String fileName = wo.getId().toString() + "_foto1" + ".jpg";
-
-					String location = DefaultConfiguration.instance()
-							.getString("osyris.location.temp.csv");
-
-					file = new File(location + wo.getId().toString() + "/"
-							+ fileName);
-
-					file.getParentFile().mkdirs();
-
-					if (!file.exists()) {
-						file.createNewFile();
-					}
-					FileOutputStream fos = new FileOutputStream(file.getPath());
-
-					fos.write(wo.getFoto());
-					fos.close();
-				}
-			}
-		} catch (Exception e) {
-
-		}
-	}
+	/*
+	 * public void saveImagesToDisk() {
+	 * 
+	 * File file = null;
+	 * 
+	 * try { for (WerkOpdracht wo : getResults()) {
+	 * 
+	 * if (wo.getFoto() != null) {
+	 * 
+	 * // WerkOpdracht wo = (WerkOpdracht) modelRepository // .loadObject(new
+	 * ResourceKey("WerkOpdracht", "4"));
+	 * 
+	 * String fileName = wo.getId().toString() + "_foto1" + ".jpg";
+	 * 
+	 * String location = DefaultConfiguration.instance()
+	 * .getString("osyris.location.temp.csv");
+	 * 
+	 * file = new File(location + wo.getId().toString() + "/" + fileName);
+	 * 
+	 * file.getParentFile().mkdirs();
+	 * 
+	 * if (!file.exists()) { file.createNewFile(); } FileOutputStream fos = new
+	 * FileOutputStream(file.getPath());
+	 * 
+	 * fos.write(wo.getFoto()); fos.close(); } } } catch (Exception e) {
+	 * 
+	 * } }
+	 */
 }
