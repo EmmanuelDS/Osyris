@@ -2488,9 +2488,38 @@ public class ControleOpdrachtOverzichtFormBase extends
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public Content<?> report() {
 
+		File file = null;
+
 		DefaultModelObjectList objectList = new DefaultModelObjectList<ControleOpdracht>(
 				getModelClass(), getResults());
-		return new EncodableContent<ModelObjectList>(
+
+		// Write CSV to disk
+		Content content = new EncodableContent<ModelObjectList>(
 				(Encoder) new ControleOpdrachtCSVModelEncoder(), objectList);
+
+		Random randomGenerator = new Random();
+		Integer randomInt = randomGenerator.nextInt(1000000000);
+		String fileName = "ControleOpdrachtOverzicht_" + randomInt.toString()
+				+ ".csv";
+
+		String location = DefaultConfiguration.instance().getString(
+				"osyris.location.temp.csv");
+
+		file = new File(location + fileName);
+
+		try {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			content.encode(file);
+		} catch (IOException e) {
+			LOG.error("Can not encode CSV file.");
+		} catch (Exception e) {
+			LOG.error("Can not create new CSV file.");
+		}
+		return new FileResource(file);
+
+		// return new EncodableContent<ModelObjectList>(
+		// (Encoder) new ControleOpdrachtCSVModelEncoder(), objectList);
 	}
 }
