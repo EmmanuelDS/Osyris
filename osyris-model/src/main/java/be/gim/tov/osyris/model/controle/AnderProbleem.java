@@ -10,6 +10,7 @@ import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
+import org.hibernate.bytecode.internal.javassist.FieldHandled;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -20,7 +21,7 @@ import com.vividsolutions.jts.geom.Geometry;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public abstract class AnderProbleem extends Probleem {
+public abstract class AnderProbleem extends Probleem implements FieldHandled {
 
 	// VARIABLES
 	@Required

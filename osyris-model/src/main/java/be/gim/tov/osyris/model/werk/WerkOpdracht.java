@@ -8,6 +8,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.ContentType;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.FileSize;
+import org.conscientia.api.model.annotation.Ignore;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -192,7 +193,8 @@ public class WerkOpdracht extends AbstractModelObject implements
 	@Type(ModelPropertyType.DATE)
 	private Date datumLaatsteWijziging;
 
-	private transient FieldHandler FIELD_HANDLER;
+	@Ignore
+	private transient FieldHandler fieldHandler;
 
 	// GETTERS AND SETTERS
 	@Override
@@ -251,48 +253,54 @@ public class WerkOpdracht extends AbstractModelObject implements
 	}
 
 	public byte[] getFoto() {
-		if (FIELD_HANDLER != null)
-			return (byte[]) FIELD_HANDLER.readObject(this, "foto", foto);
-		else
+		if (fieldHandler != null) {
+			return (byte[]) fieldHandler.readObject(this, "foto", foto);
+		} else {
 			return foto;
+		}
 	}
 
 	public void setFoto(byte[] foto) {
-		if (FIELD_HANDLER != null)
-			this.foto = (byte[]) FIELD_HANDLER.writeObject(this, "foto",
+		if (fieldHandler != null) {
+			this.foto = (byte[]) fieldHandler.writeObject(this, "foto",
 					this.foto, foto);
-		else
+		} else {
 			this.foto = foto;
+		}
 	}
 
 	public byte[] getFoto2() {
-		if (FIELD_HANDLER != null)
-			return (byte[]) FIELD_HANDLER.readObject(this, "foto2", foto2);
-		else
+		if (fieldHandler != null) {
+			return (byte[]) fieldHandler.readObject(this, "foto2", foto2);
+		} else {
 			return foto2;
+		}
 	}
 
 	public void setFoto2(byte[] foto2) {
-		if (FIELD_HANDLER != null)
-			this.foto2 = (byte[]) FIELD_HANDLER.writeObject(this, "foto2",
+		if (fieldHandler != null) {
+			this.foto2 = (byte[]) fieldHandler.writeObject(this, "foto2",
 					this.foto2, foto2);
-		else
+		} else {
 			this.foto2 = foto2;
+		}
 	}
 
 	public byte[] getFoto3() {
-		if (FIELD_HANDLER != null)
-			return (byte[]) FIELD_HANDLER.readObject(this, "foto3", foto3);
-		else
+		if (fieldHandler != null) {
+			return (byte[]) fieldHandler.readObject(this, "foto3", foto3);
+		} else {
 			return foto3;
+		}
 	}
 
 	public void setFoto3(byte[] foto3) {
-		if (FIELD_HANDLER != null)
-			this.foto3 = (byte[]) FIELD_HANDLER.writeObject(this, "foto3",
+		if (fieldHandler != null) {
+			this.foto3 = (byte[]) fieldHandler.writeObject(this, "foto3",
 					this.foto3, foto3);
-		else
+		} else {
 			this.foto3 = foto3;
+		}
 	}
 
 	public Date getDatumGeannuleerd() {
@@ -425,11 +433,11 @@ public class WerkOpdracht extends AbstractModelObject implements
 
 	@Override
 	public void setFieldHandler(FieldHandler handler) {
-		this.FIELD_HANDLER = handler;
+		this.fieldHandler = handler;
 	}
 
 	@Override
 	public FieldHandler getFieldHandler() {
-		return FIELD_HANDLER;
+		return fieldHandler;
 	}
 }

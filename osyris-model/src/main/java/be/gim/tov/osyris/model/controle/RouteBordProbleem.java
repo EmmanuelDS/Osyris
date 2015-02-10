@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.controle;
 
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
+import org.hibernate.bytecode.internal.javassist.FieldHandled;
 
 /**
  * 
@@ -10,6 +11,6 @@ import org.conscientia.api.model.annotation.ModelStore;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public class RouteBordProbleem extends BordProbleem {
+public class RouteBordProbleem extends BordProbleem implements FieldHandled {
 
 }

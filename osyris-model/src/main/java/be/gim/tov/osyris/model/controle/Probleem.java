@@ -7,6 +7,7 @@ import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.ContentType;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.FileSize;
+import org.conscientia.api.model.annotation.Ignore;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotSearchable;
@@ -48,7 +49,8 @@ public abstract class Probleem extends AbstractModelObject implements
 	@Width(250)
 	private byte[] foto;
 
-	private transient FieldHandler FIELD_HANDLER;
+	@Ignore
+	private transient FieldHandler fieldHandler;
 
 	// GETTERS AND SETTERS
 	public ProbleemStatus getStatus() {
@@ -68,28 +70,30 @@ public abstract class Probleem extends AbstractModelObject implements
 	}
 
 	public byte[] getFoto() {
-		if (FIELD_HANDLER != null)
-			return (byte[]) FIELD_HANDLER.readObject(this, "foto", foto);
-		else
+		if (fieldHandler != null) {
+			return (byte[]) fieldHandler.readObject(this, "foto", foto);
+		} else {
 			return foto;
+		}
 	}
 
 	public void setFoto(byte[] foto) {
 
-		if (FIELD_HANDLER != null)
-			this.foto = (byte[]) FIELD_HANDLER.writeObject(this, "foto",
+		if (fieldHandler != null) {
+			this.foto = (byte[]) fieldHandler.writeObject(this, "foto",
 					this.foto, foto);
-		else
+		} else {
 			this.foto = foto;
+		}
 	}
 
 	@Override
 	public void setFieldHandler(FieldHandler handler) {
-		this.FIELD_HANDLER = handler;
+		this.fieldHandler = handler;
 	}
 
 	@Override
 	public FieldHandler getFieldHandler() {
-		return FIELD_HANDLER;
+		return fieldHandler;
 	}
 }

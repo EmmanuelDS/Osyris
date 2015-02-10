@@ -10,6 +10,7 @@ import org.conscientia.api.model.annotation.Required;
 import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.Type;
 import org.conscientia.api.model.annotation.ValuesExpression;
+import org.hibernate.bytecode.internal.javassist.FieldHandled;
 
 import be.gim.commons.resource.ResourceIdentifier;
 
@@ -20,7 +21,7 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
-public abstract class BordProbleem extends Probleem {
+public abstract class BordProbleem extends Probleem implements FieldHandled {
 
 	// VARIABLES
 	@Required
