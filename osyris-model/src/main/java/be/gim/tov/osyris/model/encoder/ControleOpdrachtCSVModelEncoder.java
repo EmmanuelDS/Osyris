@@ -131,37 +131,41 @@ public class ControleOpdrachtCSVModelEncoder extends CSVModelEncoder {
 		try {
 
 			ControleOpdracht opdracht = (ControleOpdracht) object;
-			User user = (User) Beans.getReference(ModelRepository.class)
-					.loadObject(opdracht.getPeterMeter());
 
-			// Add UserProfile info to ControleOpdracht CSV export
-			OsyrisUserProfile profile = (OsyrisUserProfile) user.getAspect(
-					"UserProfile", Beans.getReference(ModelRepository.class),
-					true);
+			// Leave fields blank if no PM is assigned
+			if (opdracht.getPeterMeter() != null) {
+				User user = (User) Beans.getReference(ModelRepository.class)
+						.loadObject(opdracht.getPeterMeter());
 
-			if (profile != null) {
+				// Add UserProfile info to ControleOpdracht CSV export
+				OsyrisUserProfile profile = (OsyrisUserProfile) user.getAspect(
+						"UserProfile",
+						Beans.getReference(ModelRepository.class), true);
 
-				String firstName = profile.getFirstName();
-				ModelProperty propFirstName = profile.getModelClass()
-						.getProperty("firstName");
-				values.add(getString(propFirstName, profile, firstName));
+				if (profile != null) {
 
-				String lastName = profile.getLastName();
-				ModelProperty propLastName = profile.getModelClass()
-						.getProperty("lastName");
-				values.add(getString(propLastName, profile, lastName));
+					String firstName = profile.getFirstName();
+					ModelProperty propFirstName = profile.getModelClass()
+							.getProperty("firstName");
+					values.add(getString(propFirstName, profile, firstName));
 
-				String email = profile.getEmail();
-				ModelProperty propEmail = profile.getModelClass().getProperty(
-						"email");
-				values.add(getString(propEmail, profile, email));
+					String lastName = profile.getLastName();
+					ModelProperty propLastName = profile.getModelClass()
+							.getProperty("lastName");
+					values.add(getString(propLastName, profile, lastName));
+
+					String email = profile.getEmail();
+					ModelProperty propEmail = profile.getModelClass()
+							.getProperty("email");
+					values.add(getString(propEmail, profile, email));
+				}
 			}
 		} catch (IOException e) {
 			LOG.error("Can not open aspect of ControleOpdracht", e);
 		} catch (InstantiationException e) {
 			LOG.error("Can not instantiate aspect of ControleOpdracht", e);
 		} catch (IllegalAccessException e) {
-			LOG.error("Illegal access at aspect of ControleOprdracht", e);
+			LOG.error("Illegal access at aspect of ControleOpdracht", e);
 		}
 
 		return values;
