@@ -59,6 +59,8 @@ import org.geotools.feature.FeatureIterator;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.filter.Filter;
+import org.primefaces.component.datatable.DataTable;
+import org.primefaces.model.SelectableDataModel;
 import org.quartz.xml.ValidationException;
 import org.w3c.dom.Document;
 
@@ -119,7 +121,8 @@ import com.vividsolutions.jts.geom.Point;
 @Named
 @ViewScoped
 public class WerkOpdrachtOverzichtFormBase extends
-		AbstractListForm<WerkOpdracht> implements Serializable {
+		AbstractListForm<WerkOpdracht> implements Serializable,
+		SelectableDataModel<WerkOpdracht> {
 
 	private static final long serialVersionUID = -7478667205313972513L;
 
@@ -162,6 +165,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected List<String> bordSelection;
 	protected List<Geometry> anderProbleemGeoms;
 	protected List<Geometry> anderProbleemLineGeoms;
+	protected Map<WerkOpdracht, Integer> fullTableSelection;
+	protected List<WerkOpdracht> fullListWerkOpdrachten;
 
 	// GETTERS AND SETTERS
 	public WerkOpdracht getWerkOpdracht() {
@@ -277,10 +282,18 @@ public class WerkOpdrachtOverzichtFormBase extends
 	}
 
 	public WerkOpdracht[] getSelectedOpdrachten() {
+
+		if (fullListWerkOpdrachten != null) {
+			return fullListWerkOpdrachten
+					.toArray(new WerkOpdracht[fullListWerkOpdrachten.size()]);
+		}
 		return selectedOpdrachten;
 	}
 
 	public void setSelectedOpdrachten(WerkOpdracht[] selectedOpdrachten) {
+		DataTable table = (DataTable) ComponentUtils.findComponent("objects");
+		int page = table.getPage();
+		rememberTableSelection(page, selectedOpdrachten);
 		this.selectedOpdrachten = selectedOpdrachten;
 	}
 
@@ -338,6 +351,15 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 	public void setAnderProbleemLineGeoms(List<Geometry> anderProbleemLineGeoms) {
 		this.anderProbleemLineGeoms = anderProbleemLineGeoms;
+	}
+
+	public Map<WerkOpdracht, Integer> getFullTableSelection() {
+		return fullTableSelection;
+	}
+
+	public void setFullTableSelection(
+			Map<WerkOpdracht, Integer> fullTableSelection) {
+		this.fullTableSelection = fullTableSelection;
 	}
 
 	// METHODS
@@ -638,23 +660,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 	public void createUitvoeringsronde() {
 
 		try {
-			Uitvoeringsronde ronde = (Uitvoeringsronde) modelRepository
-					.createObject("Uitvoeringsronde", null);
-			ronde.setStatus(UitvoeringsrondeStatus.AANGEMAAKT);
-
 			// Minstens 1 werkopdracht moet geselecteerd zijn
-			if (Arrays.asList(selectedOpdrachten).size() < 1) {
+			if (fullListWerkOpdrachten.size() < 1) {
 				throw new IOException();
 			}
-			// Set opdrachten
-			List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>();
-			for (WerkOpdracht werkOpdracht : Arrays.asList(selectedOpdrachten)) {
-				ids.add(modelRepository.getResourceIdentifier(werkOpdracht));
-			}
 
-			ronde.setOpdrachten(ids);
-
-			for (WerkOpdracht werkOpdracht : Arrays.asList(selectedOpdrachten)) {
+			// Check of geselecteerde WOs in aanmerking komen
+			for (WerkOpdracht werkOpdracht : fullListWerkOpdrachten) {
 
 				// Opdrachten mogen nog niet aan een ronde toegewezen zijn
 				if (werkOpdracht.getInRonde().equals("1")) {
@@ -666,13 +678,30 @@ public class WerkOpdrachtOverzichtFormBase extends
 						WerkopdrachtStatus.TE_CONTROLEREN)) {
 					throw new InStatusTeControlerenException();
 				}
+			}
+
+			// Geen fouten tegengekomen, save WOs en create UVR
+			Uitvoeringsronde ronde = (Uitvoeringsronde) modelRepository
+					.createObject("Uitvoeringsronde", null);
+			ronde.setStatus(UitvoeringsrondeStatus.AANGEMAAKT);
+
+			List<ResourceIdentifier> ids = new ArrayList<ResourceIdentifier>();
+
+			for (WerkOpdracht werkOpdracht : fullListWerkOpdrachten) {
+				ids.add(modelRepository.getResourceIdentifier(werkOpdracht));
 
 				// Set opdrachten flagged inRonde true
 				werkOpdracht.setInRonde("1");
 				ronde.setUitvoerder(werkOpdracht.getUitvoerder());
-				modelRepository.saveObject(ronde);
 				modelRepository.saveObject(werkOpdracht);
 			}
+
+			ronde.setOpdrachten(ids);
+			modelRepository.saveObject(ronde);
+
+			// selectedOpdrachten = null;
+			fullListWerkOpdrachten = null;
+			fullTableSelection = null;
 			selectedOpdrachten = null;
 			messages.info("Uitvoeringsronde succesvol aangemaakt.");
 
@@ -695,10 +724,8 @@ public class WerkOpdrachtOverzichtFormBase extends
 			LOG.error("Can not save Uitvoeringsronde.", e);
 
 		} catch (IOException e) {
-			messages.error("Fout bij het aanmaken van uitvoeringsronde: "
-					+ e.getMessage());
+			messages.error("Fout bij het aanmaken van uitvoeringsronde: Geen werkopdrachten geselecteerd.");
 			LOG.error("Can not save Uitvoeringsronde.", e);
-
 		}
 	}
 
@@ -2355,6 +2382,71 @@ public class WerkOpdrachtOverzichtFormBase extends
 			LOG.error("Can not create new CSV file.");
 		}
 		return new FileResource(file);
+	}
+
+	@Override
+	public Object getRowKey(WerkOpdracht object) {
+		return object.getId().toString();
+	}
+
+	@Override
+	public WerkOpdracht getRowData(String rowKey) {
+		try {
+			return (WerkOpdracht) modelRepository.loadObject(new ResourceKey(
+					"WerkOpdracht", rowKey));
+		} catch (IOException e) {
+			LOG.error("Can not get RowData for WerkOpdracht with rowKey: "
+					+ rowKey);
+		}
+		return null;
+	}
+
+	private void rememberTableSelection(Integer page,
+			WerkOpdracht[] selectedOpdrachten) {
+
+		// Nothing is selected, make a new Map
+		if (fullTableSelection == null) {
+			fullTableSelection = new HashMap<WerkOpdracht, Integer>();
+
+			for (WerkOpdracht werkOpdracht : Arrays.asList(selectedOpdrachten)) {
+				fullTableSelection.put(werkOpdracht, page);
+			}
+		}
+
+		// Items have already been selected
+		else {
+			fullTableSelection.values().removeAll(Collections.singleton(page));
+
+			// If key exists, remove and replace with new selection
+			for (WerkOpdracht opdracht : Arrays.asList(selectedOpdrachten)) {
+				fullTableSelection.put(opdracht, page);
+			}
+		}
+
+		fullListWerkOpdrachten = new ArrayList<WerkOpdracht>(
+				fullTableSelection.keySet());
+
+		if (fullListWerkOpdrachten.isEmpty()) {
+			this.selectedOpdrachten = null;
+		}
+	}
+
+	@Override
+	@SuppressWarnings("unchecked")
+	public void search() {
+
+		dataModel = null;
+		fullListWerkOpdrachten = null;
+		fullTableSelection = null;
+		selectedOpdrachten = null;
+
+		try {
+			results = (List<WerkOpdracht>) modelRepository.searchObjects(
+					transformQuery(getQuery()), true, isIndex(), true);
+		} catch (IOException e) {
+			LOG.error("Can not get search results.", e);
+			results = null;
+		}
 	}
 
 	/*

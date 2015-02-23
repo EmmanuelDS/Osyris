@@ -1,6 +1,7 @@
 package be.gim.tov.osyris.model.listener;
 
 import java.io.IOException;
+import java.util.Date;
 import java.util.List;
 
 import org.apache.commons.collections.Transformer;
@@ -19,6 +20,7 @@ import be.gim.commons.resource.ResourceKey;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.traject.NetwerkLus;
 import be.gim.tov.osyris.model.traject.Regio;
+import be.gim.tov.osyris.model.utils.GeometryValidator;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -51,7 +53,24 @@ public class NetwerkLusSaveListener {
 
 		lus.setGeom(GeometryUtils.union(geoms));
 
-		// Automatisch setten Regio
+		// In sommige gevallen is de aangepaste geometrie van de netwerkLus niet
+		// valid in SQL Server
+		// Bewaren van de aangepaste geometrie in een tussentabel
+		// GeometryValidator waarop een trigger een valid geometrie zal invullen
+		// Deze valid geometrie uitlezen en als geometrie van de lus zetten
+		GeometryValidator validator = new GeometryValidator();
+		validator.setTrajectId((Long) lus.getId());
+		validator.setNaam(lus.getNaam());
+		validator.setGeom(lus.getGeom());
+		validator.setTijdstip(new Date());
+		modelRepository.saveObject(validator);
+		modelRepository.evictObject(validator);
+		validator = (GeometryValidator) modelRepository.loadObject(
+				validator.getModelClass(), validator.getId());
+		Geometry validatedGeom = validator.getValidGeom();
+		lus.setGeom(validatedGeom);
+
+		// Automatisch setten Regio, geometrie moet valid zijn
 		Regio regio = Beans.getReference(OsyrisModelFunctions.class)
 				.getRegioForTraject(lus);
 		if (regio != null) {
