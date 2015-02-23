@@ -13,6 +13,7 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.SortOrder;
 
 import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
@@ -22,10 +23,12 @@ import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
 import org.conscientia.api.preferences.Preferences;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 
@@ -303,6 +306,12 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			LOG.error("Can not load user.", e);
 		}
 
+		DefaultQueryOrderBy orderBy = new DefaultQueryOrderBy(
+				FilterUtils.property("id"));
+		orderBy.setSortOrder(SortOrder.DESCENDING);
+
+		query.setOrderBy(Collections.singletonList((QueryOrderBy) orderBy));
+
 		return query;
 	}
 
@@ -465,13 +474,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 */
 	public void removeFromUitvoeringsronde() {
 
-		// Verwijder werkopdracht uit ronde
-		object.getOpdrachten().remove(
-				modelRepository.getResourceIdentifier(selectedWerkOpdracht));
-		// Set flag inRonde false
-		selectedWerkOpdracht.setInRonde("0");
-
 		try {
+			// Verwijder WO uit ronde
+			object.getOpdrachten()
+					.remove(modelRepository
+							.getResourceIdentifier(selectedWerkOpdracht));
+			// Set flag inRonde false
+			selectedWerkOpdracht.setInRonde("0");
+
 			// Save opdracht en ronde
 			modelRepository.saveObject(object);
 			modelRepository.saveObject(selectedWerkOpdracht);
