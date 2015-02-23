@@ -32,6 +32,7 @@ import org.conscientia.core.model.AbstractModelObject;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
+import be.gim.tov.osyris.model.annotation.NotEditableForModelClass;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 
@@ -53,6 +54,7 @@ public abstract class Traject extends AbstractModelObject implements
 
 	// VARIABLES
 	@Required
+	@NotEditableForModelClass("NetwerkLus")
 	@Edit(type = "suggestions")
 	// @LabelProperty
 	@Search(type = "suggestions:like-wildcard-nocase")

@@ -1,0 +1,36 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="org.conscientia.ui.ModelObject" />
+	<cc:implementation>
+		<div>
+			<c:forEach items="#{modelRepository.getModelClass('NetwerkLus').properties}"
+				var="property">
+				<c:choose>
+					<c:when test="#{propertyNotEditableForModelClassBean.isEditable(cc.attrs.value, property) }">
+						<d:propertyField id="field1_#{property.name}"
+							path="#{property.getPath(cc.attrs.path)}"
+							modelProperty="#{property}" 
+							modelClass="#{cc.attrs.modelClass}"
+							modelObject="#{cc.attrs.value}"
+							mode="#{cc.attrs.mode}"
+							level="#{cc.attrs.level}"
+							simple="#{cc.attrs.simple}"/>
+					</c:when>
+					<c:when test="#{property.isVisible('VIEW', cc.attrs.level, cc.attrs.simple)}">
+						<d:propertyField id="field2_#{property.name}"
+							path="#{property.getPath(cc.attrs.path)}"
+							modelProperty="#{property}" 
+							modelClass="#{cc.attrs.modelClass}"
+							modelObject="#{cc.attrs.value}"
+							mode="VIEW"
+							level="#{cc.attrs.level}"
+							simple="#{cc.attrs.simple}" />
+					</c:when>
+				</c:choose>
+			</c:forEach>
+		</div>
+	</cc:implementation>
+</div>

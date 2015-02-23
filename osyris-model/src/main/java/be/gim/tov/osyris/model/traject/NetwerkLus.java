@@ -2,6 +2,7 @@ package be.gim.tov.osyris.model.traject;
 
 import java.util.List;
 
+import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelClassName;
 import org.conscientia.api.model.annotation.ModelStore;
@@ -17,6 +18,7 @@ import be.gim.commons.resource.ResourceIdentifier;
  */
 @Model
 @ModelStore("OsyrisDataStore")
+@Edit(type = "netwerkLus")
 public abstract class NetwerkLus extends Traject {
 
 	// VARIABLES
