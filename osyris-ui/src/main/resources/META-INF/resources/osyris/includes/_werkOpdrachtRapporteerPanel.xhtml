@@ -18,7 +18,9 @@
 	<table width="100%">
 	<tr valign="top">
 	<td width="50%">
-	<r:panel id="probleemPanel">
+	<p:tabView>
+	<p:tab title="Info">
+	<a:outputPanel id="probleemPanel">
 	<d:fields>
 		<d:field for="probleem" label="Probleem">
 			<d:propertyValue id="probleem"
@@ -52,12 +54,6 @@
 	</a:outputPanel>
 	<br/>
 	
-<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
-		<u:decorate
-			template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
-			<u:param name="form" value="#{form}" />
-		</u:decorate>
-	<br/>
 	<a:outputPanel id="commentaarPanel">
 	<d:fields>
 		<d:field for="commentaar" label="Commentaar uitvoerder">
@@ -68,7 +64,49 @@
 		</d:field>
 	</d:fields>
     </a:outputPanel>
-	</r:panel>
+	</a:outputPanel>
+	</p:tab>
+	<p:tab title="Materialen">
+		<d:field for="hasMateriaal" label="Gebruikt materiaal"
+					required="true">
+			<h:selectOneRadio id="hasMateriaal" value="#{form.hasMateriaal}"
+				layout="grid">
+				<f:selectItem itemValue="false" itemLabel="Geen materiaal gebruikt" />
+				<f:selectItem itemValue="true" itemLabel="Gebruikte materialen toevoegen" />
+				<a:ajax listener="#{form.checkHasMateriaal()}"
+					render="materiaalTablePanel" execute="@this" />
+			</h:selectOneRadio>
+			</d:field>
+						
+		<j:renderPanel id="materiaalTablePanel"
+				rendered="#{form.hasMateriaal}">						
+	<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
+			<u:decorate
+				template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
+				<u:param name="form" value="#{form}" />
+			</u:decorate>
+		</j:renderPanel>
+	<br/>
+	</p:tab>
+	<p:tab title="Foto 1">
+		<d:propertyField id="foto" 
+				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
+				value="#{form.selectedWerkOpdracht.foto}"
+					mode="EDIT" />	
+	</p:tab>
+	<p:tab title="Foto 2">
+		<d:propertyField id="foto2" 
+				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
+				value="#{form.selectedWerkOpdracht.foto2}"
+					mode="EDIT" />	
+	</p:tab>
+	<p:tab title="Foto 3">
+		<d:propertyField id="foto3" 
+				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
+				value="#{form.selectedWerkOpdracht.foto3}"
+					mode="EDIT" />	
+	</p:tab>
+	</p:tabView>
 	
 <!-- 	<br/> -->
 <!-- 	<r:panel id="fotoPanel"> -->
@@ -104,6 +142,7 @@
 	</tr>
 	</table>
 	<br/>
+<!--
 	<r:panel id="fotoPanel">
 	<d:fields>				
 		<d:propertyField id="foto" 
@@ -120,15 +159,17 @@
 					mode="EDIT" />				
 	</d:fields>
 	</r:panel>
+-->
 	<d:buttons>	
 		<j:commandButton value="#{messages['form.general.save.button']}"
 			image="#{resource['core/images/actions/12x12/save.png']}"
 			type="button"
 			action="#{form.rapporteerWerkOpdrachtInRonde()}"
 			render="#{render}, #{r:clientId('werkOpdrachtSamenvattingPanel')}"
-			oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"
+			actionListener="#{form.resetHasMateriaal()}"
 			image="#{resource['core/images/actions/12x12/cancel.png']}"
 			oncomplete="conscientia.widget(#{r:element('rapporteerWerkOpdrachtPopup')}).hide(); conscientia.widget(#{r:element('rapporteerPopup')}).show();" />
 	</d:buttons>

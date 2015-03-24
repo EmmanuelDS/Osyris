@@ -52,6 +52,7 @@ import org.conscientia.core.model.DefaultModelObjectList;
 import org.conscientia.core.resource.FileResource;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
+import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 import org.conscientia.jsf.event.ControllerEvent;
 import org.geotools.feature.FeatureCollection;
@@ -167,6 +168,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected List<Geometry> anderProbleemLineGeoms;
 	protected Map<WerkOpdracht, Integer> fullTableSelection;
 	protected List<WerkOpdracht> fullListWerkOpdrachten;
+	protected String bordId;
 
 	// GETTERS AND SETTERS
 	public WerkOpdracht getWerkOpdracht() {
@@ -362,6 +364,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 		this.fullTableSelection = fullTableSelection;
 	}
 
+	public String getBordId() {
+		return bordId;
+	}
+
+	public void setBordId(String bordId) {
+		this.bordId = bordId;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -424,6 +434,12 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		if (gemeente != null) {
 			query.addFilter(FilterUtils.equal("gemeente", gemeente));
+		}
+
+		if (bordId != null) {
+			// Filter op probleem ids ahv van opgegeven BordId
+			query.addFilter(FilterUtils.in("probleem.id",
+					getBordProbleemIds(bordId)));
 		}
 
 		if (trajectType != null && trajectId != null) {
@@ -2447,6 +2463,25 @@ public class WerkOpdrachtOverzichtFormBase extends
 			LOG.error("Can not get search results.", e);
 			results = null;
 		}
+	}
+
+	private List<Long> getBordProbleemIds(String bordId) {
+
+		QueryBuilder builder = new QueryBuilder("BordProbleem");
+
+		ResourceKey bordKey = new ResourceKey("Bord", bordId);
+		try {
+			builder.addFilter(FilterUtils.equal("bord", bordKey));
+			builder.results(FilterUtils.properties("id"));
+			List<Long> ids = (List<Long>) modelRepository.searchObjects(
+					builder.build(), false, false, true);
+
+			return ids;
+
+		} catch (IOException e) {
+			LOG.error("Can not search BordProblemen for bord " + bordKey);
+		}
+		return Collections.emptyList();
 	}
 
 	/*

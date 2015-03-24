@@ -13,7 +13,7 @@
 			value="#{form.selectedWerkOpdracht.materialen}"
 			mode="RESULT"
 			var="gebruiktMateriaal"
-			emptyMessage="#{messages['ui.dataTable.empty']}">
+			emptyMessage="NOG GEEN MATERIALEN TOEGEVOEGD">
 			<j:bindAttribute var="gebruiktMateriaal"
 						name="rowData" />
 			<f:facet name="header">
@@ -23,28 +23,34 @@
 				<f:facet name="header">
 				<h:outputText value="Categorie" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="categorieColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('categorie')}"
 					value="#{gebruiktMateriaal.stockMateriaal.categorie}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
 				<h:outputText value="Subcategorie" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="subCategorieColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
 					value="#{gebruiktMateriaal.stockMateriaal.subCategorie}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
 				<h:outputText value="Type" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
 					value="#{gebruiktMateriaal.stockMateriaal.type}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
@@ -59,7 +65,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<h:outputText value="Nummer" />
+				<h:outputText value="Nr" />
 				</f:facet>
 				<d:propertyValue id="nummerColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
@@ -73,6 +79,15 @@
 				<d:propertyValue id="aantalColumn"
 					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"
 					value="#{gebruiktMateriaal.aantal}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Actie" />
+				</f:facet>
+				<d:propertyValue id="actieStockColumn"
+					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('actieStock')}"
+					value="#{gebruiktMateriaal.actieStock}"
 					mode="VIEW" />
 			</p:column>
 			<p:column>

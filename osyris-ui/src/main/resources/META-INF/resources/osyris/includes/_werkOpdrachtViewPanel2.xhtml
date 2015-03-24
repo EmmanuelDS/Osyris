@@ -14,11 +14,13 @@
 	<table width="100%">
 	<tr valign="top">
 	<td>
+	<p:tabView>
 	<u:decorate
 				template="/resources/osyris/includes/_werkOpdrachtGerapporteerdView.xhtml">
 				<u:param name="form" value="#{form}" />
 				<u:param name="render" value="#{render}" />
 			</u:decorate>
+	</p:tabView>
 	<br/>
 	
 	</td>
@@ -38,6 +40,7 @@
 	</tr>
 	</table>
 	<br/>
+<!-- 
 	<r:panel id="fotoPanel" rendered="#{form.object.foto != null or form.object.foto2 != null or form.object.foto3 != null}">
 	<d:fields>
 		<d:propertyField id="foto"
@@ -54,6 +57,7 @@
 				mode="VIEW" />
 	</d:fields>
 	</r:panel>	
+-->
 	<d:buttons>
 		<j:commandButton
 			rendered="#{form.object.status == 'GERAPPORTEERD' }"

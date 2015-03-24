@@ -53,6 +53,11 @@ public abstract class Traject extends AbstractModelObject implements
 	private static final Log LOG = LogFactory.getLog(Traject.class);
 
 	// VARIABLES
+	// @NotViewable
+	// @NotSearchable
+	@NotEditable
+	private String labelId;
+
 	@Required
 	@NotEditableForModelClass("NetwerkLus")
 	@Edit(type = "suggestions")
@@ -99,11 +104,6 @@ public abstract class Traject extends AbstractModelObject implements
 	@ValuesExpression("#{osyrisModelFunctions.getPeterMeterNaamCodes(true)}")
 	@Target("_blank")
 	private ResourceIdentifier peterMeter3;
-
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	private String labelId;
 
 	// GETTERS AND SETTERS
 	public String getNaam() {

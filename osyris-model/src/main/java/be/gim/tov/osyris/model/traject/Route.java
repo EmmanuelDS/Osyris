@@ -3,7 +3,6 @@ package be.gim.tov.osyris.model.traject;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Model;
 import org.conscientia.api.model.annotation.ModelStore;
-import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.Search;
 
 /**
@@ -23,11 +22,11 @@ public abstract class Route extends Traject {
 	private String routeType;
 
 	// GETTERS AND SETTERS
-	@Override
-	@NotEditable
-	public Long getId() {
-		return (Long) super.getId();
-	}
+	// @Override
+	// @NotEditable
+	// public Long getId() {
+	// return (Long) super.getId();
+	// }
 
 	public String getRouteType() {
 		return routeType;

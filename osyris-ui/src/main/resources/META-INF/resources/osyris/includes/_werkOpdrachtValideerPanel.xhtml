@@ -13,13 +13,10 @@
 	<table width="100%">
 	<tr valign="top">
 	<td>
-	<u:decorate
-				template="/resources/osyris/includes/_werkOpdrachtGerapporteerdView.xhtml">
-				<u:param name="form" value="#{form}" />
-				<u:param name="render" value="#{render}" />
-			</u:decorate>
-	<br/>
-	<r:panel id="validatiePanel">
+	
+	<p:tabView>
+	<p:tab title="Validatie">
+	<a:outputPanel id="validatiePanel">
 	<d:fields>
 		<d:field for="validatie" label="Validatie">
 		<h:selectOneMenu id="validatie"
@@ -41,9 +38,9 @@
 				</d:field>
 		</j:renderPanel>
 	</d:fields>
-	</r:panel>
+	</a:outputPanel>
 	<br/>
-	<r:panel id="CommentaarValidatiePanel">
+	<a:outputPanel id="CommentaarValidatiePanel">
 	<d:fields>
 		<d:field for="commentaarValidatieWO" label="Commentaar validatie">
 			<d:propertyValue id="commentaarValidatieWO"
@@ -52,7 +49,17 @@
 					mode="EDIT" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+	</a:outputPanel>
+	</p:tab>
+	
+	<u:decorate
+				template="/resources/osyris/includes/_werkOpdrachtGerapporteerdView.xhtml">
+				<u:param name="form" value="#{form}" />
+				<u:param name="render" value="#{render}" />
+			</u:decorate>
+	</p:tabView>
+	<br/>
+	
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>

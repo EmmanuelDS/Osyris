@@ -14,7 +14,9 @@
 	<table width="100%">
 	<tr valign="top">
 	<td>
-	<r:panel id="werkOpdrachtInfo">
+	<p:tabView>
+    <p:tab title="Info en probleem" rendered="#{form.selectedWerkOpdracht != null}">
+	<!--  <r:panel id="werkOpdrachtInfo"> -->
 	<d:fields>
 		<d:field for="status" label="Status">
 			<d:propertyValue id="status"
@@ -41,12 +43,12 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+	<!--  </r:panel> -->
 	<br/>
 	<!-- Probleem tabel --> 
 	<c:choose>
 	<c:when test="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
-	<r:panel id="bordProbleemPanel">
+	<a:outputPanel id="bordProbleemPanel">
 		<p:dataTable id="bordProbleem"
 			value="#{form.selectedWerkOpdracht.probleem}"
 			mode="RESULT"
@@ -108,10 +110,10 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-	</r:panel>
+	</a:outputPanel>
 	</c:when>
 	<c:otherwise>
-	<r:panel id="AnderProbleemPanel" >
+	<a:outputPanel id="AnderProbleemPanel" >
 	<p:dataTable id="AnderProbleem"
 			value="#{form.selectedWerkOpdracht.probleem}"
 			mode="RESULT"
@@ -160,11 +162,13 @@
 					value="#{anderProbleem.status}" mode="VIEW" />
 			</p:column>
    		</p:dataTable>
-   	</r:panel>
+   	</a:outputPanel>
    	</c:otherwise>
 	</c:choose>
+	</p:tab>
    	<br/>
-	<r:panel id="handelingenPanel">
+   	<p:tab title="Handelingen">
+	<a:outputPanel id="handelingenPanel">
 	<d:fields>
 		<d:field for="handelingen" label="Handelingen">
 			<d:propertyValue id="handelingen"
@@ -180,7 +184,7 @@
 			value="#{form.selectedWerkOpdracht.materialen}"
 			mode="RESULT"
 			var="gebruiktMateriaal"
-			emptyMessage="#{messages['ui.dataTable.empty']}">
+			emptyMessage="GEEN MATERIAAL GEBRUIKT">
 			<j:bindAttribute var="gebruiktMateriaal"
 						name="rowData" />
 			<f:facet name="header">
@@ -208,10 +212,12 @@
 				<f:facet name="header">
 				<h:outputText value="Type" />
 				</f:facet>
+				<div style="white-space:pre-line;">
 				<d:propertyValue id="typeColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
 					value="#{gebruiktMateriaal.stockMateriaal.type}"
 					mode="VIEW" />
+				</div>
 			</p:column>
 			<p:column>
 				<f:facet name="header">
@@ -226,7 +232,7 @@
 			</p:column>
 			<p:column>
 				<f:facet name="header">
-				<h:outputText value="Nummer" />
+				<h:outputText value="Nr" />
 				</f:facet>
 				<d:propertyValue id="nummerColumn"
 					modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
@@ -240,6 +246,15 @@
 				<d:propertyValue id="aantalColumn"
 					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"
 					value="#{gebruiktMateriaal.aantal}"
+					mode="VIEW" />
+			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Actie" />
+				</f:facet>
+				<d:propertyValue id="actieStockColumn"
+					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('actieStock')}"
+					value="#{gebruiktMateriaal.actieStock}"
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
@@ -265,8 +280,34 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-	</r:panel>
+	</a:outputPanel>
 	<br/>
+	</p:tab>
+		<p:tab title="Foto 1" rendered="#{form.selectedWerkOpdracht.foto != null}">
+	<d:fields>
+		<d:propertyValue id="foto"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
+				value="#{form.selectedWerkOpdracht.foto}"
+				mode="VIEW" />
+	</d:fields>
+	</p:tab>
+	<p:tab title="Foto 2" rendered="#{form.selectedWerkOpdracht.foto2 != null}">
+	<d:fields>
+		<d:propertyValue id="foto2"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
+				value="#{form.selectedWerkOpdracht.foto2}"
+				mode="VIEW" />
+	</d:fields>
+	</p:tab>
+	<p:tab title="Foto 3" rendered="#{form.selectedWerkOpdracht.foto3 != null}">
+	<d:fields>
+		<d:propertyValue id="foto3"
+		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
+				value="#{form.selectedWerkOpdracht.foto3}"
+				mode="VIEW" />
+	</d:fields>
+	</p:tab>
+	</p:tabView>
 <!-- 	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}"> -->
 <!-- 	<d:fields> -->
 	
@@ -304,6 +345,20 @@
 	</tr>
 	</table>
 	<br/>
+	<c:if test="#{form.object.status == 'AANGEMAAKT'}">
+	<d:buttons>
+		<d:fileDownload 
+			
+			fileName="OSYRIS_ronde_#{form.object.getId().toString()}_werkopdracht_#{form.selectedWerkOpdracht.getId().toString()}.pdf"
+			type="button"
+			image="#{resource['core/images/actions/12x12/print.png']}"
+			contentType="application/pdf"
+			content="#{form.printWerkOpdracht()}"
+			value="Printen werkopdracht"
+			eventsQueue="pdfQueue" />
+	</d:buttons>
+	</c:if>
+<!--  
 	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}">
 	<d:fields>
 	
@@ -323,4 +378,5 @@
 					mode="VIEW" />
 	</d:fields>
 	</r:panel>
+-->
 </u:composition>

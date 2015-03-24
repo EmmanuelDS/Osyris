@@ -43,7 +43,7 @@
 					value="#{stockMateriaalOverzichtFormBase.object.naam}"
 					mode="VIEW" />
 		</d:field>
-		<d:field for="nummer" label="Nummer">
+		<d:field for="nummer" label="Nr">
 			<d:propertyValue id="nummer"
 			 		modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
 					value="#{stockMateriaalOverzichtFormBase.object.nummer}"
@@ -57,6 +57,15 @@
 		</d:field>
 	</d:fields>
 	<d:fields>
+		<d:field for="actieStock" label="Actie stock"
+			required="true">
+			<h:selectOneMenu id="actieStock" value="#{stockMateriaalOverzichtFormBase.actieStock}"
+				required="true"
+				requiredMessage="De waarde voor actie stock is verplicht.">
+				<f:selectItem itemLabel="Uit" itemValue="UIT" />
+				<f:selectItem itemLabel="In" itemValue="IN" />
+			</h:selectOneMenu>
+		</d:field>
 		<d:field for="aantalGebruikt" label="Aantal gebruikt">
 			<d:propertyValue id="aantalGebruikt"
 			 		modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('aantal')}"

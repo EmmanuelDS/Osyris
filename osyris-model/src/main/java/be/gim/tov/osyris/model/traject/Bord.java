@@ -44,6 +44,11 @@ public abstract class Bord extends AbstractModelObject implements
 		StorableObject {
 
 	// VARIABLES
+	// @NotViewable
+	// @NotSearchable
+	@NotEditable
+	private String labelId;
+
 	@ModelClassName("Regio")
 	@Edit(type = "menu")
 	@Search(type = "menu:equals")
@@ -117,17 +122,12 @@ public abstract class Bord extends AbstractModelObject implements
 	@Index
 	private Geometry geom;
 
-	@NotViewable
-	@NotSearchable
-	@NotEditable
-	private String labelId;
-
 	// GETTERS AND SETTERS
-	@Override
-	@NotEditable
-	public Long getId() {
-		return (Long) super.getId();
-	}
+	// @Override
+	// @NotEditable
+	// public Long getId() {
+	// return (Long) super.getId();
+	// }
 
 	public ResourceIdentifier getRegio() {
 		return regio;

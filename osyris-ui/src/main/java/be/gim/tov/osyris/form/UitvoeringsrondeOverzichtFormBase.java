@@ -1,12 +1,16 @@
 package be.gim.tov.osyris.form;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Random;
 import java.util.Set;
 
 import javax.annotation.PostConstruct;
@@ -14,10 +18,20 @@ import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
 import javax.swing.SortOrder;
+import javax.xml.transform.Result;
+import javax.xml.transform.Source;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.sax.SAXResult;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.collections.Transformer;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.apache.fop.apps.Fop;
+import org.apache.fop.apps.FopFactory;
+import org.apache.fop.apps.MimeConstants;
 import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.mail.MailSender;
 import org.conscientia.api.model.ModelClass;
@@ -27,10 +41,12 @@ import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.core.form.AbstractListForm;
+import org.conscientia.core.resource.FileResource;
 import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.w3c.dom.Document;
 
 import be.gim.commons.bean.Beans;
 import be.gim.commons.filter.FilterUtils;
@@ -38,6 +54,7 @@ import be.gim.commons.geometry.GeometryUtils;
 import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.commons.resource.ResourceKey;
+import be.gim.peritia.io.content.Content;
 import be.gim.specto.api.configuration.MapConfiguration;
 import be.gim.specto.api.context.FeatureMapLayer;
 import be.gim.specto.api.context.MapContext;
@@ -59,8 +76,10 @@ import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.status.ActieStockStatus;
 import be.gim.tov.osyris.model.werk.status.UitvoeringsrondeStatus;
 import be.gim.tov.osyris.model.werk.status.WerkopdrachtStatus;
+import be.gim.tov.osyris.pdf.XmlBuilder;
 
 import com.vividsolutions.jts.geom.Envelope;
 import com.vividsolutions.jts.geom.Geometry;
@@ -83,6 +102,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	private static final String GEOMETRY_LAYER_NAME = "geometry";
 	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
+
+	public static final String WO_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtPdf.xsl";
 
 	// VARIABLES
 	@Inject
@@ -116,6 +137,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	protected List<String> rondeIds;
 	protected List<Long> werkOpdrachtIds;
 	protected List<ResourceIdentifier> filteredWerkOpdrachten;
+	protected String hasMateriaal;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -265,6 +287,31 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	public void setFilteredWerkOpdrachten(
 			List<ResourceIdentifier> filteredWerkOpdrachten) {
 		this.filteredWerkOpdrachten = filteredWerkOpdrachten;
+	}
+
+	public String getHasMateriaal() {
+
+		if (selectedWerkOpdracht != null
+				&& selectedWerkOpdracht.getMaterialen() != null
+				&& selectedWerkOpdracht.getMaterialen().size() > 0) {
+			return "true";
+		} else {
+
+			if (hasMateriaal == null) {
+				if (selectedWerkOpdracht != null
+						&& selectedWerkOpdracht.getMaterialen() != null
+						&& selectedWerkOpdracht.getMaterialen().size() > 0) {
+					return "true";
+				} else {
+					return "false";
+				}
+			}
+			return hasMateriaal;
+		}
+	}
+
+	public void setHasMateriaal(String hasMateriaal) {
+		this.hasMateriaal = hasMateriaal;
 	}
 
 	// METHODS
@@ -500,12 +547,27 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 */
 	public void rapporteerWerkOpdrachtInRonde() {
 
-		try {
+		hasErrors = true;
 
-			selectedWerkOpdracht.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
-			selectedWerkOpdracht.setDatumGerapporteerd(new Date());
-			modelRepository.saveObject(selectedWerkOpdracht);
-			messages.info("Werkopdracht in uitvoeringsronde succesvol gerapporteerd.");
+		try {
+			if (checkGerapporteerdeWerkOpdracht()) {
+
+				hasErrors = false;
+
+				// Expliciet leegmaken van de gebruikte materialen indien
+				// aangevinkt
+				if (hasMateriaal.equals("false")) {
+					selectedWerkOpdracht.setMaterialen(null);
+				}
+
+				selectedWerkOpdracht
+						.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
+				selectedWerkOpdracht.setDatumGerapporteerd(new Date());
+				modelRepository.saveObject(selectedWerkOpdracht);
+				messages.info("Werkopdracht in uitvoeringsronde succesvol gerapporteerd.");
+
+				hasMateriaal = "false";
+			}
 
 		} catch (IOException e) {
 			messages.error("Fout bij het rapporteren van de werkopdracht in uitvoeringsronde: "
@@ -562,35 +624,57 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				for (ResourceIdentifier id : object.getOpdrachten()) {
 					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 							.loadObject(id);
-					if (!opdracht.getMaterialen().isEmpty()
-							|| opdracht.getMaterialen() != null) {
+					if (opdracht.getMaterialen() != null
+							&& !opdracht.getMaterialen().isEmpty()) {
 
 						for (GebruiktMateriaal materiaal : opdracht
 								.getMaterialen()) {
-							int inStockUpdated = materiaal.getStockMateriaal()
-									.getInStock() - materiaal.getAantal();
-							materiaal.getStockMateriaal().setInStock(
-									inStockUpdated);
-							// Save
-							modelRepository.saveObject(materiaal
-									.getStockMateriaal());
 
-							// Checken of materiaal aan limiet zit en mail
-							// sturen
-							if (materiaal.getStockMateriaal().getInStock() <= materiaal
-									.getStockMateriaal().getMin()) {
+							// Toevoegen aan stock als actie IN is
+							if (materiaal.getActieStock().equals(
+									ActieStockStatus.IN)) {
 
-								// Stuur email naar Routedokters
-								String mailServiceStatus = DefaultConfiguration
-										.instance().getString(
-												"service.mail.stockMateriaal");
+								int inStockUpdated = materiaal
+										.getStockMateriaal().getInStock()
+										+ materiaal.getAantal();
+								materiaal.getStockMateriaal().setInStock(
+										inStockUpdated);
+								// Save
+								modelRepository.saveObject(materiaal
+										.getStockMateriaal());
+							}
 
-								if (mailServiceStatus.equalsIgnoreCase("on")) {
-									Beans.getReference(
-											OsyrisModelFunctions.class)
-											.sendMailStockMateriaalLimiet(
-													materiaal
-															.getStockMateriaal());
+							else if (materiaal.getActieStock().equals(
+									ActieStockStatus.UIT)) {
+								// Verwijderen uit stock als actie UIT is
+								int inStockUpdated = materiaal
+										.getStockMateriaal().getInStock()
+										- materiaal.getAantal();
+								materiaal.getStockMateriaal().setInStock(
+										inStockUpdated);
+								// Save
+								modelRepository.saveObject(materiaal
+										.getStockMateriaal());
+
+								// Checken of materiaal aan limiet zit en mail
+								// sturen
+								if (materiaal.getStockMateriaal().getInStock() <= materiaal
+										.getStockMateriaal().getMin()) {
+
+									// Stuur email naar Routedokters
+									String mailServiceStatus = DefaultConfiguration
+											.instance()
+											.getString(
+													"service.mail.stockMateriaal");
+
+									if (mailServiceStatus
+											.equalsIgnoreCase("on")) {
+										Beans.getReference(
+												OsyrisModelFunctions.class)
+												.sendMailStockMateriaalLimiet(
+														materiaal
+																.getStockMateriaal());
+									}
 								}
 							}
 						}
@@ -1177,5 +1261,127 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 */
 	public void switchBaseLayers() {
 		getViewer().setBaseLayerId(baseLayerName);
+	}
+
+	/**
+	 * Printen van een PDF bestand met overzicht van de WerkOpdracht.
+	 * 
+	 * @return
+	 * @throws Exception
+	 */
+	public Content printWerkOpdracht() throws Exception {
+
+		FileOutputStream out = null;
+		File file = null;
+		InputStream in = null;
+
+		try {
+
+			// Opbouwen XML
+			Traject traject = (Traject) modelRepository
+					.loadObject(selectedWerkOpdracht.getTraject());
+
+			Document doc = null;
+			XmlBuilder xmlBuilder = new XmlBuilder();
+
+			if (selectedWerkOpdracht.getProbleem() instanceof BordProbleem) {
+
+				BordProbleem bordProbleem = (BordProbleem) selectedWerkOpdracht
+						.getProbleem();
+				Bord bord = (Bord) modelRepository.loadObject(bordProbleem
+						.getBord());
+
+				doc = xmlBuilder.buildWerkOpdrachtFicheBordProbleem(
+						getViewer(), traject, selectedWerkOpdracht, bord);
+			}
+
+			else if (selectedWerkOpdracht.getProbleem() instanceof AnderProbleem) {
+
+				doc = xmlBuilder.buildWerkOpdrachtFicheAnderProbleem(
+						getViewer(), traject, selectedWerkOpdracht);
+			}
+
+			Random randomGenerator = new Random();
+			Integer randomInt = randomGenerator.nextInt(1000000000);
+			String fileName = "traject" + traject.getId().toString() + "_"
+					+ randomInt.toString() + ".pdf";
+
+			String location = DefaultConfiguration.instance().getString(
+					"osyris.location.temp.pdf.wo.fiche");
+
+			file = new File(location + fileName);
+			out = new FileOutputStream(file);
+
+			// ByteArrayOutputStream out = new ByteArrayOutputStream();
+			Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+					FopFactory.newInstance().newFOUserAgent(), out);
+
+			// xslt
+			Source xslt = new StreamSource(getClass().getResourceAsStream(
+					WO_PDF));
+			in = getClass().getResourceAsStream(WO_PDF);
+
+			// Transform source
+			javax.xml.transform.Transformer transformer = TransformerFactory
+					.newInstance().newTransformer(xslt);
+			Result res = new SAXResult(fop.getDefaultHandler());
+
+			transformer.transform(new DOMSource(doc), res);
+
+			String contentStr = IOUtils.toString(in, "UTF-8");
+
+			// File aanmaken indien niet bestaand
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			out.write(contentStr.getBytes());
+			contentStr = null;
+
+			return new FileResource(file);
+			// return new ByteArrayContent("application/pdf",
+			// out.toByteArray());
+
+		} finally {
+			in.close();
+			out.close();
+		}
+	}
+
+	/**
+	 * Checken of men specifiek heeft aangeduid of er materialen zijn gebruikt
+	 * voor de Werkopdracht of niet.
+	 * 
+	 * @return
+	 */
+	public boolean checkGerapporteerdeWerkOpdracht() {
+		if (hasMateriaal != null && !hasMateriaal.isEmpty()) {
+
+			if (hasMateriaal.equals("true") && selectedWerkOpdracht != null
+					&& selectedWerkOpdracht.getMaterialen() != null
+					&& selectedWerkOpdracht.getMaterialen().size() == 0) {
+				messages.warn("Er zijn geen gebruikte materialen toegevoegd aan deze werkopdracht. Voeg 1 of meerdere materialen toe of vink expliciet 'Geen materiaal gebruikt' aan.");
+				return false;
+			}
+
+			return true;
+
+		} else {
+			messages.warn("Gelieve eerst expliciet te specifiëren of er al dan niet materiaal gebruikt is bij deze werkopdracht.");
+			return false;
+		}
+	}
+
+	public void checkHasMateriaal() {
+		if (hasMateriaal.equals("false")) {
+			if (selectedWerkOpdracht.getMaterialen() != null
+					&& selectedWerkOpdracht.getMaterialen().size() > 0) {
+
+				selectedWerkOpdracht.setMaterialen(null);
+			}
+		}
+	}
+
+	public void resetHasMateriaal() {
+		hasMateriaal = null;
 	}
 }

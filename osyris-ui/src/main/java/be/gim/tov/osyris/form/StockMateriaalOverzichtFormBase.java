@@ -2,6 +2,7 @@ package be.gim.tov.osyris.form;
 
 import java.io.IOException;
 import java.io.Serializable;
+import java.util.ArrayList;
 
 import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
@@ -21,6 +22,7 @@ import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.werk.GebruiktMateriaal;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
+import be.gim.tov.osyris.model.werk.status.ActieStockStatus;
 
 /**
  * 
@@ -44,6 +46,7 @@ public class StockMateriaalOverzichtFormBase extends
 	protected Integer hoeveelheid;
 	protected String keuzeAanpassing;
 	protected GebruiktMateriaal gebruiktMateriaal;
+	protected ActieStockStatus actieStock;
 
 	// GETTERS AND SETTERS
 	public int getAantalGebruikt() {
@@ -76,6 +79,14 @@ public class StockMateriaalOverzichtFormBase extends
 
 	public void setGebruiktMateriaal(GebruiktMateriaal gebruiktMateriaal) {
 		this.gebruiktMateriaal = gebruiktMateriaal;
+	}
+
+	public ActieStockStatus getActieStock() {
+		return actieStock;
+	}
+
+	public void setActieStock(ActieStockStatus actieStock) {
+		this.actieStock = actieStock;
 	}
 
 	// METHODS
@@ -127,15 +138,22 @@ public class StockMateriaalOverzichtFormBase extends
 					.createObject("GebruiktMateriaal", null);
 			gebruiktMateriaal.setStockMateriaal(object);
 			gebruiktMateriaal.setAantal(aantalGebruikt);
+			gebruiktMateriaal.setActieStock(actieStock);
 
 			// GebruiktMateriaal toevoegen en saven indien niet 0
 			if (aantalGebruikt != 0) {
+
+				if (opdracht.getMaterialen() == null) {
+					opdracht.setMaterialen(new ArrayList<GebruiktMateriaal>());
+				}
 				opdracht.getMaterialen().add(gebruiktMateriaal);
 			}
 
 			// reset aantal gebruikt
 			setAantalGebruikt(0);
+			setActieStock(null);
 			search();
+			// }
 		} catch (InstantiationException e) {
 			messages.error("Fout bij het toevoegen van stockmateriaal: "
 					+ e.getMessage());

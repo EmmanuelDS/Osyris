@@ -53,12 +53,12 @@ public abstract class NetwerkSegment extends Traject {
 	private ResourceIdentifier naarKnooppunt;
 
 	// GETTERS AND SETTERS
-	@Override
+	// @Override
 	// @LabelProperty
-	@NotEditable
-	public Long getId() {
-		return (Long) super.getId();
-	}
+	// @NotEditable
+	// public Long getId() {
+	// return (Long) super.getId();
+	// }
 
 	public String getEnkeleRichting() {
 		return enkeleRichting;
