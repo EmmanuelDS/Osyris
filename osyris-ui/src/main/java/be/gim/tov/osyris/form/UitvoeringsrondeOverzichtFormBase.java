@@ -1366,7 +1366,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			return true;
 
 		} else {
-			messages.warn("Gelieve eerst expliciet te specifiëren of er al dan niet materiaal gebruikt is bij deze werkopdracht.");
+			messages.warn("Gelieve eerst expliciet te op te geven of er al dan niet materiaal gebruikt is bij deze werkopdracht.");
 			return false;
 		}
 	}
