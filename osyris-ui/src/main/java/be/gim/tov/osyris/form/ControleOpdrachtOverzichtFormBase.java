@@ -592,7 +592,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 			resetLayers(context);
 
 			// Setup layers
-			setupLayers(configuration, context);
+			setupLayers(configuration, context, true);
 
 			return configuration;
 		}
@@ -1301,7 +1301,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 					layer.setSelection(new ArrayList<String>(1));
 				}
 
-				setupLayers(configuration, context);
+				setupLayers(configuration, context, false);
 				context.setShowFeatureInfoControl(false);
 				context.setShowDrawPointControl(false);
 				context.setShowDrawLineStringControl(false);
@@ -2099,12 +2099,9 @@ public class ControleOpdrachtOverzichtFormBase extends
 	 * @throws IOException
 	 * 
 	 */
-	private void setupLayers(MapConfiguration configuration, MapContext context)
-			throws InstantiationException, IllegalAccessException, IOException {
-
-		// List<String> bordSelection = new ArrayList<String>();
-		// List<Geometry> anderProbleemPointGeoms = new ArrayList<Geometry>();
-		// List<Geometry> anderProbleemLineGeoms = new ArrayList<Geometry>();
+	private void setupLayers(MapConfiguration configuration,
+			MapContext context, boolean reset) throws InstantiationException,
+			IllegalAccessException, IOException {
 
 		bordSelection = new ArrayList<String>();
 		anderProbleemPointGeoms = new ArrayList<Geometry>();
@@ -2120,76 +2117,80 @@ public class ControleOpdrachtOverzichtFormBase extends
 						GEOMETRY_LAYER_LINE_NAME, null, LineString.class, null,
 						true, "single", null, null);
 
-		// Get traject
-		Traject traject = (Traject) modelRepository.loadObject(object
-				.getTraject());
+		// Reset the layers to default view if specified
+		if (reset) {
+			// Get traject
+			Traject traject = (Traject) modelRepository.loadObject(object
+					.getTraject());
 
-		// Laden laag op basis van trajectType
-		FeatureMapLayer trajectLayer = (FeatureMapLayer) context
-				.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
-						.getName()));
+			// Laden laag op basis van trajectType
+			FeatureMapLayer trajectLayer = (FeatureMapLayer) context
+					.getLayer(LabelUtils.lowerCamelCase(traject.getModelClass()
+							.getName()));
 
-		if (trajectLayer != null) {
-			trajectLayer.setHidden(false);
-			trajectLayer
-					.setFilter(FilterUtils.equal("naam", traject.getNaam()));
+			if (trajectLayer != null) {
+				trajectLayer.setHidden(false);
+				trajectLayer.setFilter(FilterUtils.equal("naam",
+						traject.getNaam()));
 
-			Envelope envelope = GeometryUtils.getEnvelope(traject.getGeom());
-			GeometryUtils.expandEnvelope(envelope, 0.1,
-					context.getMaxBoundingBox());
-			context.setBoundingBox(envelope);
-		}
-
-		// BordLayer
-		bordLayer = null;
-		// ROUTES
-		if (traject instanceof Route) {
-			bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
-					.lowerCamelCase(LabelUtils.lowerCamelCase(traject
-							.getModelClass().getName() + "Bord")));
-
-			// Filteren Routeborden op BordNaam
-			if (bordLayer != null) {
-				bordLayer
-						.setFilter(FilterUtils.equal("naam", traject.getNaam()));
-				bordLayer.set("selectable", true);
-				bordLayer.setHidden(false);
+				Envelope envelope = GeometryUtils
+						.getEnvelope(traject.getGeom());
+				GeometryUtils.expandEnvelope(envelope, 0.1,
+						context.getMaxBoundingBox());
+				context.setBoundingBox(envelope);
 			}
 
-		}
-		// LUSSEN
-		else if (traject instanceof NetwerkLus) {
-			bordLayer = (FeatureMapLayer) context
-					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
-							.lowerCamelCase(traject.getModelClass().getName()
-									.replace("Lus", "Bord"))));
+			// BordLayer
+			bordLayer = null;
+			// ROUTES
+			if (traject instanceof Route) {
+				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName() + "Bord")));
 
-			FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
-					.getLayer(LabelUtils.lowerCamelCase(LabelUtils
-							.lowerCamelCase(traject.getModelClass().getName()
-									.replace("Lus", "Knooppunt"))));
-
-			// Filteren NetwerkBorden op segmenten van de Lus
-			if (bordLayer != null) {
-
-				bordLayer.setFilter(FilterUtils.in("segmenten",
-						((NetwerkLus) traject).getSegmenten()));
-
-				List<String> bordIds = new ArrayList<String>();
-
-				for (Bord b : createBewegwijzering(object.getTraject())) {
-
-					bordIds.add(b.getId().toString());
+				// Filteren Routeborden op BordNaam
+				if (bordLayer != null) {
+					bordLayer.setFilter(FilterUtils.equal("naam",
+							traject.getNaam()));
+					bordLayer.set("selectable", true);
+					bordLayer.setHidden(false);
 				}
 
-				bordLayer.setFilter(FilterUtils.in("id", bordIds));
-
-				bordLayer.setHidden(false);
-				bordLayer.set("selectable", true);
 			}
+			// LUSSEN
+			else if (traject instanceof NetwerkLus) {
+				bordLayer = (FeatureMapLayer) context.getLayer(LabelUtils
+						.lowerCamelCase(LabelUtils.lowerCamelCase(traject
+								.getModelClass().getName()
+								.replace("Lus", "Bord"))));
 
-			if (knooppuntLayer != null) {
-				searchKnooppuntLayer(knooppuntLayer);
+				FeatureMapLayer knooppuntLayer = (FeatureMapLayer) context
+						.getLayer(LabelUtils.lowerCamelCase(LabelUtils
+								.lowerCamelCase(traject.getModelClass()
+										.getName().replace("Lus", "Knooppunt"))));
+
+				// Filteren NetwerkBorden op segmenten van de Lus
+				if (bordLayer != null) {
+
+					bordLayer.setFilter(FilterUtils.in("segmenten",
+							((NetwerkLus) traject).getSegmenten()));
+
+					List<String> bordIds = new ArrayList<String>();
+
+					for (Bord b : createBewegwijzering(object.getTraject())) {
+
+						bordIds.add(b.getId().toString());
+					}
+
+					bordLayer.setFilter(FilterUtils.in("id", bordIds));
+
+					bordLayer.setHidden(false);
+					bordLayer.set("selectable", true);
+				}
+
+				if (knooppuntLayer != null) {
+					searchKnooppuntLayer(knooppuntLayer);
+				}
 			}
 		}
 
@@ -2521,5 +2522,35 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		// return new EncodableContent<ModelObjectList>(
 		// (Encoder) new ControleOpdrachtCSVModelEncoder(), objectList);
+	}
+
+	/**
+	 * 
+	 */
+	public void saveAllLussen() {
+
+		try {
+
+			DefaultQuery query = new DefaultQuery("NetwerkLus");
+			List<NetwerkLus> lussen = (List<NetwerkLus>) modelRepository
+					.searchObjects(query, false, false);
+
+			for (NetwerkLus lus : lussen) {
+				modelRepository.saveObject(lus);
+
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean checkDebugMode() {
+		String mode = DefaultConfiguration.instance().getString(
+				"core.mode.debug");
+		if (mode.equalsIgnoreCase("true")) {
+			return true;
+		}
+		return false;
 	}
 }

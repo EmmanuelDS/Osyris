@@ -103,6 +103,14 @@
 						value="#{messages['page.actions.report.label']}" />
 				</d:buttons>
 			</div>
+			<r:panel id="saveAlleLussenPanel" rendered="#{identity.inGroup('admin','CUSTOM') and controleOpdrachtOverzichtFormBase.checkDebugMode()}">			
+					<div>Bulk save van alle lussen - Debug only!</div>
+					<j:commandButton rendered="true"
+						value="Bewaar alle Lussen"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{controleOpdrachtOverzichtFormBase.saveAllLussen()}" />
+			</r:panel>
 			<r:panel id="automatischeControleOpdrachtPanel" rendered="#{identity.inGroup('admin','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') }">
 				<div>Maak automatisch controleopdrachten aan voor routes en lussen:</div>
 				<br />

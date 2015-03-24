@@ -66,6 +66,7 @@ import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
+import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
 import com.vividsolutions.jts.geom.Geometry;
@@ -2015,6 +2016,63 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Bepalen van de Regio waarin de segmenten van een lus zich bevinden.
+	 * Indien een segment meerdere regios doorkruist, wordt de regio genomen
+	 * waar de lijn intersectie het grootst is. De regio waar de lengte van de
+	 * intersectie het grootste is zal teruggegeven worden.
+	 * 
+	 * @param segment
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Regio getRegioForSegmenten(List<Geometry> segmenten) {
+
+		try {
+
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Regio");
+
+			Map<Regio, Double> result = new HashMap<Regio, Double>();
+			List<Regio> regios = new ArrayList<Regio>();
+
+			for (Geometry segment : segmenten) {
+
+				query.setFilters(null);
+				query.addFilter(FilterUtils.intersects("geom", segment));
+
+				regios = (List<Regio>) modelRepository.searchObjects(query,
+						false, false);
+
+				for (Regio regio : regios) {
+
+					Geometry g1 = regio.getGeom().intersection(segment);
+
+					if (result.containsKey(regio)) {
+						Double updatedLength = result.get(regio)
+								+ g1.getLength();
+						result.put(regio, updatedLength);
+
+					} else {
+						result.put(regio, g1.getLength());
+					}
+				}
+
+				double maxValueInMap = (Collections.max(result.values()));
+				for (Entry<Regio, Double> entry : result.entrySet()) {
+					if (entry.getValue() == maxValueInMap) {
+
+						return entry.getKey();
+					}
+				}
+			}
+		} catch (IOException e) {
+			LOG.error("Can not search Regio", e);
+		}
+
+		return null;
+	}
+
+	/**
 	 * Bepalen van de Regio waarin een traject zich bevindt. Indien een traject
 	 * meerdere regios doorkruist, wordt de regio genomen waar de lijn
 	 * intersectie het grootst is.
@@ -2031,7 +2089,7 @@ public class OsyrisModelFunctions {
 			query.addFilter(FilterUtils.intersects("geom", traject.getGeom()));
 
 			List<Regio> regios = (List<Regio>) modelRepository.searchObjects(
-					query, true, true);
+					query, false, false);
 
 			Regio regio = null;
 
@@ -2138,5 +2196,100 @@ public class OsyrisModelFunctions {
 			}
 		}
 		return null;
+	}
+
+	public List<String> getSegmentenInNetwerkLus() {
+		try {
+			QueryBuilder builder = new QueryBuilder("NetwerkLus");
+			builder.results(FilterUtils.properties("segmenten"));
+			builder.groupBy(FilterUtils.properties("segmenten"));
+
+			List<ResourceIdentifier> segmentIds = (List<ResourceIdentifier>) modelRepository
+					.searchObjects(builder.build(), false, false);
+
+			List<String> ids = new ArrayList<String>();
+			for (ResourceIdentifier resourceId : segmentIds) {
+				ids.add(resourceId.getIdPart());
+			}
+
+			segmentIds.clear();
+			return ids;
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public Traject getTrajectForWerkOpdracht(WerkOpdracht werkOpdracht) {
+		try {
+			Traject traject = (Traject) modelRepository.loadObject(werkOpdracht
+					.getTraject());
+			return traject;
+		} catch (IOException e) {
+			LOG.error("Can not find Traject for WerkOpdracht "
+					+ werkOpdracht.getId().toString());
+		}
+		return null;
+	}
+
+	public boolean checkIsLusGesloten(List<ResourceIdentifier> ids)
+			throws IOException {
+
+		List<NetwerkSegment> segmenten = new ArrayList<NetwerkSegment>();
+
+		for (ResourceIdentifier id : ids) {
+
+			NetwerkSegment segment = (NetwerkSegment) modelRepository
+					.loadObject(id);
+			segmenten.add(segment);
+		}
+
+		NetwerkSegment first = segmenten.get(0);
+		NetwerkSegment last = segmenten.get(segmenten.size() - 1);
+
+		NetwerkSegment current = null;
+		NetwerkSegment next = null;
+
+		// Check eerst of de eerste en laatste segmenten een knooppunt
+		// gemeeschappelijk hebben
+		if (first.getNaarKnooppunt().equals(last.getNaarKnooppunt())
+				|| first.getNaarKnooppunt().equals(last.getVanKnooppunt())
+				|| first.getVanKnooppunt().equals(last.getNaarKnooppunt())
+				|| first.getVanKnooppunt().equals(last.getVanKnooppunt())) {
+
+			for (int i = 0; i < segmenten.size(); i++) {
+
+				if (i == 0) {
+					current = first;
+				} else {
+					current = segmenten.get(i);
+				}
+
+				int j = i + 1;
+
+				if (j < segmenten.size()) {
+					next = segmenten.get(j);
+				} else {
+					next = last;
+				}
+
+				if (current.getNaarKnooppunt().equals(next.getNaarKnooppunt())
+						|| current.getNaarKnooppunt().equals(
+								next.getVanKnooppunt())
+						|| current.getVanKnooppunt().equals(
+								next.getNaarKnooppunt())
+						|| current.getVanKnooppunt().equals(
+								next.getVanKnooppunt())) {
+				} else {
+					return false;
+				}
+
+			}
+			return true;
+
+		} else {
+			return false;
+		}
 	}
 }

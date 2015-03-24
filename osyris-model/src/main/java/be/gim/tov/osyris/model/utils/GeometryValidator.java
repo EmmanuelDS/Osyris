@@ -4,8 +4,6 @@ import java.util.Date;
 
 import org.conscientia.api.model.ModelPropertyType;
 import org.conscientia.api.model.StorableObject;
-import org.conscientia.api.model.annotation.Model;
-import org.conscientia.api.model.annotation.ModelStore;
 import org.conscientia.api.model.annotation.NotEditable;
 import org.conscientia.api.model.annotation.NotSearchable;
 import org.conscientia.api.model.annotation.SrsName;
@@ -19,8 +17,8 @@ import com.vividsolutions.jts.geom.Geometry;
  * @author kristof
  * 
  */
-@Model
-@ModelStore("OsyrisDataStore")
+// @Model
+// @ModelStore("OsyrisDataStore")
 public class GeometryValidator extends AbstractModelObject implements
 		StorableObject {
 

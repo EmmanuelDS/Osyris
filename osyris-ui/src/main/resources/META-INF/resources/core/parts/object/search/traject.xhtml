@@ -24,6 +24,17 @@
 			</d:fields>
 		</a:outputPanel>
 		
+		<a:outputPanel rendered="#{cc.attrs.modelClass.name.contains('Segment')}">
+			<d:fields>
+				<d:field label="In lus?" for="inLus">
+					<d:propertyValue id="inLus"
+						modelProperty="#{cc.attrs.modelClass.getProperty('enkeleRichting')}"
+						mode="SEARCH" 
+						path="inLus"/>
+				</d:field>
+			</d:fields>
+		</a:outputPanel>
+		
 		</div>
 	</cc:implementation>
 </div>
