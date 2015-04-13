@@ -297,10 +297,20 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			return "true";
 		} else {
 
+			// if (hasMateriaal == null) {
+			// if (selectedWerkOpdracht != null
+			// && selectedWerkOpdracht.getMaterialen() != null
+			// && selectedWerkOpdracht.getMaterialen().size() > 0) {
+			// return "true";
+			// } else {
+			// return "false";
+			// }
+			// }
+
+			// Zet standaard hasMateriaal op true
 			if (hasMateriaal == null) {
 				if (selectedWerkOpdracht != null
-						&& selectedWerkOpdracht.getMaterialen() != null
-						&& selectedWerkOpdracht.getMaterialen().size() > 0) {
+						&& selectedWerkOpdracht.getMaterialen() != null) {
 					return "true";
 				} else {
 					return "false";

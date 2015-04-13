@@ -439,6 +439,9 @@ public class OsyrisModelFunctions {
 		Object[] code4 = { new ResourceKey("Regio@4"), "Waasland" };
 		Object[] code5 = { new ResourceKey("Regio@5"), "Scheldeland" };
 		Object[] code6 = { new ResourceKey("Regio@9"), "Zeeuws-Vlaanderen" };
+		Object[] code7 = { new ResourceKey("Regio@6"), "Brugse Ommeland" };
+		Object[] code8 = { new ResourceKey("Regio@7"), "Groene Gordel" };
+		Object[] code9 = { new ResourceKey("Regio@99"), "Wallonië" };
 
 		regios.add(code1);
 		regios.add(code2);
@@ -446,6 +449,9 @@ public class OsyrisModelFunctions {
 		regios.add(code4);
 		regios.add(code5);
 		regios.add(code6);
+		regios.add(code7);
+		regios.add(code8);
+		regios.add(code9);
 
 		Collections.sort(regios, new DropdownListSorting());
 		return regios;
@@ -1284,6 +1290,48 @@ public class OsyrisModelFunctions {
 					Object[] object = {
 							new ResourceKey("Traject", t.getId().toString()),
 							t.getNaam() };
+					namen.add(object);
+				}
+
+				Collections.sort(namen, new DropdownListSorting());
+				return namen;
+			}
+
+		} catch (IOException e) {
+			LOG.error("Can not search " + trajectType + ".", e);
+		}
+		return Collections.emptyList();
+	}
+
+	/**
+	 * Get Gefilterede trajectnamen voor cascading dropdowns in zoekfunctie
+	 * overzicht forms.
+	 * 
+	 * @return
+	 */
+	@RunPrivileged
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getTrajectNamenNetwerkSearch(
+			ResourceIdentifier regio, String trajectType) {
+
+		try {
+			if (trajectType != null && !trajectType.isEmpty()) {
+
+				QueryBuilder builder = new QueryBuilder(trajectType);
+
+				if (regio != null) {
+					builder.filter(FilterUtils.equal("regio", regio));
+				}
+				builder.results(FilterUtils.properties("naam"));
+				builder.groupBy(FilterUtils.properties("naam"));
+
+				List<String> results = (List<String>) modelRepository
+						.searchObjects(builder.build(), true, true);
+
+				List<Object[]> namen = new ArrayList<Object[]>();
+
+				for (String naam : results) {
+					Object[] object = { naam, naam };
 					namen.add(object);
 				}
 

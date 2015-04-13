@@ -35,11 +35,12 @@
 							<f:selectItem itemValue="" itemLabel="" />
 							<f:selectItems
 								value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
-							<a:ajax event="change" render="trajectNaam" execute="@this" />
+							<a:ajax event="change" render="trajectNaam, trajectNaamNetwerk" execute="@this" />
 						</h:selectOneMenu>
 					</d:field>
-					<j:renderPanel id="detailSearchPanel"
-						rendered="#{meldingOverzichtFormBase.trajectType.contains('Route')}">
+					<j:renderPanel id="detailSearchPanel">
+						<a:outputPanel
+								rendered="#{meldingOverzichtFormBase.trajectType.contains('Route')}">
 						<d:field for="trajectNaam" label="Traject naam">
 							<h:selectOneMenu id="trajectNaam"
 								value="#{meldingOverzichtFormBase.trajectId}">
@@ -50,6 +51,19 @@
 									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamenSearch(meldingOverzichtFormBase.regio, meldingOverzichtFormBase.trajectType))}" />
 							</h:selectOneMenu>
 						</d:field>
+						</a:outputPanel>
+						
+						<a:outputPanel
+							rendered="#{meldingOverzichtFormBase.trajectType.contains('Netwerk')}">
+						<d:field for="trajectNaamNetwerk" label="Traject naam">
+							<h:selectOneMenu id="trajectNaamNetwerk"
+								value="#{meldingOverzichtFormBase.trajectNaam}">
+								<f:selectItem itemValue="" itemLabel="" />
+								<f:selectItems
+									value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamenNetwerkSearch(meldingOverzichtFormBase.regio, meldingOverzichtFormBase.trajectType))}" />
+							</h:selectOneMenu>
+						</d:field>
+						</a:outputPanel>
 					</j:renderPanel>
 				</d:fields>
 

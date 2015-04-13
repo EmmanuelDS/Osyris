@@ -104,4 +104,21 @@
 			<f:param name="render" value="#{render}" />
 		</j:lazyInclude>
 	</p:dialog>	
+	
+	<p:dialog id="confirmBewarenPopup" 
+		header="Bevestigen bewaren werkopdracht"
+		icon="#{resources['core/images/actions/16x16/save.png']}"
+		show="true"
+		modal="true"
+		width="600"
+		resizable="false"
+		onShow="#{r:component('confirmBewarenInclude')}.show();"
+		onHide="#{r:component('confirmBewarenInclude')}.hide();">
+	<j:relocate />
+	<j:lazyInclude id="confirmBewarenInclude"
+		src="/resources/osyris/includes/_confirmBewarenPanel.xhtml">
+		<f:param name="form" value="#{form}" />
+		<f:param name="render" value="#{render}" />
+	</j:lazyInclude>
+	</p:dialog>
 </u:composition>

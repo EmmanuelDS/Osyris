@@ -19,6 +19,28 @@
 	<tr valign="top">
 	<td width="50%">
 	<p:tabView>
+	<p:tab title="Materialen">
+		<d:field for="hasMateriaal" label="Gebruikt materiaal"
+					required="true">
+			<h:selectOneRadio id="hasMateriaal" value="#{form.hasMateriaal}"
+				layout="grid">
+					<f:selectItem itemValue="true" itemLabel="Gebruikte materialen toevoegen" />
+					<f:selectItem itemValue="false" itemLabel="Geen materiaal gebruikt" />				
+				<a:ajax listener="#{form.checkHasMateriaal()}"
+					render="materiaalTablePanel" execute="@this" />
+			</h:selectOneRadio>
+			</d:field>
+						
+		<j:renderPanel id="materiaalTablePanel"
+				rendered="#{form.hasMateriaal}">						
+	<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
+			<u:decorate
+				template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
+				<u:param name="form" value="#{form}" />
+			</u:decorate>
+		</j:renderPanel>
+	<br/>
+	</p:tab>
 	<p:tab title="Info">
 	<a:outputPanel id="probleemPanel">
 	<d:fields>
@@ -65,28 +87,6 @@
 	</d:fields>
     </a:outputPanel>
 	</a:outputPanel>
-	</p:tab>
-	<p:tab title="Materialen">
-		<d:field for="hasMateriaal" label="Gebruikt materiaal"
-					required="true">
-			<h:selectOneRadio id="hasMateriaal" value="#{form.hasMateriaal}"
-				layout="grid">
-				<f:selectItem itemValue="false" itemLabel="Geen materiaal gebruikt" />
-				<f:selectItem itemValue="true" itemLabel="Gebruikte materialen toevoegen" />
-				<a:ajax listener="#{form.checkHasMateriaal()}"
-					render="materiaalTablePanel" execute="@this" />
-			</h:selectOneRadio>
-			</d:field>
-						
-		<j:renderPanel id="materiaalTablePanel"
-				rendered="#{form.hasMateriaal}">						
-	<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
-			<u:decorate
-				template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
-				<u:param name="form" value="#{form}" />
-			</u:decorate>
-		</j:renderPanel>
-	<br/>
 	</p:tab>
 	<p:tab title="Foto 1">
 		<d:propertyField id="foto" 

@@ -18,6 +18,7 @@ import org.conscientia.api.search.Query;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 
 import be.gim.commons.filter.FilterUtils;
@@ -69,6 +70,7 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 	protected Date totDatum;
 	protected ResourceIdentifier trajectId;
 	protected String baseLayerName;
+	protected String trajectNaam;
 
 	// GETTERS AND SETTERS
 	public ResourceIdentifier getRegio() {
@@ -123,6 +125,14 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 		this.baseLayerName = baseLayerName;
 	}
 
+	public String getTrajectNaam() {
+		return trajectNaam;
+	}
+
+	public void setTrajectNaam(String trajectNaam) {
+		this.trajectNaam = trajectNaam;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -150,6 +160,10 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 
 		if (trajectType != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
+		}
+
+		if (trajectType != null && trajectNaam != null) {
+			query.addFilter(FilterUtils.in("traject", getFilteredTrajectIds()));
 		}
 
 		else {
@@ -406,5 +420,43 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 	public void switchBaseLayers() {
 
 		getViewer().setBaseLayerId(baseLayerName);
+	}
+
+	public List<ResourceIdentifier> getFilteredTrajectIds() {
+
+		try {
+
+			if (trajectType != null) {
+				QueryBuilder builder = new QueryBuilder(trajectType);
+
+				if (regio != null) {
+					builder.addFilter(FilterUtils.equal("regio", regio));
+				}
+
+				if (trajectNaam != null) {
+					builder.addFilter(FilterUtils.equal("naam", trajectNaam));
+				}
+
+				// Enkel WerkOpdracht ids nodig
+				builder.results(FilterUtils.properties("id"));
+				List<Long> ids = (List<Long>) modelRepository.searchObjects(
+						builder.build(), false, false);
+
+				// Omzetten ids naar ResourceIdentifiers
+				List<ResourceIdentifier> filteredTrajectIds = new ArrayList<ResourceIdentifier>();
+
+				for (Long id : ids) {
+					filteredTrajectIds.add(new ResourceKey("Traject", id
+							.toString()));
+				}
+
+				return filteredTrajectIds;
+
+			}
+		} catch (IOException e) {
+			LOG.error("Can not search Trajecten.");
+		}
+
+		return Collections.emptyList();
 	}
 }

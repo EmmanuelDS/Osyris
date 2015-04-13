@@ -12,7 +12,7 @@
 		<a:outputPanel rendered="#{form.isBordProbleem(form.selectedProbleem)}">			
 			<d:fields>
 				<d:propertyField id="typeField"
-			 		modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+			 		modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
 					value="#{form.selectedProbleem.type}"
 					mode="VIEW" />	
 							
@@ -30,7 +30,7 @@
 		<a:outputPanel rendered="#{!form.isBordProbleem(form.selectedProbleem)}">			
 			<d:fields>
 				<d:propertyField id="categorieField"
-			 		modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+			 		modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
 					value="#{form.selectedProbleem.categorie}"
 					mode="VIEW" />		
 			</d:fields>	

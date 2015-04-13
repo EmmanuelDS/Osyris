@@ -169,6 +169,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 	protected Map<WerkOpdracht, Integer> fullTableSelection;
 	protected List<WerkOpdracht> fullListWerkOpdrachten;
 	protected String bordId;
+	protected String trajectNaamSearch;
 
 	// GETTERS AND SETTERS
 	public WerkOpdracht getWerkOpdracht() {
@@ -372,6 +373,14 @@ public class WerkOpdrachtOverzichtFormBase extends
 		this.bordId = bordId;
 	}
 
+	public String getTrajectNaamSearch() {
+		return trajectNaamSearch;
+	}
+
+	public void setTrajectNaamSearch(String trajectNaamSearch) {
+		this.trajectNaamSearch = trajectNaamSearch;
+	}
+
 	// METHODS
 	@PostConstruct
 	public void init() throws IOException {
@@ -444,7 +453,13 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		if (trajectType != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
-		} else {
+		}
+
+		if (trajectType != null && trajectNaamSearch != null) {
+			query.addFilter(FilterUtils.in("traject", getFilteredTrajectIds()));
+		}
+
+		else {
 
 			if (trajectType != null) {
 				query.addFilter(FilterUtils.equal("trajectType", trajectType));
@@ -2481,6 +2496,45 @@ public class WerkOpdrachtOverzichtFormBase extends
 		} catch (IOException e) {
 			LOG.error("Can not search BordProblemen for bord " + bordKey);
 		}
+		return Collections.emptyList();
+	}
+
+	public List<ResourceIdentifier> getFilteredTrajectIds() {
+
+		try {
+
+			if (trajectType != null) {
+				QueryBuilder builder = new QueryBuilder(trajectType);
+
+				if (regio != null) {
+					builder.addFilter(FilterUtils.equal("regio", regio));
+				}
+
+				if (trajectNaamSearch != null) {
+					builder.addFilter(FilterUtils.equal("naam",
+							trajectNaamSearch));
+				}
+
+				// Enkel WerkOpdracht ids nodig
+				builder.results(FilterUtils.properties("id"));
+				List<Long> ids = (List<Long>) modelRepository.searchObjects(
+						builder.build(), false, false);
+
+				// Omzetten ids naar ResourceIdentifiers
+				List<ResourceIdentifier> filteredTrajectIds = new ArrayList<ResourceIdentifier>();
+
+				for (Long id : ids) {
+					filteredTrajectIds.add(new ResourceKey("Traject", id
+							.toString()));
+				}
+
+				return filteredTrajectIds;
+
+			}
+		} catch (IOException e) {
+			LOG.error("Can not search Trajecten.");
+		}
+
 		return Collections.emptyList();
 	}
 

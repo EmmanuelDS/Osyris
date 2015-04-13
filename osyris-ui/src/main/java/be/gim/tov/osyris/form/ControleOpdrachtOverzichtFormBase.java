@@ -391,7 +391,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		query = new DefaultQuery(query);
 
-		if (trajectId != null) {
+		if (trajectId != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
 		} else {
 			if (trajectType != null) {
@@ -1013,6 +1013,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 				setHasErrors(false);
 				object.setStatus(ControleOpdrachtStatus.UIT_TE_VOEREN);
 				object.setDatumUitTeVoeren(new Date());
+				object.setDatumLaatsteWijziging(new Date());
 
 				try {
 					modelRepository.saveObject(object);
@@ -1957,6 +1958,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// Indien BordProbleem check of bord geselecteerd is
 		if (probleem instanceof BordProbleem) {
 			BordProbleem b = (BordProbleem) probleem;
+
+			if (b.getType().equals(null) || b.getType().isEmpty()) {
+				messages.warn("Probleem niet toegevoegd: gelieve een type op te geven.");
+				return false;
+			}
 			if (b.getBord() == null) {
 				messages.warn("Probleem niet toegevoegd: gelieve eerst een bord op de kaart te selecteren.");
 				return false;
@@ -1966,6 +1972,11 @@ public class ControleOpdrachtOverzichtFormBase extends
 		// Indien AnderProbleem check of probleempunt is aangeduid
 		if (probleem instanceof AnderProbleem) {
 			AnderProbleem a = (AnderProbleem) probleem;
+
+			if (a.getCategorie().equals(null) || a.getCategorie().isEmpty()) {
+				messages.warn("Probleem niet toegevoegd: gelieve een categorie op te geven.");
+				return false;
+			}
 			if (a.getGeom() == null) {
 				messages.warn("Probleem niet toegevoegd: gelieve eerst een probleem(punt) aan te duiden op de kaart.");
 				return false;
