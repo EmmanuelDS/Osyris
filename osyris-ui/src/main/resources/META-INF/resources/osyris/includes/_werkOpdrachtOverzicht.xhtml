@@ -40,7 +40,7 @@
 							<f:selectItem itemValue="" itemLabel="" />
 							<f:selectItems
 								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypesWO)}" />
-							<a:ajax event="change" render="detailSearchPanel" execute="@this" />
+							<a:ajax event="change" render="detailSearchPanel" execute="@this" listener="#{werkOpdrachtOverzichtFormBase.resetSearchParameters()}" />
 						</h:selectOneMenu>
 					</d:field>
 					<d:field for="regio" label="Regio">

@@ -24,7 +24,7 @@
 							<f:selectItem itemValue="" itemLabel="" />
 							<f:selectItems
 								value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
-							<a:ajax event="change" render="detailSearchPanel" execute="@this" />
+							<a:ajax event="change" render="detailSearchPanel" execute="@this" listener="#{meldingOverzichtFormBase.resetSearchParameters()}"/>
 						</h:selectOneMenu>
 					</d:field>
 					<d:field for="regio" label="Regio">

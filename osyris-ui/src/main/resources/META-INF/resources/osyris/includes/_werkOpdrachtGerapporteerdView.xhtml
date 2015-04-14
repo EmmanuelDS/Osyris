@@ -118,6 +118,15 @@
 					value="#{gebruiktMateriaal.aantal}"
 					mode="VIEW" />
 			</p:column>
+			<p:column>
+				<f:facet name="header">
+				<h:outputText value="Actie" />
+				</f:facet>
+				<d:propertyValue id="actieStockColumn"
+					modelProperty="#{d:modelClass('GebruiktMateriaal').getProperty('actieStock')}"
+					value="#{gebruiktMateriaal.actieStock}"
+					mode="VIEW" />
+			</p:column>
 	   	</p:dataTable>
 <!-- 	</r:panel> -->
 	<br/>

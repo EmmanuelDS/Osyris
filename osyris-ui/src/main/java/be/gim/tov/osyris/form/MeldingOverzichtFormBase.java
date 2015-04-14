@@ -459,4 +459,14 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 
 		return Collections.emptyList();
 	}
+
+	/**
+	 * Reset zoekvelden trajectNaam en trajectId bij het wijzigen van het
+	 * trajectType
+	 * 
+	 */
+	public void resetSearchParameters() {
+		trajectId = null;
+		trajectNaam = null;
+	}
 }

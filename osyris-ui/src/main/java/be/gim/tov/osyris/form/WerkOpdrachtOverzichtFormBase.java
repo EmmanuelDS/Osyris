@@ -2538,6 +2538,16 @@ public class WerkOpdrachtOverzichtFormBase extends
 		return Collections.emptyList();
 	}
 
+	/**
+	 * Reset zoekvelden trajectNaamSearch en trajectId bij het wijzigen van het
+	 * trajectType
+	 * 
+	 */
+	public void resetSearchParameters() {
+		trajectId = null;
+		trajectNaamSearch = null;
+	}
+
 	/*
 	 * public void saveImagesToDisk() {
 	 * 

@@ -391,7 +391,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		query = new DefaultQuery(query);
 
-		if (trajectId != null && trajectId != null) {
+		if (trajectType != null && trajectId != null) {
 			query.addFilter(FilterUtils.equal("traject", trajectId));
 		} else {
 			if (trajectType != null) {
@@ -2563,5 +2563,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Reset zoekvelden trajectId bij het wijzigen van het trajectType
+	 * 
+	 */
+	public void resetSearchParameters() {
+		trajectId = null;
 	}
 }
