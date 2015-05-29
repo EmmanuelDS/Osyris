@@ -51,7 +51,7 @@
 							<f:selectItem itemValue="" itemLabel="" />
 							<f:selectItems
 								value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
-							<a:ajax event="change" render="trajectNaam" execute="@this" />
+							<a:ajax event="change" render="detailSearchPanel" execute="@this" listener="#{werkOpdrachtOverzichtFormBase.resetSearchParameters()}" />
 						</h:selectOneMenu>
 					</d:field>
 					<j:renderPanel id="detailSearchPanel">
@@ -142,6 +142,181 @@
 		
 		<j:layoutPane>
 		<a:outputPanel id="result">
+		
+		<c:choose>
+		<!-- WERKOPDRACHT OVERZICHT FOR MEDEWERKERS AND ROUTEDOKTERS -->
+		<c:when test="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM')}">
+			<p:dataTable id="objects"
+					value="#{werkOpdrachtOverzichtFormBase.dataModel}"
+					lazy="true"
+					var="werkOpdracht"
+					style="width: 100%;"
+					styleClass="blue"
+					paginator="true"
+					rows="50"
+					paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
+					rowsPerPageTemplate="20,30,40,50"
+					scrollable="true"
+					resizableColumns="true"
+					tableStyle="min-width: 850px"
+					emptyMessage="#{messages['ui.dataTable.empty']}"
+					rowKey="#{werkOpdracht.id}" >																					
+					<j:bindAttribute var="werkOpdracht"
+						name="rowData" />
+					<j:layoutContent />												       									
+											
+					<p:column label="Acties" style="width:30px;">
+						<a:outputPanel styleClass="model-table-actions">
+							<j:commandButton
+								rendered="#{werkOpdrachtOverzichtFormBase.isCanView(werkOpdracht)}"
+								image="#{resource['core/images/actions/16x16/view.png']}"
+								type="image"
+								title="#{messages['page.actions.view.label']}"
+								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{werkOpdrachtOverzichtFormBase.object}"
+									value="#{werkOpdracht}" />
+							</j:commandButton>
+							<j:commandButton
+								rendered="#{werkOpdrachtOverzichtFormBase.isCanDelete(werkOpdracht)}"
+								image="#{resource['core/images/actions/16x16/delete.png']}"
+								type="image"
+								title="#{messages['page.actions.delete.label']}"
+								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
+								<f:setPropertyActionListener
+									target="#{werkOpdrachtOverzichtFormBase.object}"
+									value="#{werkOpdracht}" />
+							</j:commandButton>
+						</a:outputPanel>
+					</p:column>
+					 <p:column label="id" style="width:60px;"
+					 	sortBy="#{werkOpdracht.id }" >
+						<f:facet name="header">
+						<h:outputText value="Id" />
+						</f:facet>
+						<div>#{d:modelObject(werkOpdracht).getId()}</div>
+					</p:column>
+					<p:column label="InRonde" style="width:40px;"
+						sortBy="#{werkOpdracht.inRonde }" >
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}" />
+						</f:facet>
+						<d:propertyValue id="inRondeColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}"
+							value="#{werkOpdracht.inRonde }" mode="VIEW" />
+					</p:column>
+					<p:column label="TrajectType" style="width:135px;"
+						 sortBy="#{werkOpdracht.trajectType }" >
+						<f:facet name="header">
+						<d:displayLabel
+							property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
+						</f:facet>
+						<d:propertyValue id="trajectTypeColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}"
+							value="#{werkOpdracht.trajectType }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Traject" style="width:225px;"
+						sortBy="#{werkOpdracht.traject }" >
+						<f:facet name="header">
+							<h:outputText value="Routenaam" />
+						</f:facet>
+						<d:propertyValue id="trajectColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
+							value="#{werkOpdracht.traject }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Regio" style="width:80px;"
+						sortBy="#{werkOpdracht.regioId}" >				
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('regioId')}" />
+						</f:facet>
+						<d:propertyValue id="regioColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regioId')}"
+							value="#{werkOpdracht.regioId }" mode="VIEW" />
+					</p:column>
+					<p:column label="Gemeente" style="width:90px;"
+						sortBy="#{werkOpdracht.gemeente }" >
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}" />
+						</f:facet>
+						<d:propertyValue id="gemeenteColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}"
+							value="#{werkOpdracht.gemeente }" mode="VIEW" />
+					</p:column>			
+					<p:column label="Status" style="width:85px;"
+						 sortBy="#{werkOpdracht.status }" >
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('status')}" />
+						</f:facet>
+						<d:propertyValue id="statusColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+							value="#{werkOpdracht.status }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Validatie" style="width:150px;"
+						sortBy="#{werkOpdracht.validatie }" >
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('validatie')}" />
+						</f:facet>
+						<d:propertyValue id="validatieColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('validatie')}"
+							value="#{werkOpdracht.validatie }"
+							mode="VIEW" />
+					</p:column>
+					<p:column label="Datum" style="width:65px;"
+						sortBy="#{werkOpdracht.datumLaatsteWijziging }" >
+						<f:facet name="header">
+							<h:outputText value="Datum" />
+						</f:facet>
+						<d:propertyValue id="datumLaatsteWijzigingColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLaatsteWijziging')}"
+							value="#{werkOpdracht.datumLaatsteWijziging }"
+							mode="VIEW" /> 
+					</p:column>
+					<p:column label="Uitvoerder" style="width:75px;"
+						sortBy="#{werkOpdracht.uitvoerder }" >
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
+						</f:facet>
+						<d:propertyValue id="uitvoerderColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+							value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
+					</p:column>		
+					<p:column label="Medewerker" style="width:55px;"
+						sortBy="#{werkOpdracht.medewerker }" >
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
+						</f:facet>
+						<d:propertyValue id="medewerkerColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+							value="#{werkOpdracht.medewerker }"
+							mode="VIEW" />
+					</p:column>			
+					<f:facet name="footer" >
+						<a:outputPanel
+							layout="block"
+							style="text-align: center" 
+							rendered="#{identity.inGroup('Uitvoerder','CUSTOM') or identity.inGroup('admin','CUSTOM')}">
+							<j:commandButton
+						value="Uitvoeringsronde maken"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{werkOpdrachtOverzichtFormBase.createUitvoeringsronde()}" 
+						render="#{r:clientId('result')}"/>
+						</a:outputPanel>
+					</f:facet>
+				</p:dataTable>
+			</c:when>
+			<c:otherwise>
+			<!-- DEFAULT WERKOPDRACHT OVERZICHT -->
 				<p:dataTable id="objects"
 					value="#{werkOpdrachtOverzichtFormBase.dataModel}"
 					lazy="true"
@@ -171,7 +346,7 @@
 						</div>
 						</f:facet>					
 					</p:column>							
-					<p:column label="Acties" style="width:40px;">
+					<p:column label="Acties" style="width:30px;">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton
 								rendered="#{werkOpdrachtOverzichtFormBase.isCanView(werkOpdracht)}"
@@ -195,14 +370,14 @@
 							</j:commandButton>
 						</a:outputPanel>
 					</p:column>
-					 <p:column label="id" style="width:40px;"
+					 <p:column label="id" style="width:60px;"
 					 	sortBy="#{werkOpdracht.id }" >
 						<f:facet name="header">
 						<h:outputText value="Id" />
 						</f:facet>
 						<div>#{d:modelObject(werkOpdracht).getId()}</div>
 					</p:column>
-					<p:column label="InRonde" style="width:50px;"
+					<p:column label="InRonde" style="width:40px;"
 						sortBy="#{werkOpdracht.inRonde }" >
 						<f:facet name="header">
 						<d:displayLabel
@@ -212,7 +387,7 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('inRonde')}"
 							value="#{werkOpdracht.inRonde }" mode="VIEW" />
 					</p:column>
-					<p:column label="TrajectType" style="width:120px;"
+					<p:column label="TrajectType" style="width:125px;"
 						 sortBy="#{werkOpdracht.trajectType }" >
 						<f:facet name="header">
 						<d:displayLabel
@@ -223,7 +398,7 @@
 							value="#{werkOpdracht.trajectType }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Traject" style="width:100px;"
+					<p:column label="Traject" style="width:225px;"
 						sortBy="#{werkOpdracht.traject }" >
 						<f:facet name="header">
 							<h:outputText value="Routenaam" />
@@ -233,7 +408,7 @@
 							value="#{werkOpdracht.traject }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Regio" style="width:100px;"
+					<p:column label="Regio" style="width:120px;"
 						sortBy="#{werkOpdracht.regioId}" >				
 						<f:facet name="header">
 						<d:displayLabel
@@ -243,7 +418,7 @@
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regioId')}"
 							value="#{werkOpdracht.regioId }" mode="VIEW" />
 					</p:column>
-					<p:column label="Gemeente" style="width:100px;"
+					<p:column label="Gemeente" style="width:110px;"
 						sortBy="#{werkOpdracht.gemeente }" >
 						<f:facet name="header">
 						<d:displayLabel
@@ -252,28 +427,7 @@
 						<d:propertyValue id="gemeenteColumn"
 							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('gemeente')}"
 							value="#{werkOpdracht.gemeente }" mode="VIEW" />
-					</p:column>
-					<p:column label="Uitvoerder" style="width:100px;"
-						sortBy="#{werkOpdracht.uitvoerder }" >
-						<f:facet name="header">
-						<d:displayLabel
-								property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
-						</f:facet>
-						<d:propertyValue id="uitvoerderColumn"
-							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
-							value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
-					</p:column>
-					<p:column label="Medewerker" style="width:100px;"
-						sortBy="#{werkOpdracht.medewerker }" >
-						<f:facet name="header">
-							<d:displayLabel
-								property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
-						</f:facet>
-						<d:propertyValue id="medewerkerColumn"
-							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
-							value="#{werkOpdracht.medewerker }"
-							mode="VIEW" />
-					</p:column>				
+					</p:column>		
 					<p:column label="Status" style="width:100px;"
 						 sortBy="#{werkOpdracht.status }" >
 						<f:facet name="header">
@@ -296,7 +450,7 @@
 							value="#{werkOpdracht.validatie }"
 							mode="VIEW" />
 					</p:column>
-					<p:column label="Datum" style="width:100px;"
+					<p:column label="Datum" style="width:65px;"
 						sortBy="#{werkOpdracht.datumLaatsteWijziging }" >
 						<f:facet name="header">
 							<h:outputText value="Datum" />
@@ -306,6 +460,28 @@
 							value="#{werkOpdracht.datumLaatsteWijziging }"
 							mode="VIEW" /> 
 					</p:column>
+					<p:column label="Uitvoerder" style="width:100px;"
+						sortBy="#{werkOpdracht.uitvoerder }" 
+						rendered="#{!identity.inGroup('Uitvoerder','CUSTOM')}">
+						<f:facet name="header">
+						<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
+						</f:facet>
+						<d:propertyValue id="uitvoerderColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+							value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
+					</p:column>
+					<p:column label="Medewerker" style="width:100px;"
+						sortBy="#{werkOpdracht.medewerker }" >
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
+						</f:facet>
+						<d:propertyValue id="medewerkerColumn"
+							modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+							value="#{werkOpdracht.medewerker }"
+							mode="VIEW" />
+					</p:column>		
 					<p:rowExpansion label="Handelingen">
 						<h:panelGrid id="display" columns="1" style="width:400px;">
 							<f:facet name="header">
@@ -331,7 +507,9 @@
 						render="#{r:clientId('result')}"/>
 						</a:outputPanel>
 					</f:facet>
-				</p:dataTable>
+				</p:dataTable>			
+			</c:otherwise>
+			</c:choose>
 			</a:outputPanel>
 
 			<u:decorate

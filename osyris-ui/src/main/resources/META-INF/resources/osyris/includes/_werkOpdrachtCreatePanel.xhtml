@@ -90,73 +90,19 @@
 		<j:renderPanel id="probleemPanel" rendered="#{form.object.probleem != null}">
 			<div>
 			<a:outputPanel rendered="#{form.probleemType == 'bord'}">
-<!-- 			<br/> -->
-<!-- 			<j:commandButton -->
-<!-- 				id="selectFeatures" -->
-<!-- 				rendered="#{form.probleemType == 'bord'}" -->
-<!-- 				image="#{resource['core/images/actions/24x24/select.png']}" -->
-<!-- 				styleClass="component-toolbar-button" -->
-<!-- 				value="Selecteer bord" -->
-<!-- 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
-<!-- 				submit="false" -->
-<!-- 				render="viewer"> -->
-<!-- 				<j:activateControl -->
-<!-- 					for="viewer" -->
-<!-- 					event="click" -->
-<!-- 					control="selectBox" /> -->
-<!-- 			</j:commandButton> -->
+			
 			</a:outputPanel>
 			<br/>
 			
 			<a:outputPanel rendered="#{form.probleemType == 'ander'}">
-<!-- 			<br/> -->
-<!-- 			<d:fields> -->
-<!-- 			<b><h:outputText value="Duid probleem(punt) aan op kaart hiernaast. "></h:outputText></b> -->
-<!-- 			<h:graphicImage alt="(verplicht)" -->
-<!-- 						value="#{resource['core/images/actions/12x12/required_alt.png']}" /> -->
-<!-- 			</d:fields> -->
-<!-- 			<j:commandButton -->
-<!-- 				id="drawPoint" -->
-<!-- 				rendered="#{form.probleemType == 'ander'}" -->
-<!-- 				image="#{resource['core/images/actions/24x24/drawPoint.png']}" -->
-<!-- 				styleClass="component-toolbar-button" -->
-<!-- 				value="Teken punt" -->
-<!-- 				submit="false" -->
-<!-- 				render="viewer"> -->
-<!-- 				<j:activateControl -->
-<!-- 					for="viewer" -->
-<!-- 					event="click" -->
-<!-- 					control="drawPoint" /> -->
-<!-- 			</j:commandButton> -->
+
 			</a:outputPanel>
-<!-- 			<br/> -->
+
 			<a:outputPanel rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}">
 			<br/>
-<!-- 			<d:fields> -->
-<!-- 			<b><h:outputText value="Selecteer segment op kaart "></h:outputText></b> -->
-<!-- 			<h:graphicImage alt="(verplicht)" -->
-<!-- 						value="#{resource['core/images/actions/12x12/required_alt.png']}" /> -->
-<!-- 			</d:fields> -->
-<!-- 			<j:commandButton -->
-<!-- 				id="selectSegment" -->
-<!-- 				rendered="#{form.trajectTypeCreate.contains('Segment') and form.probleemType == 'ander'}" -->
-<!-- 				image="#{resource['core/images/actions/24x24/select.png']}" -->
-<!-- 				styleClass="component-toolbar-button" -->
-<!-- 				value="Selecteer segment" -->
-<!-- 				title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" -->
-<!-- 				submit="false"> -->
-<!-- 				<j:activateControl -->
-<!-- 					for="viewer" -->
-<!-- 					event="click" -->
-<!-- 					control="selectBox" > -->
-<!-- 					<f:param -->
-<!-- 						name="layerId" -->
-<!-- 						value="#{trajectType}" /> -->
-<!-- 				</j:activateControl> -->
-<!-- 			</j:commandButton> -->
 			</a:outputPanel>
 			</div>
-<!-- 			<br/>		 -->
+
 			<d:propertyField id="status" 
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
 						value="#{form.object.probleem.status}"
@@ -177,10 +123,6 @@
 				 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
 						value="#{form.object.probleem.foto}"
 						mode="EDIT" />												
-<!-- 			<d:propertyField id="commentaar"  -->
-<!-- 				 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}" -->
-<!-- 						value="#{form.object.probleem.commentaar}" -->
-<!-- 						mode="EDIT" /> -->
 						
 			<d:field label="Commentaar" for="commentaar" required="true">
 			 	<h:inputTextarea id="commentaar" value="#{form.object.probleem.commentaar}" required="true" requiredMessage="De waarde voor Commentaar is verplicht." />

@@ -252,9 +252,31 @@
 				</j:activateControl>
 			</j:commandButton>
 		</j:sectionPanel>
+
 		<j:sectionPanel
 			label="#{messages['model.entry.mapContext.tools.info.label']}"
-			rendered="#{viewer.context.hasTool('featureInfo') and identity.isLoggedIn() and !identity.inGroup('PeterMeter','CUSTOM') and !viewer.context.showFeatureInfoControl}"
+			rendered="#{viewer.context.title != 'Routes' and viewer.context.hasTool('featureInfo')}"
+			transient="true">
+			<j:commandButton
+				image="#{resource['core/images/actions/24x24/featureInfo.png']}"
+				styleClass="component-toolbar-button"
+				rendered="#{viewer.context.hasTool('featureInfo')}"
+				value="#{messages['model.entry.mapContext.tools.featureInfo.btn.label']}"
+				title="#{messages['model.entry.mapContext.tools.featureInfo.label']}"
+				submit="false">
+				<j:activateControl
+					event="click"
+					control="featureInfoBox">
+					<f:param
+						name="layerId"
+						value="#{null}" />
+				</j:activateControl>
+			</j:commandButton>
+		</j:sectionPanel>
+
+		<j:sectionPanel
+			label="#{messages['model.entry.mapContext.tools.info.label']}"
+			rendered="#{viewer.context.title == 'Routes' and viewer.context.hasTool('featureInfo') and identity.isLoggedIn() and !identity.inGroup('PeterMeter','CUSTOM') and !viewer.context.showFeatureInfoControl}"
 			transient="true">
 			<j:commandButton
 				image="#{resource['core/images/actions/24x24/featureInfo.png']}"

@@ -1695,8 +1695,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// return new ByteArrayContent("application/pdf",
 			// out.toByteArray());
 		} finally {
-			in.close();
-			out.close();
+			// in.close();
+			// out.close();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
 	}
 
@@ -1764,8 +1766,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// return new ByteArrayContent("application/pdf",
 			// out.toByteArray());
 		} finally {
-			in.close();
-			out.close();
+			// in.close();
+			// out.close();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
 	}
 
@@ -1833,8 +1837,10 @@ public class ControleOpdrachtOverzichtFormBase extends
 			// return new ByteArrayContent("application/pdf",
 			// out.toByteArray());
 		} finally {
-			in.close();
-			out.close();
+			// in.close();
+			// out.close();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
 	}
 

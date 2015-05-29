@@ -1,0 +1,38 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf">
+
+	<div>Voor een werkopdracht kunnen er 2 PDF bestanden gegenereerd worden.</div>
+	<br/>
+	<div>1. Individuele fiche van deze werkopdracht.</div>
+	<br/>
+	<div>2. Alle fiches van de werkopdrachten die behoren tot uitvoeringsronde #{d:modelObject(form.object).getId()}.</div>
+	<br/>
+	<div><b>Opmerking: gelieve er rekening mee te houden dat het genereren van de PDF van alle werkopdrachten die behoren tot deze uitvoeringsronde enkele minuten in beslag kan nemen (afhankelijk van het aantal werkopdrachten).</b></div>
+    <br />
+    <d:buttons>
+    	<d:fileDownload 	
+			fileName="OSYRIS_ronde_#{form.object.getId().toString()}_werkopdracht_#{form.selectedWerkOpdracht.getId().toString()}.pdf"
+			type="button"
+			image="#{resource['core/images/actions/12x12/print.png']}"
+			contentType="application/pdf"
+			content="#{form.printWerkOpdracht()}"
+			value="Printen werkopdracht"
+			eventsQueue="pdfQueue" />
+		
+		<d:fileDownload 	
+			fileName="OSYRIS_ronde_#{form.object.getId().toString()}_werkopdrachten.pdf"
+			type="button"
+			image="#{resource['core/images/actions/12x12/print.png']}"
+			contentType="application/pdf"
+			content="#{form.printWerkOpdrachtenInRonde()}"
+			value="Printen alle werkopdrachten in ronde"
+			eventsQueue="pdfQueue" />
+	</d:buttons>
+	</u:composition>

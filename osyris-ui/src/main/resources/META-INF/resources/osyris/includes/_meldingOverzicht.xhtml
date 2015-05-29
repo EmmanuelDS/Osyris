@@ -133,7 +133,7 @@
 					<j:layoutContent />
 					<j:bindAttribute var="melding"
 						name="rowData" />
-					<p:column>
+					<p:column style="width:30px;">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton
 								rendered="#{meldingOverzichtFormBase.isCanView(melding)}"
@@ -158,7 +158,7 @@
 						</a:outputPanel>
 					</p:column>
 					<p:column label="TrajectType"
-						sortBy="#{melding.trajectType}">
+						sortBy="#{melding.trajectType}" style="width:140px;">
 							<f:facet name="header">
 						<d:displayLabel
 							property="#{d:modelClass('Melding').getProperty('trajectType')}" />
@@ -168,7 +168,7 @@
 							value="#{melding.trajectType }" mode="VIEW" />
 					</p:column>
 					<p:column label="Traject"
-						sortBy="#{melding.traject }">
+						sortBy="#{melding.traject }" style="width:145px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('traject')}" />
@@ -178,7 +178,7 @@
 							value="#{melding.traject }" mode="VIEW" />
 					</p:column>
 					<p:column label="Regio" 
-						sortBy="#{melding.regioId }">
+						sortBy="#{melding.regioId }" style="width:110px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('regioId')}" />
@@ -188,7 +188,7 @@
 							value="#{melding.regioId }" mode="VIEW" />
 					</p:column>
 					<p:column label="Status"
-						sortBy="#{melding.status }">
+						sortBy="#{melding.status }" style="width:110px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('status')}" />
@@ -197,8 +197,17 @@
 							modelProperty="#{d:modelClass('Melding').getProperty('status')}"
 							value="#{melding.status }" mode="VIEW" />
 					</p:column>
+					<p:column label="Datum"
+						sortBy="#{melding.datumLaatsteWijziging }" style="width:65px;">
+						<f:facet name="header">
+							<h:outputText value="Datum" />
+						</f:facet>
+						<d:propertyValue id="datumLaatsteWijzigingColumn"
+							modelProperty="#{d:modelClass('Melding').getProperty('datumLaatsteWijziging')}"
+							value="#{melding.datumLaatsteWijziging }" mode="VIEW" /> 
+					</p:column>
 					<p:column label="Medewerker"
-						sortBy="#{melding.medewerker }">
+						sortBy="#{melding.medewerker }" style="width:120px;">
 						<f:facet name="header">
 							<d:displayLabel
 								property="#{d:modelClass('Melding').getProperty('medewerker')}" />
@@ -206,15 +215,6 @@
 						<d:propertyValue id="medewerkerColumn"
 							modelProperty="#{d:modelClass('Melding').getProperty('medewerker')}"
 							value="#{melding.medewerker }" mode="VIEW" />
-					</p:column>
-					<p:column label="Datum"
-						sortBy="#{melding.datumLaatsteWijziging }" >
-						<f:facet name="header">
-							<h:outputText value="Datum" />
-						</f:facet>
-						<d:propertyValue id="datumLaatsteWijzigingColumn"
-							modelProperty="#{d:modelClass('Melding').getProperty('datumLaatsteWijziging')}"
-							value="#{melding.datumLaatsteWijziging }" mode="VIEW" /> 
 					</p:column>
 				</p:dataTable>
 			</a:outputPanel>

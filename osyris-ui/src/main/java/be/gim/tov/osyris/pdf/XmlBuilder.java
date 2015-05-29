@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -21,9 +22,11 @@ import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.TransformerException;
 
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.apache.xerces.impl.dv.util.Base64;
+import org.conscientia.api.repository.ModelRepository;
 import org.conscientia.core.configuration.DefaultConfiguration;
 import org.conscientia.service.interchange.InterchangeStore;
 import org.geotools.geometry.jts.ReferencedEnvelope;
@@ -40,8 +43,11 @@ import be.gim.commons.label.LabelUtils;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.peritia.codec.EncodableContent;
 import be.gim.specto.api.context.FeatureMapLayer;
+import be.gim.specto.core.context.MapFactory;
+import be.gim.specto.core.layer.feature.GeometryListFeatureMapLayer;
 import be.gim.specto.ui.component.MapViewer;
 import be.gim.specto.ui.component.Position;
+import be.gim.tov.osyris.form.UitvoeringsrondeOverzichtFormBase;
 import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
 import be.gim.tov.osyris.model.controle.AnderProbleem;
 import be.gim.tov.osyris.model.controle.BordProbleem;
@@ -66,6 +72,7 @@ import be.gim.tov.osyris.model.werk.WerkOpdracht;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Envelope;
+import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.geom.GeometryFactory;
 import com.vividsolutions.jts.geom.LineString;
 import com.vividsolutions.jts.geom.Point;
@@ -90,11 +97,17 @@ public class XmlBuilder {
 	private static String POSITIE_PIJL_LINKS = "L";
 	private static String POSITIE_PIJL_RECHTS = "R";
 
+	private static final String GEOMETRY_LAYER_NAME = "geometry";
+	private static final String GEOMETRY_LAYER_LINE_NAME = "geometryLine";
+
 	private static final Log LOG = LogFactory.getLog(XmlBuilder.class);
 
 	protected Collection<String> imageKeys = new ArrayList<String>();
 
 	private Bord nearestBord;
+
+	private List<Geometry> anderProbleemGeoms;
+	private List<Geometry> anderProbleemLineGeoms;
 
 	public Bord getNearestBord() {
 		return nearestBord;
@@ -102,6 +115,22 @@ public class XmlBuilder {
 
 	public void setNearestBord(Bord nearestBord) {
 		this.nearestBord = nearestBord;
+	}
+
+	public List<Geometry> getAnderProbleemGeoms() {
+		return anderProbleemGeoms;
+	}
+
+	public void setAnderProbleemGeoms(List<Geometry> anderProbleemGeoms) {
+		this.anderProbleemGeoms = anderProbleemGeoms;
+	}
+
+	public List<Geometry> getAnderProbleemLineGeoms() {
+		return anderProbleemLineGeoms;
+	}
+
+	public void setAnderProbleemLineGeoms(List<Geometry> anderProbleemLineGeoms) {
+		this.anderProbleemLineGeoms = anderProbleemLineGeoms;
 	}
 
 	/**
@@ -215,6 +244,12 @@ public class XmlBuilder {
 					pijl.appendChild(doc.createTextNode(getPijlBord(rb
 							.getImageCode())));
 				}
+
+				Element volg = doc.createElement("volg");
+				if (rb.getVolg() != null) {
+					volg.appendChild(doc.createTextNode(rb.getVolg()));
+				}
+				bord.appendChild(volg);
 
 			}
 			bord.appendChild(pijl);
@@ -895,6 +930,14 @@ public class XmlBuilder {
 				pijl.appendChild(doc.createTextNode(getPijlBord(rb
 						.getImageCode())));
 			}
+
+			bordElement.appendChild(pijl);
+
+			Element volg = doc.createElement("volg");
+			if (rb.getVolg() != null) {
+				volg.appendChild(doc.createTextNode(rb.getVolg()));
+			}
+			bordElement.appendChild(volg);
 		}
 		bordElement.appendChild(pijl);
 
@@ -1202,13 +1245,14 @@ public class XmlBuilder {
 		}
 
 		// Selecteer bord
-		List<String> ids = new ArrayList<String>(1);
-		ids.add(bord.getId().toString());
+		List<String> ids = new ArrayList<String>(Arrays.asList(bord.getId()
+				.toString()));
 
 		FeatureMapLayer layer = (FeatureMapLayer) viewer.getContext().getLayer(
 				LabelUtils.lowerCamelCase(bord.getModelClass().getName()));
 
-		viewer.setSelection(layer, ids);
+		layer.setSelection(ids);
+		// viewer.setSelection(layer, ids);
 
 		Coordinate centerPoint = bord.getGeom().getCoordinate();
 		int width = 450;
@@ -1492,7 +1536,8 @@ public class XmlBuilder {
 				BufferedImage image = ImageIO.read(in);
 				g2d.drawImage(image, width - 30, 5, 25, 50, null);
 			} finally {
-				in.close();
+				// in.close();
+				IOUtils.closeQuietly(in);
 			}
 		} catch (Exception e) {
 			LOG.error("Can not add north arrow graphic.", e);
@@ -1777,5 +1822,828 @@ public class XmlBuilder {
 		}
 
 		return pijlPositie;
+	}
+
+	/**
+	 * Aanmaken van alle WerkOpdracht fiches binnen een UVR. De fiches kunnen
+	 * voor alle types van trajecten en zowel bordproblemen en andere problemen
+	 * omvatten.
+	 * 
+	 * @param viewer
+	 * @param selectedWerkOpdracht
+	 * @param opdrachtenInRode
+	 * @return
+	 * @throws DOMException
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws ParserConfigurationException
+	 * @throws IOException
+	 */
+	public Document buildWerkOpdrachtFichesInRonde(MapViewer viewer,
+			WerkOpdracht selectedWerkOpdracht,
+			List<WerkOpdracht> opdrachtenInRode) throws DOMException,
+			InstantiationException, IllegalAccessException,
+			ParserConfigurationException, IOException {
+
+		DocumentBuilderFactory docFactory = DocumentBuilderFactory
+				.newInstance();
+		DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+
+		// root element
+		Document doc = docBuilder.newDocument();
+		Element rootElement = doc.createElement("ronde");
+		doc.appendChild(rootElement);
+
+		for (WerkOpdracht opdracht : opdrachtenInRode) {
+
+			// RESET MAP
+			resetLayers(viewer);
+
+			// Ophalen traject bij WO
+			Traject traject = (Traject) Beans.getReference(
+					ModelRepository.class).loadObject(opdracht.getTraject());
+
+			Element opdrachtElement = doc.createElement("opdracht");
+			rootElement.appendChild(opdrachtElement);
+
+			// Nummering voor de handelingen bij een WO
+			int counter = 1;
+
+			FeatureMapLayer layer = null;
+
+			if (opdracht.getProbleem() instanceof AnderProbleem) {
+
+				AnderProbleem anderProbleem = (AnderProbleem) opdracht
+						.getProbleem();
+
+				Element id = doc.createElement("id");
+				id.appendChild(doc.createTextNode(opdracht.getId().toString()));
+				opdrachtElement.appendChild(id);
+
+				opdrachtElement.setAttribute("bordProbleem",
+						Boolean.FALSE.toString());
+				opdrachtElement.setAttribute("segment",
+						Boolean.FALSE.toString());
+				opdrachtElement.setAttribute("hasFoto",
+						Boolean.FALSE.toString());
+				opdrachtElement
+						.setAttribute("hasNaam", Boolean.TRUE.toString());
+
+				if (traject instanceof NetwerkSegment) {
+					opdrachtElement.setAttribute("hasNaam",
+							Boolean.FALSE.toString());
+					opdrachtElement.setAttribute("segment",
+							Boolean.TRUE.toString());
+				}
+
+				if (opdracht.getProbleem().getFoto() != null) {
+					opdrachtElement.setAttribute("hasFoto",
+							Boolean.TRUE.toString());
+				}
+
+				if (traject instanceof Route || traject instanceof NetwerkLus) {
+
+					Element trajectNaam = doc.createElement("trajectnaam");
+					trajectNaam.appendChild(doc.createTextNode(traject
+							.getNaam()));
+					opdrachtElement.appendChild(trajectNaam);
+				}
+
+				else if (traject instanceof NetwerkSegment) {
+
+					NetwerkSegment seg = (NetwerkSegment) traject;
+
+					Element vanKp = doc.createElement("vankp");
+					if (seg.getVanKpNr() != null) {
+						vanKp.appendChild(doc.createTextNode(seg.getVanKpNr()
+								.toString()));
+					}
+					opdrachtElement.appendChild(vanKp);
+
+					Element naarKp = doc.createElement("naarkp");
+					if (seg.getNaarKpNr() != null) {
+						naarKp.appendChild(doc.createTextNode(seg.getNaarKpNr()
+								.toString()));
+					}
+					opdrachtElement.appendChild(naarKp);
+				}
+
+				if (opdracht.getHandelingen() != null
+						&& !opdracht.getHandelingen().isEmpty()) {
+					for (WerkHandeling h : opdracht.getHandelingen()) {
+
+						if (h != null && h.getType() != null) {
+							Element handeling = doc.createElement("handeling");
+							opdrachtElement.appendChild(handeling);
+
+							Element nummer = doc.createElement("nummer");
+							nummer.appendChild(doc.createTextNode(String
+									.valueOf(counter)));
+							handeling.appendChild(nummer);
+							counter++;
+
+							Element type = doc.createElement("type");
+							type.appendChild(doc.createTextNode(h.getType()));
+							handeling.appendChild(type);
+						}
+					}
+				}
+
+				// COMMENTAAR TOV
+				Element commentaar = doc.createElement("commentaar");
+				if (opdracht.getCommentaarMedewerker() != null) {
+					commentaar.appendChild(doc.createTextNode(opdracht
+							.getCommentaarMedewerker()));
+				}
+				opdrachtElement.appendChild(commentaar);
+
+				// REGIO
+				Element regio = doc.createElement("regio");
+				String regioNaam = Beans.getReference(
+						OsyrisModelFunctions.class).getTrajectRegio(
+						opdracht.getTraject());
+				if (regioNaam != null) {
+					regio.appendChild(doc.createTextNode(regioNaam));
+				}
+				opdrachtElement.appendChild(regio);
+
+				// GEMEENTE
+				Element gemeente = doc.createElement("gemeente");
+				String gemeenteWO = Beans.getReference(
+						OsyrisModelFunctions.class).getWerkOpdrachtGemeente(
+						opdracht.getProbleem());
+				if (gemeenteWO != null) {
+					gemeente.appendChild(doc.createTextNode(gemeenteWO));
+				}
+				opdrachtElement.appendChild(gemeente);
+
+				// STRAAT
+				Element straat = doc.createElement("straat");
+				// Dichtsbijzijnde bord zoeken
+				nearestBord = Beans.getReference(OsyrisModelFunctions.class)
+						.getNearestBord(anderProbleem.getGeom(),
+								opdracht.getTraject());
+
+				if (nearestBord != null) {
+					String straatWO = nearestBord.getStraatnaam();
+					// Init BordLayer en toon enkel dit bord
+					layer = (FeatureMapLayer) viewer.getContext().getLayer(
+							LabelUtils.lowerCamelCase(nearestBord
+									.getModelClass().getName()));
+					layer.setFilter(FilterUtils.equal("id", nearestBord.getId()));
+					viewer.setLayerVisibility(layer, false);
+
+					if (straatWO != null) {
+						straat.appendChild(doc.createTextNode(straatWO));
+					}
+				}
+				opdrachtElement.appendChild(straat);
+
+				// TYPE TRAJECT
+				Element trajectType = doc.createElement("trajecttype");
+				if (opdracht.getTrajectType() != null) {
+					trajectType.appendChild(doc.createTextNode(opdracht
+							.getTrajectType()));
+				}
+				opdrachtElement.appendChild(trajectType);
+
+				// FOTO PROBLEEM
+				Element foto = doc.createElement("probleemfoto");
+				if (opdracht.getProbleem().getFoto() != null) {
+
+					foto.appendChild(doc.createTextNode(Base64.encode(opdracht
+							.getProbleem().getFoto())));
+				} else {
+					foto.appendChild(doc.createTextNode(getUrlGeenFoto()));
+				}
+				opdrachtElement.appendChild(foto);
+
+				// ORTHO KAART
+				Element mapOrthoAnderProbleem = doc
+						.createElement("mapOrthoAnderProbleem");
+				mapOrthoAnderProbleem.appendChild(doc
+						.createTextNode(getMapAnderProbleem(viewer, traject,
+								anderProbleem, true)));
+				opdrachtElement.appendChild(mapOrthoAnderProbleem);
+
+				// TOPO KAART
+				Element mapTopoAnderProbleem = doc
+						.createElement("mapTopoAnderProbleem");
+				mapTopoAnderProbleem.appendChild(doc
+						.createTextNode(getMapAnderProbleem(viewer, traject,
+								anderProbleem, false)));
+				opdrachtElement.appendChild(mapTopoAnderProbleem);
+
+				if (nearestBord != null) {
+					// Laat opnieuw de overige borden zien
+					if (traject instanceof NetwerkSegment) {
+
+						ArrayList<ResourceIdentifier> segmentIds = new ArrayList<ResourceIdentifier>();
+						segmentIds.add(opdracht.getTraject());
+						layer.setFilter(FilterUtils.in("segmenten", segmentIds));
+
+					} else if (traject instanceof NetwerkLus) {
+						layer.setFilter(FilterUtils.in("segmenten",
+								((NetwerkLus) traject).getSegmenten()));
+					}
+
+					else if (traject instanceof Route) {
+						layer.setFilter(FilterUtils.equal("naam",
+								traject.getNaam()));
+					}
+					layer.setHidden(false);
+				}
+				nearestBord = null;
+				viewer.setBaseLayerId("tms");
+
+			}
+
+			else if (opdracht.getProbleem() instanceof BordProbleem) {
+
+				BordProbleem bordProbleem = (BordProbleem) opdracht
+						.getProbleem();
+
+				Bord bord = (Bord) Beans.getReference(ModelRepository.class)
+						.loadObject(bordProbleem.getBord());
+
+				// ELEMENT BORD
+				Element bordElement = doc.createElement("bord");
+				opdrachtElement.appendChild(bordElement);
+
+				// OPDRACHT ID
+				Element id = doc.createElement("id");
+				id.appendChild(doc.createTextNode(opdracht.getId().toString()));
+				opdrachtElement.appendChild(id);
+
+				// Attribute checks
+				opdrachtElement.setAttribute("segment",
+						Boolean.FALSE.toString());
+				opdrachtElement.setAttribute("hasFoto",
+						Boolean.FALSE.toString());
+				opdrachtElement.setAttribute("bordProbleem",
+						Boolean.FALSE.toString());
+				opdrachtElement
+						.setAttribute("hasNaam", Boolean.TRUE.toString());
+				opdrachtElement.setAttribute("netwerkbord",
+						Boolean.FALSE.toString());
+				if (opdracht.getTrajectType().contains("netwerk")) {
+					opdrachtElement.setAttribute("netwerkbord",
+							Boolean.TRUE.toString());
+				}
+
+				if (traject instanceof NetwerkSegment) {
+					opdrachtElement.setAttribute("segment",
+							Boolean.TRUE.toString());
+					opdrachtElement.setAttribute("hasNaam",
+							Boolean.FALSE.toString());
+				}
+
+				if (opdracht.getProbleem().getFoto() != null) {
+					opdrachtElement.setAttribute("hasFoto",
+							Boolean.TRUE.toString());
+				}
+
+				// VOORBEELD FOTO ROUTEBORD
+				if (bord instanceof RouteBord) {
+					Element voorbeeldFoto = doc.createElement("voorbeeldFoto");
+					voorbeeldFoto.appendChild(doc
+							.createTextNode(getVoorbeeldRouteBord(traject)));
+					opdrachtElement.appendChild(voorbeeldFoto);
+				}
+				// VOORBEELD FOTO NETWERKBORD
+				if (bord instanceof NetwerkBord) {
+					Element voorbeeldFotoKp = doc
+							.createElement("voorbeeld_kp_bord");
+					NetwerkBord nwb = (NetwerkBord) bord;
+					voorbeeldFotoKp.appendChild(doc
+							.createTextNode(getVoorbeeldNetwerkBord(nwb)));
+
+					opdrachtElement.appendChild(voorbeeldFotoKp);
+				}
+
+				// GEMEENTE OPDRACHT
+				Element gemeente = doc.createElement("gemeente");
+				if (opdracht.getGemeente() != null) {
+					gemeente.appendChild(doc.createTextNode(opdracht
+							.getGemeente()));
+				}
+				opdrachtElement.appendChild(gemeente);
+
+				// NAAM TRAJECT
+				if (traject instanceof Route || traject instanceof NetwerkLus) {
+
+					Element trajectNaam = doc.createElement("trajectnaam");
+					if (traject.getNaam() != null) {
+						trajectNaam.appendChild(doc.createTextNode(traject
+								.getNaam()));
+					}
+					opdrachtElement.appendChild(trajectNaam);
+				}
+
+				else if (traject instanceof NetwerkSegment) {
+
+					NetwerkSegment seg = (NetwerkSegment) traject;
+
+					Element vanKp = doc.createElement("vankp");
+					if (seg.getVanKpNr().toString() != null) {
+						vanKp.appendChild(doc.createTextNode(seg.getVanKpNr()
+								.toString()));
+					}
+					opdrachtElement.appendChild(vanKp);
+
+					Element naarKp = doc.createElement("naarkp");
+					if (seg.getNaarKpNr().toString() != null) {
+						naarKp.appendChild(doc.createTextNode(seg.getNaarKpNr()
+								.toString()));
+					}
+					rootElement.appendChild(naarKp);
+				}
+
+				// TYPE PAAL
+				Element paalType = doc.createElement("paaltype");
+				if (bord.getPaalConst() != null) {
+					paalType.appendChild(doc.createTextNode(bord.getPaalConst()));
+				}
+				bordElement.appendChild(paalType);
+
+				// DIAMETER PAAL
+				Element paalDiameter = doc.createElement("paaldiameter");
+				if (bord.getPaalDia() != null) {
+					paalDiameter.appendChild(doc.createTextNode(bord
+							.getPaalDia()));
+				}
+				bordElement.appendChild(paalDiameter);
+
+				// PAALBEUGEL
+				Element paalBeugel = doc.createElement("paalbeugel");
+				if (bord.getPaalBeugel() != null) {
+					paalBeugel.appendChild(doc.createTextNode(bord
+							.getPaalBeugel()));
+				}
+				bordElement.appendChild(paalBeugel);
+
+				// PAALONDERGROND
+				Element paalOndergrond = doc.createElement("paalondergrond");
+				if (bord.getPaalGrond() != null) {
+					paalOndergrond.appendChild(doc.createTextNode(bord
+							.getPaalGrond()));
+				}
+				bordElement.appendChild(paalOndergrond);
+
+				// BORD
+				if (opdracht.getProbleem() instanceof BordProbleem) {
+					opdrachtElement.setAttribute("bordProbleem",
+							Boolean.TRUE.toString());
+				}
+				// WERKHANDELINGEN
+				if (opdracht.getHandelingen() != null
+						&& !opdracht.getHandelingen().isEmpty()) {
+					for (WerkHandeling h : opdracht.getHandelingen()) {
+
+						if (h != null && h.getType() != null) {
+							Element handeling = doc.createElement("handeling");
+							opdrachtElement.appendChild(handeling);
+
+							Element nummer = doc.createElement("nummer");
+							nummer.appendChild(doc.createTextNode(String
+									.valueOf(counter)));
+							handeling.appendChild(nummer);
+							counter++;
+
+							Element type = doc.createElement("type");
+							type.appendChild(doc.createTextNode(h.getType()));
+							handeling.appendChild(type);
+						}
+					}
+				}
+
+				// COMMENTAAR TOV
+				Element commentaar = doc.createElement("commentaar");
+				if (opdracht.getCommentaarMedewerker() != null) {
+					commentaar.appendChild(doc.createTextNode(opdracht
+							.getCommentaarMedewerker()));
+				}
+				opdrachtElement.appendChild(commentaar);
+
+				// URL BORDFOTO
+				Element bordFoto = doc.createElement("bordfoto");
+				if (bord.getFoto() != null) {
+					bordFoto.appendChild(doc.createTextNode(bord.getFoto()
+							.toString()));
+				}
+				opdrachtElement.appendChild(bordFoto);
+
+				// FOTO PROBLEEM
+				Element probleemFoto = doc.createElement("probleemfoto");
+				if (opdracht.getProbleem().getFoto() != null) {
+					probleemFoto.appendChild(doc.createTextNode(Base64
+							.encode(opdracht.getProbleem().getFoto())));
+				} else {
+					probleemFoto.appendChild(doc
+							.createTextNode(getUrlGeenFoto()));
+				}
+				opdrachtElement.appendChild(probleemFoto);
+
+				// REGIO
+				Element regio = doc.createElement("regio");
+				String regioNaam = Beans.getReference(
+						OsyrisModelFunctions.class).getTrajectRegio(
+						opdracht.getTraject());
+				if (regioNaam != null) {
+					regio.appendChild(doc.createTextNode(regioNaam));
+				}
+				opdrachtElement.appendChild(regio);
+
+				// TYPE TRAJECT
+				Element trajectType = doc.createElement("trajecttype");
+				if (opdracht.getTrajectType() != null) {
+					trajectType.appendChild(doc.createTextNode(opdracht
+							.getTrajectType()));
+				}
+				opdrachtElement.appendChild(trajectType);
+
+				// BORD ID
+				Element bordId = doc.createElement("bordId");
+				bordId.appendChild(doc.createTextNode(bord.getId().toString()));
+				bordElement.appendChild(bordId);
+
+				// GEMEENTE BORD
+				Element bordGemeente = doc.createElement("bordGemeente");
+				if (bord.getGemeente() != null) {
+					bordGemeente.appendChild(doc.createTextNode(bord
+							.getGemeente()));
+				}
+				bordElement.appendChild(bordGemeente);
+
+				// STRAAT BORD
+				Element bordStraat = doc.createElement("bordStraat");
+				if (bord.getStraatnaam() != null) {
+					bordStraat.appendChild(doc.createTextNode(bord
+							.getStraatnaam()));
+				}
+				bordElement.appendChild(bordStraat);
+
+				// X
+				Element x = doc.createElement("x");
+				x.appendChild(doc.createTextNode(BigDecimal
+						.valueOf(bord.getX())
+						.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+				bordElement.appendChild(x);
+
+				// Y
+				Element y = doc.createElement("y");
+				y.appendChild(doc.createTextNode(BigDecimal
+						.valueOf(bord.getY())
+						.setScale(2, BigDecimal.ROUND_HALF_UP).toString()));
+				bordElement.appendChild(y);
+
+				// WEGBEVOEGD
+				Element wegBevoegd = doc.createElement("wegbevoegd");
+				if (bord.getWegBevoegd() != null) {
+					wegBevoegd.appendChild(doc.createTextNode(bord
+							.getWegBevoegd()));
+				}
+				bordElement.appendChild(wegBevoegd);
+
+				// ROUTEBORD
+				if (bord instanceof RouteBord) {
+					RouteBord rb = (RouteBord) bord;
+
+					Element pijl = doc.createElement("pijl");
+					if (rb.getImageCode() != null) {
+						pijl.appendChild(doc.createTextNode(getPijlBord(rb
+								.getImageCode())));
+					}
+					bordElement.appendChild(pijl);
+
+					Element volg = doc.createElement("volg");
+					if (rb.getVolg() != null) {
+						volg.appendChild(doc.createTextNode(rb.getVolg()));
+					}
+					bordElement.appendChild(volg);
+				}
+
+				// NETWERKBORD
+				if (bord instanceof NetwerkBord) {
+
+					NetwerkBord nwb = (NetwerkBord) bord;
+
+					// KP 0
+					Element knooppunt0 = doc.createElement("knooppunt0");
+
+					if (nwb.getKpnr0() != null) {
+						knooppunt0.appendChild(doc.createTextNode(nwb
+								.getKpnr0().toString()));
+					}
+					bordElement.appendChild(knooppunt0);
+
+					// KP 1
+					Element knooppunt1 = doc.createElement("knooppunt1");
+					Element knooppunt1Pijl = doc.createElement("kp1_pijl");
+
+					if (nwb.getKpnr1() != null) {
+						knooppunt1.appendChild(doc.createTextNode(nwb
+								.getKpnr1().toString()));
+
+						knooppunt1Pijl.appendChild(doc
+								.createTextNode(getPijlBord(nwb
+										.getKp1ImageCode())));
+					}
+					bordElement.appendChild(knooppunt1);
+					bordElement.appendChild(knooppunt1Pijl);
+
+					// KP 2
+					Element knooppunt2 = doc.createElement("knooppunt2");
+					Element knooppunt2Pijl = doc.createElement("kp2_pijl");
+
+					if (nwb.getKpnr2() != null) {
+						knooppunt2.appendChild(doc.createTextNode(nwb
+								.getKpnr2().toString()));
+
+						knooppunt2Pijl.appendChild(doc
+								.createTextNode(getPijlBord(nwb
+										.getKp2ImageCode())));
+					}
+					bordElement.appendChild(knooppunt2);
+					bordElement.appendChild(knooppunt2Pijl);
+
+					// KP 3
+					Element knooppunt3 = doc.createElement("knooppunt3");
+					Element knooppunt3Pijl = doc.createElement("kp3_pijl");
+
+					if (nwb.getKpnr3() != null) {
+						knooppunt3.appendChild(doc.createTextNode(nwb
+								.getKpnr3().toString()));
+
+						knooppunt3Pijl.appendChild(doc
+								.createTextNode(getPijlBord(nwb
+										.getKp3ImageCode())));
+					}
+					bordElement.appendChild(knooppunt3);
+					bordElement.appendChild(knooppunt3Pijl);
+				}
+
+				// TYPE CONSTRUCTIE
+				Element constructieType = doc.createElement("constructieType");
+				if (bord.getBordConst() != null) {
+					constructieType.appendChild(doc.createTextNode(bord
+							.getBordConst()));
+				}
+				bordElement.appendChild(constructieType);
+
+				// ORTHO KAART
+				Element mapOrtho = doc.createElement("mapOrtho");
+				mapOrtho.appendChild(doc.createTextNode(getMapBord(viewer,
+						traject, bord, true)));
+				bordElement.appendChild(mapOrtho);
+
+				// TOPO KAART
+				Element mapTopo = doc.createElement("mapTopo");
+				mapTopo.appendChild(doc.createTextNode(getMapBord(viewer,
+						traject, bord, false)));
+				bordElement.appendChild(mapTopo);
+			}
+		}
+
+		// Reset the map to the selected WO
+		resetMapSelectedWO(viewer, selectedWerkOpdracht);
+
+		return doc;
+	}
+
+	/**
+	 * Aanmaken afbeelding en teruggeven url van de kaartafbeelding ingezoomd op
+	 * het Bord voor een opdracht met een BordProbleem. Deze variant wordt
+	 * gebruikt voor het opstellen van alle WO fiches uit een UVR.
+	 * 
+	 * @param viewer
+	 * @param bord
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IOException
+	 */
+	private String getMapBord(MapViewer viewer, Traject traject, Bord bord,
+			boolean hasOrthoBasemap) throws InstantiationException,
+			IllegalAccessException, IOException {
+
+		double scale = SCALE_ORTHO;
+
+		if (!hasOrthoBasemap) {
+			viewer.setBaseLayerId("topo");
+			scale = SCALE_TOPO;
+		}
+
+		// ROUTES EN LUSSEN
+		if (traject instanceof Route || traject instanceof NetwerkLus) {
+
+			Beans.getReference(UitvoeringsrondeOverzichtFormBase.class)
+					.processRouteOrNetwerkLus(traject,
+							viewer.getConfiguration(), viewer.getContext());
+		}
+
+		// SEGMENTEN
+		if (traject instanceof NetwerkSegment) {
+
+			Beans.getReference(UitvoeringsrondeOverzichtFormBase.class)
+					.processNetwerkSegment(traject, viewer.getConfiguration(),
+							viewer.getContext());
+		}
+
+		// Selecteer bord
+		List<String> ids = new ArrayList<String>(Arrays.asList(bord.getId()
+				.toString()));
+
+		FeatureMapLayer bordLayer = (FeatureMapLayer) viewer.getContext()
+				.getLayer(
+						LabelUtils.lowerCamelCase(bord.getModelClass()
+								.getName()));
+
+		bordLayer.setSelection(ids);
+		// viewer.setSelection(bordLayer, ids);
+
+		Coordinate centerPoint = bord.getGeom().getCoordinate();
+		int width = 450;
+		int height = 300;
+
+		double worldWidth = GeometryUtils.pixelsToWorld(width, scale, DPI);
+		double worldHeight = GeometryUtils.pixelsToWorld(height, scale, DPI);
+
+		CoordinateReferenceSystem crs = viewer.getContext().getCrs();
+
+		Envelope boundingBox = new ReferencedEnvelope(centerPoint.x
+				- worldWidth / 2, centerPoint.x + worldWidth / 2, centerPoint.y
+				- worldHeight / 2, centerPoint.y + worldHeight / 2, crs);
+
+		RenderedImage mapImage = viewer.getMap(
+				viewer.getContext().getSrsName(), boundingBox, null, width,
+				height, scale);
+
+		// Terugzetten naar tms baseLayer
+		viewer.unselectFeatures(bordLayer, ids);
+		viewer.setBaseLayerId("tms");
+
+		return getImage(bord, mapImage);
+	}
+
+	/**
+	 * Aanmaken afbeelding en teruggeven url van de kaartafbeelding ingezoomd op
+	 * de aangeduide locatie van het Probleem voor een opdracht met een
+	 * AnderProbleem. Deze variant wordt gebruikt voor het opstellen van alle WO
+	 * fiches uit een UVR.
+	 * 
+	 * @param viewer
+	 * @param probleem
+	 * @param hasOrthoBasemap
+	 * @return
+	 * @throws InstantiationException
+	 * @throws IllegalAccessException
+	 * @throws IOException
+	 */
+	private String getMapAnderProbleem(MapViewer viewer, Traject traject,
+			AnderProbleem anderProbleem, boolean hasOrthoBasemap)
+			throws InstantiationException, IllegalAccessException, IOException {
+
+		double scale = SCALE_TOPO * 2;
+		Coordinate[] coordinates = null;
+		GeometryFactory factory = new GeometryFactory();
+		LineString line = null;
+		Coordinate centerPoint;
+
+		if (!hasOrthoBasemap) {
+			viewer.setBaseLayerId("navstreet");
+			scale = SCALE_TOPO * 3;
+		}
+
+		// ROUTES EN LUSSEN
+		if (traject instanceof Route || traject instanceof NetwerkLus) {
+
+			Beans.getReference(UitvoeringsrondeOverzichtFormBase.class)
+					.processRouteOrNetwerkLus(traject,
+							viewer.getConfiguration(), viewer.getContext());
+		}
+
+		// SEGMENTEN
+		if (traject instanceof NetwerkSegment) {
+
+			Beans.getReference(UitvoeringsrondeOverzichtFormBase.class)
+					.processNetwerkSegment(traject, viewer.getConfiguration(),
+							viewer.getContext());
+		}
+
+		anderProbleemGeoms = new ArrayList<Geometry>();
+		anderProbleemLineGeoms = new ArrayList<Geometry>();
+
+		// Geometry laag voor punt probleem
+		GeometryListFeatureMapLayer geomLayer = (GeometryListFeatureMapLayer) Beans
+				.getReference(MapFactory.class).createGeometryLayer(
+						viewer.getConfiguration().getContext(),
+						GEOMETRY_LAYER_NAME, null, Point.class, null, true,
+						"single", null, null);
+
+		// Geometry laag voor lijn probleem
+		GeometryListFeatureMapLayer geomLineLayer = (GeometryListFeatureMapLayer) Beans
+				.getReference(MapFactory.class).createGeometryLayer(
+						viewer.getConfiguration().getContext(),
+						GEOMETRY_LAYER_LINE_NAME, null, LineString.class, null,
+						true, "single", null, null);
+
+		// Ander Probleem
+		if (anderProbleem.getGeom() != null
+				&& anderProbleem.getGeom() instanceof Point) {
+
+			anderProbleemGeoms.add(anderProbleem.getGeom());
+			geomLayer.setGeometries(anderProbleemGeoms);
+			geomLayer.setHidden(false);
+		}
+
+		else if (anderProbleem.getGeomOmleiding() instanceof LineString) {
+
+			anderProbleemLineGeoms.add(anderProbleem.getGeomOmleiding());
+			geomLineLayer.setGeometries(anderProbleemLineGeoms);
+			geomLineLayer.setHidden(false);
+		}
+
+		// Map centreren op het punt tussen het anderProbleempunt en het
+		// dichtstbijzijnde bord indien aanwezig
+		if (nearestBord != null) {
+			coordinates = new Coordinate[] {
+					anderProbleem.getGeom().getCoordinate(),
+					nearestBord.getGeom().getCoordinate() };
+			line = factory.createLineString(coordinates);
+			centerPoint = line.getCentroid().getCoordinate();
+		} else {
+			centerPoint = anderProbleem.getGeom().getCoordinate();
+		}
+
+		int width = 450;
+		int height = 300;
+
+		double worldWidth = GeometryUtils.pixelsToWorld(width, scale, DPI);
+		double worldHeight = GeometryUtils.pixelsToWorld(height, scale, DPI);
+
+		CoordinateReferenceSystem crs = viewer.getContext().getCrs();
+		Envelope boundingBox = new ReferencedEnvelope(centerPoint.x
+				- worldWidth / 2, centerPoint.x + worldWidth / 2, centerPoint.y
+				- worldHeight / 2, centerPoint.y + worldHeight / 2, crs);
+
+		RenderedImage mapImage = viewer.getMap(
+				viewer.getContext().getSrsName(), boundingBox, null, width,
+				height, scale);
+
+		// Terugzetten naar tms baseLayer
+		viewer.setBaseLayerId("tms");
+
+		return getImage(anderProbleem, mapImage);
+	}
+
+	/**
+	 * Resetten van de kaartlagen wanneer er fiches worden opgesteld voor alle
+	 * WO in een UVR.
+	 * 
+	 * @param viewer
+	 */
+	public void resetLayers(MapViewer viewer) {
+
+		for (FeatureMapLayer layer : viewer.getContext().getFeatureLayers()) {
+			layer.setFilter(null);
+			layer.setHidden(true);
+			layer.setSelection(Collections.EMPTY_LIST);
+		}
+	}
+
+	/**
+	 * Reset the map to match the selected WO.
+	 * 
+	 * @throws IOException
+	 * @throws IllegalAccessException
+	 * @throws InstantiationException
+	 * 
+	 */
+	public void resetMapSelectedWO(MapViewer viewer,
+			WerkOpdracht selectedWerkOpdracht) throws IOException,
+			InstantiationException, IllegalAccessException {
+
+		// Ophalen traject
+		Traject traject = (Traject) Beans.getReference(ModelRepository.class)
+				.loadObject(selectedWerkOpdracht.getTraject());
+
+		// ROUTES EN LUSSEN
+		if (traject instanceof Route || traject instanceof NetwerkLus) {
+
+			Beans.getReference(UitvoeringsrondeOverzichtFormBase.class)
+					.processRouteOrNetwerkLus(traject,
+							viewer.getConfiguration(), viewer.getContext());
+		}
+
+		// SEGMENTEN
+		if (traject instanceof NetwerkSegment) {
+
+			Beans.getReference(UitvoeringsrondeOverzichtFormBase.class)
+					.processNetwerkSegment(traject, viewer.getConfiguration(),
+							viewer.getContext());
+		}
+
+		viewer.setBaseLayerId("tms");
 	}
 }

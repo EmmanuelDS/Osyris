@@ -42,10 +42,11 @@ public class ControleOpdrachtSaveListener {
 		ControleOpdracht controleOpdracht = (ControleOpdracht) event
 				.getModelObject();
 
-		if (null == controleOpdracht.getMedewerker()) {
-			controleOpdracht.setMedewerker(osyrisModelFunctions
-					.zoekVerantwoordelijke(controleOpdracht.getTraject()));
-		}
+		// Altijd medewerker herberekenen
+		// if (null == controleOpdracht.getMedewerker()) {
+		controleOpdracht.setMedewerker(osyrisModelFunctions
+				.zoekVerantwoordelijke(controleOpdracht.getTraject()));
+		// }
 
 		if (controleOpdracht.getJaar() == null) {
 			Calendar c = Calendar.getInstance();

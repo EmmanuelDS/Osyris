@@ -101,6 +101,7 @@ import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
 import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
+import be.gim.tov.osyris.model.werk.WerkHandeling;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.exceptions.AlreadyInRondeException;
 import be.gim.tov.osyris.model.werk.exceptions.InStatusTeControlerenException;
@@ -472,7 +473,7 @@ public class WerkOpdrachtOverzichtFormBase extends
 
 		try {
 			if (identity.inGroup("Routedokter", "CUSTOM")) {
-				return query;
+				// return query;
 			} else if (identity.inGroup("Uitvoerder", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
 						.getResourceName(userRepository.loadUser(identity
@@ -763,25 +764,36 @@ public class WerkOpdrachtOverzichtFormBase extends
 	@Override
 	public void save() {
 		try {
-			modelRepository.saveObject(object);
-			messages.info("Werkopdracht succesvol bewaard.");
+			setHasErrors(true);
 
-			// Stuur mail naar uitvoerder indien werkopdracht gewijzigd door TOV
-			// en in status uit te voeren
-			if (object.getStatus().equals(WerkopdrachtStatus.UIT_TE_VOEREN)
-					&& (identity.inGroup("admin", "CUSTOM")
-							|| identity.inGroup("Medewerker", "CUSTOM") || identity
-								.inGroup("Routedokter", "CUSTOM"))) {
+			// Check of alle handelingen in de WO een type hebben ingevuld
+			if (checkHandelingen()) {
 
-				String mailServiceStatus = DefaultConfiguration.instance()
-						.getString("service.mail.werkOpdracht");
+				setHasErrors(false);
 
-				if (mailServiceStatus.equalsIgnoreCase("on")) {
-					sendWerkOpdrachtEditedMail();
+				modelRepository.saveObject(object);
+				messages.info("Werkopdracht succesvol bewaard.");
+
+				// Stuur mail naar uitvoerder indien werkopdracht gewijzigd door
+				// TOV
+				// en in status uit te voeren
+				if (object.getStatus().equals(WerkopdrachtStatus.UIT_TE_VOEREN)
+						&& (identity.inGroup("admin", "CUSTOM")
+								|| identity.inGroup("Medewerker", "CUSTOM") || identity
+									.inGroup("Routedokter", "CUSTOM"))) {
+
+					String mailServiceStatus = DefaultConfiguration.instance()
+							.getString("service.mail.werkOpdracht");
+
+					if (mailServiceStatus.equalsIgnoreCase("on")) {
+						sendWerkOpdrachtEditedMail();
+					}
 				}
+				// clear();
+				search();
+			} else {
+				messages.warn("De werkopdracht bevat handelingen waarvoor het type blanco is. Gelieve een type op te geven of de handeling te verwijderen.");
 			}
-			// clear();
-			search();
 
 		} catch (IOException e) {
 			messages.error("Fout bij het bewaren van werkopdracht: "
@@ -793,6 +805,21 @@ public class WerkOpdrachtOverzichtFormBase extends
 					+ e.getMessage());
 			LOG.error("Can not send email", e);
 		}
+	}
+
+	/**
+	 * Checken van de types in alle werkhandelingen van de te bewaren
+	 * WerkOpdracht.
+	 * 
+	 */
+	public boolean checkHandelingen() {
+
+		for (WerkHandeling handeling : object.getHandelingen()) {
+			if (handeling.getType() == null || handeling.getType().isEmpty()) {
+				return false;
+			}
+		}
+		return true;
 	}
 
 	/**
@@ -1498,8 +1525,10 @@ public class WerkOpdrachtOverzichtFormBase extends
 			// out.toByteArray());
 
 		} finally {
-			in.close();
-			out.close();
+			// in.close();
+			// out.close();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
 	}
 
@@ -1680,8 +1709,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 		setKnooppuntNummer(null);
 		trajectNaamCreate = null;
 
-		object.setMedewerker(Beans.getReference(OsyrisModelFunctions.class)
-				.zoekVerantwoordelijke(trajectTypeCreate));
+		// Will be obsolete when new TrajectVerantwoordelijkheid is enabled
+		// object.setMedewerker(Beans.getReference(OsyrisModelFunctions.class)
+		// .zoekVerantwoordelijke(trajectTypeCreate));
 	}
 
 	/**
@@ -2546,6 +2576,30 @@ public class WerkOpdrachtOverzichtFormBase extends
 	public void resetSearchParameters() {
 		trajectId = null;
 		trajectNaamSearch = null;
+	}
+
+	/**
+	 * Check of de geselecteerde WO mag gevalideerd worden door te kijken of de
+	 * bijbehorende UVR in status UITGEVOERD staat. Indien geen UVR gekoppeld
+	 * is, mag de de WO eveneens gevalideerd worden.
+	 * 
+	 */
+	public boolean canValidate(WerkOpdracht opdracht) {
+
+		if (opdracht.getStatus().equals(WerkopdrachtStatus.GERAPPORTEERD)) {
+			Uitvoeringsronde ronde = getUitvoeringsronde();
+
+			if (ronde != null) {
+				if (ronde.getStatus().equals(UitvoeringsrondeStatus.UITGEVOERD)) {
+					return true;
+				}
+			}
+			// Er is geen UVR gekoppeld, de WO mag toch gevalideerd worden
+			else {
+				return true;
+			}
+		}
+		return false;
 	}
 
 	/*

@@ -10,12 +10,17 @@
 	xmlns:p="http://primefaces.org/ui">
 
 	<p:dataTable id="objects"
-		value="#{stockMateriaalOverzichtFormBase.dataModel}" lazy="true"
-		var="stockMateriaal" style="width: 100%;" styleClass="blue"
+		value="#{stockMateriaalOverzichtFormBase.dataModel}" 
+		lazy="true"
+		var="stockMateriaal" 
+		style="width: 100%;" 
+		styleClass="blue"
 		paginator="true" rows="50"
 		paginatorTemplate="{FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink} {RowsPerPageDropdown}"
-		rowsPerPageTemplate="10,20,30,40,50" scrollable="true"
-		resizableColumns="true" tableStyle="min-width: 850px"
+		rowsPerPageTemplate="10,20,30,40,50" 
+		scrollable="true"
+		resizableColumns="true" 
+		tableStyle="min-width: 850px"
 		emptyMessage="#{messages['ui.dataTable.empty']}">
 		<j:layoutContent />
 		<p:column label="Acties" style="width:60px;">
@@ -58,8 +63,91 @@
 				</j:commandButton>
 			</a:outputPanel>
 		</p:column>
-		<p:column label="Magazijn" sortBy="#{stockMateriaal.magazijn }"
-			style="width:80px;">
+		<p:column label="Regio" sortBy="#{stockMateriaal.regio }"
+			style="width:60px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('regio')}" />
+			</f:facet>
+			<d:propertyValue id="regioColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('regio')}"
+				value="#{stockMateriaal.regio }" mode="VIEW" />
+		</p:column>
+		
+		<p:column label="Type" sortBy="#{stockMateriaal.type }"
+			style="width:115px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('type')}" />
+			</f:facet>
+			<d:propertyValue id="typeColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
+				value="#{stockMateriaal.type }" mode="VIEW" />
+		</p:column>
+		<p:column label="Naam" sortBy="#{stockMateriaal.naam }"
+			style="width:205px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('naam')}" />
+			</f:facet>
+			<d:propertyValue id="naamColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
+				value="#{stockMateriaal.naam }" mode="VIEW" />
+		</p:column>
+		<p:column label="Nummer" sortBy="#{stockMateriaal.nummer }"
+			style="width:35px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('nummer')}" />
+			</f:facet>
+			<d:propertyValue id="nummerColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
+				value="#{stockMateriaal.nummer }" mode="VIEW" />
+		</p:column>
+		<p:column label="In stock" sortBy="#{stockMateriaal.inStock }"
+			style="width:35px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('inStock')}" />
+			</f:facet>
+			<d:propertyValue id="inStockColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('inStock')}"
+				value="#{stockMateriaal.inStock }" mode="VIEW" />
+		</p:column>
+		<p:column label="Mininum" sortBy="#{stockMateriaal.min}"
+			style="width:35px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('min')}" />
+			</f:facet>
+			<d:propertyValue id="minimumColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('min')}"
+				value="#{stockMateriaal.min }" mode="VIEW" />
+		</p:column>
+		<p:column label="Maximum" sortBy="#{stockMateriaal.max }"
+			style="width:35px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('max')}" />
+			</f:facet>
+			<d:propertyValue id="MaximumColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('max')}"
+				value="#{stockMateriaal.max }" mode="VIEW" />
+		</p:column>
+		<p:column label="te bestellen" sortBy="#{stockMateriaal.teBestellen }"
+			style="width:70px;">
+			<f:facet name="header">
+				<d:displayLabel
+					property="#{d:modelClass('StockMateriaal').getProperty('teBestellen')}" />
+			</f:facet>
+			<d:propertyValue id="teBestellenColumn"
+				modelProperty="#{d:modelClass('StockMateriaal').getProperty('teBestellen')}"
+				value="#{stockMateriaal.teBestellen }" mode="VIEW" />
+		</p:column>
+		<p:column label="Magazijn" 
+			sortBy="#{stockMateriaal.magazijn }"
+			style="width:55px;"
+			rendered="#{!identity.inGroup('Uitvoerder','CUSTOM')}">
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('StockMateriaal').getProperty('magazijn')}" />
@@ -88,78 +176,8 @@
 				modelProperty="#{d:modelClass('StockMateriaal').getProperty('subCategorie')}"
 				value="#{stockMateriaal.subCategorie }" mode="VIEW" />
 		</p:column>
-		<p:column label="Type" sortBy="#{stockMateriaal.type }"
-			style="width:140px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('type')}" />
-			</f:facet>
-			<d:propertyValue id="typeColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('type')}"
-				value="#{stockMateriaal.type }" mode="VIEW" />
-		</p:column>
-		<p:column label="Naam" sortBy="#{stockMateriaal.naam }"
-			style="width:400px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('naam')}" />
-			</f:facet>
-			<d:propertyValue id="naamColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('naam')}"
-				value="#{stockMateriaal.naam }" mode="VIEW" />
-		</p:column>
-		<p:column label="Nummer" sortBy="#{stockMateriaal.nummer }"
-			style="width:50px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('nummer')}" />
-			</f:facet>
-			<d:propertyValue id="nummerColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('nummer')}"
-				value="#{stockMateriaal.nummer }" mode="VIEW" />
-		</p:column>
-		<p:column label="In stock" sortBy="#{stockMateriaal.inStock }"
-			style="width:50px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('inStock')}" />
-			</f:facet>
-			<d:propertyValue id="inStockColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('inStock')}"
-				value="#{stockMateriaal.inStock }" mode="VIEW" />
-		</p:column>
-		<p:column label="Minimum" sortBy="#{stockMateriaal.min}"
-			style="width:60px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('min')}" />
-			</f:facet>
-			<d:propertyValue id="minimumColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('min')}"
-				value="#{stockMateriaal.min }" mode="VIEW" />
-		</p:column>
-		<p:column label="Maximum" sortBy="#{stockMateriaal.max }"
-			style="width:60px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('max')}" />
-			</f:facet>
-			<d:propertyValue id="MaximumColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('max')}"
-				value="#{stockMateriaal.max }" mode="VIEW" />
-		</p:column>
-		<p:column label="te bestellen" sortBy="#{stockMateriaal.teBestellen }"
-			style="width:65px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('teBestellen')}" />
-			</f:facet>
-			<d:propertyValue id="teBestellenColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('teBestellen')}"
-				value="#{stockMateriaal.teBestellen }" mode="VIEW" />
-		</p:column>
 		<p:column label="Besteld" sortBy="#{stockMateriaal.besteld }"
-			style="width:65px;">
+			style="width:60px;">
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('StockMateriaal').getProperty('besteld')}" />
@@ -168,18 +186,8 @@
 				modelProperty="#{d:modelClass('StockMateriaal').getProperty('besteld')}"
 				value="#{stockMateriaal.besteld }" mode="VIEW" />
 		</p:column>
-		<p:column label="Regio" sortBy="#{stockMateriaal.regio }"
-			style="width:105px;">
-			<f:facet name="header">
-				<d:displayLabel
-					property="#{d:modelClass('StockMateriaal').getProperty('regio')}" />
-			</f:facet>
-			<d:propertyValue id="regioColumn"
-				modelProperty="#{d:modelClass('StockMateriaal').getProperty('regio')}"
-				value="#{stockMateriaal.regio }" mode="VIEW" />
-		</p:column>
 		<p:column label="Datum besteld"
-			sortBy="#{stockMateriaal.datumBesteld }" style="width:80px;">
+			sortBy="#{stockMateriaal.datumBesteld }" style="width:65px;">
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('StockMateriaal').getProperty('datumBesteld')}" />
@@ -189,7 +197,7 @@
 				value="#{stockMateriaal.datumBesteld }" mode="VIEW" />
 		</p:column>
 		<p:column label="Datum geleverd"
-			sortBy="#{stockMateriaal.datumGeleverd }" style="width:85px;">
+			sortBy="#{stockMateriaal.datumGeleverd }" style="width:65px;">
 			<f:facet name="header">
 				<d:displayLabel
 					property="#{d:modelClass('StockMateriaal').getProperty('datumGeleverd')}" />

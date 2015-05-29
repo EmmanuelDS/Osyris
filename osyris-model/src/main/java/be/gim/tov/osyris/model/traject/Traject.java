@@ -2,16 +2,8 @@ package be.gim.tov.osyris.model.traject;
 
 import static org.conscientia.api.model.SubClassPersistence.UNION;
 
-import java.io.IOException;
-import java.io.Serializable;
-import java.util.Map;
-
-import javax.persistence.Transient;
-
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.conscientia.api.cache.CacheProducer;
 import org.conscientia.api.model.StorableObject;
 import org.conscientia.api.model.annotation.Edit;
 import org.conscientia.api.model.annotation.Index;
@@ -27,14 +19,11 @@ import org.conscientia.api.model.annotation.SrsName;
 import org.conscientia.api.model.annotation.SubClassPersistence;
 import org.conscientia.api.model.annotation.Target;
 import org.conscientia.api.model.annotation.ValuesExpression;
-import org.conscientia.api.repository.ModelRepository;
+import org.conscientia.api.model.annotation.View;
 import org.conscientia.core.model.AbstractModelObject;
 
-import be.gim.commons.bean.Beans;
 import be.gim.commons.resource.ResourceIdentifier;
 import be.gim.tov.osyris.model.annotation.NotEditableForModelClass;
-import be.gim.tov.osyris.model.bean.OsyrisModelFunctions;
-import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 
 import com.vividsolutions.jts.geom.Geometry;
 
@@ -47,6 +36,7 @@ import com.vividsolutions.jts.geom.Geometry;
 @ModelStore("OsyrisDataStore")
 @SubClassPersistence(UNION)
 @Search(type = "traject")
+@View(type = "traject")
 public abstract class Traject extends AbstractModelObject implements
 		StorableObject {
 
@@ -170,46 +160,32 @@ public abstract class Traject extends AbstractModelObject implements
 		this.labelId = labelId;
 	}
 
-	@Transient
-	@NotSearchable
-	@NotEditable
-	public ResourceIdentifier getMedewerker() {
-
-		Map<Serializable, Object> cache = Beans.getReference(
-				CacheProducer.class).getCache("trajectMedewerkerCache",
-				new Transformer() {
-
-					@Override
-					public Object transform(Object key) {
-
-						try {
-							for (ResourceIdentifier user : Beans.getReference(
-									OsyrisModelFunctions.class)
-									.getUsersInGroup("Medewerker")) {
-
-								MedewerkerProfiel profiel = (MedewerkerProfiel) Beans
-										.getReference(ModelRepository.class)
-										.loadAspect(
-												Beans.getReference(
-														ModelRepository.class)
-														.getModelClass(
-																"MedewerkerProfiel"),
-												user);
-
-								if (profiel != null
-										&& profiel.getTrajectType().contains(
-												key)) {
-									return user;
-								}
-							}
-						} catch (IOException e) {
-							LOG.error("Can not search objects.", e);
-						}
-
-						return null;
-					}
-				});
-
-		return (ResourceIdentifier) cache.get(getModelClass().getName());
-	}
+	/*
+	 * @Transient
+	 * 
+	 * @NotSearchable
+	 * 
+	 * @NotEditable public ResourceIdentifier getMedewerker() {
+	 * 
+	 * Map<Serializable, Object> cache = Beans.getReference(
+	 * CacheProducer.class).getCache("trajectMedewerkerCache", new Transformer()
+	 * {
+	 * 
+	 * @Override public Object transform(Object key) {
+	 * 
+	 * try { for (ResourceIdentifier user : Beans.getReference(
+	 * OsyrisModelFunctions.class) .getUsersInGroup("Medewerker")) {
+	 * 
+	 * MedewerkerProfiel profiel = (MedewerkerProfiel) Beans
+	 * .getReference(ModelRepository.class) .loadAspect( Beans.getReference(
+	 * ModelRepository.class) .getModelClass( "MedewerkerProfiel"), user);
+	 * 
+	 * if (profiel != null && profiel.getTrajectType().contains( key)) { return
+	 * user; } } } catch (IOException e) { LOG.error("Can not search objects.",
+	 * e); }
+	 * 
+	 * return null; } });
+	 * 
+	 * return (ResourceIdentifier) cache.get(getModelClass().getName()); }
+	 */
 }

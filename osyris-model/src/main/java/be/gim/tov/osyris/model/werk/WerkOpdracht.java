@@ -83,7 +83,7 @@ public class WerkOpdracht extends AbstractModelObject implements
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
 	@Edit(type = "menu")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	@ValuesExpression("#{osyrisModelFunctions.getVerantwoordelijkenTOV()}")
 	@Target("_blank")
 	private ResourceIdentifier medewerker;
 

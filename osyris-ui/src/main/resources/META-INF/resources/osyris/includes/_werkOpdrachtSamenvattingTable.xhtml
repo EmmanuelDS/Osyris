@@ -9,7 +9,7 @@
 	xmlns:m="http://specto.gim.be/map"
 	xmlns:p="http://primefaces.org/ui">
 	
-	<r:panel id="werkOpdrachtSamenvattingPanel">
+	<a:outputPanel id="werkOpdrachtSamenvattingPanel">
 		<p:dataTable id="samenvatting"
 			value="#{form.getWerkOpdrachtenInUitvoeringsronde(form.object)}"
 			mode="RESULT"
@@ -21,7 +21,7 @@
 			<j:bindAttribute var="werkOpdracht"
 						name="rowData" />
 			<f:facet name="header">
-			<h:outputText value="Samenvatting werkopdrachten in uitvoeringsronde" />
+			<h:outputText value="Overzicht werkopdrachten" />
 			</f:facet>
 	   		<p:column label="Acties">
 				<a:outputPanel styleClass="model-table-actions">
@@ -84,5 +84,5 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-	</r:panel>
+	</a:outputPanel>
 </u:composition>

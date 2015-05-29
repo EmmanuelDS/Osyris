@@ -11,13 +11,16 @@ import javax.annotation.PostConstruct;
 import javax.faces.bean.ViewScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.swing.SortOrder;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.conscientia.api.search.Query;
+import org.conscientia.api.search.QueryOrderBy;
 import org.conscientia.api.user.UserRepository;
 import org.conscientia.core.form.AbstractListForm;
 import org.conscientia.core.search.DefaultQuery;
+import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
 
@@ -197,6 +200,11 @@ public class MeldingOverzichtFormBase extends AbstractListForm<Melding>
 				LOG.error("Can not load user.", e);
 			}
 		}
+
+		DefaultQueryOrderBy orderBy = new DefaultQueryOrderBy(
+				FilterUtils.property("datumLaatsteWijziging"));
+		orderBy.setSortOrder(SortOrder.DESCENDING);
+		query.setOrderBy(Collections.singletonList((QueryOrderBy) orderBy));
 
 		return query;
 	}

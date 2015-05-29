@@ -7,8 +7,15 @@
 	xmlns:d="http://specto.gim.be/display"
 	xmlns:p="http://primefaces.org/ui"
 	xmlns:j="http://conscientia.org/jsf"
-	xmlns:m="http://specto.gim.be/map">
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:c="http://java.sun.com/jsp/jstl/core">
 	<h2>Werkopdracht #{d:modelObject(form.object).getId()} (uitvoeringsronde #{d:modelObject(form.uitvoeringsronde).getId()}) - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
+	
+	<br/>
+	
+	<c:if test="#{!form.canValidate(form.object)}">
+		
+	</c:if>
 	
 	<br/>
 	<table width="100%">
@@ -23,6 +30,38 @@
 	</p:tabView>
 	<br/>
 	
+	<p:fieldset legend="Opmerking" 
+		style="margin-bottom:20px"
+		rendered="#{form.object.status == 'GERAPPORTEERD' and !form.canValidate(form.object)}">		
+        <h:panelGrid columns="1" cellpadding="5">
+            <h:outputText
+                value="Deze werkopdracht kan momenteel niet gevalideerd worden 
+                omdat ronde #{d:modelObject(form.uitvoeringsronde).getId()} zich nog niet in status UITGEVOERD bevindt."  /> 
+                <h:outputText
+                value="Pas wanneer de uitvoerder de ronde naar TOV heeft verzonden (en dus in status UITGEVOERD komt te staan), 
+                kunnen de werkopdrachten in deze ronde gevalideerd worden."  />       
+        </h:panelGrid>
+    </p:fieldset>
+    
+    <p:fieldset legend="Opmerking" 
+		style="margin-bottom:20px"
+		rendered="#{form.object.status == 'GERAPPORTEERD' and form.uitvoeringsronde == null}">		
+        <h:panelGrid columns="1" cellpadding="5">
+           	<h:outputText
+               value="Deze werkopdracht is momenteel niet gekoppeld aan een uitvoeringsronde. 
+               U hebt de mogelijkheid om:" />
+            <ol>  
+            <li style="margin-bottom:10px;">  
+           		De werkopdracht te valideren zonder dat deze aan een ronde gekoppeld is.
+            </li>
+            <li>
+         		De werkopdracht eerst op te nemen in een nieuwe ronde. Gelieve er in dit geval rekening mee te houden 
+               	dat de werkopdrachten pas gevalideerd kunnen worden als de ronde zich in status UITGEVOERD bevindt."
+            </li>
+            </ol>
+        </h:panelGrid>
+    </p:fieldset>
+    
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>
@@ -40,27 +79,9 @@
 	</tr>
 	</table>
 	<br/>
-<!-- 
-	<r:panel id="fotoPanel" rendered="#{form.object.foto != null or form.object.foto2 != null or form.object.foto3 != null}">
-	<d:fields>
-		<d:propertyField id="foto"
-		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
-				value="#{form.object.foto}"
-				mode="VIEW" />
-		<d:propertyField id="foto2"
-		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
-				value="#{form.object.foto2}"
-				mode="VIEW" />
-		<d:propertyField id="foto3"
-		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
-				value="#{form.object.foto3}"
-				mode="VIEW" />
-	</d:fields>
-	</r:panel>	
--->
 	<d:buttons>
 		<j:commandButton
-			rendered="#{form.object.status == 'GERAPPORTEERD' }"
+			rendered="#{form.object.status == 'GERAPPORTEERD' and form.canValidate(form.object)}"
 			value="Valideren"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"

@@ -1,0 +1,52 @@
+<div
+	xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:cc="http://java.sun.com/jsf/composite">
+	<cc:interface componentType="be.gim.specto.ui.MapComponent" />
+	<cc:implementation>
+		<j:bind var="ribbon" />
+		<c:set
+			var="viewer"
+			value="#{ribbon.viewer}" />
+		<r:tabPanel
+			styleClass="component-map-ribbon"
+			switchType="client">
+			<r:tab id="mainTab"
+				header="#{messages['component.map.ribbon.main.label']}">
+				<j:dynamicInclude id="mainSection"
+					src="/resources/map/components2/_mainSection.xhtml">
+					<f:param name="viewer"
+						value="#{viewer}"/>
+				</j:dynamicInclude>
+			</r:tab>
+			<r:tab
+				id="editTab"
+				header="#{messages['component.map.ribbon.edit.label']}"
+				rendered="#{(!identity.inGroup('PeterMeter', 'CUSTOM') and !identity.inGroup('Uitvoerder','CUSTOM')) and viewer.editLayer != null}">
+				<j:dynamicInclude id="editSection"
+					src="/resources/map/components2/_editSection.xhtml">
+					<f:param name="viewer"
+						value="#{viewer}"/>
+				</j:dynamicInclude>
+			</r:tab>
+			<r:tab
+				id="exportTab"
+				header="#{messages['component.map.ribbon.export.label']}"
+				rendered="#{viewer.context.exportFormats.size() gt 0}">
+				<j:dynamicInclude id="exportSection"
+					src="/resources/map/components2/_exportSection.xhtml">
+					<f:param name="viewer"
+						value="#{viewer}"/>
+				</j:dynamicInclude>
+			</r:tab>
+		</r:tabPanel>
+	</cc:implementation>
+</div>

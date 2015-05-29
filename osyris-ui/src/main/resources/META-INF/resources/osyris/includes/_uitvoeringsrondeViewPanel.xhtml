@@ -10,6 +10,12 @@
 	xmlns:m="http://specto.gim.be/map">
 	<h2>Uitvoeringsronde #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getUitvoerderNaam(form.object.uitvoerder)}</h2>
 	<br/>
+	<!-- WerkOpdracht Samenvatting Table -->
+	<u:decorate
+				template="/resources/osyris/includes/_werkOpdrachtSamenvattingViewTable.xhtml">
+				<u:param name="form" value="#{form}" />
+	</u:decorate>
+	<br/>
 	<r:panel>
   		<d:fields>
    		<d:field label="Datum uitvoering" for="datumUitvoering">	 
@@ -19,16 +25,10 @@
 				mode="VIEW" />
 			</d:field>
 	</d:fields>
-	</r:panel>
+	
 	<br/>
-	<!-- WerkOpdracht Samenvatting Table -->
-	<u:decorate
-				template="/resources/osyris/includes/_werkOpdrachtSamenvattingViewTable.xhtml">
-				<u:param name="form" value="#{form}" />
-	</u:decorate>
-	<br/>
-	<r:panel>
-  		<d:fields>
+
+  	<d:fields>
    		<d:field label="Omschrijving uitvoeringsronde" for="omschrijving">	 
 		<d:propertyValue id="omschrijving" 
 				modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('omschrijving')}" 
@@ -36,10 +36,10 @@
 				mode="VIEW" />
 			</d:field>
 	</d:fields>
-	</r:panel>
+
 	<br/>
-	<r:panel>
-  		<d:fields>
+
+  	<d:fields>
    		<d:field label="Totaal aantal km" for="afstand">	 
 		<d:propertyValue id="afstand"
 				modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('afstand')}" 

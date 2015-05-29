@@ -105,6 +105,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public static final String WO_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtPdf.xsl";
 
+	public static final String WO_UVR_PDF = "/META-INF/resources/osyris/xslts/werkOpdrachtenPdf.xsl";
+
 	// VARIABLES
 	@Inject
 	protected UserRepository userRepository;
@@ -627,13 +629,17 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				return;
 			}
 
-			// Checken of alle WO in status GERAPPORTEERD
+			// Checken of alle WO in status GERAPPORTEERD of GEVALIDEERD
 			if (checkWerkOpdrachtenGerapporteerd()) {
 
 				// Afboeken stock voor elk gebruikt materiaal in elke WO
 				for (ResourceIdentifier id : object.getOpdrachten()) {
 					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 							.loadObject(id);
+
+					// Enkel stock manipuleren
+					// if(opdracht.getStatus().equals(WerkopdrachtStatus.GERAPPORTEERD))
+
 					if (opdracht.getMaterialen() != null
 							&& !opdracht.getMaterialen().isEmpty()) {
 
@@ -923,7 +929,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @throws InstantiationException
 	 * @throws IllegalAccessException
 	 */
-	private void processRouteOrNetwerkLus(Traject traject,
+	public void processRouteOrNetwerkLus(Traject traject,
 			MapConfiguration configuration, MapContext context)
 			throws IOException, InstantiationException, IllegalAccessException {
 
@@ -1055,7 +1061,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	 * @throws IllegalAccessException
 	 * @throws IOException
 	 */
-	private void processNetwerkSegment(Traject traject,
+	public void processNetwerkSegment(Traject traject,
 			MapConfiguration configuration, MapContext context)
 			throws InstantiationException, IllegalAccessException, IOException {
 
@@ -1313,7 +1319,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 			Random randomGenerator = new Random();
 			Integer randomInt = randomGenerator.nextInt(1000000000);
-			String fileName = "traject" + traject.getId().toString() + "_"
+			String fileName = "werkopdracht_"
+					+ selectedWerkOpdracht.getId().toString() + "_"
 					+ randomInt.toString() + ".pdf";
 
 			String location = DefaultConfiguration.instance().getString(
@@ -1352,8 +1359,80 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			// out.toByteArray());
 
 		} finally {
-			in.close();
-			out.close();
+			// in.close();
+			// out.close();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
+		}
+	}
+
+	/**
+	 * Printen van alle werkopdrachten die tot de UVR van de geselecteerde
+	 * werkOpdracht behoren. De knop printen is toegevoegd aan het
+	 * uitvoeringsrondeWerkOpdrachtViewPanel omdat hier een kaartje beschikbaar
+	 * is om te kunnen manipuleren. In het uitvoeringsrondeViewPanel is geen
+	 * kaartje beschikbaar.
+	 * 
+	 */
+	public Content printWerkOpdrachtenInRonde() throws Exception {
+		FileOutputStream out = null;
+		File file = null;
+		InputStream in = null;
+
+		try {
+
+			// Opbouwen XML
+			Document doc = null;
+			XmlBuilder xmlBuilder = new XmlBuilder();
+
+			doc = xmlBuilder.buildWerkOpdrachtFichesInRonde(getViewer(),
+					selectedWerkOpdracht,
+					getWerkOpdrachtenInUitvoeringsronde(object));
+
+			Random randomGenerator = new Random();
+			Integer randomInt = randomGenerator.nextInt(1000000000);
+			String fileName = "werkopdrachten_"
+					+ selectedWerkOpdracht.getId().toString() + "ronde_"
+					+ object.getId().toString() + "_" + randomInt.toString()
+					+ ".pdf";
+
+			String location = DefaultConfiguration.instance().getString(
+					"osyris.location.temp.pdf.wo.fiche");
+
+			file = new File(location + fileName);
+			out = new FileOutputStream(file);
+
+			Fop fop = FopFactory.newInstance().newFop(MimeConstants.MIME_PDF,
+					FopFactory.newInstance().newFOUserAgent(), out);
+
+			// xslt
+			Source xslt = new StreamSource(getClass().getResourceAsStream(
+					WO_UVR_PDF));
+			in = getClass().getResourceAsStream(WO_UVR_PDF);
+
+			// Transform source
+			javax.xml.transform.Transformer transformer = TransformerFactory
+					.newInstance().newTransformer(xslt);
+			Result res = new SAXResult(fop.getDefaultHandler());
+
+			transformer.transform(new DOMSource(doc), res);
+
+			String contentStr = IOUtils.toString(in, "UTF-8");
+
+			// File aanmaken indien niet bestaand
+			if (!file.exists()) {
+				file.createNewFile();
+			}
+			out.write(contentStr.getBytes());
+			contentStr = null;
+
+			return new FileResource(file);
+
+		} finally {
+			// in.close();
+			// out.close();
+			IOUtils.closeQuietly(in);
+			IOUtils.closeQuietly(out);
 		}
 	}
 

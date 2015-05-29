@@ -13,27 +13,33 @@
           <fo:region-after region-name="footer" />
         </fo:simple-page-master>
       </fo:layout-master-set>
-      <fo:page-sequence master-reference="A4-landscape">
       
-      
-      <fo:static-content flow-name="footer">
-    	<fo:block text-align="center" font-size="10pt" color="#000000">
-      	<fo:inline><fo:page-number/></fo:inline>
-    	</fo:block>
-   	  </fo:static-content>
-  
-        <fo:flow flow-name="xsl-region-body">
-
-		 <xsl:if test="//@bordProbleem='false'">
-		 	<xsl:call-template name="anderProbleemFiche" />
-		 </xsl:if>
-		 
-		 <xsl:if test="//@bordProbleem='true'">
-			<xsl:call-template name="bordFiche" />
-		 </xsl:if>         
-        
-        </fo:flow>
-      </fo:page-sequence>    
+      <!-- NEW PAGE SEQUENCE FOR EVERY PAGE TO AVOID HEAP SPACE MEMORY ISSUES -->
+      <xsl:for-each select="/ronde/opdracht">
+	      <fo:page-sequence master-reference="A4-landscape">
+	      
+	      
+	      <fo:static-content flow-name="footer">
+	    	<fo:block text-align="center" font-size="10pt" color="#000000">
+	      	<fo:inline><fo:page-number/></fo:inline>
+	    	</fo:block>
+	   	  </fo:static-content>
+	  
+	        <fo:flow flow-name="xsl-region-body">
+	
+			 <xsl:if test="./@bordProbleem='false'">
+			 	<xsl:call-template name="anderProbleemFiche" >
+			 	</xsl:call-template>
+			 </xsl:if>
+			 
+			 <xsl:if test="./@bordProbleem='true'">
+				<xsl:call-template name="bordFiche" >
+			 	</xsl:call-template>
+			 </xsl:if>         
+			 
+	        </fo:flow>
+	      </fo:page-sequence>  
+      </xsl:for-each>  
     </fo:root>
   </xsl:template>
   
@@ -46,26 +52,26 @@
               			 <fo:block text-align="center" font-weight="bold">
               			 <fo:inline font-weight="bold"><xsl:text>Opdrachtnummer: </xsl:text></fo:inline>
          					<xsl:value-of
-		    					 select="/opdracht/id">
+		    					 select="./id">
 							</xsl:value-of>	                       
 			          	</fo:block>			
                     </fo:table-cell>
                     <fo:table-cell>
                         <fo:block text-align="center" font-weight="bold">REGIO: 
                        		<xsl:value-of
-	          				select="/opdracht/regio">
+	          				select="./regio">
 		          			</xsl:value-of>
 		          		
 		          		 	<fo:block text-align="center" font-weight="bold">
 	                        <fo:inline color="red">
 		                        <xsl:value-of
-				          			select="/opdracht/trajecttype">	
+				          			select="./trajecttype">	
 				          		</xsl:value-of>
 				          		
-				          		<xsl:if test="//@segment='false'">
+				          		<xsl:if test="./@hasNaam='true'">
 				          		     <xsl:text> </xsl:text>
 					          		 <xsl:value-of
-					          			select="/opdracht/trajectnaam">
+					          			select="./trajectnaam">
 					          		</xsl:value-of>
 				          		</xsl:if>
 				          		
@@ -84,28 +90,28 @@
 				<fo:block space-after="8pt">
 			        <fo:inline font-weight="bold"><xsl:text>Gemeente: </xsl:text></fo:inline>
 			          	<xsl:value-of
-						     select="/opdracht/gemeente">
+						     select="./gemeente">
 						</xsl:value-of>
 			    </fo:block>
 			   
 				<fo:block space-after="8pt">
 			        <fo:inline font-weight="bold"><xsl:text>Straat dichtstbijzijnde bord: </xsl:text></fo:inline>
 			          	<xsl:value-of
-						     select="/opdracht/straat">
+						     select="./straat">
 						</xsl:value-of>
 			    </fo:block>
 			        
-				<xsl:if test="//@segment='true'">
+				<xsl:if test="./@segment='true'">
 			        <fo:block space-after="8pt">
 			        <fo:inline font-weight="bold"><xsl:text>Segment knooppunt van: </xsl:text></fo:inline>
 			          	<xsl:value-of
-						     select="/opdracht/vankp">
+						     select="./vankp">
 						</xsl:value-of>
 			        </fo:block>
 			        <fo:block space-after="8pt">
 			        <fo:inline font-weight="bold"><xsl:text>Segment knooppunt naar: </xsl:text></fo:inline>
 			          	<xsl:value-of
-						     select="/opdracht/naarkp">
+						     select="./naarkp">
 						</xsl:value-of>
         			</fo:block>
        			</xsl:if>
@@ -113,7 +119,7 @@
 				<fo:block space-after="8pt">
 		       		<fo:inline font-weight="bold"><xsl:text>Werkhandelingen: </xsl:text></fo:inline>
 		      	</fo:block>    
-		       	<xsl:for-each select="/opdracht/handeling">
+		       	<xsl:for-each select="./handeling">
 			        <fo:block margin-left="20px" margin-bottom="8px">
 			        	<xsl:value-of
 			        		select="./nummer">
@@ -127,7 +133,7 @@
 		      		<fo:block space-after="8pt">
 					  <fo:inline font-weight="bold"><xsl:text>Commentaar TOV: </xsl:text></fo:inline>
 			          	<xsl:value-of
-			          		select="/opdracht/commentaar">
+			          		select="./commentaar">
 			          	</xsl:value-of>
 				 	</fo:block>	
        		 </fo:block>
@@ -136,14 +142,14 @@
                     
             <fo:table-cell>											
              	<fo:block margin-left="0.1cm" text-align="center">
-            		<xsl:if test="//@hasFoto='true'">
-	               <xsl:variable name="foto" select="/opdracht/probleemfoto" />
+            		<xsl:if test="./@hasFoto='true'">
+	               <xsl:variable name="foto" select="./probleemfoto" />
 	               <fo:external-graphic src="data:image/jpeg;base64,{$foto}" 
 	               	content-width="137mm"
             		content-height="80mm" />
 	              </xsl:if>
-				   <xsl:if test="//@hasFoto='false'">
-	          		<xsl:variable name="url_geen_foto" select="/opdracht/probleemfoto" />	
+				   <xsl:if test="./@hasFoto='false'">
+	          		<xsl:variable name="url_geen_foto" select="./probleemfoto" />	
 		            <fo:external-graphic src="'{$url_geen_foto}'"
 		            content-width="137mm"
             		content-height="80mm" />
@@ -155,10 +161,7 @@
            <fo:table-row height="80mm">
             <fo:table-cell border="solid">
             	 <fo:block margin-left="0.1cm">
-					<xsl:variable name="mapTopoAnderProbleem_url" select="/opdracht/mapTopoAnderProbleem" />
-<!-- 				<fo:external-graphic src="'{$mapTopoAnderProbleem_url}'" -->
-<!-- 						content-width="137mm" -->
-<!-- 		            	content-height="100mm" /> -->
+					<xsl:variable name="mapTopoAnderProbleem_url" select="./mapTopoAnderProbleem" />
 					<fo:external-graphic src="url(file:/{$mapTopoAnderProbleem_url})"
 							content-width="137mm"
 		            		content-height="100mm" />
@@ -167,10 +170,7 @@
 	          	
              <fo:table-cell border="solid">
               <fo:block margin-left="0.1cm">
-				<xsl:variable name="mapOrthoAnderProbleem_url" select="/opdracht/mapOrthoAnderProbleem" />
-<!-- 				<fo:external-graphic src="'{$mapOrthoAnderProbleem_url}'" -->
-<!-- 						content-width="137mm" -->
-<!-- 	            		content-height="100mm" /> -->
+				<xsl:variable name="mapOrthoAnderProbleem_url" select="./mapOrthoAnderProbleem" />
 					<fo:external-graphic src="url(file:/{$mapOrthoAnderProbleem_url})"
 							content-width="137mm"
 		            		content-height="100mm" />
@@ -194,26 +194,26 @@
                         <fo:block text-align="center" font-weight="bold">
 		          			<fo:inline font-weight="bold"><xsl:text>Opdrachtnummer: </xsl:text></fo:inline>
          					<xsl:value-of
-		    					 select="/opdracht/id">
+		    					 select="./id">
 							</xsl:value-of>
 		          		</fo:block>
                     </fo:table-cell>
                     <fo:table-cell>
                         <fo:block text-align="center" font-weight="bold">REGIO: 
                        	<xsl:value-of
-	          				select="/opdracht/regio">
+	          				select="./regio">
 		          		</xsl:value-of>
 		          		
 		          		 <fo:block text-align="center" font-weight="bold">
 	                        <fo:inline color="red">
 		                        <xsl:value-of
-				          			select="/opdracht/trajecttype">	
+				          			select="./trajecttype">	
 				          		</xsl:value-of>
 				          		
-				          		<xsl:if test="//@netwerkbord='false'">
+				          		<xsl:if test="./@hasNaam='true'">
 				          		     <xsl:text> </xsl:text>
 					          		 <xsl:value-of
-					          			select="/opdracht/trajectnaam">
+					          			select="./trajectnaam">
 					          		</xsl:value-of>
 				          		</xsl:if>
 				          		
@@ -230,16 +230,16 @@
             
              <fo:block-container>												
              	<fo:block margin-left="0.1cm">
-             	<xsl:if test="//@netwerkbord='false'">		
-            		<xsl:variable name="url_voorbeeldFoto" select="/opdracht/voorbeeldFoto" />	
+             	<xsl:if test="./@netwerkbord='false'">		
+            		<xsl:variable name="url_voorbeeldFoto" select="./voorbeeldFoto" />	
 		            <fo:external-graphic src="'{$url_voorbeeldFoto}'"
 		            content-width="55mm"
             		content-height="79mm" />
             	</xsl:if>
             	
-            	<xsl:if test="//@netwerkbord='true'">											
+            	<xsl:if test="./@netwerkbord='true'">											
 	             	<fo:block margin-left="0.1cm" margin-top="0.1cm">
-	            		<xsl:variable name="url_voorbeeld_kp_bord" select="/opdracht/voorbeeld_kp_bord" />	
+	            		<xsl:variable name="url_voorbeeld_kp_bord" select="./voorbeeld_kp_bord" />	
 			            <fo:external-graphic src="'{$url_voorbeeld_kp_bord}'"
 			           	  content-width="55mm"
 	            		  content-height="79mm" />
@@ -253,19 +253,19 @@
 				<fo:block space-after="8pt">
 				<fo:inline font-weight="bold"><xsl:text>Id: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/bordId">
+	          		select="./bord/bordId">
 	          	</xsl:value-of>
 	          </fo:block>
 	           <fo:block space-after="8pt">
 	           <fo:inline font-weight="bold"><xsl:text>Gemeente: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/bordGemeente">
+	          		select="./bord/bordGemeente">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Straat: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/bordStraat">
+	          		select="./bord/bordStraat">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block space-after="8pt">
@@ -274,33 +274,33 @@
 	          <fo:block  space-after="8pt" text-indent="20mm">
 	          <fo:inline font-weight="bold"><xsl:text>X: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/x">
+	          		select="./bord/x">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block text-indent="20mm" space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Y: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/y">
+	          		select="./bord/y">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Wegbevoegd: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/wegbevoegd">
+	          		select="./bord/wegbevoegd">
 	          	</xsl:value-of>
 	          </fo:block>	
 	          
-	          <xsl:if test="//@netwerkbord='false'">
+	          <xsl:if test="./@netwerkbord='false'">
 	          
-	           <fo:block space-after="8pt">
+	            <fo:block space-after="8pt">
 		          <fo:inline font-weight="bold"><xsl:text>Volgnr: </xsl:text></fo:inline>
 		          	<xsl:value-of
-		          		 select="/opdracht/bord/volg">
+		          		 select="./bord/volg">
 		          	</xsl:value-of>
 		          </fo:block>
 		          
 		          <fo:block space-after="8pt">
-		          <xsl:variable name="url_pijl" select="/opdracht/bord/pijl" />	
+		          <xsl:variable name="url_pijl" select="./bord/pijl" />	
 		          <fo:inline font-weight="bold"><xsl:text>Pijl: </xsl:text></fo:inline>
 		            <fo:external-graphic src="'{$url_pijl}'"/>
 		          </fo:block>
@@ -308,40 +308,40 @@
 		          <fo:block space-after="8pt">
 		          <fo:inline font-weight="bold"><xsl:text>Opschrift bord: </xsl:text></fo:inline>
 		          	<xsl:value-of
-		          		 select="/opdracht/trajectnaam">
+		          		 select="./trajectnaam">
 		          	</xsl:value-of>
 		          </fo:block>
 	           </xsl:if>
 	          
-				<xsl:if test="//@netwerkbord='true'">
+				<xsl:if test="./@netwerkbord='true'">
 					  <fo:block space-after="8pt">
 					  <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 0: </xsl:text></fo:inline>
 			          	<xsl:value-of
-			          		select="/opdracht/bord/knooppunt0">
+			          		select="./bord/knooppunt0">
 			          	</xsl:value-of>
 			          </fo:block>
 			          <fo:block space-after="8pt">
-			          <xsl:variable name="url_kp1_pijl" select="/opdracht/bord/kp1_pijl" />
+			          <xsl:variable name="url_kp1_pijl" select="./bord/kp1_pijl" />
 			          <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 1: </xsl:text></fo:inline>
 			          	<xsl:value-of
-			          		select="/opdracht/bord/knooppunt1">
+			          		select="./bord/knooppunt1">
 			          	</xsl:value-of>
 			          	<xsl:text>   </xsl:text>
 			          	<fo:external-graphic src="'{$url_kp1_pijl}'"/>
 			          </fo:block>
 			           <fo:block space-after="8pt">
-			           <xsl:variable name="url_kp2_pijl" select="/opdracht/bord/kp2_pijl" />
+			           <xsl:variable name="url_kp2_pijl" select="./bord/kp2_pijl" />
 			           <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 2: </xsl:text></fo:inline>
 			          	<xsl:value-of
-			          		select="/opdracht/bord/knooppunt2">
+			          		select="./bord/knooppunt2">
 			          	</xsl:value-of>
 			          	<fo:external-graphic src="'{$url_kp2_pijl}'"/>
 			          </fo:block>
 			           <fo:block space-after="8pt">
-			           <xsl:variable name="url_kp3_pijl" select="/opdracht/bord/kp3_pijl" />
+			           <xsl:variable name="url_kp3_pijl" select="./bord/kp3_pijl" />
 			           <fo:inline font-weight="bold"><xsl:text>KnooppuntNr 3: </xsl:text></fo:inline>
 			          	<xsl:value-of
-			          		select="/opdracht/bord/knooppunt3">
+			          		select="./bord/knooppunt3">
 			          	</xsl:value-of>
 			          	<fo:external-graphic src="'{$url_kp3_pijl}'"/>
 			          </fo:block>
@@ -353,67 +353,50 @@
             <fo:table-cell>
              <fo:block-container>												
              	<fo:block margin-left="0.1cm">
-	               <xsl:variable name="url_bordfoto" select="/opdracht/bordfoto" />
+	               <xsl:variable name="url_bordfoto" select="./bordfoto" />
 	                <fo:external-graphic src="'{$url_bordfoto}'" 
 	               	content-width="60mm"
             		content-height="90mm" />
        			 </fo:block>
              </fo:block-container>
-             
-<!--             <fo:block-container>												 -->
-<!--              	<fo:block margin-left="0.1cm"> -->
-<!--             		<xsl:if test="//@hasFoto='true'"> -->
-<!-- 	               <xsl:variable name="foto" select="/opdracht/probleemfoto" /> -->
-<!-- 	               <fo:external-graphic src="data:image/jpeg;base64,{$foto}"  -->
-<!-- 	               	content-width="60mm" -->
-<!--             		content-height="90mm" /> -->
-<!-- 	              </xsl:if> -->
-<!-- 				   <xsl:if test="//@hasFoto='false'"> -->
-<!-- 	          		<xsl:variable name="url_geen_foto" select="/opdracht/probleemfoto" />	 -->
-<!-- 		            <fo:external-graphic src="'{$url_geen_foto}'" -->
-<!-- 		            content-width="60mm" -->
-<!--             		content-height="90mm" /> -->
-<!-- 	               </xsl:if> -->
-<!--        			 </fo:block> -->
-<!--              </fo:block-container> -->
            
           <fo:block-container position="absolute">
            <fo:block font-size="8pt" margin-top="0.3cm" margin-bottom="0.1cm" margin-left="7cm">
                <fo:block space-after="10pt">
                  <fo:inline font-weight="bold"><xsl:text>Constructietype: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/constructieType">
+	          		select="./bord/constructieType">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Paaltype: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/paaltype">
+	          		select="./bord/paaltype">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Paaldiameter: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/paaldiameter">
+	          		select="./bord/paaldiameter">
 	          	</xsl:value-of>
 	          </fo:block>
 	          <fo:block space-after="8pt">
 	          <fo:inline font-weight="bold"><xsl:text>Paalbeugel: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/paalbeugel">
+	          		select="./bord/paalbeugel">
 	          	</xsl:value-of>
 	          </fo:block>
 			  <fo:block space-after="8pt">
 			  <fo:inline font-weight="bold"><xsl:text>Paalondergrond: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/bord/paalondergrond">
+	          		select="./bord/paalondergrond">
 	          	</xsl:value-of>
 	          </fo:block>	
 	          
 		      <fo:block space-after="8pt">
 		       	<fo:inline font-weight="bold"><xsl:text>Opdracht: </xsl:text></fo:inline>
 		      </fo:block>    
-		       <xsl:for-each select="/opdracht/handeling">
+		       <xsl:for-each select="./handeling">
 		        <fo:block margin-left="20px" margin-bottom="8px">
 		        	<xsl:value-of
 		        		select="./nummer">
@@ -428,7 +411,7 @@
 	     	  <fo:block space-after="8pt">
 			  <fo:inline font-weight="bold"><xsl:text>Commentaar TOV: </xsl:text></fo:inline>
 	          	<xsl:value-of
-	          		select="/opdracht/commentaar">
+	          		select="./commentaar">
 	          	</xsl:value-of>
 	          </fo:block>	
 	          
@@ -440,10 +423,7 @@
            <fo:table-row height="80mm">
             <fo:table-cell border="solid">
             	 <fo:block margin-left="0.1cm">
-					<xsl:variable name="mapTopo_url" select="/opdracht/bord/mapTopo" />
-<!-- 					<fo:external-graphic src="'{$mapTopo_url}'" -->
-<!-- 							content-width="137mm" -->
-<!-- 		            		content-height="100mm" /> -->
+					<xsl:variable name="mapTopo_url" select="./bord/mapTopo" />
 					<fo:external-graphic src="url(file:/{$mapTopo_url})"
 							content-width="137mm"
 		            		content-height="100mm" />
@@ -452,10 +432,7 @@
 	          	
              <fo:table-cell border="solid">
               <fo:block margin-left="0.1cm">
-				<xsl:variable name="mapOrtho_url" select="/opdracht/bord/mapOrtho" />
-<!-- 				<fo:external-graphic src="'{$mapOrtho_url}'" -->
-<!-- 						content-width="137mm" -->
-<!-- 	            		content-height="100mm" /> -->
+				<xsl:variable name="mapOrtho_url" select="./bord/mapOrtho" />
 					<fo:external-graphic src="url(file:/{$mapOrtho_url})"
 							content-width="137mm"
 		            		content-height="100mm" />

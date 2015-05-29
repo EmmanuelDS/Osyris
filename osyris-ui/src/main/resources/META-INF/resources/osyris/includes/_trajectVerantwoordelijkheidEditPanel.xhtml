@@ -1,0 +1,79 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:p="http://primefaces.org/ui"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:m="http://specto.gim.be/map">
+	<br />
+		<a:outputPanel id="trajectVerantwoordelijkheidPanel">
+			<r:panel rendered="#{form.object != null}">
+				
+				<d:field for="trajectType" label="Trajecttype" required="true">
+				<h:selectOneMenu id="trajectType" value="#{form.object.trajectType}">
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.trajectTypes)}" />
+					<a:ajax
+						event="change"
+						render="detailPanel, medewerkerPanel"
+						execute="@this"
+						listener="#{form.resetParameters()}" />
+				</h:selectOneMenu>
+				</d:field>
+				
+			<j:renderPanel id="detailPanel" rendered="#{form.object.trajectType != null and !form.object.trajectType.contains('Route')}">
+			
+				<d:field for="regio" label="Regio" required="true">
+				<h:selectOneMenu id="regio" value="#{form.object.regio}">
+					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
+					<f:selectItem itemValue="" itemLabel="" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+					<a:ajax
+						event="change"
+						render="trajectNaam"
+						execute="@this" />
+				</h:selectOneMenu>
+				</d:field>
+
+			
+				<d:field for="trajectNaam" label="Traject naam" rendered="#{!form.object.trajectType.contains('Route') and !form.object.trajectType.contains('Lus') and form.object.trajectType.contains('Wandel')}">
+					<h:selectOneMenu id="trajectNaam" value="#{form.object.trajectNaam}" rendered="#{!form.object.trajectType.contains('Route') and !form.object.trajectType.contains('Lus') and form.object.trajectType.contains('Wandel')}" >
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getTrajectNamen(form.object.regio, form.object.trajectType))}" />
+					</h:selectOneMenu>
+				</d:field>
+							
+				</j:renderPanel>
+				
+				<j:renderPanel id="medewerkerPanel">
+					<d:field for="medewerker" label="Medewerker" required="true">
+					<h:selectOneMenu id="medewerker" value="#{form.object.medewerker}">
+						<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
+						<f:selectItem itemValue="" itemLabel="" />
+						<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.getVerantwoordelijkenTOV())}" />
+					</h:selectOneMenu>
+					</d:field>
+				</j:renderPanel>
+			</r:panel>
+		</a:outputPanel>
+		
+	<d:buttons>
+		<j:commandButton
+			rendered="#{form.isCanEdit(form.object)}"
+			value="Opslaan"
+			image="#{resource['core/images/actions/12x12/apply.png']}"
+			type="button"
+			title="Bewaren"
+			action="#{form.save()}"
+			render="#{render}"
+			oncomplete="if(#{!form.hasErrors()})conscientia.widget(#{r:element('editTrajectverantwoordelijkheidPopup')}).hide();" />
+		<j:commandButton value="#{messages['form.general.close.button']}"
+			image="#{resource['core/images/actions/12x12/close.png']}"
+			type="button"
+			submit="false"
+			onclick="conscientia.widget(#{r:element('editTrajectverantwoordelijkheidPopup')}).hide();" />
+	</d:buttons>
+</u:composition>

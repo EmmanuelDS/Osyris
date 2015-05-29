@@ -77,7 +77,7 @@ public class Melding extends AbstractModelObject implements StorableObject {
 
 	@ModelClassName("User")
 	@Search(type = "menu:equals")
-	@ValuesExpression("#{osyrisModelFunctions.getSuggestions('Medewerker')}")
+	@ValuesExpression("#{osyrisModelFunctions.getVerantwoordelijkenTOV()}")
 	@Target("_blank")
 	private ResourceIdentifier medewerker;
 

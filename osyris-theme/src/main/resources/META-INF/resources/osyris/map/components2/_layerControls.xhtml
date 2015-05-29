@@ -1,0 +1,74 @@
+<div xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j"
+	xmlns:m="http://specto.gim.be/map"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:cc="http://java.sun.com/jsf/composite"
+	xmlns:j="http://conscientia.org/jsf">
+	<a:outputPanel>
+		<h:graphicImage
+			rendered="#{node.editable and node.editLayer}"
+			value="#{resource['core/images/actions/16x16/editable.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['component.map.layer.setEditLayer.label']}" />
+		<j:commandButton
+			rendered="#{node.editable and !node.editLayer and !identity.inGroup('PeterMeter','CUSTOM') and !identity.inGroup('Uitvoerder','CUSTOM')}"
+			action="#{viewer.setEditLayerId(layer.layerId)}"
+			execute="@this"
+			render="tree"
+			type="image"
+			image="#{resource['core/images/actions/16x16/notEditable.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['component.map.layer.setEditLayer.label']}" />
+		<j:commandButton
+			rendered="#{node.selectable}"
+			onclick="#{j:controller()}.activateControl('selectBox', { layerId : '#{layer.layerId}' });"
+			submit="false"
+			type="image"
+			image="#{resource['core/images/actions/16x16/select.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['model.entry.mapContext.tools.selectFeatures.label']}" />
+		<j:commandButton
+			rendered="#{node.queryable}"
+			onclick="#{j:controller()}.activateControl('featureInfoBox', { layerId : '#{layer.layerId}' });"
+			submit="false"
+			type="image"
+			image="#{resource['core/images/actions/16x16/featureInfo.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['model.entry.mapContext.tools.featureInfo.label']}" />
+		<a:commandButton
+			rendered="#{node.zoomable}"
+			data="#{d:converter('envelope').getAsString(null, null, viewer.getContentExtent(layer))}"
+			oncomplete="#{j:controller()}.zoomToExtent(event.data)"
+			execute="@this"
+			image="#{resource['core/images/actions/16x16/zoom.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['model.entry.mapLayer.tools.zoomToContent.label']}" />
+		<a:commandButton
+			rendered="#{node.canMoveDown()}"
+			render="tree"
+			execute="@this"
+			action="#{node.moveDown()}"
+			image="#{resource['core/images/actions/16x16/down.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['component.map.layer.moveLayerDown.label']}" />
+		<a:commandButton
+			rendered="#{node.canMoveUp()}"
+			render="tree"
+			execute="@this"
+			action="#{node.moveUp()}"
+			image="#{resource['core/images/actions/16x16/up.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['component.map.layer.moveLayerUp.label']}" />
+		<a:commandButton
+			rendered="#{node.canRemove()}"
+			render="tree"
+			execute="@this"
+			action="#{node.remove()}"
+			image="#{resource['core/images/actions/16x16/remove.png']}"
+			styleClass="component-map-layer-control"
+			title="#{messages['component.map.layer.removeLayer.label']}" />
+	</a:outputPanel>
+</div>

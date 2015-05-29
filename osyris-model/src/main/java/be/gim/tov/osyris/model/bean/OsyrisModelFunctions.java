@@ -7,9 +7,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.TreeMap;
 
 import javax.faces.context.FacesContext;
@@ -51,6 +53,7 @@ import be.gim.tov.osyris.model.controle.BordProbleem;
 import be.gim.tov.osyris.model.controle.Melding;
 import be.gim.tov.osyris.model.controle.Probleem;
 import be.gim.tov.osyris.model.traject.Bord;
+import be.gim.tov.osyris.model.traject.FietsNetwerkSegment;
 import be.gim.tov.osyris.model.traject.Gemeente;
 import be.gim.tov.osyris.model.traject.NetwerkBord;
 import be.gim.tov.osyris.model.traject.NetwerkKnooppunt;
@@ -61,11 +64,13 @@ import be.gim.tov.osyris.model.traject.RichtingEnum;
 import be.gim.tov.osyris.model.traject.Route;
 import be.gim.tov.osyris.model.traject.RouteBord;
 import be.gim.tov.osyris.model.traject.Traject;
+import be.gim.tov.osyris.model.traject.WandelNetwerkSegment;
 import be.gim.tov.osyris.model.user.MedewerkerProfiel;
 import be.gim.tov.osyris.model.user.UitvoerderBedrijf;
 import be.gim.tov.osyris.model.user.UitvoerderProfiel;
 import be.gim.tov.osyris.model.utils.DropdownListSorting;
 import be.gim.tov.osyris.model.werk.StockMateriaal;
+import be.gim.tov.osyris.model.werk.Uitvoeringsronde;
 import be.gim.tov.osyris.model.werk.WerkOpdracht;
 import be.gim.tov.osyris.model.werk.status.ValidatieStatus;
 
@@ -381,7 +386,6 @@ public class OsyrisModelFunctions {
 	/**
 	 * Get suggestielijst voor een bepaalde groep.
 	 * 
-	 * @return
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Object[]> getSuggestions(final String groupName) {
@@ -421,6 +425,58 @@ public class OsyrisModelFunctions {
 						}
 
 						return suggestions;
+					}
+				}).get(null);
+	}
+
+	/**
+	 * Ophalen van de medewerkers en routdokters werkzaam bij TOV. Deze lijst
+	 * wordt gebruikt bij het toewijzen van trajectverantwoordelijkheden.
+	 * 
+	 */
+	@SuppressWarnings("unchecked")
+	public List<Object[]> getVerantwoordelijkenTOV() {
+
+		return (List<Object[]>) cacheProducer.getCache(
+				"VerantwoordelijkenTOVCache", new Transformer() {
+
+					@Override
+					public Object transform(Object key) {
+						List<Object[]> verantwoordelijken = new ArrayList<Object[]>();
+
+						try {
+
+							// Use set to remove duplicates. Some users are
+							// defined in multiple groups
+							Set<User> users = new HashSet<User>();
+							users.addAll(getUserObjectsInGroup("Medewerker"));
+							users.addAll(getUserObjectsInGroup("Routedokter"));
+
+							for (User user : users) {
+
+								UserProfile profiel = (UserProfile) user
+										.getAspect("UserProfile",
+												modelRepository, false);
+
+								verantwoordelijken.add(new Object[] {
+										modelRepository.getResourceName(user),
+										profiel.getLastName() + " "
+												+ profiel.getFirstName() });
+
+								// Sorteren suggesties
+								Collections.sort(verantwoordelijken,
+										new DropdownListSorting());
+							}
+
+						} catch (IOException e) {
+							LOG.error("Can not load user.", e);
+						} catch (InstantiationException e) {
+							LOG.error("Can not instantiate UserProfile.", e);
+						} catch (IllegalAccessException e) {
+							LOG.error("Illegal access at UserProfile.", e);
+						}
+
+						return verantwoordelijken;
 					}
 				}).get(null);
 	}
@@ -947,8 +1003,10 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
-	 * Zoekt verantwoordelijke medewerker voor een bepaald traject aan de hand
-	 * van het MedewerkerProfiel.
+	 * Zoekt verantwoordelijke medewerker voor een bepaald traject via de
+	 * TrajectVerantwoordelijkheid. Is er geen medewerker gevonden dan valt het
+	 * systeem terug op de oude manier van werken via de instellingen in de
+	 * MedewerkerProfielen.
 	 * 
 	 * @param traject
 	 * @return
@@ -960,37 +1018,106 @@ public class OsyrisModelFunctions {
 		try {
 			Traject t = (Traject) modelRepository.loadObject(traject);
 
-			// Group medewerkers opzoeken
-			DefaultQuery query = new DefaultQuery("Group");
-			query.addFilter(FilterUtils.equal("groupname", "Medewerker"));
-			List<Group> groups = new ArrayList<Group>();
-			groups = (List<Group>) modelRepository.searchObjects(query, false,
-					false);
-			Group group = (Group) ModelRepository.getUniqueResult(groups);
+			QueryBuilder builder = new QueryBuilder(
+					"TrajectVerantwoordelijkheid");
+			List<ResourceName> result = new ArrayList<ResourceName>();
 
-			// Users uit medewerker group halen
-			for (ResourceIdentifier id : group.getMembers()) {
-				User medewerker = (User) modelRepository.loadObject(id);
+			// Indien route haal de medewerker op uit de
+			// TrajectVerantwoordelijkheid
+			if (t instanceof Route) {
+				builder.addFilter(FilterUtils.equal("trajectType", t
+						.getModelClass().getName()));
+				builder.results(FilterUtils.properties("medewerker"));
 
-				if (medewerker != null) {
-					// Check welke Medewerker verantwoordelijk is voor het
-					// gekozen trajectType
-					MedewerkerProfiel profiel = (MedewerkerProfiel) medewerker
-							.getAspect("MedewerkerProfiel", modelRepository,
-									true);
-					if (profiel != null) {
-						for (String trajectType : profiel.getTrajectType()) {
-							if (t.getModelClass().getName().contains("Lus")) {
-								String className = t.getModelClass().getName()
-										.replace("Lus", "Segment");
-								if (className.equals(trajectType)) {
+				result = (List<ResourceName>) modelRepository.searchObjects(
+						builder.build(), false, false);
+				if (!result.isEmpty()) {
+					return result.get(0);
+				}
+			}
+
+			// Indien FietsNetwerkSegment haal de medewerker op voor de regio
+			// van het
+			// traject
+			else if (t instanceof FietsNetwerkSegment) {
+				builder.addFilter(FilterUtils.equal("trajectType", t
+						.getModelClass().getName()));
+				builder.addFilter(FilterUtils.equal("regio", t.getRegio()));
+				builder.results(FilterUtils.properties("medewerker"));
+
+				result = (List<ResourceName>) modelRepository.searchObjects(
+						builder.build(), false, false);
+				if (!result.isEmpty()) {
+					return result.get(0);
+				}
+			}
+
+			// Indien WandelNetwerkSegment haal de medewerker op voor de
+			// trajectNaam van het
+			// traject
+			else if (t instanceof WandelNetwerkSegment) {
+				builder.addFilter(FilterUtils.equal("trajectType", t
+						.getModelClass().getName()));
+				builder.addFilter(FilterUtils.equal("trajectNaam", t.getNaam()));
+				builder.results(FilterUtils.properties("medewerker"));
+
+				result = (List<ResourceName>) modelRepository.searchObjects(
+						builder.build(), false, false);
+				if (!result.isEmpty()) {
+					return result.get(0);
+				}
+			}
+
+			else if (t instanceof NetwerkLus) {
+				builder.addFilter(FilterUtils.equal("trajectType", t
+						.getModelClass().getName().replace("Lus", "Segment")));
+				builder.addFilter(FilterUtils.equal("regio", t.getRegio()));
+				builder.results(FilterUtils.properties("medewerker"));
+
+				result = (List<ResourceName>) modelRepository.searchObjects(
+						builder.build(), false, false);
+				if (!result.isEmpty()) {
+					return result.get(0);
+				}
+			}
+
+			// Indien geen medewerkers gevonden via het nieuwe systeem, fallback
+			// op het oude systeem
+			if (result.isEmpty()) {
+
+				// Group medewerkers opzoeken
+				DefaultQuery query = new DefaultQuery("Group");
+				query.addFilter(FilterUtils.equal("groupname", "Medewerker"));
+				List<Group> groups = new ArrayList<Group>();
+				groups = (List<Group>) modelRepository.searchObjects(query,
+						false, false);
+				Group group = (Group) ModelRepository.getUniqueResult(groups);
+
+				// Users uit medewerker group halen
+				for (ResourceIdentifier id : group.getMembers()) {
+					User medewerker = (User) modelRepository.loadObject(id);
+
+					if (medewerker != null) {
+						// Check welke Medewerker verantwoordelijk is voor het
+						// gekozen trajectType
+						MedewerkerProfiel profiel = (MedewerkerProfiel) medewerker
+								.getAspect("MedewerkerProfiel",
+										modelRepository, true);
+						if (profiel != null) {
+							for (String trajectType : profiel.getTrajectType()) {
+								if (t.getModelClass().getName().contains("Lus")) {
+									String className = t.getModelClass()
+											.getName()
+											.replace("Lus", "Segment");
+									if (className.equals(trajectType)) {
+										return modelRepository
+												.getResourceName(medewerker);
+									}
+								} else if (trajectType.equals(t.getModelClass()
+										.getName())) {
 									return modelRepository
 											.getResourceName(medewerker);
 								}
-							} else if (trajectType.equals(t.getModelClass()
-									.getName())) {
-								return modelRepository
-										.getResourceName(medewerker);
 							}
 						}
 					}
@@ -1008,6 +1135,51 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Zoekt verantwoordelijke medewerker voor een bepaald traject aan de hand
+	 * van het MedewerkerProfiel.
+	 * 
+	 * @param traject
+	 * @return
+	 */
+	/*
+	 * @RunPrivileged
+	 * 
+	 * @SuppressWarnings("unchecked") public ResourceName
+	 * zoekVerantwoordelijke(ResourceIdentifier traject) {
+	 * 
+	 * try { Traject t = (Traject) modelRepository.loadObject(traject);
+	 * 
+	 * // Group medewerkers opzoeken DefaultQuery query = new
+	 * DefaultQuery("Group"); query.addFilter(FilterUtils.equal("groupname",
+	 * "Medewerker")); List<Group> groups = new ArrayList<Group>(); groups =
+	 * (List<Group>) modelRepository.searchObjects(query, false, false); Group
+	 * group = (Group) ModelRepository.getUniqueResult(groups);
+	 * 
+	 * // Users uit medewerker group halen for (ResourceIdentifier id :
+	 * group.getMembers()) { User medewerker = (User)
+	 * modelRepository.loadObject(id);
+	 * 
+	 * if (medewerker != null) { // Check welke Medewerker verantwoordelijk is
+	 * voor het // gekozen trajectType MedewerkerProfiel profiel =
+	 * (MedewerkerProfiel) medewerker .getAspect("MedewerkerProfiel",
+	 * modelRepository, true); if (profiel != null) { for (String trajectType :
+	 * profiel.getTrajectType()) { if
+	 * (t.getModelClass().getName().contains("Lus")) { String className =
+	 * t.getModelClass().getName() .replace("Lus", "Segment"); if
+	 * (className.equals(trajectType)) { return modelRepository
+	 * .getResourceName(medewerker); } } else if
+	 * (trajectType.equals(t.getModelClass() .getName())) { return
+	 * modelRepository .getResourceName(medewerker); } } } } }
+	 * 
+	 * } catch (IOException e) { LOG.error("Can not load object.", e); } catch
+	 * (InstantiationException e) { LOG.error("Can not instantiate object.", e);
+	 * } catch (IllegalAccessException e) { LOG.error("Can not access object.",
+	 * e); } return null; }
+	 */
+
+	/**
+	 * DEPRECATED NIET MEER GEBRUIKT
+	 * 
 	 * Zoekt verantwoordelijke medewerker voor een bepaald trajectType aan de
 	 * hand van het MedewerkerProfiel.
 	 * 
@@ -2104,13 +2276,13 @@ public class OsyrisModelFunctions {
 						result.put(regio, g1.getLength());
 					}
 				}
+			}
 
-				double maxValueInMap = (Collections.max(result.values()));
-				for (Entry<Regio, Double> entry : result.entrySet()) {
-					if (entry.getValue() == maxValueInMap) {
+			double maxValueInMap = (Collections.max(result.values()));
+			for (Entry<Regio, Double> entry : result.entrySet()) {
+				if (entry.getValue() == maxValueInMap) {
 
-						return entry.getKey();
-					}
+					return entry.getKey();
 				}
 			}
 		} catch (IOException e) {
@@ -2339,5 +2511,29 @@ public class OsyrisModelFunctions {
 		} else {
 			return false;
 		}
+	}
+
+	/**
+	 * Zoeken uitvoeringsronde bij een werkopdracht.
+	 * 
+	 * @return
+	 */
+	@SuppressWarnings("unchecked")
+	public Uitvoeringsronde getUitvoeringsronde(WerkOpdracht opdracht) {
+
+		try {
+			DefaultQuery query = new DefaultQuery();
+			query.setModelClassName("Uitvoeringsronde");
+			query.setFilter(FilterUtils.equal("opdrachten",
+					modelRepository.getResourceIdentifier(opdracht)));
+			List<Uitvoeringsronde> result = (List<Uitvoeringsronde>) modelRepository
+					.searchObjects(query, true, true, true);
+
+			return (Uitvoeringsronde) modelRepository.getUniqueResult(result);
+
+		} catch (IOException e) {
+			LOG.error("Can not search Uitvoeringsronde for WerkOpdracht.", e);
+		}
+		return null;
 	}
 }

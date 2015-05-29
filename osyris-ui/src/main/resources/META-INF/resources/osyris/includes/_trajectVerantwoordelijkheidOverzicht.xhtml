@@ -1,0 +1,123 @@
+<u:composition xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:u="http://java.sun.com/jsf/facelets"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:a="http://richfaces.org/a4j" 
+	xmlns:r="http://richfaces.org/rich"
+	xmlns:d="http://specto.gim.be/display"
+	xmlns:c="http://java.sun.com/jsp/jstl/core"
+	xmlns:j="http://conscientia.org/jsf"
+	xmlns:q="http://specto.gim.be/search"
+	xmlns:m="http://specto.gim.be/map" 
+	xmlns:p="http://primefaces.org/ui">
+	
+	<h2>Trajectverantwoordelijkheden</h2>
+	<br />
+	
+	<j:layout style="height: 650px;">
+		<j:layoutPane region="west" size="350" minSize="200" resizable="true"
+			slidable="true">
+			<div class="ui-layout-content">
+			
+				<q:query value="#{trajectVerantwoordelijkheidForm.query}"
+					modelClassName="#{trajectVerantwoordelijkheidForm.modelClass.name}">
+					<c:if test="#{trajectVerantwoordelijkheidForm.index}">
+						<d:field for="term"
+							label="#{messages['page.search.query.term.title']}">
+							<q:phrase id="termFilter"
+								value="#{searchForm.term}">
+								<h:inputText value="#{searchForm.term}" />
+							</q:phrase>
+						</d:field>
+					</c:if>
+					<d:object id="filter"
+						mode="SEARCH"
+						modelClass="#{trajectVerantwoordelijkheidForm.modelClass}" />
+				</q:query>
+				
+				<d:buttons>
+					<j:commandButton rendered="true"
+						value="#{messages['page.general.button.search']}"
+						image="#{resource['core/images/actions/12x12/apply.png']}"
+						type="button"
+						actionListener="#{trajectVerantwoordelijkheidForm.search()}"
+						render="objects" />
+					<j:commandButton rendered="#{trajectVerantwoordelijkheidForm.canCreate}"
+						value="#{messages['page.actions.create.label']}"
+						image="#{resource['core/images/actions/12x12/create.png']}"
+						type="button"
+						action="#{trajectVerantwoordelijkheidForm.create()}"
+						oncomplete="conscientia.widget(#{r:element('editTrajectverantwoordelijkheidPopup')}).show();" />
+					<j:commandButton rendered="#{trajectVerantwoordelijkheidForm.canUpload}"
+						value="#{messages['page.actions.upload.label']}"
+						image="#{resource['core/images/actions/12x12/upload.png']}"
+						type="button"
+						action="#{trajectVerantwoordelijkheidForm.clear()}"
+						oncomplete="conscientia.widget(#{r:element('uploadPopup')}).show();" />
+					<d:fileDownload fileName="#{trajectVerantwoordelijkheidForm.fileName}"
+						type="button"
+						image="#{resource['core/images/actions/12x12/download.png']}"
+						content="#{trajectVerantwoordelijkheidForm.report()}" 
+						value="#{messages['page.actions.report.label']}" />
+				</d:buttons>
+				<div style="display: none">
+					<u:decorate template="/resources/core/includes/managePanels.xhtml">
+						<u:param name="form"
+							value="#{trajectVerantwoordelijkheidForm}" />
+						<u:param name="render"
+							value="#{r:clientId('result')}" />
+					</u:decorate>
+				</div>
+			</div>
+		</j:layoutPane>
+		
+		<j:layoutPane>
+			<a:outputPanel id="result">
+				<d:objects id="objects" 
+					value="#{trajectVerantwoordelijkheidForm.results}"
+					modelClass="#{trajectVerantwoordelijkheidForm.modelClass}" 
+					mode="RESULT" 
+					level="SHORT">
+					<f:facet name="right">
+						<a:outputPanel rendered="true" 
+							styleClass="model-table-actions">
+							<j:commandButton rendered="#{trajectVerantwoordelijkheidForm.isCanView(object)}"
+								image="#{resource['core/images/actions/16x16/view.png']}"
+								type="image" 
+								title="#{messages['page.actions.view.label']}"
+								oncomplete="conscientia.widget(#{r:element('viewPopup')}).show();">
+								<f:setPropertyActionListener target="#{trajectVerantwoordelijkheidForm.object}"
+									value="#{object}" />
+							</j:commandButton>
+							<j:commandButton rendered="#{trajectVerantwoordelijkheidForm.isCanEdit(object)}"
+								image="#{resource['core/images/actions/16x16/edit.png']}"
+								type="image" 
+								title="#{messages['page.actions.edit.label']}"
+								oncomplete="conscientia.widget(#{r:element('editTrajectverantwoordelijkheidPopup')}).show();">
+								<f:setPropertyActionListener target="#{trajectVerantwoordelijkheidForm.object}"
+									value="#{object}" />
+							</j:commandButton>
+							<j:commandButton rendered="#{trajectVerantwoordelijkheidForm.isCanDelete(object)}"
+								image="#{resource['core/images/actions/16x16/delete.png']}"
+								type="image" 
+								title="#{messages['page.actions.delete.label']}"
+								oncomplete="conscientia.widget(#{r:element('deletePopup')}).show();">
+								<f:setPropertyActionListener target="#{trajectVerantwoordelijkheidForm.object}"
+									value="#{object}" />
+							</j:commandButton>
+						</a:outputPanel>
+					</f:facet>
+				</d:objects>
+			</a:outputPanel>
+
+			<div style="display: none">
+				<u:decorate
+					template="/resources/osyris/includes/trajectVerantwoordelijkheidPanels.xhtml">
+					<u:param name="form" value="#{trajectVerantwoordelijkheidForm}" />
+					<u:param name="render" value="#{r:clientId('result')}" />
+				</u:decorate>
+			</div>
+			
+		</j:layoutPane>
+	</j:layout>
+</u:composition>

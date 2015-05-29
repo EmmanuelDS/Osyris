@@ -13,7 +13,7 @@
 				mode="#{cc.attrs.mode}"
 				level="#{cc.attrs.level}"
 				simple="#{cc.attrs.simple}" />
-		<a:outputPanel>
+		<a:outputPanel rendered="#{!identity.inGroup('PeterMeter','CUSTOM') and !identity.inGroup('Uitvoerder','CUSTOM')}">
 			<d:fields>
 				<d:field label="Peter/Meter" for="peterMeter">
 					<d:propertyValue id="peterMeter"

@@ -122,6 +122,14 @@
 	          </fo:block>	
 	          
 	          <xsl:if test="//@netwerkbord='false'">
+	          
+	           <fo:block space-after="8pt">
+		          <fo:inline font-weight="bold"><xsl:text>Volgnr: </xsl:text></fo:inline>
+		          	<xsl:value-of
+		          		 select="./volg">
+		          	</xsl:value-of>
+		          </fo:block>
+		          
 		          <fo:block space-after="8pt">
 		          <xsl:variable name="url_pijl" select="./pijl" />	
 		          <fo:inline font-weight="bold" padding-end="5pt"><xsl:text>Pijl: </xsl:text></fo:inline>

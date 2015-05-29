@@ -57,6 +57,9 @@
 			emptyMessage="#{messages['ui.dataTable.empty']}">
 			<j:bindAttribute var="bordProbleem"
 						name="rowData" />
+			<p:column style="width:20px;">
+				<p:rowToggler />
+			</p:column>
 			<f:facet name="header">
 			<h:outputText value="Bordprobleem" />
 			</f:facet>
@@ -85,21 +88,21 @@
 				<h:outputText value="Type" />
 				</f:facet>
 				<d:propertyValue id="typeColumn"
-					modelProperty="#{d:modelClass('Probleem').getProperty('type')}"
+					modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
 					value="#{bordProbleem.type}"
 					mode="VIEW" />
 			</p:column>
-			<p:column>
-				<f:facet name="header">
-				<h:outputText value="Commentaar" />
-				</f:facet>
-				<div style="white-space:pre-line;">
-				<d:propertyValue id="commentaarColumn"
-					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-					value="#{bordProbleem.commentaar}"
-					mode="VIEW" />
-				</div>
-			</p:column>
+<!-- 			<p:column> -->
+<!-- 				<f:facet name="header"> -->
+<!-- 				<h:outputText value="Commentaar" /> -->
+<!-- 				</f:facet> -->
+<!-- 				<div style="white-space:pre-line;"> -->
+<!-- 				<d:propertyValue id="commentaarColumn" -->
+<!-- 					modelProperty="#{d:modelClass('BordProbleem').getProperty('commentaar')}" -->
+<!-- 					value="#{bordProbleem.commentaar}" -->
+<!-- 					mode="VIEW" /> -->
+<!-- 				</div> -->
+<!-- 			</p:column> -->
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
 				<h:outputText value="Status" />
@@ -109,6 +112,18 @@
 					value="#{bordProbleem.status}"
 					mode="VIEW" />
 			</p:column>
+			<p:rowExpansion>
+					<h:panelGrid  rows="2" columns="1">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('BordProbleem').getProperty('commentaar')}" />
+						</f:facet>					
+						<d:propertyValue id="commentaarBordProbleemExpansion"
+							modelProperty="#{d:modelClass('BordProbleem').getProperty('commentaar')}"
+							value="#{bordProbleem.commentaar}"
+							mode="VIEW" style="white-space:pre-line;"/>
+					</h:panelGrid>
+			</p:rowExpansion>
 	   	</p:dataTable>
 	</a:outputPanel>
 	</c:when>
@@ -122,6 +137,9 @@
 			emptyMessage="#{messages['ui.dataTable.empty']}">
 			<j:bindAttribute var="anderProbleem"
 						name="rowData" />
+			<p:column style="width:20px;">
+				<p:rowToggler />
+			</p:column>
 			<f:facet name="header">
 				<h:outputText value="Ander probleem" />
 			</f:facet>
@@ -138,7 +156,7 @@
 				<h:outputText value="Categorie" />
 				</f:facet>
 				<d:propertyValue id="categorieColumn"
-					modelProperty="#{d:modelClass('Probleem').getProperty('categorie')}"
+					modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
 					value="#{anderProbleem.categorie}"
 					mode="VIEW" />
 			</p:column>
@@ -148,7 +166,7 @@
 				</f:facet>
 				<div style="white-space:pre-line;">
 				<d:propertyValue id="commentaarColumn"
-					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+					modelProperty="#{d:modelClass('AnderProbleem').getProperty('commentaar')}"
 					value="#{anderProbleem.commentaar}"
 					mode="VIEW" />
 				</div>
@@ -158,9 +176,21 @@
 				<h:outputText value="Status" />
 				</f:facet>
 				<d:propertyValue id="statusColumn"
-					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+					modelProperty="#{d:modelClass('AnderProbleem').getProperty('status')}"
 					value="#{anderProbleem.status}" mode="VIEW" />
 			</p:column>
+			<p:rowExpansion>
+					<h:panelGrid  rows="2" columns="1">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('AnderProbleem').getProperty('commentaar')}" />
+						</f:facet>					
+						<d:propertyValue id="commentaarAnderProbleemExpansion"
+							modelProperty="#{d:modelClass('AnderProbleem').getProperty('commentaar')}"
+							value="#{anderProbleem.commentaar}"
+							mode="VIEW" style="white-space:pre-line;"/>
+					</h:panelGrid>
+			</p:rowExpansion>
    		</p:dataTable>
    	</a:outputPanel>
    	</c:otherwise>
@@ -347,15 +377,11 @@
 	<br/>
 	<c:if test="#{form.object.status == 'AANGEMAAKT'}">
 	<d:buttons>
-		<d:fileDownload 
-			
-			fileName="OSYRIS_ronde_#{form.object.getId().toString()}_werkopdracht_#{form.selectedWerkOpdracht.getId().toString()}.pdf"
-			type="button"
+		<j:commandButton 
+			value="Printen"
 			image="#{resource['core/images/actions/12x12/print.png']}"
-			contentType="application/pdf"
-			content="#{form.printWerkOpdracht()}"
-			value="Printen werkopdracht"
-			eventsQueue="pdfQueue" />
+			type="button"
+			onclick="conscientia.widget(#{r:element('createWOPdfPopup')}).show();" />
 	</d:buttons>
 	</c:if>
 <!--  

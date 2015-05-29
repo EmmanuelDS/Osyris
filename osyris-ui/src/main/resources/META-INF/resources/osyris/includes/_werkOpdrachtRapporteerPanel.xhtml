@@ -41,16 +41,8 @@
 		</j:renderPanel>
 	<br/>
 	</p:tab>
-	<p:tab title="Info">
-	<a:outputPanel id="probleemPanel">
-	<d:fields>
-		<d:field for="probleem" label="Probleem">
-			<d:propertyValue id="probleem"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('probleem')}"
-					value="#{form.selectedWerkOpdracht.probleem}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
+
+	<p:tab title="Handelingen en commentaar">
 <!-- 	</r:panel> -->
 	<br/>
 	<a:outputPanel id="handelingenPanel">
@@ -86,8 +78,59 @@
 		</d:field>
 	</d:fields>
     </a:outputPanel>
-	</a:outputPanel>
 	</p:tab>
+	
+	<p:tab title="Probleem">
+		<a:outputPanel id="probleemPanel">
+			<d:fields>
+				<d:field for="probleemStatus" label="Status">
+					<d:propertyValue id="probleemStatus"
+					 		modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
+							value="#{form.selectedWerkOpdracht.probleem.status}"
+							mode="VIEW" />
+				</d:field>
+				<d:field for="probleemCommentaar" label="Commentaar">
+					<d:propertyValue id="probleemCommentaar"
+					 		modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+							value="#{form.selectedWerkOpdracht.probleem.commentaar}"
+							mode="VIEW" />
+				</d:field>
+				
+				<d:field for="probleemFoto" label="Foto">
+					<a:outputPanel id="probleemFotoPanel" rendered="#{form.selectedWerkOpdracht.probleem.foto == null}">
+						<div style="font-style: italic;">Geen foto toegevoegd</div>
+					</a:outputPanel>
+					<d:propertyValue id="probleemFoto"
+					 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+							value="#{form.selectedWerkOpdracht.probleem.foto}"
+							mode="VIEW" />
+				</d:field>
+				<a:outputPanel id="probleemTypePanel" rendered="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
+					<a:outputPanel rendered="#{form.selectedWerkOpdracht.probleem.type == null}">
+						<div style="font-style: italic;">Geen type opgegeven</div>
+					</a:outputPanel>
+					<d:field for="probleemType" label="Type">
+						<d:propertyValue id="probleemType"
+						 		modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
+								value="#{form.selectedWerkOpdracht.probleem.type}"
+								mode="VIEW" />
+					</d:field>
+				</a:outputPanel>
+				<a:outputPanel id="probleemCategoriePanel" rendered="#{!form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
+					<a:outputPanel rendered="#{form.selectedWerkOpdracht.probleem.categorie == null}">
+						<div style="font-style: italic;">Geen categorie opgegeven</div>
+					</a:outputPanel>
+					<d:field for="probleemCategorie" label="Categorie">
+						<d:propertyValue id="probleemCategorie"
+						 		modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
+								value="#{form.selectedWerkOpdracht.probleem.categorie}"
+								mode="VIEW" />
+					</d:field>
+				</a:outputPanel>
+			</d:fields>
+		</a:outputPanel>
+	</p:tab>
+	
 	<p:tab title="Foto 1">
 		<d:propertyField id="foto" 
 				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"

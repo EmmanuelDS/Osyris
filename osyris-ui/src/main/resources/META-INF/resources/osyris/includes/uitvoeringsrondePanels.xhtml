@@ -16,7 +16,7 @@
 		resizable="false"
 		onShow="#{r:component('viewInclude')}.show();"
 		onHide="#{r:component('viewInclude')}.hide();"
-		style="max-height:100% !important; right:30% !important; left:30% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:25% !important; left:25% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="viewInclude"
 			src="/resources/osyris/includes/_uitvoeringsrondeViewPanel.xhtml">
@@ -48,7 +48,7 @@
 		resizable="false"
 		onShow="#{r:component('rapporteerInclude')}.show();"
 		onHide="#{r:component('rapporteerInclude')}.hide();"
-		style="max-height:90% !important; right:30% !important; left:30% !important; top:0% !important; overflow:auto !important;">
+		style="max-height:100% !important; right:25% !important; left:25% !important; top:0% !important; overflow:auto !important;">
 		<j:relocate />
 		<j:lazyInclude id="rapporteerInclude"
 			src="/resources/osyris/includes/_uitvoeringsrondeRapporteerPanel.xhtml">
@@ -153,5 +153,21 @@
 			<f:param name="render" value="#{render}" />
 		</j:lazyInclude>
 	</p:dialog>
+	
+	<p:dialog id="createWOPdfPopup" 
+			header="Printen werkopdracht"
+			icon="#{resources['core/images/actions/16x16/print.png']}"
+			show="true"
+			modal="true"
+			width="600"
+			resizable="false"
+			onShow="#{r:component('werkOpdrachtPdfInclude')}.show();"
+			onHide="#{r:component('werkOpdrachtPdfInclude')}.hide();">
+		<j:relocate />
+		<j:lazyInclude id="werkOpdrachtPdfInclude"
+			src="/resources/osyris/includes/_werkOpdrachtPdf.xhtml">
+			<f:param name="form" value="#{form}" />
+		</j:lazyInclude>
+	</p:dialog>	
 		
 </u:composition>
