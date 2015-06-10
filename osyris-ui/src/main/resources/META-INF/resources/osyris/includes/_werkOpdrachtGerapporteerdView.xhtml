@@ -9,13 +9,15 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 
-	<!--  <p:tabView> -->
-    <p:tab title="Info en probleem" rendered="#{form.uitvoeringsronde != null}">
-	 <!--  <r:panel id="uitvoeringsrondePanel" header="Uitvoeringsronde Info"> -->
+    <p:tab title="Ronde en probleem" rendered="#{form.uitvoeringsronde != null}">
 		<d:fields>
 			<d:field for="rondeId" label="Uitvoeringsronde">
 				<h:outputText id="rondeId" value= "#{d:modelObject(form.uitvoeringsronde).getId()}" />
-			</d:field>			
+			</d:field>	
+			<d:propertyField id="uitvoeringsrondeStatus"
+			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('status')}"
+					value="#{form.uitvoeringsronde.status}"
+					mode="VIEW" />		
 			<d:propertyField id="uitvoeringsrondeDatum"
 			 		modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}"
 					value="#{form.uitvoeringsronde.datumUitvoering}"
@@ -29,13 +31,37 @@
 					value="#{form.uitvoeringsronde.afstand}"
 					mode="VIEW" />
 		</d:fields>
-	<!--  </r:panel> -->
 	<br/>
-	<!-- Probleem tabel -->
 		<u:decorate
 			template="/resources/osyris/includes/_werkOpdrachtProbleemTable.xhtml">
 			<u:param name="form" value="#{form}" />
 		</u:decorate>
+	</p:tab>
+	<p:tab title="Werkopdracht">
+		<d:propertyField id="status"
+	 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+			value="#{form.object.status}"
+			mode="VIEW" />
+		<d:propertyField id="datumTeControleren"
+	 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumTeControleren')}"
+			value="#{form.object.datumTeControleren}"
+			mode="VIEW" />
+		<d:propertyField id="datumUitTeVoeren"
+	 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitTeVoeren')}"
+			value="#{form.object.datumUitTeVoeren}"
+			mode="VIEW" />
+		<d:propertyField id="datumGeannuleerd"
+	 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumGeannuleerd')}"
+			value="#{form.object.datumGeannuleerd}"
+			mode="VIEW" />
+		<d:propertyField id="datumGerapporteerd"
+	 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumGerapporteerd')}"
+			value="#{form.object.datumGerapporteerd}"
+			mode="VIEW" />
+		<d:propertyField id="datumGevalideerd"
+	 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumGevalideerd')}"
+			value="#{form.object.datumGevalideerd}"
+			mode="VIEW" />
 	</p:tab>
 	<br/>
 	<p:tab title="Handelingen">
@@ -48,10 +74,8 @@
 				mode="VIEW" />
 		</d:field>
 	</d:fields>
-<!-- 	</r:panel> -->
 
 	<br/>
-<!-- 	<r:panel id="materialenPanel"> -->
 		<p:dataTable id="stockMaterialen"
 			value="#{form.object.materialen}"
 			mode="RESULT"
@@ -128,33 +152,9 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-<!-- 	</r:panel> -->
 	<br/>
-<!-- 	<r:panel id="fotoPanel"> -->
-<!-- 	<d:fields> -->
-<!-- 		<d:propertyField id="foto" -->
-<!-- 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}" -->
-<!-- 				value="#{form.object.foto}" -->
-<!-- 				mode="VIEW" /> -->
-<!-- 		<d:propertyField id="foto2" -->
-<!-- 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}" -->
-<!-- 				value="#{form.object.foto2}" -->
-<!-- 				mode="VIEW" /> -->
-<!-- 		<d:propertyField id="foto3" -->
-<!-- 		 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}" -->
-<!-- 				value="#{form.object.foto3}" -->
-<!-- 				mode="VIEW" /> -->
-<!-- 	</d:fields> -->
-<!-- 	</r:panel> -->
 	<br/>
-<!-- 	<r:panel id="commentaarMedewerkerPanel"> -->
 	<d:fields>
-		<d:field for="status" label="Status">
-			<d:propertyValue id="status"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
-					value="#{form.object.status}"
-					mode="VIEW" />
-		</d:field>
 		<d:field for="commentaarMedewerker" label="Commentaar TOV">
 			<d:propertyValue id="commentaarMedewerker"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
@@ -162,8 +162,6 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-<!-- 	</r:panel> -->
-<!-- 	<r:panel id="commentaarUitvoerderPanel"> -->
 	<d:fields>
 		<d:field for="commentaarUitvoerder" label="Commentaar uitvoerder">
 			<d:propertyValue id="commentaarUitvoerder"
@@ -224,5 +222,4 @@
 				mode="VIEW" />
 	</d:fields>
 	</p:tab>
-	<!-- </p:tabView> -->
 </u:composition>

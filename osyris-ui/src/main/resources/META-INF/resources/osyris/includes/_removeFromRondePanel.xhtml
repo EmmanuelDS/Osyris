@@ -14,7 +14,7 @@
 			image="#{resource['core/images/actions/12x12/delete.png']}"
 			type="button" 
 			action="#{form.removeFromUitvoeringsronde()}"
-			render="#{render}"
+			render="#{render}, #{r:clientId('samenvatting')}"
 			oncomplete="conscientia.widget(#{r:element('removeFromRondePopup')}).hide();" />
 		<j:commandButton value="#{messages['form.general.cancel.button']}"
 			type="button"

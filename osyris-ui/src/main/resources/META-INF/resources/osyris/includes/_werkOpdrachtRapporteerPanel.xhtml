@@ -12,7 +12,7 @@
 	<h:outputStylesheet id="fileuploadCss"
 		name="fileupload/fileupload.css"
 		library="primefaces" />
-		
+
 	<h2>Werkopdracht #{d:modelObject(form.selectedWerkOpdracht).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.selectedWerkOpdracht.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.selectedWerkOpdracht.traject)}) - #{form.selectedWerkOpdracht.trajectType}</h2>
 	<br/>
 	<table width="100%">
@@ -33,7 +33,6 @@
 						
 		<j:renderPanel id="materiaalTablePanel"
 				rendered="#{form.hasMateriaal}">						
-	<!-- 	<r:panel id="gebruiktMateriaalPanel"> -->
 			<u:decorate
 				template="/resources/osyris/includes/_werkOpdrachtGebruiktMateriaalTable.xhtml">
 				<u:param name="form" value="#{form}" />
@@ -43,7 +42,6 @@
 	</p:tab>
 
 	<p:tab title="Handelingen en commentaar">
-<!-- 	</r:panel> -->
 	<br/>
 	<a:outputPanel id="handelingenPanel">
 	<d:fields>
@@ -96,8 +94,8 @@
 							mode="VIEW" />
 				</d:field>
 				
-				<d:field for="probleemFoto" label="Foto">
-					<a:outputPanel id="probleemFotoPanel" rendered="#{form.selectedWerkOpdracht.probleem.foto == null}">
+				<d:field for="probleemFoto" label="Foto" rendered="#{form.selectedWerkOpdracht.probleem.foto == null}">
+					<a:outputPanel id="probleemFotoPanel">
 						<div style="font-style: italic;">Geen foto toegevoegd</div>
 					</a:outputPanel>
 					<d:propertyValue id="probleemFoto"
@@ -105,28 +103,32 @@
 							value="#{form.selectedWerkOpdracht.probleem.foto}"
 							mode="VIEW" />
 				</d:field>
-				<a:outputPanel id="probleemTypePanel" rendered="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
-					<a:outputPanel rendered="#{form.selectedWerkOpdracht.probleem.type == null}">
-						<div style="font-style: italic;">Geen type opgegeven</div>
+				
+				<d:field for="probleemType" label="Type" rendered="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
+					<a:outputPanel id="probleemTypePanel">
+						<a:outputPanel rendered="#{form.selectedWerkOpdracht.probleem.type == null}">
+							<div style="font-style: italic;">Geen type opgegeven</div>
+						</a:outputPanel>
+						
+							<d:propertyValue id="probleemType"
+							 		modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
+									value="#{form.selectedWerkOpdracht.probleem.type}"
+									mode="VIEW" />			
 					</a:outputPanel>
-					<d:field for="probleemType" label="Type">
-						<d:propertyValue id="probleemType"
-						 		modelProperty="#{d:modelClass('BordProbleem').getProperty('type')}"
-								value="#{form.selectedWerkOpdracht.probleem.type}"
-								mode="VIEW" />
-					</d:field>
-				</a:outputPanel>
-				<a:outputPanel id="probleemCategoriePanel" rendered="#{!form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
-					<a:outputPanel rendered="#{form.selectedWerkOpdracht.probleem.categorie == null}">
-						<div style="font-style: italic;">Geen categorie opgegeven</div>
+				</d:field>
+				
+				<d:field for="probleemCategorie" label="Categorie" rendered="#{!form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
+					<a:outputPanel id="probleemCategoriePanel">
+						<a:outputPanel rendered="#{form.selectedWerkOpdracht.probleem.categorie == null}">
+							<div style="font-style: italic;">Geen categorie opgegeven</div>
+						</a:outputPanel>
+							<d:propertyValue id="probleemCategorie"
+							 		modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
+									value="#{form.selectedWerkOpdracht.probleem.categorie}"
+									mode="VIEW" />
+						
 					</a:outputPanel>
-					<d:field for="probleemCategorie" label="Categorie">
-						<d:propertyValue id="probleemCategorie"
-						 		modelProperty="#{d:modelClass('AnderProbleem').getProperty('categorie')}"
-								value="#{form.selectedWerkOpdracht.probleem.categorie}"
-								mode="VIEW" />
-					</d:field>
-				</a:outputPanel>
+				</d:field>
 			</d:fields>
 		</a:outputPanel>
 	</p:tab>
@@ -151,23 +153,6 @@
 	</p:tab>
 	</p:tabView>
 	
-<!-- 	<br/> -->
-<!-- 	<r:panel id="fotoPanel"> -->
-<!-- 	<d:fields>				 -->
-<!-- 		<d:propertyField id="foto"  -->
-<!-- 				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}" -->
-<!-- 				value="#{form.selectedWerkOpdracht.foto}" -->
-<!-- 					mode="EDIT" />	 -->
-<!-- 		<d:propertyField id="foto2"  -->
-<!-- 				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}" -->
-<!-- 				value="#{form.selectedWerkOpdracht.foto2}" -->
-<!-- 					mode="EDIT" />	 -->
-<!-- 		<d:propertyField id="foto3"  -->
-<!-- 				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}" -->
-<!-- 				value="#{form.selectedWerkOpdracht.foto3}" -->
-<!-- 					mode="EDIT" />				 -->
-<!-- 	</d:fields> -->
-<!-- 	</r:panel> -->
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>
@@ -185,24 +170,7 @@
 	</tr>
 	</table>
 	<br/>
-<!--
-	<r:panel id="fotoPanel">
-	<d:fields>				
-		<d:propertyField id="foto" 
-				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
-				value="#{form.selectedWerkOpdracht.foto}"
-					mode="EDIT" />	
-		<d:propertyField id="foto2" 
-				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
-				value="#{form.selectedWerkOpdracht.foto2}"
-					mode="EDIT" />	
-		<d:propertyField id="foto3" 
-				modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
-				value="#{form.selectedWerkOpdracht.foto3}"
-					mode="EDIT" />				
-	</d:fields>
-	</r:panel>
--->
+	
 	<d:buttons>	
 		<j:commandButton value="#{messages['form.general.save.button']}"
 			image="#{resource['core/images/actions/12x12/save.png']}"

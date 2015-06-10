@@ -134,9 +134,7 @@
 					<j:layoutContent />
 					<j:bindAttribute var="uitvoeringsronde"
 						name="rowData" />
-					<p:column style="width:5%">
-						<p:rowToggler />
-					</p:column>
+
 					<p:column label="Acties" style="width:40px;">
 						<a:outputPanel styleClass="model-table-actions">
 							<j:commandButton
@@ -185,84 +183,7 @@
 							modelProperty="#{d:modelClass('Uitvoeringsronde').getProperty('datumUitvoering')}"
 							value="#{uitvoeringsronde.datumUitvoering }" mode="VIEW" />
 					</p:column>	
-					<p:rowExpansion label="Werkopdrachten">
-						<p:dataTable id="werkOpdrachten"
-							value="#{uitvoeringsrondeOverzichtFormBase.getWerkOpdrachtenInUitvoeringsronde(uitvoeringsronde)}"
-							var="werkOpdracht">
-							<f:facet name="header">  
-           						<d:displayLabel property="#{d:modelClass('Uitvoeringsronde').getProperty('opdrachten')}" />
-      							</f:facet>
-	       					<p:column style="width:20px;">
-							<a:outputPanel>
-								<j:commandButton
-									rendered="#{identity.inGroup('Uitvoerder','CUSTOM') || identity.inGroup('admin','CUSTOM')}"
-									image="#{resource['core/images/actions/16x16/delete.png']}"
-									type="image"
-									title="Werkopdracht verwijderen uit ronde"
-									onclick="conscientia.widget(#{r:element('removeFromRondePopup')}).show();">
-									<f:setPropertyActionListener
-										target="#{uitvoeringsrondeOverzichtFormBase.object}"
-										value="#{uitvoeringsronde}" />
-									<f:setPropertyActionListener
-										target="#{uitvoeringsrondeOverzichtFormBase.selectedWerkOpdracht}"
-										value="#{werkOpdracht}" />
-								</j:commandButton>
-							</a:outputPanel>
-							</p:column>
-							<p:column label="id" style="width:20px;">
-								<f:facet name="header">
-								<h:outputText value="Id" />
-								</f:facet>
-								<div>#{d:modelObject(werkOpdracht).getId()}</div>
-							</p:column>
-      							<p:column label="TrajectType">
-								<f:facet name="header">
-								<d:displayLabel
-										property="#{d:modelClass('WerkOpdracht').getProperty('trajectType')}" />
-								</f:facet>
-								<d:propertyValue id="trajectTypeColumn"
-									modelProperty="#{d:modelClass('WerkOpdrachte').getProperty('trajectType')}"
-									value="#{werkOpdracht.trajectType }" mode="VIEW" />
-							</p:column>
-							<p:column label="Traject">
-								<f:facet name="header">
-								<d:displayLabel
-										property="#{d:modelClass('WerkOpdracht').getProperty('traject')}" />
-								</f:facet>
-								<d:propertyValue id="trajectColumn"
-									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('traject')}"
-									value="#{werkOpdracht.traject }" mode="VIEW" />
-							</p:column>
-							<p:column label="Regio">
-								<f:facet name="header">
-								<d:displayLabel
-										property="#{d:modelClass('WerkOpdracht').getProperty('regioId')}" />
-								</f:facet>
-								<d:propertyValue id="regioColumn"
-									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('regioId')}"
-									value="#{werkOpdracht.regioId }" mode="VIEW" />
-							</p:column>
-							<p:column label="Uitvoerder">
-							<f:facet name="header">
-							<d:displayLabel
-									property="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}" />
-							</f:facet>
-							<d:propertyValue id="uitvoerderColumn"
-								modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
-								value="#{werkOpdracht.uitvoerder }" mode="VIEW" />
-							</p:column>
-							<p:column label="Medewerker">
-								<f:facet name="header">
-									<d:displayLabel
-										property="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}" />
-								</f:facet>
-								<d:propertyValue id="medewerkerColumn"
-									modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
-									value="#{werkOpdracht.medewerker }"
-									mode="VIEW" />
-							</p:column>				
-						</p:dataTable>
-					</p:rowExpansion>	
+		
 					<p:column label="Werkopdrachten">
 						<f:facet name="header">
 						<d:displayLabel

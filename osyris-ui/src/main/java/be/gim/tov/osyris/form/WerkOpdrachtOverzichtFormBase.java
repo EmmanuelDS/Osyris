@@ -478,8 +478,9 @@ public class WerkOpdrachtOverzichtFormBase extends
 				query.addFilter(FilterUtils.equal("uitvoerder", modelRepository
 						.getResourceName(userRepository.loadUser(identity
 								.getUser().getId()))));
-				query.addFilter(FilterUtils.equal("status",
-						WerkopdrachtStatus.UIT_TE_VOEREN));
+				query.addFilter(FilterUtils.or(FilterUtils.equal("status",
+						WerkopdrachtStatus.UIT_TE_VOEREN), FilterUtils.equal(
+						"status", WerkopdrachtStatus.IN_UITVOERING)));
 			} else if (identity.inGroup("Medewerker", "CUSTOM")) {
 				query.addFilter(FilterUtils.equal("medewerker", modelRepository
 						.getResourceName(userRepository.loadUser(identity
@@ -2602,32 +2603,36 @@ public class WerkOpdrachtOverzichtFormBase extends
 		return false;
 	}
 
-	/*
-	 * public void saveImagesToDisk() {
-	 * 
-	 * File file = null;
-	 * 
-	 * try { for (WerkOpdracht wo : getResults()) {
-	 * 
-	 * if (wo.getFoto() != null) {
-	 * 
-	 * // WerkOpdracht wo = (WerkOpdracht) modelRepository // .loadObject(new
-	 * ResourceKey("WerkOpdracht", "4"));
-	 * 
-	 * String fileName = wo.getId().toString() + "_foto1" + ".jpg";
-	 * 
-	 * String location = DefaultConfiguration.instance()
-	 * .getString("osyris.location.temp.csv");
-	 * 
-	 * file = new File(location + wo.getId().toString() + "/" + fileName);
-	 * 
-	 * file.getParentFile().mkdirs();
-	 * 
-	 * if (!file.exists()) { file.createNewFile(); } FileOutputStream fos = new
-	 * FileOutputStream(file.getPath());
-	 * 
-	 * fos.write(wo.getFoto()); fos.close(); } } } catch (Exception e) {
-	 * 
-	 * } }
-	 */
+	public void saveImagesToDisk() {
+
+		// File file = null;
+		//
+		// try {
+		// for (WerkOpdracht wo : getResults()) {
+		//
+		// if (wo.getFoto() != null) {
+		//
+		// String fileName = wo.getId().toString() + "_foto1" + ".jpg";
+		//
+		// String location = DefaultConfiguration.instance()
+		// .getString("osyris.location.temp.csv");
+		//
+		// file = new File(location + wo.getId().toString() + "/"
+		// + fileName);
+		//
+		// file.getParentFile().mkdirs();
+		//
+		// if (!file.exists()) {
+		// file.createNewFile();
+		// }
+		// FileOutputStream fos = new FileOutputStream(file.getPath());
+		//
+		// fos.write(wo.getFoto());
+		// fos.close();
+		// }
+		// }
+		// } catch (Exception e) {
+		//
+		// }
+	}
 }

@@ -1,148 +1,142 @@
 <u:composition xmlns="http://www.w3.org/1999/xhtml"
-	xmlns:u="http://java.sun.com/jsf/facelets"
-	xmlns:h="http://java.sun.com/jsf/html"
-	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:a="http://richfaces.org/a4j"
-	xmlns:r="http://richfaces.org/rich"
-	xmlns:d="http://specto.gim.be/display"
-	xmlns:p="http://primefaces.org/ui"
-	xmlns:c="http://java.sun.com/jsp/jstl/core"
-	xmlns:j="http://conscientia.org/jsf"
-	xmlns:m="http://specto.gim.be/map">
-	
-	<a:outputPanel id="werkOpdrachtViewPanel">
-	<h2>Werkopdracht #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
-	<br/>
-	<table width="100%">
-	<tr valign="top">
-	<td>
-	<r:panel id="werkOpdrachtInfo" header="Werkopdracht Info">
-	<d:fields>
-		<d:field for="status" label="Status">
-			<d:propertyValue id="status"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
-					value="#{form.object.status}"
-					mode="VIEW" />
-		</d:field>
-		
-		<a:outputPanel rendered="#{form.object.status == 'UITGESTELD'}">
-		<d:field for="datumLaterUitTeVoeren" label="Uitgesteld naar">
-			<d:propertyValue id="datumLaterUitTeVoeren"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLateruitTeVoeren')}"
-					value="#{form.object.datumLaterUitTeVoeren}"
-					mode="VIEW" />
-		</d:field>
-		</a:outputPanel>
-		
-		<d:field for="datumUitvoering" label="Datum uitvoering">
-			<d:propertyValue id="datumUitvoering"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitTeVoeren')}"
-					value="#{form.object.datumUitTeVoeren}"
-					mode="VIEW" />
-		</d:field>
-		<d:field for="medewerker" label="Medewerker">
-			<d:propertyValue id="medewerker"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
-					value="#{form.object.medewerker}"
-					mode="VIEW" />
-		</d:field>
-		<d:field for="uitvoerder" label="Uitvoerder">
-			<d:propertyValue id="uitvoerder"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
-					value="#{form.object.uitvoerder}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
-	</r:panel>
-	<br/>
-	<!-- Probleem tabel -->
-		<u:decorate
-			template="/resources/osyris/includes/_werkOpdrachtProbleemTable.xhtml">
-			<u:param name="form" value="#{form}" />
-		</u:decorate>
-	<br/>
-	<r:panel id="handelingenPanel">
-	<d:fields>
-		<d:field for="probleemFoto" label="Foto probleem" rendered="#{form.object.probleem.foto != null}">
-			<d:propertyValue id="probleemFoto"
-			 		modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
-					value="#{form.object.probleem.foto}"
-					mode="VIEW" />
-		</d:field>
-		<d:field for="handelingen" label="Handelingen">
-			<d:propertyValue id="handelingen"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
-					value="#{form.object.handelingen}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
-<!-- 	</r:panel> -->
-	<br/>
-<!-- 	<r:panel id="CommentaarTOVPanel"> -->
-	<d:fields>
-		<d:field for="commentaarMedewerker" label="Commentaar TOV">
-			<d:propertyValue id="commentaarMedewerker"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
-					value="#{form.object.commentaarMedewerker}"
-					mode="VIEW" />
-		</d:field>
-	</d:fields>
-	</r:panel>
-	
-	</td>
-	<td width="50%" valign="top">
-		<r:panel>
-			<div style="height: 500px">
-				<m:mapViewer id="viewer"
-					configuration="#{form.configuration}">
-				</m:mapViewer>
-			</div>
-		</r:panel>
-		<u:decorate
-			template="/resources/osyris/includes/baseLayerSwitch.xhtml">
-			<u:param name="form" value="#{form}" />
-		</u:decorate>
-	</td>
-	</tr>
-	</table>
-	<d:buttons>
-	<c:if test="#{(form.object.status == 'TE_CONTROLEREN' or form.object.status == 'UIT_TE_VOEREN') and !identity.inGroup('Uitvoerder', 'CUSTOM')}">
-	<j:commandButton
-			rendered="#{form.isCanEdit(form.object) or identity.inGroup('admin', 'CUSTOM')}"
-			value="Bewerken"
-			image="#{resource['core/images/actions/12x12/edit.png']}"
-			type="button"
-			onclick="conscientia.widget(#{r:element('controleerPopup')}).show(); conscientia.widget(#{r:element('viewPopup')}).hide(); " />
-		</c:if>
-		<j:commandButton 
-			rendered="#{form.object.status == 'TE_CONTROLEREN' }"
-			value="Verzenden"
-			image="#{resource['core/images/actions/12x12/next.png']}"
-			type="button"
-			action="#{form.verzendenWerkOpdracht()}"
-			render="#{render}" 
-			oncomplete="if(#{!form.hasErrors})conscientia.widget(#{r:element('viewPopup')}).hide();"/>
-		<j:commandButton
-			rendered="#{form.object.status == 'GERAPPORTEERD' }"
-			value="Valideren"
-			image="#{resource['core/images/actions/12x12/edit.png']}"
-			type="button"
-			onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
-		<d:fileDownload fileName="OSYRIS_werkopdracht_#{form.object.getId().toString()}.pdf"
-			type="button"
-			image="#{resource['core/images/actions/12x12/print.png']}"
-			contentType="application/pdf"
-			content="#{form.printWerkOpdracht()}"
-			value="Printen werkopdracht"
-			eventsQueue="pdfQueue" />
-		<j:commandButton 
-			rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
-			value="Opnieuw te controleren"
-			image="#{resource['core/images/actions/12x12/reload.png']}"
-			type="button"
-			action="#{form.reopenWerkOpdracht()}"
-			render="#{render}"
-			oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
-	</d:buttons>
-	</a:outputPanel>
+   xmlns:u="http://java.sun.com/jsf/facelets"
+   xmlns:h="http://java.sun.com/jsf/html"
+   xmlns:f="http://java.sun.com/jsf/core"
+   xmlns:a="http://richfaces.org/a4j"
+   xmlns:r="http://richfaces.org/rich"
+   xmlns:d="http://specto.gim.be/display"
+   xmlns:p="http://primefaces.org/ui"
+   xmlns:c="http://java.sun.com/jsp/jstl/core"
+   xmlns:j="http://conscientia.org/jsf"
+   xmlns:m="http://specto.gim.be/map">
+   <a:outputPanel id="werkOpdrachtViewPanel">
+      <h2>Werkopdracht #{d:modelObject(form.object).getId()} - #{osyrisModelFunctions.getTrajectNaam(form.object.traject)} (#{osyrisModelFunctions.getTrajectRegio(form.object.traject)}) - #{form.object.trajectType}</h2>
+      <br/>
+      <table width="100%">
+         <tr valign="top">
+            <td>
+               <p:tabView>
+                  <p:tab title="Info">
+                     <d:fields>
+                        <d:propertyField id="status"
+                           modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
+                           value="#{form.object.status}"
+                           mode="VIEW" />
+                        <a:outputPanel rendered="#{form.object.status == 'UITGESTELD'}">
+                           <d:field for="datumLaterUitTeVoeren" label="Uitgesteld naar">
+                              <d:propertyValue id="datumLaterUitTeVoeren"
+                                 modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumLateruitTeVoeren')}"
+                                 value="#{form.object.datumLaterUitTeVoeren}"
+                                 mode="VIEW" />
+                           </d:field>
+                        </a:outputPanel>
+                        <d:propertyField id="datumTeControleren"
+                           modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumTeControleren')}"
+                           value="#{form.object.datumTeControleren}"
+                           mode="VIEW" />
+                        <d:propertyField id="datumUitvoering"
+                           modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitTeVoeren')}"
+                           value="#{form.object.datumUitTeVoeren}"
+                           mode="VIEW" />
+                        <d:propertyField id="medewerker"
+                           modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
+                           value="#{form.object.medewerker}"
+                           mode="VIEW" />
+                        <d:propertyField id="uitvoerder"
+                           modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
+                           value="#{form.object.uitvoerder}"
+                           mode="VIEW" />
+                     </d:fields>
+                  </p:tab>
+                  <p:tab title="Probleem">
+                     <br/>
+                     <d:fields>
+                        <d:field for="probleemFoto" label="Foto probleem" rendered="#{form.object.probleem.foto != null}">
+                           <d:propertyValue id="probleemFoto"
+                              modelProperty="#{d:modelClass('Probleem').getProperty('foto')}"
+                              value="#{form.object.probleem.foto}"
+                              mode="VIEW" />
+                        </d:field>
+                     </d:fields>
+                     <!-- Probleem tabel -->
+                     <u:decorate
+                        template="/resources/osyris/includes/_werkOpdrachtProbleemTable.xhtml">
+                        <u:param name="form" value="#{form}" />
+                     </u:decorate>
+                     <br/>
+                  </p:tab>
+                  <p:tab title="Handelingen">
+                     <d:fields>
+                        <d:field for="handelingen" label="Handelingen">
+                           <d:propertyValue id="handelingen"
+                              modelProperty="#{d:modelClass('WerkOpdracht').getProperty('handelingen')}"
+                              value="#{form.object.handelingen}"
+                              mode="VIEW" />
+                        </d:field>
+                     </d:fields>
+                     <br/>
+                     <d:fields>
+                        <d:propertyField id="commentaarMedewerker"
+                           modelProperty="#{d:modelClass('WerkOpdracht').getProperty('commentaarMedewerker')}"
+                           value="#{form.object.commentaarMedewerker}"
+                           mode="VIEW" />
+                     </d:fields>
+                  </p:tab>
+               </p:tabView>
+            </td>
+            <td width="50%" valign="top">
+               <r:panel>
+                  <div style="height: 500px">
+                     <m:mapViewer id="viewer"
+                        configuration="#{form.configuration}">
+                     </m:mapViewer>
+                  </div>
+               </r:panel>
+               <u:decorate
+                  template="/resources/osyris/includes/baseLayerSwitch.xhtml">
+                  <u:param name="form" value="#{form}" />
+               </u:decorate>
+            </td>
+         </tr>
+      </table>
+      <d:buttons>
+         <c:if test="#{(form.object.status == 'TE_CONTROLEREN' or form.object.status == 'UIT_TE_VOEREN') and !identity.inGroup('Uitvoerder', 'CUSTOM')}">
+            <j:commandButton
+               rendered="#{form.isCanEdit(form.object) or identity.inGroup('admin', 'CUSTOM')}"
+               value="Bewerken"
+               image="#{resource['core/images/actions/12x12/edit.png']}"
+               type="button"
+               onclick="conscientia.widget(#{r:element('controleerPopup')}).show(); conscientia.widget(#{r:element('viewPopup')}).hide(); " />
+         </c:if>
+         <j:commandButton 
+            rendered="#{form.object.status == 'TE_CONTROLEREN' }"
+            value="Verzenden"
+            image="#{resource['core/images/actions/12x12/next.png']}"
+            type="button"
+            action="#{form.verzendenWerkOpdracht()}"
+            render="#{render}" 
+            oncomplete="if(#{!form.hasErrors})conscientia.widget(#{r:element('viewPopup')}).hide();"/>
+         <j:commandButton
+            rendered="#{form.object.status == 'GERAPPORTEERD' }"
+            value="Valideren"
+            image="#{resource['core/images/actions/12x12/edit.png']}"
+            type="button"
+            onclick="conscientia.widget(#{r:element('viewPopup')}).hide(); conscientia.widget(#{r:element('valideerPopup')}).show();" />
+         <d:fileDownload fileName="OSYRIS_werkopdracht_#{form.object.getId().toString()}.pdf"
+            type="button"
+            image="#{resource['core/images/actions/12x12/print.png']}"
+            contentType="application/pdf"
+            content="#{form.printWerkOpdracht()}"
+            value="Printen werkopdracht"
+            eventsQueue="pdfQueue" />
+         <j:commandButton 
+            rendered="#{identity.inGroup('admin', 'CUSTOM') and form.object.status == 'GEANNULEERD'  }"
+            value="Opnieuw te controleren"
+            image="#{resource['core/images/actions/12x12/reload.png']}"
+            type="button"
+            action="#{form.reopenWerkOpdracht()}"
+            render="#{render}"
+            oncomplete="conscientia.widget(#{r:element('viewPopup')}).hide();" />
+      </d:buttons>
+   </a:outputPanel>
 </u:composition>

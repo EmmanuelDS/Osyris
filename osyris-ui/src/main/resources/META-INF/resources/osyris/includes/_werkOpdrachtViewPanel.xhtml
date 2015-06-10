@@ -10,7 +10,7 @@
 	xmlns:j="http://conscientia.org/jsf"
 	xmlns:m="http://specto.gim.be/map">
 	<c:choose>
-		<c:when test="#{form.object.status == 'GERAPPORTEERD' or form.object.status == 'GEVALIDEERD'}">
+		<c:when test="#{form.object.status == 'IN_UITVOERING' or form.object.status == 'GERAPPORTEERD' or form.object.status == 'GEVALIDEERD'}">
 			<u:decorate
 				template="/resources/osyris/includes/_werkOpdrachtViewPanel2.xhtml">
 				<u:param name="form" value="#{form}" />

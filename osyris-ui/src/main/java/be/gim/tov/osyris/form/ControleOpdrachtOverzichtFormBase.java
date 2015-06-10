@@ -489,6 +489,13 @@ public class ControleOpdrachtOverzichtFormBase extends
 			if (object.getTraject() != null) {
 				setHasErrors(false);
 				probleem = null;
+
+				// Verwijder expliciet null waarden om de index in db correct te
+				// houden
+				while (object.getProblemen().remove(null)) {
+					;
+				}
+
 				modelRepository.saveObject(object);
 				messages.info("Controleopdracht succesvol bewaard.");
 				// clear();
@@ -1057,6 +1064,12 @@ public class ControleOpdrachtOverzichtFormBase extends
 	public void rapporterenControleOpdracht() {
 
 		if (object != null) {
+
+			// Verwijder expliciet null waarden om de index in db correct te
+			// houden
+			while (object.getProblemen().remove(null)) {
+				;
+			}
 
 			object.setStatus(ControleOpdrachtStatus.GERAPPORTEERD);
 			object.setDatumGerapporteerd(new Date());
@@ -1886,6 +1899,7 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		try {
 			object.getProblemen().remove(probleem);
+
 			modelRepository.saveObject(object);
 			modelRepository.deleteObject(probleem);
 
@@ -2332,9 +2346,14 @@ public class ControleOpdrachtOverzichtFormBase extends
 
 		if (controleOpdracht.getProblemen() != null) {
 			for (Probleem p : controleOpdracht.getProblemen()) {
-				if (p.getStatus() == null || p.getStatus().toString().isEmpty()
-						|| p.getStatus().equals(ProbleemStatus.IN_BEHANDELING)) {
-					openstaandeProblemen = +1;
+
+				if (p != null) {
+					if (p.getStatus() == null
+							|| p.getStatus().toString().isEmpty()
+							|| p.getStatus().equals(
+									ProbleemStatus.IN_BEHANDELING)) {
+						openstaandeProblemen = +1;
+					}
 				}
 			}
 		}

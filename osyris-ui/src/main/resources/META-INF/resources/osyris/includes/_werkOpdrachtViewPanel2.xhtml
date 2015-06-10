@@ -13,9 +13,9 @@
 	
 	<br/>
 	
-	<c:if test="#{!form.canValidate(form.object)}">
+<!-- 	<c:if test="#{!form.canValidate(form.object)}"> -->
 		
-	</c:if>
+<!-- 	</c:if> -->
 	
 	<br/>
 	<table width="100%">
@@ -30,37 +30,37 @@
 	</p:tabView>
 	<br/>
 	
-	<p:fieldset legend="Opmerking" 
-		style="margin-bottom:20px"
-		rendered="#{form.object.status == 'GERAPPORTEERD' and !form.canValidate(form.object)}">		
-        <h:panelGrid columns="1" cellpadding="5">
-            <h:outputText
-                value="Deze werkopdracht kan momenteel niet gevalideerd worden 
-                omdat ronde #{d:modelObject(form.uitvoeringsronde).getId()} zich nog niet in status UITGEVOERD bevindt."  /> 
-                <h:outputText
-                value="Pas wanneer de uitvoerder de ronde naar TOV heeft verzonden (en dus in status UITGEVOERD komt te staan), 
-                kunnen de werkopdrachten in deze ronde gevalideerd worden."  />       
-        </h:panelGrid>
-    </p:fieldset>
+<!-- 	<p:fieldset legend="Opmerking"  -->
+<!-- 		style="margin-bottom:20px" -->
+<!-- 		rendered="#{form.object.status == 'GERAPPORTEERD' and !form.canValidate(form.object)}">		 -->
+<!--         <h:panelGrid columns="1" cellpadding="5"> -->
+<!--             <h:outputText -->
+<!--                 value="Deze werkopdracht kan momenteel niet gevalideerd worden  -->
+<!--                 omdat ronde #{d:modelObject(form.uitvoeringsronde).getId()} zich nog niet in status UITGEVOERD bevindt."  />  -->
+<!--                 <h:outputText -->
+<!--                 value="Pas wanneer de uitvoerder de ronde naar TOV heeft verzonden (en dus in status UITGEVOERD komt te staan),  -->
+<!--                 kunnen de werkopdrachten in deze ronde gevalideerd worden."  />        -->
+<!--         </h:panelGrid> -->
+<!--     </p:fieldset> -->
     
-    <p:fieldset legend="Opmerking" 
-		style="margin-bottom:20px"
-		rendered="#{form.object.status == 'GERAPPORTEERD' and form.uitvoeringsronde == null}">		
-        <h:panelGrid columns="1" cellpadding="5">
-           	<h:outputText
-               value="Deze werkopdracht is momenteel niet gekoppeld aan een uitvoeringsronde. 
-               U hebt de mogelijkheid om:" />
-            <ol>  
-            <li style="margin-bottom:10px;">  
-           		De werkopdracht te valideren zonder dat deze aan een ronde gekoppeld is.
-            </li>
-            <li>
-         		De werkopdracht eerst op te nemen in een nieuwe ronde. Gelieve er in dit geval rekening mee te houden 
-               	dat de werkopdrachten pas gevalideerd kunnen worden als de ronde zich in status UITGEVOERD bevindt."
-            </li>
-            </ol>
-        </h:panelGrid>
-    </p:fieldset>
+<!--     <p:fieldset legend="Opmerking"  -->
+<!-- 		style="margin-bottom:20px" -->
+<!-- 		rendered="#{form.object.status == 'GERAPPORTEERD' and form.uitvoeringsronde == null}">		 -->
+<!--         <h:panelGrid columns="1" cellpadding="5"> -->
+<!--            	<h:outputText -->
+<!--                value="Deze werkopdracht is momenteel niet gekoppeld aan een uitvoeringsronde.  -->
+<!--                U hebt de mogelijkheid om:" /> -->
+<!--             <ol>   -->
+<!--             <li style="margin-bottom:10px;">   -->
+<!--            		De werkopdracht te valideren zonder dat deze aan een ronde gekoppeld is. -->
+<!--             </li> -->
+<!--             <li> -->
+<!--          		De werkopdracht eerst op te nemen in een nieuwe ronde. Gelieve er in dit geval rekening mee te houden  -->
+<!--                	dat de werkopdrachten pas gevalideerd kunnen worden als de ronde zich in status UITGEVOERD bevindt." -->
+<!--             </li> -->
+<!--             </ol> -->
+<!--         </h:panelGrid> -->
+<!--     </p:fieldset> -->
     
 	</td>
 	<td width="50%" valign="top">
@@ -81,7 +81,7 @@
 	<br/>
 	<d:buttons>
 		<j:commandButton
-			rendered="#{form.object.status == 'GERAPPORTEERD' and form.canValidate(form.object)}"
+			rendered="#{form.object.status == 'GERAPPORTEERD'}"
 			value="Valideren"
 			image="#{resource['core/images/actions/12x12/edit.png']}"
 			type="button"

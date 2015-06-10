@@ -25,7 +25,6 @@ import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.sax.SAXResult;
 import javax.xml.transform.stream.StreamSource;
 
-import org.apache.commons.collections.Transformer;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -46,6 +45,7 @@ import org.conscientia.core.search.DefaultQuery;
 import org.conscientia.core.search.DefaultQueryOrderBy;
 import org.conscientia.core.search.QueryBuilder;
 import org.conscientia.jsf.component.ComponentUtils;
+import org.primefaces.event.FileUploadEvent;
 import org.w3c.dom.Document;
 
 import be.gim.commons.bean.Beans;
@@ -299,16 +299,6 @@ public class UitvoeringsrondeOverzichtFormBase extends
 			return "true";
 		} else {
 
-			// if (hasMateriaal == null) {
-			// if (selectedWerkOpdracht != null
-			// && selectedWerkOpdracht.getMaterialen() != null
-			// && selectedWerkOpdracht.getMaterialen().size() > 0) {
-			// return "true";
-			// } else {
-			// return "false";
-			// }
-			// }
-
 			// Zet standaard hasMateriaal op true
 			if (hasMateriaal == null) {
 				if (selectedWerkOpdracht != null
@@ -420,34 +410,54 @@ public class UitvoeringsrondeOverzichtFormBase extends
 	public List<WerkOpdracht> getWerkOpdrachtenInUitvoeringsronde(
 			Uitvoeringsronde ronde) {
 
-		return (List<WerkOpdracht>) cacheProducer.getCache(
-				"WerkOpdrachtInRondeCache", new Transformer() {
+		try {
+			if (ronde != null) {
+				opdrachtenInRonde = new ArrayList<WerkOpdracht>();
 
-					@Override
-					public Object transform(Object ronde) {
+				for (ResourceIdentifier id : ronde.getOpdrachten()) {
+					opdrachtInRonde = (WerkOpdracht) modelRepository
+							.loadObject(id);
 
-						try {
-							if (ronde != null) {
-								opdrachtenInRonde = new ArrayList<WerkOpdracht>();
-
-								for (ResourceIdentifier id : ((Uitvoeringsronde) ronde)
-										.getOpdrachten()) {
-									opdrachtInRonde = (WerkOpdracht) modelRepository
-											.loadObject(id);
-
-									if (opdrachtInRonde != null) {
-										opdrachtenInRonde.add(opdrachtInRonde);
-									}
-								}
-								return opdrachtenInRonde;
-
-							}
-						} catch (IOException e) {
-							LOG.error("Can not load WerkOpdracht", e);
-						}
-						return Collections.emptyList();
+					if (opdrachtInRonde != null) {
+						opdrachtenInRonde.add(opdrachtInRonde);
 					}
-				}).get(ronde);
+				}
+				return opdrachtenInRonde;
+
+			}
+		} catch (IOException e) {
+			LOG.error("Can not load WerkOpdracht", e);
+		}
+		return Collections.emptyList();
+
+		// return (List<WerkOpdracht>) cacheProducer.getCache(
+		// "WerkOpdrachtInRondeCache", new Transformer() {
+		//
+		// @Override
+		// public Object transform(Object ronde) {
+		//
+		// try {
+		// if (ronde != null) {
+		// opdrachtenInRonde = new ArrayList<WerkOpdracht>();
+		//
+		// for (ResourceIdentifier id : ((Uitvoeringsronde) ronde)
+		// .getOpdrachten()) {
+		// opdrachtInRonde = (WerkOpdracht) modelRepository
+		// .loadObject(id);
+		//
+		// if (opdrachtInRonde != null) {
+		// opdrachtenInRonde.add(opdrachtInRonde);
+		// }
+		// }
+		// return opdrachtenInRonde;
+		//
+		// }
+		// } catch (IOException e) {
+		// LOG.error("Can not load WerkOpdracht", e);
+		// }
+		// return Collections.emptyList();
+		// }
+		// }).get(ronde);
 	}
 
 	@Override
@@ -573,12 +583,13 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				}
 
 				selectedWerkOpdracht
-						.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
-				selectedWerkOpdracht.setDatumGerapporteerd(new Date());
+						.setStatus(WerkopdrachtStatus.IN_UITVOERING);
+				selectedWerkOpdracht.setDatumLaatsteWijziging(new Date());
+				// selectedWerkOpdracht.setDatumGerapporteerd(new Date());
 				modelRepository.saveObject(selectedWerkOpdracht);
-				messages.info("Werkopdracht in uitvoeringsronde succesvol gerapporteerd.");
+				messages.info("Werkopdracht succesvol in uitvoering geplaatst.");
 
-				hasMateriaal = "false";
+				resetHasMateriaal();
 			}
 
 		} catch (IOException e) {
@@ -629,7 +640,8 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				return;
 			}
 
-			// Checken of alle WO in status GERAPPORTEERD of GEVALIDEERD
+			// Checken of alle WO in status IN_UITVOERING, GERAPPORTEERD of
+			// GEVALIDEERD zijn
 			if (checkWerkOpdrachtenGerapporteerd()) {
 
 				// Afboeken stock voor elk gebruikt materiaal in elke WO
@@ -637,6 +649,14 @@ public class UitvoeringsrondeOverzichtFormBase extends
 					WerkOpdracht opdracht = (WerkOpdracht) modelRepository
 							.loadObject(id);
 
+					// Indien status IN_UITVOERING mag de werkopdracht in status
+					// GERAPPORTEERD komen te staan.
+					if (opdracht.getStatus().equals(
+							WerkopdrachtStatus.IN_UITVOERING)) {
+						opdracht.setStatus(WerkopdrachtStatus.GERAPPORTEERD);
+						opdracht.setDatumLaatsteWijziging(new Date());
+						opdracht.setDatumGerapporteerd(new Date());
+					}
 					// Enkel stock manipuleren
 					// if(opdracht.getStatus().equals(WerkopdrachtStatus.GERAPPORTEERD))
 
@@ -703,7 +723,7 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				setHasErrors(false);
 
 			} else {
-				messages.error("Uitvoeringsronde niet gerapporteerd: De uitvoeringsronde bevat nog niet-gerapporteerde werkopdrachten.");
+				messages.error("Uitvoeringsronde niet gerapporteerd: De uitvoeringsronde bevat nog werkopdrachten in status 'Uit te voeren'.");
 			}
 
 		} catch (IOException e) {
@@ -730,7 +750,9 @@ public class UitvoeringsrondeOverzichtFormBase extends
 				if (!opdracht.getStatus().equals(
 						WerkopdrachtStatus.GERAPPORTEERD)
 						&& !opdracht.getStatus().equals(
-								WerkopdrachtStatus.GEVALIDEERD)) {
+								WerkopdrachtStatus.GEVALIDEERD)
+						&& !opdracht.getStatus().equals(
+								WerkopdrachtStatus.IN_UITVOERING)) {
 					isGerapporteerd = false;
 				}
 			}
@@ -1472,5 +1494,57 @@ public class UitvoeringsrondeOverzichtFormBase extends
 
 	public void resetHasMateriaal() {
 		hasMateriaal = null;
+	}
+
+	public void fileUploadListener(FileUploadEvent event) throws IOException {
+
+		// String path = FacesContext.getCurrentInstance().getExternalContext()
+		// .getRealPath("/");
+		//
+		// String fileName = selectedWerkOpdracht.getId().toString() + "_foto4"
+		// + ".jpg";
+		//
+		// File file = new File("c:/Temp/test/"
+		// + selectedWerkOpdracht.getId().toString() + "/" + fileName);
+		//
+		// file.getParentFile().mkdirs();
+		//
+		// if (!file.exists()) {
+		// file.createNewFile();
+		// }
+		//
+		// InputStream in = event.getFile().getInputstream();
+		// FileOutputStream out = new FileOutputStream(file.getPath());
+		//
+		// int read = 0;
+		// byte[] bytes = new byte[1024];
+		//
+		// while ((read = in.read(bytes)) != -1) {
+		// out.write(bytes, 0, read);
+		// }
+		//
+		// in.close();
+		// out.flush();
+		// out.close();
+		//
+		// String appURL = getViewer().getConfiguration().getGeoServletURL()
+		// .replace("geocms/http/ogc", "");
+		//
+		// String url = "http://localhost/werkopdrachten/"
+		// + selectedWerkOpdracht.getId().toString() + "/" + fileName;
+		//
+		// selectedWerkOpdracht.setFoto4(ResourceIdentifier.fromString(url));
+	}
+
+	public void deleteFoto4() {
+
+		// String fileName = selectedWerkOpdracht.getId().toString() + "_foto4"
+		// + ".jpg";
+		//
+		// File file = new File("c:/Temp/test/"
+		// + selectedWerkOpdracht.getId().toString() + "/" + fileName);
+		// file.delete();
+		//
+		// selectedWerkOpdracht.setFoto4(null);
 	}
 }

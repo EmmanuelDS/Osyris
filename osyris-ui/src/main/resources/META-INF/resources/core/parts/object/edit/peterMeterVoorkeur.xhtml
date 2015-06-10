@@ -35,7 +35,7 @@
 				<h:selectOneMenu id="regio" value="#{cc.attrs.value.regio}">
 					<f:converter converterId="be.gim.commons.ResourceIdentifierConverter" />
 					<f:selectItem itemValue="" itemLabel="" />
-					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderen)}" />
+					<f:selectItems value="#{modelUtils.selectItems(osyrisModelFunctions.regiosOostVlaanderenVoorkeuren)}" />
 					<a:ajax
 						event="change"
 						render="trajectNaam"

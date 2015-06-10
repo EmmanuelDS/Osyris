@@ -35,6 +35,19 @@
 							target="#{form.selectedWerkOpdracht}"
 							value="#{werkOpdracht}" />
 					</j:commandButton>
+					<j:commandButton
+						rendered="#{identity.inGroup('Uitvoerder','CUSTOM') || identity.inGroup('admin','CUSTOM')}"
+						image="#{resource['core/images/actions/16x16/delete.png']}"
+						type="image"
+						title="Werkopdracht verwijderen uit ronde"
+						onclick="conscientia.widget(#{r:element('removeFromRondePopup')}).show();">
+						<f:setPropertyActionListener
+							target="#{form.object}"
+							value="#{form.object}" />
+						<f:setPropertyActionListener
+							target="#{form.selectedWerkOpdracht}"
+							value="#{werkOpdracht}" />
+					</j:commandButton>
 				</a:outputPanel>
 			</p:column>
 	   		<p:column label="id">

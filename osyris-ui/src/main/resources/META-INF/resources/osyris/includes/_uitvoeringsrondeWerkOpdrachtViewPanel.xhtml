@@ -16,36 +16,43 @@
 	<td>
 	<p:tabView>
     <p:tab title="Info en probleem" rendered="#{form.selectedWerkOpdracht != null}">
-	<!--  <r:panel id="werkOpdrachtInfo"> -->
 	<d:fields>
-		<d:field for="status" label="Status">
-			<d:propertyValue id="status"
+			<d:propertyField id="status"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('status')}"
 					value="#{form.selectedWerkOpdracht.status}"
 					mode="VIEW" />
-		</d:field>
-		<d:field for="datumUitvoering" label="Datum uitvoering">
-			<d:propertyValue id="datumUitvoering"
+					
+			<d:propertyField id="datumTeControleren"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumTeControleren')}"
+					value="#{form.selectedWerkOpdracht.datumTeControleren}"
+					mode="VIEW" />
+					
+			<d:propertyField id="datumUitvoering"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumUitTeVoeren')}"
 					value="#{form.selectedWerkOpdracht.datumUitTeVoeren}"
 					mode="VIEW" />
-		</d:field>
-		<d:field for="medewerker" label="Medewerker">
-			<d:propertyValue id="medewerker"
+		
+			<d:propertyField id="datumGerapporteerd"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumGerapporteerd')}"
+					value="#{form.selectedWerkOpdracht.datumGerapporteerd}"
+					mode="VIEW" />
+					
+			<d:propertyField id="datumGevalideerd"
+			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('datumGevalideerd')}"
+					value="#{form.selectedWerkOpdracht.datumGevalideerd}"
+					mode="VIEW" />
+					
+			<d:propertyField id="medewerker"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('medewerker')}"
 					value="#{form.selectedWerkOpdracht.medewerker}"
 					mode="VIEW" />
-		</d:field>
-		<d:field for="uitvoerder" label="Uitvoerder">
-			<d:propertyValue id="uitvoerder"
+					
+			<d:propertyField id="uitvoerder"
 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('uitvoerder')}"
 					value="#{form.selectedWerkOpdracht.uitvoerder}"
 					mode="VIEW" />
-		</d:field>
 	</d:fields>
-	<!--  </r:panel> -->
 	<br/>
-	<!-- Probleem tabel --> 
 	<c:choose>
 	<c:when test="#{form.isBordProbleem(form.selectedWerkOpdracht.probleem)}">
 	<a:outputPanel id="bordProbleemPanel">
@@ -92,17 +99,6 @@
 					value="#{bordProbleem.type}"
 					mode="VIEW" />
 			</p:column>
-<!-- 			<p:column> -->
-<!-- 				<f:facet name="header"> -->
-<!-- 				<h:outputText value="Commentaar" /> -->
-<!-- 				</f:facet> -->
-<!-- 				<div style="white-space:pre-line;"> -->
-<!-- 				<d:propertyValue id="commentaarColumn" -->
-<!-- 					modelProperty="#{d:modelClass('BordProbleem').getProperty('commentaar')}" -->
-<!-- 					value="#{bordProbleem.commentaar}" -->
-<!-- 					mode="VIEW" /> -->
-<!-- 				</div> -->
-<!-- 			</p:column> -->
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
 				<h:outputText value="Status" />
@@ -207,9 +203,7 @@
 					mode="VIEW" />
 		</d:field>
 	</d:fields>
-<!-- 	</r:panel> -->
 	<br/>
-<!-- 	<r:panel id="materialenPanel"> -->
 		<p:dataTable id="stockMaterialen"
 			value="#{form.selectedWerkOpdracht.materialen}"
 			mode="RESULT"
@@ -288,9 +282,7 @@
 					mode="VIEW" />
 			</p:column>
 	   	</p:dataTable>
-<!-- 	</r:panel> -->
 	<br/>
-<!-- 	<r:panel id="CommentaarTOVPanel"> -->
 	<d:fields>
 		<d:field for="commentaarMedewerker" label="Commentaar TOV">
 			<d:propertyValue id="commentaarMedewerker"
@@ -338,26 +330,6 @@
 	</d:fields>
 	</p:tab>
 	</p:tabView>
-<!-- 	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}"> -->
-<!-- 	<d:fields> -->
-	
-<!-- 			<d:propertyField id="foto" -->
-<!-- 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}" -->
-<!-- 					value="#{form.selectedWerkOpdracht.foto}" -->
-<!-- 					mode="VIEW" /> -->
-		
-<!-- 			<d:propertyField id="foto2" -->
-<!-- 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}" -->
-<!-- 					value="#{form.selectedWerkOpdracht.foto2}" -->
-<!-- 					mode="VIEW" /> -->
-		
-<!-- 			<d:propertyField id="foto3" -->
-<!-- 			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}" -->
-<!-- 					value="#{form.selectedWerkOpdracht.foto3}" -->
-<!-- 					mode="VIEW" /> -->
-<!-- 	</d:fields> -->
-<!-- 	</r:panel> -->
-	
 	</td>
 	<td width="50%" valign="top">
 		<r:panel>
@@ -384,25 +356,4 @@
 			onclick="conscientia.widget(#{r:element('createWOPdfPopup')}).show();" />
 	</d:buttons>
 	</c:if>
-<!--  
-	<r:panel id="fotoPanel" rendered="#{form.selectedWerkOpdracht.foto != null or form.selectedWerkOpdracht.foto2 != null or form.selectedWerkOpdracht.foto3 != null}">
-	<d:fields>
-	
-			<d:propertyField id="foto"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto')}"
-					value="#{form.selectedWerkOpdracht.foto}"
-					mode="VIEW" />
-		
-			<d:propertyField id="foto2"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto2')}"
-					value="#{form.selectedWerkOpdracht.foto2}"
-					mode="VIEW" />
-		
-			<d:propertyField id="foto3"
-			 		modelProperty="#{d:modelClass('WerkOpdracht').getProperty('foto3')}"
-					value="#{form.selectedWerkOpdracht.foto3}"
-					mode="VIEW" />
-	</d:fields>
-	</r:panel>
--->
 </u:composition>

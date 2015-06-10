@@ -411,6 +411,15 @@ public class XmlBuilder {
 		FeatureMapLayer layer = (FeatureMapLayer) viewer.getContext().getLayer(
 				LabelUtils.lowerCamelCase(traject.getModelClass().getName()));
 
+		GeometryListFeatureMapLayer pointLayer = (GeometryListFeatureMapLayer) viewer
+				.getContext().getLayer(GEOMETRY_LAYER_NAME);
+
+		GeometryListFeatureMapLayer lineLayer = (GeometryListFeatureMapLayer) viewer
+				.getContext().getLayer(GEOMETRY_LAYER_LINE_NAME);
+
+		pointLayer.setHidden(true);
+		lineLayer.setHidden(true);
+
 		Envelope env = viewer.getContentExtent(layer);
 		Coordinate center = env.centre();
 		Coordinate[] coordinates = null;
@@ -527,6 +536,9 @@ public class XmlBuilder {
 
 		viewer.setCurrentExtent(env);
 		bordLayer.setSelection(Collections.EMPTY_LIST);
+
+		pointLayer.setHidden(false);
+		lineLayer.setHidden(false);
 
 		return doc;
 	}

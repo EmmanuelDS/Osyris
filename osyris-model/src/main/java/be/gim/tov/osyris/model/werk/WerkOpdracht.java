@@ -196,6 +196,13 @@ public class WerkOpdracht extends AbstractModelObject implements
 	@Ignore
 	private transient FieldHandler fieldHandler;
 
+	// @External
+	// @View(type = "image", level = Level.LONG)
+	// @Width(400)
+	// @NotSearchable
+	// @Target("_blank")
+	// private ResourceIdentifier foto4;
+
 	// GETTERS AND SETTERS
 	@Override
 	// @NotSearchable

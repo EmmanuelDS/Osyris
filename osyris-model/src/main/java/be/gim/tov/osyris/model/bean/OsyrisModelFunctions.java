@@ -514,6 +514,30 @@ public class OsyrisModelFunctions {
 	}
 
 	/**
+	 * Get regios Oost Vlaanderen zichtbaar voor peterMeter voorkeuren
+	 * 
+	 * @return
+	 */
+	public List<Object[]> getRegiosOostVlaanderenVoorkeuren() {
+
+		List<Object[]> regios = new ArrayList<Object[]>();
+		Object[] code1 = { new ResourceKey("Regio@1"), "Leiestreek" };
+		Object[] code2 = { new ResourceKey("Regio@2"), "Meetjesland" };
+		Object[] code3 = { new ResourceKey("Regio@3"), "Vlaamse Ardennen" };
+		Object[] code4 = { new ResourceKey("Regio@4"), "Waasland" };
+		Object[] code5 = { new ResourceKey("Regio@5"), "Scheldeland" };
+
+		regios.add(code1);
+		regios.add(code2);
+		regios.add(code3);
+		regios.add(code4);
+		regios.add(code5);
+
+		Collections.sort(regios, new DropdownListSorting());
+		return regios;
+	}
+
+	/**
 	 * Gets gemeentes
 	 * 
 	 * @return
