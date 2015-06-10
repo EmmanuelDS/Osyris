@@ -21,6 +21,9 @@
 			emptyMessage="#{messages['ui.dataTable.empty']}">
 			<j:bindAttribute var="bordProbleem"
 						name="rowData" />
+			<p:column style="width:20px;">
+				<p:rowToggler />
+			</p:column>	
 			<f:facet name="header">
 				<h:outputText value="Bordprobleem" />
 			</f:facet>
@@ -55,17 +58,17 @@
 					value="#{bordProbleem.type}"
 					mode="VIEW" />
 			</p:column>
-			<p:column>
-				<f:facet name="header">
-				<h:outputText value="Commentaar" />
-				</f:facet>
-				<div style="white-space:pre-line;">
-				<d:propertyValue id="commentaarColumn"
-					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
-					value="#{bordProbleem.commentaar}"
-					mode="VIEW" />
-				</div>
-			</p:column>
+<!-- 			<p:column> -->
+<!-- 				<f:facet name="header"> -->
+<!-- 				<h:outputText value="Commentaar" /> -->
+<!-- 				</f:facet> -->
+<!-- 				<div style="white-space:pre-line;"> -->
+<!-- 				<d:propertyValue id="commentaarColumn" -->
+<!-- 					modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}" -->
+<!-- 					value="#{bordProbleem.commentaar}" -->
+<!-- 					mode="VIEW" /> -->
+<!-- 				</div> -->
+<!-- 			</p:column> -->
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
 				<h:outputText value="Status" />
@@ -75,6 +78,18 @@
 					value="#{bordProbleem.status}"
 					mode="VIEW" />
 			</p:column>
+				<p:rowExpansion>
+					<h:panelGrid  rows="2" columns="1">
+						<f:facet name="header">
+							<d:displayLabel
+								property="#{d:modelClass('Probleem').getProperty('commentaar')}" />
+						</f:facet>					
+						<d:propertyValue id="commentaarBordProbleemExpansion"
+							modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+							value="#{bordProbleem.commentaar}"
+							mode="VIEW" style="white-space:pre-line;"/>
+					</h:panelGrid>
+			</p:rowExpansion>
 	   	</p:dataTable>
 	</a:outputPanel>
 	</c:when>
@@ -89,6 +104,9 @@
 			emptyMessage="#{messages['ui.dataTable.empty']}">
 			<j:bindAttribute var="anderProbleem"
 						name="rowData" />
+			<p:column style="width:20px;">
+				<p:rowToggler />
+			</p:column>	
 			<f:facet name="header">
 				<h:outputText value="Ander probleem" />
 			</f:facet>
@@ -109,17 +127,17 @@
 					value="#{anderProbleem.categorie}"
 					mode="VIEW" />
 			</p:column>
-			<p:column>
-				<f:facet name="header">
-				<h:outputText value="Commentaar" />
-				</f:facet>
-				<div style="white-space:pre-line;">
-				<d:propertyValue id="commentaarColumn"
-					modelProperty="#{d:modelClass('AnderProbleem').getProperty('commentaar')}"
-					value="#{anderProbleem.commentaar}"
-					mode="VIEW" />
-				</div>
-			</p:column>
+<!-- 			<p:column> -->
+<!-- 				<f:facet name="header"> -->
+<!-- 				<h:outputText value="Commentaar" /> -->
+<!-- 				</f:facet> -->
+<!-- 				<div style="white-space:pre-line;"> -->
+<!-- 				<d:propertyValue id="commentaarColumn" -->
+<!-- 					modelProperty="#{d:modelClass('AnderProbleem').getProperty('commentaar')}" -->
+<!-- 					value="#{anderProbleem.commentaar}" -->
+<!-- 					mode="VIEW" /> -->
+<!-- 				</div> -->
+<!-- 			</p:column> -->
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
 				<h:outputText value="Status" />
@@ -128,6 +146,18 @@
 					modelProperty="#{d:modelClass('Probleem').getProperty('status')}"
 					value="#{anderProbleem.status}" mode="VIEW" />
 			</p:column>
+			<p:rowExpansion>
+				<h:panelGrid rows="2" columns="1">
+					<f:facet name="header">
+						<d:displayLabel
+							property="#{d:modelClass('Probleem').getProperty('commentaar')}" />
+					</f:facet>					
+					<d:propertyValue id="commentaarAnderProbleemExpansion"
+						modelProperty="#{d:modelClass('Probleem').getProperty('commentaar')}"
+						value="#{anderProbleem.commentaar}"
+						mode="VIEW" style="white-space:pre-line;"/>
+				</h:panelGrid>
+			</p:rowExpansion>
    		</p:dataTable>
    		</a:outputPanel>
    		</c:otherwise>

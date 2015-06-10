@@ -156,17 +156,6 @@
 					value="#{anderProbleem.categorie}"
 					mode="VIEW" />
 			</p:column>
-			<p:column>
-				<f:facet name="header">
-				<h:outputText value="Commentaar" />
-				</f:facet>
-				<div style="white-space:pre-line;">
-				<d:propertyValue id="commentaarColumn"
-					modelProperty="#{d:modelClass('AnderProbleem').getProperty('commentaar')}"
-					value="#{anderProbleem.commentaar}"
-					mode="VIEW" />
-				</div>
-			</p:column>
 			<p:column rendered="#{identity.inGroup('Medewerker','CUSTOM') or identity.inGroup('Routedokter','CUSTOM') or identity.inGroup('admin','CUSTOM') }">
 				<f:facet name="header">
 				<h:outputText value="Status" />
