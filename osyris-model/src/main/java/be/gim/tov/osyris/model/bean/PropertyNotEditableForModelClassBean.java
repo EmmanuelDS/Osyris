@@ -1,7 +1,5 @@
 package be.gim.tov.osyris.model.bean;
 
-import java.lang.reflect.Field;
-
 import javax.inject.Named;
 
 import org.conscientia.api.model.ModelObject;
@@ -19,19 +17,15 @@ public class PropertyNotEditableForModelClassBean {
 
 	public boolean isEditable(ModelObject object, ModelProperty property) {
 
-		// Get properties on level of Traject
-		Field[] fields = object.getClass().getSuperclass().getSuperclass()
-				.getDeclaredFields();
-
+		// Naam niet editeerbaar voor NetwerkLus
 		if (property.getName().equals("naam") && object instanceof NetwerkLus) {
-
 			return false;
 		}
 
+		// Lengte nooit editeerbaar
 		else if (property.getName().equals("lengte")
 				&& object instanceof NetwerkLus) {
-
-			property.setViewable(false);
+			return false;
 		}
 		return property.isEditable();
 	}

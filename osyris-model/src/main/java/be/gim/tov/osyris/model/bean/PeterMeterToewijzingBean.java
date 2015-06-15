@@ -823,7 +823,7 @@ public class PeterMeterToewijzingBean {
 
 	/**
 	 * Ophalen van alle Peters en Meters met ofwel 1 voorkeur ofwel meerdere
-	 * voorkeuren. Enkel PeterMeters met status ACTIEF worden opgenomen0
+	 * voorkeuren. Enkel PeterMeters met status ACTIEF worden opgenomen
 	 * 
 	 * @param allPetersMeters
 	 * @param single
